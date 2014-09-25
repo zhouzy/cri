@@ -1,0 +1,224 @@
+.treegrid {
+  color: #666666;
+  border: 1px solid #c5c5c5;
+}
+.treegrid > div {
+  background: #ebebeb;
+  /* Old browsers */
+  background: -moz-linear-gradient(top, #ebebeb 0%, #e3e3e3 100%);
+  /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ebebeb), color-stop(100%, #e3e3e3));
+  /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, #ebebeb 0%, #e3e3e3 100%);
+  /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, #ebebeb 0%, #e3e3e3 100%);
+  /* Opera 11.10+ */
+  background: -ms-linear-gradient(top, #ebebeb 0%, #e3e3e3 100%);
+  /* IE10+ */
+  background: linear-gradient(top, #ebebeb 0%, #e3e3e3 100%);
+  /* W3C */
+  border-top: none;
+}
+.treegrid .title,
+.treegrid .toolbar,
+.treegrid .page,
+.treegrid table,
+.treegrid .grid-head {
+  background: #ebebeb;
+  /* Old browsers */
+  background: -moz-linear-gradient(top, #ebebeb 0%, #e3e3e3 100%);
+  /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ebebeb), color-stop(100%, #e3e3e3));
+  /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, #ebebeb 0%, #e3e3e3 100%);
+  /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, #ebebeb 0%, #e3e3e3 100%);
+  /* Opera 11.10+ */
+  background: -ms-linear-gradient(top, #ebebeb 0%, #e3e3e3 100%);
+  /* IE10+ */
+  background: linear-gradient(top, #ebebeb 0%, #e3e3e3 100%);
+  /* W3C */
+}
+.treegrid .title {
+  padding-left: 4px;
+  font-size: 1.2em;
+  font-weight: bold;
+  height: 30px;
+  line-height: 30px;
+  border-bottom: 1px solid #c5c5c5;
+}
+.treegrid table {
+  color: #666666;
+  position: relative;
+  margin: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  empty-cells: show;
+  border-width: 0;
+  outline: 0;
+  height: 100%;
+  display: table;
+  table-layout: fixed;
+}
+.treegrid table td {
+  line-height: 24px;
+  padding: 3px 4px;
+  border-right: 1px solid #c5c5c5;
+}
+.treegrid table td.line-number {
+  width: 12px;
+  text-align: center;
+}
+.treegrid table td.line-checkbox {
+  width: 20px;
+}
+.treegrid table td.line-file-icon span {
+  display: inline-block;
+  height: 24px;
+  line-height: 24px;
+}
+.treegrid table td.line-file-icon span i {
+  cursor: pointer;
+  padding-right: 5px;
+  color: #858585;
+}
+.treegrid table td:last-child {
+  border-right: none;
+}
+.treegrid table td input {
+  vertical-align: middle;
+}
+.treegrid table td .td-content {
+  display: inline-block;
+  height: 24px;
+  line-height: 24px;
+  width: 100%;
+  vertical-align: top;
+}
+.treegrid .grid-view {
+  overflow-x: hidden;
+}
+.treegrid .grid-head {
+  height: 30px;
+  border-bottom: 1px solid #c5c5c5;
+  padding-right: 17px;
+}
+.treegrid .grid-head .grid-head-wrap {
+  overflow: hidden;
+}
+.treegrid .grid-head td {
+  position: relative;
+}
+.treegrid .grid-head td.line-number .empty {
+  display: inline-block;
+  width: 13px;
+}
+.treegrid .grid-head td div {
+  display: inline-block;
+}
+.treegrid .grid-head td .drag-line {
+  position: absolute;
+  right: -5;
+  width: 10px;
+  height: 24px;
+}
+.treegrid .grid-head td .drag-line:hover {
+  cursor: pointer;
+}
+.treegrid .grid-body {
+  overflow: auto;
+  background: #FFF;
+}
+.treegrid .grid-body table {
+  height: auto;
+}
+.treegrid .grid-body tr {
+  background: #FFF;
+}
+.treegrid .grid-body tr td {
+  border-bottom: 1px solid #c5c5c5;
+}
+.treegrid .grid-body tr:last-child td {
+  border-bottom: none;
+}
+.treegrid .grid-body tr:hover td {
+  background: #52c6f8;
+}
+.treegrid .grid-body tr:hover td.line-file-icon i {
+  color: #ffffff;
+}
+.treegrid .grid-body tr.selected td {
+  background: #57e3c9;
+}
+.treegrid .grid-body .click td {
+  background: #57e3c9;
+}
+.treegrid .toolbar {
+  background: #e3e3e3;
+  border-bottom: 1px solid #c5c5c5;
+  height: 30px;
+  line-height: 30px;
+}
+.treegrid .toolbar ul li {
+  border-right: 1px solid #FFFFFF;
+  cursor: pointer;
+  float: left;
+  list-style: none outside none;
+  padding: 0 10px;
+}
+.treegrid .toolbar ul li:hover {
+  color: #FFFFFF;
+}
+.treegrid .page {
+  font-size: 16px;
+  height: 32px;
+  line-height: 32px;
+  padding: 4px 0 4px 2px;
+  border-top: 1px solid #c5c5c5;
+  position: relative;
+}
+.treegrid .page .pager-nav,
+.treegrid .page .pager-size,
+.treegrid .page .pager-info {
+  display: inline-block;
+}
+.treegrid .page .pager-nav {
+  margin-right: 20px;
+}
+.treegrid .page .pager-nav a {
+  margin-right: 2px;
+  display: inline-block;
+  height: 30px;
+  width: 30px;
+  line-height: 30px;
+  border-radius: 15px;
+  border: 1px solid #c5c5c5;
+  text-align: center;
+  cursor: pointer;
+}
+.treegrid .page .pager-nav a:hover {
+  border-color: #8590a0;
+  background: #8590a0;
+}
+.treegrid .page .pager-nav a.state-disabled {
+  cursor: inherit;
+}
+.treegrid .page .pager-nav a.state-disabled:hover {
+  background: none;
+}
+.treegrid .page .pager-nav a.pager-num:hover {
+  border-style: solid;
+}
+.treegrid .page .pager-nav a.state-selected {
+  color: #fff;
+  background: #4fa7e3;
+  border-style: none;
+}
+.treegrid .page .pager-nav a.state-selected:hover {
+  cursor: inherit;
+}
+.treegrid .page .pager-info {
+  font-size: 12px;
+  position: absolute;
+  right: 15px;
+}

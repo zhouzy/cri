@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>kendo-grid</title>
+    <meta charset="utf-8" content="text/html"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <link href="../script/func/easy-bootstrap/font-awesome/css/font-awesome.css" type="text/css" rel="stylesheet"/>
+    <link href="../script/func/easy-bootstrap/css/reset.css" type="text/css" rel="stylesheet"/>
+    <link href="../script/lib/kendoui/styles/kendo.default.min.css" type="text/css" rel="stylesheet"/>
+    <link href="../script/lib/kendoui/styles/kendo.common.min.css" rel="stylesheet" />
+    <link href="../script/lib/kendoui/styles/kendo.default.min.css" rel="stylesheet" />
+    <link href="../script/lib/kendoui/styles/kendo.dataviz.min.css" rel="stylesheet" />
+    <link href="../script/lib/kendoui/styles/kendo.dataviz.default.min.css" rel="stylesheet" />
+
+    <script src="../script/lib/jquery/jquery-1.9.1.js" type="text/javascript"></script>
+    <script src="../script/lib/kendoui/js/kendo.all.min.js" type="text/javascript"></script>
+    <style>
+        html{
+            font-family:Georgia,"Times New Roman","Microsoft YaHei","微软雅黑",STXihei,"华文细黑",serif;
+            font-size:12px;
+        }
+        .content{
+            width:1005px;
+            margin:5px auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <table id="grid" style="width:800px;">
+            <tr>
+                <td>propA</td>
+                <td>propB</td>
+                <td>propC</td>
+                <td>propD</td>
+                <td>propE</td>
+                <td>propF</td>
+            </tr>
+        </table>
+    </div>
+    <script type="text/x-kendo-template" id="template">
+        <div class="toolbar">
+            <label class="category-label" for="category">Show products by category:</label>
+            <input type="search" id="category" style="width: 150px"/>
+        </div>
+    </script>
+    <script type="text/javascript">
+        $("#grid").kendoGrid({
+            dataSource:data,
+            toolbar: kendo.template($("#template").html()),
+            resizable: true,
+            pageable: {
+                refresh: true,
+                pageSizes: true,
+                buttonCount: 5
+            },
+            columns: [{
+                field: "propA",
+                title: "propA",
+                width: 100
+            }, {
+                field: "propB",
+                title: "propB",
+                width: 100
+            }, {
+                field: "propC",
+                title: "propC",
+                width: 100
+            }, {
+                field: "propD",
+                title: "propD",
+                width: 150
+            },{
+                field: "propE",
+                title: "propE",
+                width: 150
+            },{
+                field: "propF",
+                title: "propF",
+                width: 150
+            }]
+        });
+        var data = [
+            {propA:123,propB:456,propC:789,propD:"ABC",propE:"DEF",propF:"GHT"},
+            {propA:123,propB:456,propC:789,propD:"ABC",propE:"DEF",propF:"GHT"},
+            {propA:123,propB:456,propC:789,propD:"ABC",propE:"DEF",propF:"GHT"},
+            {propA:123,propB:456,propC:789,propD:"ABC",propE:"DEF",propF:"GHT"},
+            {propA:123,propB:456,propC:789,propD:"ABC",propE:"DEF",propF:"GHT"},
+            {propA:123,propB:456,propC:789,propD:"ABC",propE:"DEF",propF:"GHT"},
+            {propA:123,propB:456,propC:789,propD:"ABC",propE:"DEF",propF:"GHT"},
+            {propA:123,propB:456,propC:789,propD:"ABC",propE:"DEF",propF:"GHT"},
+            {propA:123,propB:456,propC:789,propD:"ABC",propE:"DEF",propF:"GHT"},
+            {propA:123,propB:456,propC:789,propD:"ABC",propE:"DEF",propF:"GHT"},
+            {propA:123,propB:456,propC:789,propD:"ABC",propE:"DEF",propF:"GHT"}
+        ];
+    </script>
+</body>
+</html>

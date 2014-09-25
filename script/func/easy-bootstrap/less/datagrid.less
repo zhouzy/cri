@@ -1,0 +1,195 @@
+@import "./lib.less";
+@import "./theme-default.less";
+
+.datagrid {
+    color:@grid-font-color;
+    border:1px solid @grid-border-color;
+    &>div{
+        .gradient-background(lighten(@grid-bg-color,3%),@grid-bg-color);
+        border-top:none;
+    }
+    .title,.toolbar,.page,table,.grid-head{
+        .gradient-background(lighten(@grid-bg-color,3%),@grid-bg-color);
+    }
+    .title{
+        padding-left:4px;
+        font-size: 1.2em;
+        font-weight: bold;
+        height:30px;
+        line-height:30px;
+        border-bottom:1px solid @grid-border-color;
+    }
+    table {
+        color:@grid-font-color;
+        position: relative;
+        margin: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+        empty-cells: show;
+        border-width: 0;
+        outline: 0;
+        height:100%;
+        display:table;
+        table-layout:fixed;
+        td{
+            line-height: 24px;
+            padding:3px 4px;
+            border-right:1px solid @grid-border-color;
+            &.line-number{
+                width:12px;
+                text-align:center;
+            }
+            &.line-checkbox{
+                width:20px;
+            }
+            &:last-child{
+                border-right: none;
+            }
+            input{
+                vertical-align:middle;
+            }
+            .td-content{
+                display:inline-block;
+                height:24px;
+                line-height: 24px;
+                width:100%;
+                vertical-align: top;
+            }
+        }
+    }
+    .grid-view{
+        overflow-x:hidden;
+    }
+    .grid-head{
+        height:30px;
+        border-bottom:1px solid @grid-border-color;
+        padding-right: 17px;
+        .grid-head-wrap{
+            overflow:hidden;
+        }
+
+        td{
+            position:relative;
+            &.line-number{
+                .empty{
+                    display:inline-block;
+                    width:13px;
+                }
+            }
+            div{
+                display:inline-block;
+            }
+            .drag-line{
+                position:absolute;
+                right:-5;
+                width:10px;
+                height:24px;
+                &:hover{
+                    cursor:pointer;
+                }
+            }
+        }
+
+    }
+    .grid-body{
+        overflow:auto;
+        background: #FFF;
+        table{
+            height:auto;
+        }
+        tr{
+            background: #f8f8f8;
+            &:hover td{
+                background:@grid-row-hover;
+            }
+            &:nth-child(odd){
+                background: #FFF;
+            }
+            &.selected td{
+                background: @grid-row-click;
+            }
+        }
+
+        .click td{
+            background: @grid-row-click;
+        }
+    }
+
+    .toolbar {
+        background: @grid-bg-color;
+        border-bottom:1px solid @grid-border-color;
+        height:30px;
+        line-height:30px;
+        ul {
+            li {
+                border-right: 1px solid #FFFFFF;
+                cursor: pointer;
+                float: left;
+                list-style: none outside none;
+                padding: 0 10px;
+                &:hover{
+                    color: #FFFFFF;
+                }
+            }
+        }
+    }
+
+    .page{
+        font-size:16px;
+        height:32px;
+        line-height:32px;
+        padding:4px 0 4px 2px;
+        border-top:1px solid @grid-border-color;
+        position:relative;
+        .pager-nav,.pager-size,.pager-info{
+            display:inline-block;
+        }
+        .pager-nav{
+            margin-right: 20px;
+            a{
+                margin-right:2px;
+                display:inline-block;
+                height:30px;
+                width:30px;
+                line-height: 30px;
+                border-radius:15px;
+                border:1px solid @grid-border-color;
+                text-align: center;
+                cursor:pointer;
+
+                &:hover{
+                    border-color:@grid-pager-nav-color;
+                    background:@grid-pager-nav-color;
+                }
+
+                &.state-disabled{
+                    cursor:inherit;
+                    &:hover{
+                        background: none;
+                    }
+                }
+
+                &.pager-num{
+                    &:hover{
+                        border-style:solid;
+                    }
+                }
+
+                &.state-selected{
+                    color:#fff;
+                    background:@grid-pager-selected-color;
+                    border-style:none;
+                    &:hover{
+                        cursor:inherit;
+                    }
+                }
+            }
+        }
+
+        .pager-info{
+            font-size: 12px;
+            position:absolute;
+            right:15px;
+        }
+    }
+}

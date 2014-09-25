@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>JS 面向对象</title>
+</head>
+<body>
+<script type="text/javascript">
+    /**
+     * cri 前端框架 命名空间
+     */
+    !function(window){
+
+        window.cri = {};
+
+    }(window);
+
+
+    /**
+     * cri.grid
+     * 表格基类
+     */
+    !function(cri){
+
+        var _private = function(){
+            console.log("私有函数");
+        }
+
+        var Grid = function(){
+            this.kind = "animal";
+        };
+
+        Grid.prototype={
+            eat:function(){
+                console.log(this.kind + " can eat");
+                _private();
+            },
+            sleep:function(){
+                console.log(this.kind + " can sleep");
+            }
+        };
+
+        cri.Grid = Grid;
+
+    }(window.cri);
+
+    /**
+     * cri.DataGrid
+     * 数据表格
+     */
+    !function(cri){
+
+        var DataGrid = function(){
+            this.kind = "animal";
+        };
+
+        DataGrid.prototype={
+            eat:function(){
+                console.log(this.kind + " can eat");
+                _private();
+            },
+            sleep:function(){
+                console.log(this.kind + " can sleep");
+            }
+        };
+
+        cri.DataGrid = DataGrid;
+
+    }(window.cri);
+
+    !function(cri){
+
+        var TreeGrid = function(){
+            this.kind = "animal";
+        };
+
+        TreeGrid.prototype={
+            eat:function(){
+                console.log(this.kind + " can eat");
+                _private();
+            },
+            sleep:function(){
+                console.log(this.kind + " can sleep");
+            }
+        };
+
+        cri.TreeGrid = TreeGrid;
+
+    }(window.cri);
+</script>
+</body>
+</html>
