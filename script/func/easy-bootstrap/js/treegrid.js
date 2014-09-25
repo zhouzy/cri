@@ -120,7 +120,9 @@
             this.$gridbody.on('click', "tr[data-rowid]", function(e){that.trclickStyle(e);that.setSelected(e);})
                 .on('mouseover',"tr[data-rowid]",function(e){that.trhover(e);})
                 .on('mouseout',"tr[data-rowid]",function(e){that.trout(e);})
-                .on('click', "tr[data-rowid] td.line-file-icon i", function(e){that.fold(e);})
+                .on('click', "tr[data-rowid] td.line-file-icon i", function(e){
+                    that.fold(e);e.preventDefault();
+                })
                 .on('click', "tr[data-rowid] td input[type='checkbox']", function(e){that.checkbox(e);})
                 .on('dblclick', "tr[data-rowid]", function(e){that.onDblClickRow(e);});
             this.$toolbar && this.$toolbar.on('click',"li[data-toolbar]",function(e){that.clickToolbar(e);});
@@ -269,10 +271,8 @@
                 $parent.append(headHtml.join(""));
             }
 
-            this.$gridhead = $(".grid-head",$parent);
-
             $("tr:eq(0) td",this.$gridbody).each(function(index){
-                $("tr:eq(0) td:eq(" + index + ") .td-content",$parent).width($(this).width());
+                $("td:eq(" + index + ") .td-content",$parent).width($(this).width());
             });
         },
 
@@ -379,7 +379,6 @@
         refreshGridView:function(){
             this.createBody(this.$gridbody);
             this.createHead(this.$gridhead);
-            this.eventListen();
         },
 
         reload:function(param){

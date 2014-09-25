@@ -23500,7 +23500,7 @@ kendo_module({
 })(window.kendo.jQuery);
 
 kendo_module({
-    id: "grid",
+    id: "datagrid",
     name: "Grid",
     category: "web",
     description: "The Grid widget displays tabular data and offers rich support for interacting with data,including paging, sorting, grouping, and selection.",
@@ -24308,7 +24308,7 @@ kendo_module({
                 table.attr("cellspacing", 0);
             }
 
-            that.table = table.attr("role", that._hasDetails() ? "treegrid" : "grid");
+            that.table = table.attr("role", that._hasDetails() ? "treegrid" : "datagrid");
 
             that._wrapper();
         },
@@ -58452,7 +58452,7 @@ kendo_module({
 
             that.wrapper = that.element
                                .addClass("k-widget k-scheduler k-floatwrap")
-                               .attr("role", "grid")
+                               .attr("role", "datagrid")
                                .attr("aria-multiselectable", true);
 
             if (height) {
