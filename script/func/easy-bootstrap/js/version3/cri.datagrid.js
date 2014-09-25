@@ -6,22 +6,25 @@
  *
  * 依赖 Grid
  */
-!function(cri){
+!function(window){
 
-    var DataGrid = function(){
-        this.kind = "animal";
+    var $   = window.jQuery,
+        cri = window.cri;
+
+    var DataGrid = cri.DataGrid = function(element,options){
+        cri.Grid.call(this,arguments);
     };
 
-    DataGrid.prototype={
-        eat:function(){
-            console.log(this.kind + " can eat");
-            _private();
-        },
-        sleep:function(){
-            console.log(this.kind + " can sleep");
-        }
+    DataGrid.prototype = new cri.Grid();
+
+    $.fn.datagrid = function(option) {
+        var datagrid = null;
+        this.each(function () {
+            var $this   = $(this),
+                options = typeof option == 'object' && option;
+            $this.data('datagrid', (datagrid = new DataGrid(this, options)));
+        });
+        return datagrid;
     };
 
-    cri.DataGrid = DataGrid;
-
-}(window.cri);
+}(window);

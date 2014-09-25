@@ -1,9 +1,15 @@
+@import "./lib.less";
+@import "./theme-default.less";
 .tree{
+    border:1px solid @color-border;
+    color:@color-font;
+    .node{
+
+    }
     .topnode{
         background:#149BDD;
         height:25px;
         line-height:25px;
-        color:#fff;
         margin:4px;
         cursor:pointer;
         &:hover{
@@ -20,7 +26,6 @@
     }
 
     .node{
-        color:#333;
         margin:1px 4px;
         background:#E3E3E3;
         height:25px;

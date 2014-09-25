@@ -2,14 +2,14 @@
 @import "./theme-default.less";
 
 .treegrid {
-    color:@grid-font-color;
-    border:1px solid @grid-border-color;
+    color:@color-font;
+    border:1px solid @color-border;
     &>div{
-        .gradient-background(lighten(@grid-bg-color,3%),@grid-bg-color);
+        .gradient-background(lighten(@color-background,3%),@color-background);
         border-top:none;
     }
     .title,.toolbar,.page,table,.grid-head{
-        .gradient-background(lighten(@grid-bg-color,3%),@grid-bg-color);
+        .gradient-background(lighten(@color-background,3%),@color-background);
     }
     .title{
         padding-left:4px;
@@ -17,10 +17,10 @@
         font-weight: bold;
         height:30px;
         line-height:30px;
-        border-bottom:1px solid @grid-border-color;
+        border-bottom:1px solid @color-border;
     }
     table {
-        color:@grid-font-color;
+        color:@color-font;
         position: relative;
         margin: 0;
         border-collapse: separate;
@@ -34,7 +34,7 @@
         td{
             line-height: 24px;
             padding:3px 4px;
-            border-right:1px solid @grid-border-color;
+            border-right:1px solid @color-border;
             &.line-number{
                 width:12px;
                 text-align:center;
@@ -50,7 +50,7 @@
                     i{
                         cursor:pointer;
                         padding-right:5px;
-                        color:@grid-color-line-file-icon;
+                        color:@color-line-file-icon;
                     }
                 }
             }
@@ -74,7 +74,7 @@
     }
     .grid-head{
         height:30px;
-        border-bottom:1px solid @grid-border-color;
+        border-bottom:1px solid @color-border;
         padding-right: 17px;
         .grid-head-wrap{
             overflow:hidden;
@@ -112,7 +112,7 @@
         tr{
             background: #FFF;
             td{
-                border-bottom: 1px solid @grid-border-color;
+                border-bottom: 1px solid @color-border;
 
             }
 
@@ -122,27 +122,27 @@
                 }
             }
             &:hover td{
-                background:@grid-row-hover;
+                background:@color-row-hover;
                 &.line-file-icon{
                     i{
-                        color:lighten(@grid-color-line-file-icon,50%);
+                        color:lighten(@color-line-file-icon,50%);
                     }
                 }
             }
 
             &.selected td{
-                background: @grid-row-click;
+                background: @color-row-click;
             }
         }
 
         .click td{
-            background: @grid-row-click;
+            background: @color-row-click;
         }
     }
 
     .toolbar {
-        background: @grid-bg-color;
-        border-bottom:1px solid @grid-border-color;
+        background: @color-background;
+        border-bottom:1px solid @color-border;
         height:30px;
         line-height:30px;
         ul {
@@ -164,7 +164,7 @@
         height:32px;
         line-height:32px;
         padding:4px 0 4px 2px;
-        border-top:1px solid @grid-border-color;
+        border-top:1px solid @color-border;
         position:relative;
         .pager-nav,.pager-size,.pager-info{
             display:inline-block;
@@ -178,13 +178,13 @@
                 width:30px;
                 line-height: 30px;
                 border-radius:15px;
-                border:1px solid @grid-border-color;
+                border:1px solid @color-border;
                 text-align: center;
                 cursor:pointer;
 
                 &:hover{
-                    border-color:@grid-pager-nav-color;
-                    background:@grid-pager-nav-color;
+                    border:@color-pager-nav;
+                    background:@color-pager-nav;
                 }
 
                 &.state-disabled{
@@ -202,7 +202,7 @@
 
                 &.state-selected{
                     color:#fff;
-                    background:@grid-pager-selected-color;
+                    background:@color-pager-selected;
                     border-style:none;
                     &:hover{
                         cursor:inherit;

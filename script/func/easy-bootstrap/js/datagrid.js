@@ -92,69 +92,76 @@
             var left = 0;
             var right = 0;
 
-            this.$gridbody.on("scroll",function(e){
-                $(".grid-head-wrap",that.$gridhead).scrollLeft($(this).scrollLeft());
-            });
-
-            this.$gridbody.on('click', "tr[data-rowid]", function(e){
-                that.setSelected(e);
-            }).on('dblclick', "tr[data-rowid]", function(e){
-                that.onDblClickRow(e);
-            });
-
-            this.$gridbody.on("change", "input[type=checkbox]",function(e){
-                var isChecked = $(e.target).prop("checked");
-                var rowid = $(e.target).closest("tr").data("rowid");
-                if(isChecked && op.onChecked){
-                    op.onChecked(that.getRowDataById(rowid),rowid);
-                }
-            });
-
-            this.$gridhead.on('mousedown',".drag-line",function(e){
-                that.$datagrid.css("cursor","e-resize");
-                dragIndex = $(e.target).data("drag");
-                isDrag = true;
-                dragStartX = e.pageX;
-                left = dragStartX - that.col[dragIndex].width + 20;
-                right = dragStartX + that.col[dragIndex + 1].width - 20;
-            }).on("mouseup",function(e){
-                if(isDrag){
-                    that.$datagrid.css("cursor","");
-                    isDrag = false;
-                }
-            }).on("mouseover",function(e){
-                if(isDrag){
-                    if(e.pageX > left && e.pageX <right){
-                        that.col[dragIndex].width += e.pageX - dragStartX;
-                        that.col[dragIndex + 1].width -= e.pageX - dragStartX;
-                        dragStartX = e.pageX;
-                        that.refreshGridView();
+            this.$gridbody
+                .on("scroll",function(e){
+                    $(".grid-head-wrap",that.$gridhead).scrollLeft($(this).scrollLeft());
+                })
+                .on('click', "tr[data-rowid]", function(e){
+                    that.setSelected(e);
+                })
+                .on('dblclick', "tr[data-rowid]", function(e){
+                    that.onDblClickRow(e);
+                })
+                .on("change", "input[type=checkbox]",function(e){
+                    var isChecked = $(e.target).prop("checked");
+                    var rowid = $(e.target).closest("tr").data("rowid");
+                    if(isChecked && op.onChecked){
+                        op.onChecked(that.getRowDataById(rowid),rowid);
                     }
-                }
-            }).on('click',"input[type=checkbox]",function(e){
-                var isChecked = $(e.target).prop("checked");
-                $("input[type=checkbox]",that.$gridbody).each(function(){
-                    $(this).prop("checked",isChecked);
                 });
-                if(isChecked && op.onChecked){
-                    for(var i=0;i<op.rows.length;i++){
-                        op.onChecked(op.rows[i],i);
+
+            this.$gridhead
+                .on('mousedown',".drag-line",function(e){
+                    that.$datagrid.css("cursor","e-resize");
+                    dragIndex = $(e.target).data("drag");
+                    isDrag = true;
+                    dragStartX = e.pageX;
+                    left = dragStartX - that.col[dragIndex].width + 20;
+                    right = dragStartX + that.col[dragIndex + 1].width - 20;
+                })
+                .on("mouseup",function(e){
+                    if(isDrag){
+                        that.$datagrid.css("cursor","");
+                        isDrag = false;
                     }
-                }
-            });
+                })
+                .on("mouseover",function(e){
+                    if(isDrag){
+                        if(e.pageX > left && e.pageX <right){
+                            that.col[dragIndex].width += e.pageX - dragStartX;
+                            that.col[dragIndex + 1].width -= e.pageX - dragStartX;
+                            dragStartX = e.pageX;
+                            that.refreshGridView();
+                        }
+                    }
+                })
+                .on('click',"input[type=checkbox]",function(e){
+                    var isChecked = $(e.target).prop("checked");
+                    $("input[type=checkbox]",that.$gridbody).each(function(){
+                        $(this).prop("checked",isChecked);
+                    });
+                    if(isChecked && op.onChecked){
+                        for(var i=0;i<op.rows.length;i++){
+                            op.onChecked(op.rows[i],i);
+                        }
+                    }
+                });
 
-            this.$toolbar && this.$toolbar.on('click',"li[data-toolbar]",function(e){that.clickToolbar(e);});
+            this.$toolbar && this.$toolbar
+                .on('click',"li[data-toolbar]",function(e){that.clickToolbar(e);});
 
-            this.$page && this.$page.on('click',"a[data-page]",function(e){
-                op.page = $(e.target).closest("a").data('page');
-                that.page();
-            }).on('click','input.renovate',function(e){
-                var pagesize = $("input[name=pagesize]",that.$page).val();
-                var pagenum = $("input[name=pagenum]",that.$page).val();
-                op.page = pagenum;
-                op.pageSize = pagesize;
-                that.page();
-            });
+            this.$page && this.$page
+                .on('click',"a[data-page]",function(e){
+                    op.page = $(e.target).closest("a").data('page');
+                    that.page();
+                })
+                .on('click','input.renovate',function(e){
+                    var pagesize = $("input[name=pagesize]",that.$page).val();
+                    var pagenum = $("input[name=pagenum]",that.$page).val();
+                    op.page = pagenum;
+                    op.pageSize = pagesize;
+                    that.page();
+                });
         },
 
         init:function () {
@@ -207,8 +214,8 @@
             this.col.length && (this.col[this.col.length-1].width -= _cellBorderW);
 
             this.options.columns.length > 0
-                && this.getData()
-                && this.createDatagrid();
+            && this.getData()
+            && this.createDatagrid();
             this.$toolbar  = $(".toolbar",this.$datagrid);
             this.$page     = $(".page",this.$datagrid);
             this.$gridhead = $(".grid-head",this.$datagrid);
@@ -367,10 +374,10 @@
                 nextPage  = page + 1;
             if(op.pagination){
                 op.rows
-                    && op.total
-                    && (totalNum = op.total)
-                    && op.total > 0
-                    && (totalPage = Math.ceil(op.total / op.pageSize));
+                && op.total
+                && (totalNum = op.total)
+                && op.total > 0
+                && (totalPage = Math.ceil(op.total / op.pageSize));
 
                 //分页按钮组
                 pageHtml.push('<div class="pager-nav">');
@@ -387,8 +394,8 @@
                     var shiftpage = i + page;
                     if(shiftpage <= totalPage && shiftpage > 0){
                         shiftpage != page ?
-                        pageHtml.push("<a data-page=\"" + shiftpage + "\" class=\"pager-nav pager-num\" >" + shiftpage + "</a>"):
-                        pageHtml.push("<a data-page=\"" + shiftpage + "\" class=\"pager-nav state-selected\" >" + shiftpage + "</a>");
+                            pageHtml.push("<a data-page=\"" + shiftpage + "\" class=\"pager-nav pager-num\" >" + shiftpage + "</a>"):
+                            pageHtml.push("<a data-page=\"" + shiftpage + "\" class=\"pager-nav state-selected\" >" + shiftpage + "</a>");
                     }
                 }
                 if(page >= totalPage){

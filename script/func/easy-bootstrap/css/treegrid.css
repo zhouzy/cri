@@ -197,7 +197,7 @@
   cursor: pointer;
 }
 .treegrid .page .pager-nav a:hover {
-  border-color: #8590a0;
+  border: #8590a0;
   background: #8590a0;
 }
 .treegrid .page .pager-nav a.state-disabled {

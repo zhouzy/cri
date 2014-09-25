@@ -27,7 +27,7 @@
  *=====================================================================================*/
 .eb_inputGroup{
 	font-size:12px;
-	font-family:arial,宋体;
+	font-family:arial,'宋体';
 	width:200px;
 	height:20px;
 	line-height:20px;
@@ -146,7 +146,7 @@
  *=====================================================================================*/
  .eb_selectBoxGroup{
 	font-size:12px;
-	font-family:arial,宋体;
+	font-family:arial,'宋体';
 	width:200px;
 	height:20px;
 	line-height:20px;
@@ -449,7 +449,7 @@
 	width:73px;
 	text-align:right;
 	line-height:20px;
-	padding:auto 8px;
+	padding:0 8px;
 	position:absolute;
 	top:0;
 	left:0;
