@@ -12,4 +12,28 @@
 
 !function(window){
     window.cri = {};
+
+    function Class(){}
+
+    Class.extend = function(subType){
+        var prototype = (function(prototype){
+            function Prototype(){};
+            Prototype.prototype = prototype;
+            return new Prototype();
+        }(this.prototype));
+
+        prototype.constructor = subType;
+
+        subType.prototype = prototype;
+
+        subType.extend = this.extend;
+
+        return subType;
+    };
+
+    Class.prototype._initOptions = function(options) {
+        this.options = $.extend({}, this.options, options);
+    };
+
+    cri.Class = Class;
 }(window);

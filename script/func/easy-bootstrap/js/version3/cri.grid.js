@@ -6,23 +6,24 @@
  */
 !function(window){
 
+    "use strict";
+
     var cri = window.cri,
         $   = window.jQuery;
-    "use strict";
-    /**
-     * 定义表格标题，工具栏，分页高度
-     * @type {number}
-     */
-    var _titleH      = 31,
-        _toolbarH    = 31,
-        _pagerH      = 41,
-        _gridHeadH   = 31,
-        _cellPadding = 4,
-        _cellDefaultW= 100,
-        _cellBorderW = 1;
 
     /**
-     * 1.如果datagrid初始化时,定义了高宽属性
+     * 定义表格标题，工具栏，分页高度
+     */
+    var _titleH       = 31, //标题高度
+        _toolbarH     = 31, //工具栏高度
+        _pagerH       = 41, //分页高度
+        _gridHeadH    = 31, //表格头高度
+        _cellPadding  = 4,  //表格单元格左右Padding
+        _cellDefaultW = 100,//单元格默认宽度
+        _cellBorderW  = 1;  //表格border宽度
+
+    /**
+     * 1.如果组件初始化时,定义了高宽属性
      * 2.如果table设置了高宽(style)
      * 3.如果table设置了高宽属性
      * 4.都未定义 默认为100%
@@ -48,7 +49,7 @@
      * 3.若table设置了高度样式
      * 4.都未定义 默认auto
      * @param $ele
-     * @param height
+     * @param height 初始化时指定的高度
      * @private
      */
     function _getElementHeight($ele,height){
@@ -71,21 +72,50 @@
         }
     }
 
-    var _defaultOptions = {};
-    var Grid = cri.Grid = function (element, options) {
-        this.options     = $.extend({}, _defaultOptions, options);
+    /**
+     * 表格默认属性
+     * @type {{url: null, param: {}, title: null, toolbar: null, columns: null, rows: null, async: boolean, onClick: null, onDblClick: null, rowNum: boolean, checkBox: boolean, onChecked: null, changeRowCheck: null, pagination: boolean, page: number, pageSize: number, total: number, ajaxDone: null, ajaxError: null}}
+     * @private
+     */
+    var _defaultOptions = {
+        url:null,
+        param:{},
+        title:null,
+        toolbar:null,
+        columns:null,
+        rows:null,
+        async:false,
+        onClick:null,
+        onDblClick:null,
+        rowNum:true,
+        checkBox:false,
+        onChecked:null,//每行checkbox被选中时触发回调函数,当该回调函数返回,参数row,rowid
+        changeRowCheck:null,//使某行checkbox为选中或不选中,参数 rowid, isChecked
+        pagination:true,
+        page:1,
+        pageSize:10,
+        total:0,
+        ajaxDone:null,
+        ajaxError:null
+    };
+
+    var Grid = cri.Class.extend(function(element,options){
+        this.options     = _defaultOptions;
         this.$element    = $(element);
+        this.$grid       = null;
         this.$gridhead   = null;
         this.$gridbody   = null;
         this.$toolbar    = null;
         this.$page       = null;
         this.col         = null;
         this.selectedRow = null;
+        this.gridType    = null;
+        this._initOptions(options);
         this.init();
         this.eventListen();
-    };
+    });
 
-    Grid.prototype = {
+    $.extend(Grid.prototype,{
         eventListen:function(){
             var that = this;
             var op = this.options;
@@ -227,29 +257,20 @@
 
         createDatagrid:function(){
             var height = _getElementHeight(this.$element,this.options.height);
+            this.$element
+                .wrap("<div class=\"datagrid\"></div>")
+                .hide();
 
-            this.$element.wrap("<div class=\"datagrid\"></div>");
-            this.$element.hide();
-            this.$datagrid = this.$element.parent();
-            height && this.$datagrid.css("height",height);
-
-            this.options.title && this.$datagrid.append("<div class=\"title\"></div>");
-            this.options.toolbar && this.$datagrid.append("<div class=\"toolbar\"></div>");
-            this.$datagrid.append("<div class=\"grid-view\"></div>");
-            this.options.pagination && this.$datagrid.append("<div class=\"page\"></div>");
-            var $title = $(".title",this.$datagrid)
-                ,$toolbar = $(".toolbar",this.$datagrid)
-                ,$gridview = $(".grid-view",this.$datagrid)
-                ,$page = $(".page",this.$datagrid);
-            this.options.title && $title.html("<span>" + this.options.title + "</span>");
-            this.options.pagination && this.createPage($page);
-            this.options.toolbar && this.createToolbar($toolbar);
-
-            this.createGrid($gridview,height);
+            this.$grid = this.$element.parent();
+            this.options.title   && this._createTitle(this.$grid);
+            this.options.toolbar && this.createToolbar(this.$grid);
+            this.createGrid(this.$grid,height);
+            this.options.pagination && this.createPage(this.$grid);
+            this.$grid.css("height",height);
         },
 
         createGrid:function($parent,height){
-            var html = "<div class=\"grid-head\"><div class=\"grid-head-wrap\"></div></div><div class=\"grid-body\"></div>";
+            var html = '<div class="grid-view"><div class="grid-head"><div class="grid-head-wrap"></div></div><div class="grid-body"></div></div>';
             $parent.append(html);
             var $gridhead = $(".grid-head-wrap",$parent);
             var $gridbody = $(".grid-body",$parent);
@@ -264,7 +285,9 @@
                 $gridbody.css("height",height);
             }
         },
-
+        _createTitle:function($grid){
+            $grid.append('<div class="title"><span>' + this.options.title + '</span></div>');
+        },
         createHead:function($parent){
             var headHtml = ["<table cellspacing=\"1\">"]
                 ,op = this.options
@@ -357,12 +380,12 @@
         },
 
         createToolbar:function($parent){
-            var html = "<ul>"
+            var html = "<div class=\"toolbar\"><ul>"
                 ,op = this.options;
             $.each(op.toolbar,function(index,data){
                 html += "<li data-toolbar=\"" + index + "\">" + this.text + "</li>";
             });
-            html += "</ul>";
+            html += "</ul></div>";
             $parent.append(html);
         },
 
@@ -383,7 +406,7 @@
                 && (totalPage = Math.ceil(op.total / op.pageSize));
 
                 //分页按钮组
-                pageHtml.push('<div class="pager-nav">');
+                pageHtml.push('<div class="page"><div class="pager-nav">');
                 if(page <= 1){
                     pageHtml.push("<a class=\"pager-nav state-disabled\"><span class=\"fa fa-angle-double-left\"></span></a>");
                     pageHtml.push("<a class=\"pager-nav state-disabled\"><span class=\"fa fa-angle-left\"></span></a>");
@@ -411,6 +434,7 @@
                 pageHtml.push('</div>');
                 //分页信息
                 pageHtml.push('<div class="pager-info">' + ((page-1) * pageSize + 1) + ' - ' + (page * pageSize) + ' of ' + totalNum + ' items');
+                pageHtml.push('</div>');
                 if(this.$page){
                     $parent.html(pageHtml.join(""));
                 }else{
@@ -519,6 +543,7 @@
             this.options.checkBox &&
             $("tr:eq("+rowid+") input[type=checkbox]",this.$gridbody).prop("checked",isChecked);
         }
-    };
+    });
 
+    cri.Grid = Grid;
 }(window);

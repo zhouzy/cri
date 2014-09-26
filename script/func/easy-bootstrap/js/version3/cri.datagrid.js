@@ -11,11 +11,9 @@
     var $   = window.jQuery,
         cri = window.cri;
 
-    var DataGrid = cri.DataGrid = function(element,options){
-        cri.Grid.call(this,arguments);
-    };
-
-    DataGrid.prototype = new cri.Grid();
+    var DataGrid = cri.DataGrid = cri.Grid.extend(function(element,options){
+        cri.Grid.apply(this,arguments);
+    });
 
     $.fn.datagrid = function(option) {
         var datagrid = null;
