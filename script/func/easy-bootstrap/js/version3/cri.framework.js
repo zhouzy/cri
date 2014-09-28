@@ -34,6 +34,5 @@
     Class.prototype._initOptions = function(options) {
         this.options = $.extend({}, this.options, options);
     };
-
     cri.Class = Class;
 }(window);

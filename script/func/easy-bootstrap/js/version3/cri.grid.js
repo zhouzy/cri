@@ -73,6 +73,55 @@
     }
 
     /**
+     * 获取Grid每列信息
+     * @param $table        原始 table jquery对象
+     * @param optionWidth   使用 options.grid 初始化宽度
+     * @param optionColumns 使用 options.columns 初始化列属性
+     * @returns {*}         处理后的列属性
+     * @private
+     */
+    function _getColumnsDef($table,optionWidth,optionColumns){
+
+        var width = _getElementWidth($table, optionWidth);
+
+        var columns = optionColumns || (function(){
+            var fieldArr = "[";
+            $("tr th,td", $table).each(function(){
+                var data  = $(this).data("options"),
+                    title = $(this).html();
+                if(data){
+                    fieldArr += "{title:\'" + title + "\'," + data + "},";
+                }
+                else{
+                    fieldArr  += "{title:\'" + title + "\'},";
+                }
+            });
+            fieldArr += "]";
+            fieldArr = fieldArr.replace(/\},\]/g, "}]").replace(/\],\]/g, "]]");
+
+            return (new Function("return " + fieldArr))();
+        }());
+
+
+        columns.map(function(column){
+            column._width = _cellDefaultW - _cellPadding*2 - 1;
+            if(column.field && column.width){
+                var arr = ("" + column.width).split("%");
+                if(arr.length>1){
+                    column._width = Math.floor(width * arr[0] / 100);
+                }
+                else{
+                    column._width = column.width;
+                }
+                column._width -= (_cellPadding * 2 + _cellBorderW);
+            }
+            return column;
+        });
+
+        return columns;
+    }
+
+    /**
      * 表格默认属性
      * @type {{url: null, param: {}, title: null, toolbar: null, columns: null, rows: null, async: boolean, onClick: null, onDblClick: null, rowNum: boolean, checkBox: boolean, onChecked: null, changeRowCheck: null, pagination: boolean, page: number, pageSize: number, total: number, ajaxDone: null, ajaxError: null}}
      * @private
@@ -107,16 +156,17 @@
         this.$gridbody   = null;
         this.$toolbar    = null;
         this.$page       = null;
-        this.col         = null;
+        this.$title      = null;
+        this._columns    = [];//根据table td元素和this.options.columns得出列属性
         this.selectedRow = null;
         this.gridType    = null;
         this._initOptions(options);
-        this.init();
-        this.eventListen();
+        this._init();
+        this._eventListen();
     });
 
     $.extend(Grid.prototype,{
-        eventListen:function(){
+        _eventListen:function(){
             var that = this;
             var op = this.options;
             var isDrag = false;
@@ -197,266 +247,215 @@
                 });
         },
 
-        init:function () {
-            if(!this.options.columns){
-                this.options.columns = (function findTableDef(that){
-                    var fieldArr = "[";
-                    $("tr", that).each(function(){
-                        fieldArr  += "[";
-                        $("th,td", this).each(function(){
-                            var data = $(this).data("options");
-                            var title = $(this).html();
-                            if(data){
-                                fieldArr += "{title:\'" + title + "\'," + data + "},";
-                            }
-                            else{
-                                fieldArr  += "{title:\'" + title + "\'},";
-                            }
-                        });
-                        fieldArr += "],";
-                    });
-                    fieldArr += "]";
-                    fieldArr = fieldArr.replace(/\},\]/g, "}]").replace(/\],\]/g, "]]");
-                    return (new Function("return " + fieldArr))();
-                })(this.$element);
-            }
-
-            this.col = this.col || [];
-            var that = this;
-            var width = _getElementWidth(this.$element, this.options.width);
-
-            $.each(this.options.columns,function(){
-                $.each(this,function(){
-                    if(this.field){
-                        if(this.width){
-                            var arr = ("" + this.width).split("%");
-                            if(arr.length>1){
-                                this.width = Math.floor(width * arr[0] / 100);
-                            }
-                            this.width -= (_cellPadding * 2 + _cellBorderW);
-                        }else{
-                            this.width = _cellDefaultW - _cellPadding*2 - 1;
-                        }
-                    }else{
-                        this.width = _cellDefaultW - _cellPadding*2 - 1;
-                    }
-                    that.col.push(this);
-                });
-            });
-
-            this.col.length && (this.col[this.col.length-1].width -= _cellBorderW);
-
-            this.options.columns.length > 0
-            && this.getData()
-            && this.createDatagrid();
-            this.$toolbar  = $(".toolbar",this.$datagrid);
-            this.$page     = $(".page",this.$datagrid);
-            this.$gridhead = $(".grid-head",this.$datagrid);
-            this.$gridbody = $(".grid-body",this.$datagrid);
+        _init:function () {
+            this._columns = _getColumnsDef(this.$element,this.options.width,this.options.columns);
+            this._getData();
+            this._createGrid();
         },
 
-        createDatagrid:function(){
+        _createGrid:function(){
             var height = _getElementHeight(this.$element,this.options.height);
-            this.$element
-                .wrap("<div class=\"datagrid\"></div>")
-                .hide();
+            this.$element.wrap("<div class=\"datagrid\"></div>").hide();
+            this.$grid = this.$element.parent().css("height",height);
 
-            this.$grid = this.$element.parent();
-            this.options.title   && this._createTitle(this.$grid);
-            this.options.toolbar && this.createToolbar(this.$grid);
-            this.createGrid(this.$grid,height);
-            this.options.pagination && this.createPage(this.$grid);
-            this.$grid.css("height",height);
+            this._createTitle(this.$grid);
+            this._createToolbar(this.$grid);
+            this._createGridView(this.$grid,height);
+            this._createPage(this.$grid);
         },
 
-        createGrid:function($parent,height){
-            var html = '<div class="grid-view"><div class="grid-head"><div class="grid-head-wrap"></div></div><div class="grid-body"></div></div>';
-            $parent.append(html);
-            var $gridhead = $(".grid-head-wrap",$parent);
-            var $gridbody = $(".grid-body",$parent);
-            this.createBody($gridbody);
-            this.createHead($gridhead);
+        _createGridView:function($parent,height){
+            this.$gridview = $("<div></div>").addClass("grid-view");
+            this.$gridbody = $("<div></div>").addClass("grid-body");
+            this.$gridhead = $("<div></div>").addClass("grid-head");
+            $parent.append(this.$gridview.append(this.$gridhead).append(this.$gridbody));
 
             if(height){
                 height -= _gridHeadH;
-                this.options.title && (height-=_titleH);
-                this.options.toolbar && (height-=_toolbarH);
-                this.options.pagination && (height-=_pagerH);
-                $gridbody.css("height",height);
+                this.options.title      && (height -= _titleH);
+                this.options.toolbar    && (height -= _toolbarH);
+                this.options.pagination && (height -= _pagerH);
+                this.$gridbody.css("height",height);
             }
+
+            this._createBody(this.$gridbody);
+            this._createHead(this.$gridhead);
         },
+
         _createTitle:function($grid){
-            $grid.append('<div class="title"><span>' + this.options.title + '</span></div>');
+            if(this.options.title){
+                var $title = this.$title = $('<div class="title"><span>' + this.options.title + '</span></div>');
+                $grid.append($title);
+            }
         },
-        createHead:function($parent){
-            var headHtml = ["<table cellspacing=\"1\">"]
-                ,op = this.options
-                ,col = this.col;
-            op.columns && ((function(op){
-                $.each(op.columns,function(){
-                    var length = this.length;
-                    headHtml.push("<tr>");
-                    op.checkBox && headHtml.push('<td class="line-checkbox"><span class="td-content"><input type="checkbox"/></span></td>');
-                    op.rowNum   && headHtml.push('<td class="line-number"><div class="td-content"></div></td>');
-                    $.each(this,function(i){
-                        headHtml.push("<td");
-                        var thText   = "",
-                            thStyle  = " style=\"";
-                        $.each(this,function(index,data){
-                            if(index == 'field' || index=='width'){
-                                return ;
-                            }
-                            else if(index == 'title'){
-                                thText = "<div class=\"td-content grid-header-text\" title=\"" + data + "\" >" + data + "</div>";
-                            }
-                            else{
-                                thStyle = thStyle + index + ":" + data + ";";
-                            }
-                        });
-                        i < (length - 1)?
-                            headHtml.push(thStyle + "\">" + thText +"<div class=\"drag-line\" data-drag=\"" + i +"\"></td>"):
-                            headHtml.push(thStyle + "\">" + thText +"</td>");
-                    });
-                    headHtml.push("</tr>");
-                });
-            })(op));
 
-            headHtml.push("</table>");
-            if($parent.children().length > 0){
-                $("table",$parent).html(headHtml.join(""));
+        _createHead:function($parent){
+            var $headWrap = $("<div></div>").addClass("grid-head-wrap"),
+                $table    = $("<table></table>"),
+                $tr       = $("<tr></tr>"),
+                op        = this.options,
+                columns   = this._columns;
+
+            $table.append($tr);
+
+            if(op.checkBox){
+                var $lineCheckbox = $("<td></td>").addClass("line-checkbox").append('<span class="td-content"><input type="checkbox"/></span>');
+                $tr.append($lineCheckbox);
             }
-            else{
-                $parent.append(headHtml.join(""));
+            if(op.rowNum){
+                var $lineNumber = $("<td></td>").addClass("line-number").append('<div class="td-content"></div>');
+                $tr.append($lineNumber);
             }
+
+            for(var i = 0,len = columns.length; i<len; i++){
+                var $td        = $('<td></td>'),
+                    $dragLine  = $('<div></div>').addClass('drag-line').data('drag',i),
+                    $tdContent = $('<div></div>').addClass('td-content grid-header-text'),
+                    column     = columns[i];
+                for(var key in column){
+                    var value = column[key];
+                    if(key == 'title'){
+                        $tdContent.prop('title',value).append(value);
+                    }
+                    else if(key !== 'field' && key !== 'width'){
+                        $td.css(key,value);
+                    }
+                }
+                $td.append($tdContent);
+                i < (len - 1) && $td.append($dragLine);
+
+                $tr.append($td);
+            }
+
             $("tr:eq(0) td",this.$gridbody).each(function(index){
-                $("tr:eq(0) td:eq(" + index + ") .td-content",$parent).width($(this).width());
+                $("td:eq(" + index + ") .td-content",$tr).width($(this).width());
             });
-            this.$gridhead = $(".grid-head",$parent);
+
+            $parent.append($headWrap.html($table));
         },
 
-        createBody:function($parent){
-            var bodyHtml = ["<table cellspacing=\"1\">"],
+        _createBody:function($parent){
+            var $table   = $('<table></table>'),
                 op       = this.options,
                 id       = 0,
-                rowNum   = 1 + op.pageSize * (op.page - 1),
-                col      = this.col;
-            $.each(op.rows,function(index,value){
-                var that = this;
-                if (that.specialColor == "1") {
-                    bodyHtml.push("<tr style=\"font-weight:bold;color:#333333;\" data-rowid=\"" + id + "\">");
-                } else {
-                    bodyHtml.push("<tr data-rowid=\"" + id + "\">");
+                lineNum  = 1 + op.pageSize * (op.page - 1),
+                columns  = this._columns;
+
+            for(var i = 0,len = op.rows.length; i<len; i++){
+                var row = op.rows[i];
+                var $tr  = $('<tr></tr>').data("rowid",id);
+
+                if(op.checkBox){
+                    $tr.append($("<td></td>").addClass("line-checkbox").append('<span class="td-content"><input type="checkbox"/></span>'));
                 }
-                op.checkBox && bodyHtml.push("<td class=\"line-checkbox\"><input type=\"checkbox\"/></td>");
-                op.rowNum && bodyHtml.push("<td class=\"line-number\">" + rowNum + "</td>");
+                if(op.rowNum){
+                    $tr.append($("<td></td>").addClass("line-number").append('<div class="td-content">' + lineNum + '</div>'));
+                }
 
-                $.each(col,function(index,value){
-                    var text = that[this.field] || "";
-                    var _text = ("" + text).replace(/<.\w+\s*[^<]+>/g,""),
-                        width = col[index].width,
+                for(var j = 0,length = columns.length; j<length;j++){
+                    var $td = $('<td></td>');
+                    var $content = $('<div></div>').addClass('td-content');
+                    var column = columns[j],
+                        text   = row[column.field] || "",
+                        _text  = ("" + text).replace(/<.\w+\s*[^<]+>/g,""),
+                        width  = column._width,
                         divWidth = width - 2*_cellPadding;
-
-                    bodyHtml.push("<td style=\"width:" + width + "px;\"><div class=\"td-content\" title=\""+ _text +"\" style=\"width:" + divWidth + "px;\">" + text + "</div></td>");
-                });
-                bodyHtml.push("</tr>");
-                rowNum++;
-                id++;
-            });
-            bodyHtml.push("</table>");
-
-            if($parent.children().length > 0){
-                $("table",$parent).html(bodyHtml.join(""));
+                    $content.prop("title",_text).width(divWidth).text(_text);
+                    $td.append($content);
+                    $tr.append($td);
+                }
+                lineNum++;id++;
+                $table.append($tr);
             }
-            else{
-                $parent.append(bodyHtml.join(""));
-            }
-            this.$gridbody = $parent;
+
+
+            //调整最后一列宽度
             var gridbodyWith = $parent.width(),
-                tableWidth   = $("table",$parent).width();
+                tableWidth   = $table.width(),
+                $lastTd      = $("tr td:last-child",$table),
+                lastTdWidth  = $lastTd.width();
             if(gridbodyWith>(tableWidth+1)){
-                var lastTdWidth = $("table tr td:last-child",$parent).width();
-                $("table tr td:last-child").width(lastTdWidth + gridbodyWith-tableWidth);
+                $lastTd.width(lastTdWidth + gridbodyWith-tableWidth);
+            }
+
+            $parent.html($table);
+        },
+
+        _createToolbar:function($parent){
+            if(this.options.toolbar){
+                var $toolbar = $('<div class="toolbar"></div>');
+                var html = "<ul>"
+                $.each(this.options.toolbar,function(index,data){
+                    html += "<li data-toolbar=\"" + index + "\">" + this.text + "</li>";
+                });
+                html += "</ul>";
+                $toolbar.append(html);
+                $parent.html($toolbar);
+                this.$toolbar = this.$toolbar || $toolbar;
             }
         },
 
-        createToolbar:function($parent){
-            var html = "<div class=\"toolbar\"><ul>"
-                ,op = this.options;
-            $.each(op.toolbar,function(index,data){
-                html += "<li data-toolbar=\"" + index + "\">" + this.text + "</li>";
-            });
-            html += "</ul></div>";
-            $parent.append(html);
-        },
+        _createPage:function($parent){
+            if(this.options.pagination){
+                var op        = this.options,
+                    pageSize  = op.pageSize || 10,
+                    total     = op.total || 0,
+                    page      = parseInt(op.page) || 1,
+                    totalPage = Math.ceil(total / pageSize),
+                    lastPage  = page - 1,
+                    nextPage  = page + 1;
 
-        createPage:function($parent){
-            var pageHtml  = [],
-                op        = this.options,
-                pageSize  = op.pageSize || 10,
-                totalPage = 1,
-                totalNum  = 0,
-                page      = parseInt(this.options.page),
-                lastPage  = page - 1,
-                nextPage  = page + 1;
-            if(op.pagination){
-                op.rows
-                && op.total
-                && (totalNum = op.total)
-                && op.total > 0
-                && (totalPage = Math.ceil(op.total / op.pageSize));
+                var $pagerNav  = $("<div></div>").addClass("pager-nav"),
+                    $firstPage = $("<a></a>").addClass("pager-nav").append('<span class="fa fa-angle-double-left"></span>'),
+                    $lastPage  = $("<a></a>").addClass("pager-nav").append('<span class="fa fa-angle-left"></span>'),
+                    $nextPage  = $("<a></a>").addClass("pager-nav").append('<span class="fa fa-angle-right"></span>'),
+                    $totalPage = $("<a></a>").addClass("pager-nav").append('<span class="fa fa-angle-double-right"></span>'),
+                    $pageInfo  = $("<div></div>").addClass("pager-info").text("((page-1) * pageSize + 1) + ' - ' + (page * pageSize) + ' of ' + totalNum + ' items')");
 
-                //分页按钮组
-                pageHtml.push('<div class="page"><div class="pager-nav">');
+                $pagerNav.append($firstPage).append($lastPage);
                 if(page <= 1){
-                    pageHtml.push("<a class=\"pager-nav state-disabled\"><span class=\"fa fa-angle-double-left\"></span></a>");
-                    pageHtml.push("<a class=\"pager-nav state-disabled\"><span class=\"fa fa-angle-left\"></span></a>");
+                    $firstPage.addClass("state-disabled");
+                    $lastPage.addClass("state-disabled");
                 }
                 else{
-                    pageHtml.push("<a data-page=\"1\" class=\"pager-nav\"><span class=\"fa fa-angle-double-left\"></span></a>");
-                    pageHtml.push("<a data-page=\""+ lastPage +"\" class=\"pager-nav\"><span class=\"fa fa-angle-left\"></span></a>");
+                    $firstPage.data("page",1);
+                    $lastPage.data("page",lastPage);
                 }
 
                 for(var i=-2; i<3; i++){
-                    var shiftpage = i + page;
-                    if(shiftpage <= totalPage && shiftpage > 0){
-                        shiftpage != page ?
-                            pageHtml.push("<a data-page=\"" + shiftpage + "\" class=\"pager-nav pager-num\" >" + shiftpage + "</a>"):
-                            pageHtml.push("<a data-page=\"" + shiftpage + "\" class=\"pager-nav state-selected\" >" + shiftpage + "</a>");
+                    var shiftPage = i + page;
+                    var $numPage = $("<a>").addClass("pager-nav").text(shiftPage);
+                    if(shiftPage <= totalPage && shiftPage > 0){
+                        shiftPage != page ?
+                            $numPage.addClass("pager-num"):
+                            $numPage.addClass("state-selected");
                     }
+                    $pager.append($numPage);
                 }
+
+                $pagerNav.append($nextPage).append($totalPage);
                 if(page >= totalPage){
-                    pageHtml.push("<a class=\"pager-nav state-disabled\"><span class=\"fa fa-angle-right\"></span></a>");
-                    pageHtml.push("<a class=\"pager-nav state-disabled\"><span class=\"fa fa-angle-double-right\"></span></a>");
+                    $lastPage.addClass("state-disabled");
+                    $totalPage.addClass("state-disabled");
                 }else{
-                    pageHtml.push("<a data-page=\"" + nextPage + "\" class=\"pager-nav\"><span class=\"fa fa-angle-right\"></span></a>");
-                    pageHtml.push("<a data-page=\"" + totalPage + "\" class=\"pager-nav\"><span class=\"fa fa-angle-double-right\"></span></a>");
+                    $lastPage.data("page",nextPage);
+                    $totalPage.data("page",totalPage);
                 }
-                pageHtml.push('</div>');
-                //分页信息
-                pageHtml.push('<div class="pager-info">' + ((page-1) * pageSize + 1) + ' - ' + (page * pageSize) + ' of ' + totalNum + ' items');
-                pageHtml.push('</div>');
+
+                $pagerNav.append($pageInfo);
+
                 if(this.$page){
-                    $parent.html(pageHtml.join(""));
-                }else{
-                    $parent.append(pageHtml.join(""));
+                    this.$page.html($pagerNav);
+                }
+                else{
+                    var $pager = this.$page = $("<div></div>").addClass("page");
+                    $pager.html($pagerNav);
+                    $parent.append($pager);
                 }
             }
         },
 
-        refreshGridView:function(){
-            this.createBody(this.$gridbody);
-            this.createHead(this.$gridhead);
-            this.createPage(this.$page);
-        },
-
-        reload:function(param){
-            param && (this.options.param = param);
-            this.selectedRow = null;
-            this.getData();
-            this.refreshGridView();
-        },
-
-        getData:function(){
+        _getData:function(){
             var result = true,
                 op = this.options;
             if(op.pagination){
@@ -480,17 +479,30 @@
             return result;
         },
 
+        _page:function(){
+            this.getData();
+            this.refreshGridView();
+            this.createPage(this.$page);
+        },
+
+        refreshGridView:function(){
+            this.createBody(this.$gridbody);
+            this.createHead(this.$gridhead);
+            this.createPage(this.$page);
+        },
+
+        reload:function(param){
+            param && (this.options.param = param);
+            this.selectedRow = null;
+            this.getData();
+            this.refreshGridView();
+        },
+
         loadData:function(param){
             if(param.push){
                 this.options.rows = param;
                 this.refreshGridView();
             }
-        },
-
-        page:function(){
-            this.getData();
-            this.refreshGridView();
-            this.createPage(this.$page);
         },
 
         getMulSelected:function(){
