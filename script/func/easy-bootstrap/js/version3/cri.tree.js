@@ -120,7 +120,9 @@
             var height = _getElementHeight(this.$element,this.options.height);
             var $tree = $("<div></div>").addClass(this._className).css("height",height);
             this.$element.wrap($tree);
-            this._createToolbar($tree);
+            this.$element.hide();
+            this.$tree = this.$element.parent();
+            this._createToolbar(this.$tree);
             var $ul = $("<ul></ul>");
 
             !function createCol(data,isShow,id){
@@ -152,8 +154,7 @@
                     }
                 });
             }(op.rows,"show",0);
-            $tree.append($ul);
-            this.$tree = $tree;
+            this.$tree.append($ul);
         },
 
         _createToolbar:function($parent){
