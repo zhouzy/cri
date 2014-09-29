@@ -12,53 +12,153 @@
         cri = window.cri;
 
     var TreeGrid = cri.TreeGrid = cri.Grid.extend(function(element,options){
+        this._gridClassName = "treegrid";
         cri.Grid.apply(this,arguments);
-        this.$treegrid = null;
+        this._selfEvent();
     });
 
-    TreeGrid.prototype.eventListen = function(){
+    TreeGrid.prototype._selfEvent = function(){
         var that = this;
-        var isDrag = false;
-        var dragStartX = 0;
-        var dragIndex = 0;
-        var left = 0;
-        var right = 0;
-        this.$gridbody.on("scroll",function(e){
-            $(".grid-head-wrap",that.$gridhead).scrollLeft($(this).scrollLeft());
-        });
-        this.$gridhead.on('mousedown',".drag-line",function(e){
-            that.$treegrid.css("cursor","e-resize");
-            dragIndex = $(e.target).data("drag");
-            isDrag = true;
-            dragStartX = e.pageX;
-            left = dragStartX - that.col[dragIndex].width + 20;
-            right = dragStartX + that.col[dragIndex + 1].width - 20;
-        }).on("mouseup",function(e){
-            if(isDrag){
-                that.$treegrid.css("cursor","");
-                isDrag = false;
-            }
-        }).on("mouseover",function(e){
-            if(isDrag){
-                if(e.pageX > left && e.pageX <right){
-                    that.col[dragIndex].width += e.pageX - dragStartX;
-                    that.col[dragIndex + 1].width -= e.pageX - dragStartX;
-                    dragStartX = e.pageX;
-                    that.refreshGridView();
-                }
-            }
-        });
-        this.$gridbody.on('click', "tr[data-rowid]", function(e){that.trclickStyle(e);that.setSelected(e);})
-            .on('mouseover',"tr[data-rowid]",function(e){that.trhover(e);})
-            .on('mouseout',"tr[data-rowid]",function(e){that.trout(e);})
-            .on('click', "tr[data-rowid] td.line-file-icon i", function(e){
-                that.fold(e);e.preventDefault();
-            })
-            .on('click', "tr[data-rowid] td input[type='checkbox']", function(e){that.checkbox(e);})
-            .on('dblclick', "tr[data-rowid]", function(e){that.onDblClickRow(e);});
-        this.$toolbar && this.$toolbar.on('click',"li[data-toolbar]",function(e){that.clickToolbar(e);});
+        this.$gridbody
+            .on('click', "tr td.line-file-icon i", function(e){
+                that._fold(e);e.preventDefault();
+            });
     };
 
+    TreeGrid.prototype._createBody = function($parent){
+        var $table = $("<table></table>"),
+            op = this.options,
+            columns = this._columns,
+            lineNum = 1,
+            paddingLeft = 1,
+            iconWidth = 6;
+        /**
+         * 拼装每行HTML
+         */
+        !function getRowHtml(rows,isShow,id){
+            for(var i = 0,len = rows.length; i<len; i++){
+                var $tr = $("<tr></tr>").data("rowid",++id);
+                var row = rows[i];
+
+                isShow == "show" || $tr.hide();
+
+                if(op.checkBox){
+                    $tr.append($("<td></td>").addClass("line-checkbox").append('<span class="td-content"><input type="checkbox"/></span>'));
+                }
+                if(op.rowNum){
+                    $tr.append($("<td></td>").addClass("line-number").append('<div class="td-content">' + (lineNum++) + '</div>'));
+                }
+
+                getColHtml($tr,columns,row,paddingLeft);
+                $table.append($tr);
+
+                if(row.children && row.children.length > 0){
+                    row.hasChildren = true;
+                    paddingLeft += iconWidth;
+                    row.state && row.state == "closed" ?
+                        getRowHtml(row.children,"hide",id*1000) :
+                        getRowHtml(row.children,isShow,id*1000);
+                    paddingLeft -= iconWidth;
+                }
+            }
+        }(op.rows,"show",0);
+
+        /**
+         * 拼装列HTML
+         * @param colDef     列定义
+         * @param colData    列数据
+         * @param textIndent 文件图标缩进
+         * @param nodeId     id
+         * @returns {Array}
+         */
+        function getColHtml($tr,colDef,colData,textIndent){
+            var fileIcons = {"file":"fa fa-file","folderOpen":"fa fa-folder-open","folderClose":"fa fa-folder"};
+
+            $.each(colDef,function(index){
+                var $td = $("<td></td>");
+                var text  = colData[this.field] || "",
+                    width = colDef[index]._width || 100,
+                    divWidth = width - 2*4;
+
+                var $content = $("<span></span>").addClass("td-content").width(divWidth);
+
+                if(this.field == "text"){
+                    var $icon = $("<i></i>").attr("class",fileIcons.file);
+                    if(colData.hasChildren || (colData.children && colData.children.length)){
+                        colData.state == "open" ? $icon.attr("class",fileIcons.folderOpen):$icon.attr("class",fileIcons.folderClose);
+                    }
+                    $td.css("text-indent",textIndent).addClass("line-file-icon");
+                    $content.append($icon).append(text);
+                }
+                else{
+                    $content.text(text);
+                }
+                $td.append($content);
+                $tr.append($td);
+            });
+        }
+
+
+        //调整最后一列宽度
+        var gridbodyWith = $parent.width(),
+            tableWidth   = $table.width(),
+            $lastTd      = $("tr td:last-child",$table),
+            lastTdWidth  = $lastTd.width();
+        if(gridbodyWith>(tableWidth+1)){
+            $lastTd.width(lastTdWidth + gridbodyWith-tableWidth);
+        }
+
+        $parent.html($table);
+    }
+
+    TreeGrid.prototype._fold = function(e){
+        var op = this.options,
+            item = $(e.target).closest("tr"),
+            rowid = item.data('rowid'),
+            that = this;
+        this.selectedRow = this.getRowDataById(rowid);
+        if(this.selectedRow.state == "open") {
+            this.selectedRow.state = "closed";
+        }
+        else if(this.selectedRow.state == "closed"){
+            this.selectedRow.state = "open";
+            if(op.async && !this.selectedRow.children){
+                var pa = {};
+                $.each(this.selectedRow,function(index,data){index != "children" && (pa[index] = data);});
+                this.selectedRow.childrenList || $.ajax({
+                    type: "post",
+                    url: op.asyncUrl,
+                    success: function(data, textStatus){
+                        that.selectedRow.children = data.rows;
+                    },
+                    data:pa,
+                    dataType:"JSON",
+                    async:false
+                });
+            }
+        }
+        this.refreshGridView();
+    };
+
+    TreeGrid.prototype.getRowDataById = function(rowid){
+        var op = this.options
+            ,rowdata = null;
+        rowid = parseInt(rowid);
+
+        !function getRow(data){
+            var arr = [];
+            while(rowid >= 1){
+                var t = rowid%1000;
+                arr.push(t);
+                rowid = Math.floor(rowid/1000);
+            }
+            for(var i = arr.length - 1; i >= 0 ; i--){
+                var k = arr[i] - 1;
+                data[k]&&(rowdata = data[k])&&(data = data[k].children);
+            }
+        }(op.rows);
+        return rowdata;
+    };
 
     $.fn.treegrid = function(option) {
         var treeGrid = null;

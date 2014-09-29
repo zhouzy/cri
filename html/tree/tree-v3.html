@@ -6,12 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link href="../../script/func/easy-bootstrap/font-awesome/css/font-awesome.css" type="text/css" rel="stylesheet"/>
     <link href="../../script/func/easy-bootstrap/css/reset.css" type="text/css" rel="stylesheet"/>
-    <link href="../../script/func/easy-bootstrap/css/pager.css" type="text/css" rel="stylesheet"/>
-    <link href="../../script/func/easy-bootstrap/css/datagrid.css" type="text/css" rel="stylesheet"/>
+    <link href="../../script/func/easy-bootstrap/css/tree.css" type="text/css" rel="stylesheet"/>
     <script src="../../script/lib/jquery/jquery-1.9.1.js" type="text/javascript"></script>
     <script src="../../script/func/easy-bootstrap/js/version3/cri.framework.js" type="text/javascript"></script>
-    <script src="../../script/func/easy-bootstrap/js/version3/cri.grid.js" type="text/javascript"></script>
-    <script src="../../script/func/easy-bootstrap/js/version3/cri.datagrid.js" type="text/javascript"></script>
+    <script src="../../script/func/easy-bootstrap/js/version3/cri.tree.js" type="text/javascript"></script>
     <style>
         html{
             font-family:Georgia,"Times New Roman","Microsoft YaHei","微软雅黑",STXihei,"华文细黑",serif;
@@ -26,24 +24,14 @@
 </head>
 <body>
     <div class="content">
-    <table id="grid">
-        <tr>
-            <td data-options="field:'propA',width:'20%'">propA</td>
-            <td data-options="field:'propB',width:'20%'">propB</td>
-            <td data-options="field:'propC',width:'20%'">propC</td>
-            <td data-options="field:'propD',width:'20%'">propD</td>
-            <td data-options="field:'propE',width:'20%'">propE</td>
-            <td data-options="field:'propF',width:'10%'">propF</td>
-        </tr>
-    </table>
+        <div id="tree"></div>
     </div>
     <script type="text/javascript">
-        var grid = $("#grid").datagrid({
-            url:"./datagrid-data.json",
+        var tree = $("#tree").tree({
+            url:"./tree-data.json",
             rowNum:true,
             title:"hello grid",
             checkBox:true,
-            toolbar:[{"hello":"kao"}],
             onClick:function(data){
                 console.log(data.propA);
             },

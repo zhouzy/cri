@@ -44,9 +44,9 @@
 
     /**
      * 计算表格高度
-     * 1.若table初始化时，定义了高度属性
-     * 2.若table设置了高度属性(height)
-     * 3.若table设置了高度样式
+     * 1.若初始化时，定义了高度属性
+     * 2.若设置了高度属性(height)
+     * 3.若设置了高度样式
      * 4.都未定义 默认auto
      * @param $ele
      * @param height 初始化时指定的高度
@@ -159,7 +159,7 @@
         this.$title      = null;
         this._columns    = [];//根据table td元素和this.options.columns得出列属性
         this.selectedRow = null;
-        this.gridType    = null;
+        this._gridClassName = this._gridClassName || "datagrid";
         this._initOptions(options);
         this._init();
         this._eventListen();
@@ -179,10 +179,10 @@
                 .on("scroll",function(e){
                     $(".grid-head-wrap",that.$gridhead).scrollLeft($(this).scrollLeft());
                 })
-                .on('click', "tr[data-rowid]", function(e){
+                .on('click', "tr", function(e){
                     that.setSelected(e);
                 })
-                .on('dblclick', "tr[data-rowid]", function(e){
+                .on('dblclick', "tr", function(e){
                     that.onDblClickRow(e);
                 })
                 .on("change", "input[type=checkbox]",function(e){
@@ -255,9 +255,11 @@
 
         _createGrid:function(){
             var height = _getElementHeight(this.$element,this.options.height);
-            this.$element.wrap("<div class=\"datagrid\"></div>").hide();
-            this.$grid = this.$element.parent().css("height",height);
+            var $grid = $("<div></div>").addClass(this._gridClassName).css("height",height);
+            this.$element.wrap($grid);
+            this.$element.hide();
 
+            this.$grid = this.$element.parent();
             this._createTitle(this.$grid);
             this._createToolbar(this.$grid);
             this._createGridView(this.$grid,height);
@@ -284,8 +286,8 @@
 
         _createTitle:function($grid){
             if(this.options.title){
-                var $title = this.$title = $('<div class="title"><span>' + this.options.title + '</span></div>');
-                $grid.append($title);
+                this.$title = $('<div class="title"><span>' + this.options.title + '</span></div>');
+                $grid.append(this.$title);
             }
         },
 
@@ -331,7 +333,7 @@
                 $("td:eq(" + index + ") .td-content",$tr).width($(this).width());
             });
 
-            $parent.append($headWrap.html($table));
+            $parent.html($headWrap.html($table));
         },
 
         _createBody:function($parent){
@@ -352,6 +354,7 @@
                     $tr.append($("<td></td>").addClass("line-number").append('<div class="td-content">' + lineNum + '</div>'));
                 }
 
+
                 for(var j = 0,length = columns.length; j<length;j++){
                     var $td = $('<td></td>');
                     var $content = $('<div></div>').addClass('td-content');
@@ -367,7 +370,6 @@
                 lineNum++;id++;
                 $table.append($tr);
             }
-
 
             //调整最后一列宽度
             var gridbodyWith = $parent.width(),
@@ -405,14 +407,14 @@
                     lastPage  = page - 1,
                     nextPage  = page + 1;
 
-                var $pagerNav  = $("<div></div>").addClass("pager-nav"),
-                    $firstPage = $("<a></a>").addClass("pager-nav").append('<span class="fa fa-angle-double-left"></span>'),
-                    $lastPage  = $("<a></a>").addClass("pager-nav").append('<span class="fa fa-angle-left"></span>'),
-                    $nextPage  = $("<a></a>").addClass("pager-nav").append('<span class="fa fa-angle-right"></span>'),
-                    $totalPage = $("<a></a>").addClass("pager-nav").append('<span class="fa fa-angle-double-right"></span>'),
-                    $pageInfo  = $("<div></div>").addClass("pager-info").text("((page-1) * pageSize + 1) + ' - ' + (page * pageSize) + ' of ' + totalNum + ' items')");
+                var $pagerNav   = $("<div></div>").addClass("pager-nav"),
+                    $firstPage  = $("<a></a>").append('<span class="fa fa-angle-double-left"></span>'),
+                    $lastPage   = $("<a></a>").append('<span class="fa fa-angle-left"></span>'),
+                    $nextPage   = $("<a></a>").append('<span class="fa fa-angle-right"></span>'),
+                    $totalPage  = $("<a></a>").append('<span class="fa fa-angle-double-right"></span>'),
+                    $numberPage = $("<ul></ul>").addClass("pager-number"),
+                    $pageInfo   = $("<div></div>").addClass("pager-info").text(((page-1) * pageSize + 1) + ' - ' + (page * pageSize) + ' of ' + total + ' items');
 
-                $pagerNav.append($firstPage).append($lastPage);
                 if(page <= 1){
                     $firstPage.addClass("state-disabled");
                     $lastPage.addClass("state-disabled");
@@ -424,33 +426,81 @@
 
                 for(var i=-2; i<3; i++){
                     var shiftPage = i + page;
-                    var $numPage = $("<a>").addClass("pager-nav").text(shiftPage);
-                    if(shiftPage <= totalPage && shiftPage > 0){
+                    if(shiftPage>0 && shiftPage<=totalPage){
+                        var $li = $("<li></li>"),
+                            $a  = $("<a></a>").text(sh);
                         shiftPage != page ?
-                            $numPage.addClass("pager-num"):
-                            $numPage.addClass("state-selected");
-                    }
-                    $pager.append($numPage);
+                            $a.addClass("pager-num"):
+                            $a.addClass("state-selected");
+                        $numberPage.append($li.append($a));                    }
                 }
 
-                $pagerNav.append($nextPage).append($totalPage);
+                $pagerNav.append($firstPage).append($lastPage).append($numberPage).append($nextPage).append($totalPage);
+
                 if(page >= totalPage){
-                    $lastPage.addClass("state-disabled");
+                    $nextPage.addClass("state-disabled");
                     $totalPage.addClass("state-disabled");
                 }else{
-                    $lastPage.data("page",nextPage);
+                    $nextPage.data("page",nextPage);
                     $totalPage.data("page",totalPage);
                 }
 
-                $pagerNav.append($pageInfo);
-
                 if(this.$page){
                     this.$page.html($pagerNav);
+                    this.$page.append($pageInfo);
                 }
                 else{
-                    var $pager = this.$page = $("<div></div>").addClass("page");
+                    var $pager = this.$page = $("<div></div>").addClass("pager");
                     $pager.html($pagerNav);
+                    $pager.append($pageInfo);
                     $parent.append($pager);
+                }
+            }
+        },
+
+        _refreshPage:function(){
+            if(this.$page){
+                var op        = this.options,
+                    pageSize  = op.pageSize || 10,
+                    total     = op.total || 0,
+                    page      = parseInt(op.page) || 1,
+                    totalPage = Math.ceil(total / pageSize),
+                    lastPage  = page - 1,
+                    nextPage  = page + 1;
+
+                var $pagerNav  = $("<div></div>").addClass("pager-nav"),
+                    $firstPage = $("<a></a>").addClass("pager-nav first-page").append('<span class="fa fa-angle-double-left"></span>'),
+                    $lastPage  = $("<a></a>").addClass("pager-nav last-page").append('<span class="fa fa-angle-left"></span>'),
+                    $nextPage  = $("<a></a>").addClass("pager-nav next-page").append('<span class="fa fa-angle-right"></span>'),
+                    $totalPage = $("<a></a>").addClass("pager-nav totalPage").append('<span class="fa fa-angle-double-right"></span>'),
+                    $pageInfo  = $("<div></div>").addClass("pager-info").text(((page-1) * pageSize + 1) + ' - ' + (page * pageSize) + ' of ' + total + ' items');
+
+                $pagerNav.append($firstPage).append($lastPage);
+                if(page <= 1){
+                    $firstPage.addClass("state-disabled").data("page",null);
+                    $lastPage.addClass("state-disabled").data("page",null);
+                }
+                else{
+                    $firstPage.removeClass("state-disabled").data("page",1);
+                    $lastPage.removeClass("state-disabled").data("page",lastPage);
+                }
+                if(page >= totalPage){
+                    $nextPage.addClass("state-disabled").data("page",null);
+                    $totalPage.addClass("state-disabled").data("page",null);
+                }
+                else{
+                    $nextPage.removeClass("state-disabled").data("page",nextPage);
+                    $totalPage.removeClass("state-disabled").data("page",totalPage);
+                }
+
+                for(var i=-2; i<3; i++){
+                    var shiftPage = i + page;
+                    if(shiftPage>0 && shiftPage<=totalPage){
+                        var $numPage = $("<a>").addClass("pager-nav").text(shiftPage);
+                        shiftPage != page ?
+                            $numPage.addClass("pager-num"):
+                            $numPage.addClass("state-selected");
+                        $pagerNav.append($numPage);                    }
                 }
             }
         },
@@ -480,15 +530,15 @@
         },
 
         _page:function(){
-            this.getData();
+            this._getData();
             this.refreshGridView();
             this.createPage(this.$page);
         },
 
         refreshGridView:function(){
-            this.createBody(this.$gridbody);
-            this.createHead(this.$gridhead);
-            this.createPage(this.$page);
+            this._createBody(this.$gridbody);
+            this._createHead(this.$gridhead);
+            this._createPage(this.$page);
         },
 
         reload:function(param){
