@@ -1,53 +1,61 @@
 @import "./lib.less";
 @import "./theme-default.less";
+
 .tree{
-    border:1px solid @color-border;
     color:@color-font;
-    .node{
-
+    border:1px solid @color-border;
+    .title,.toolbar,.tree-view{
+        .gradient-background(lighten(@color-background,3%),@color-background);
     }
-    .topnode{
-        background:#149BDD;
-        height:25px;
-        line-height:25px;
-        margin:4px;
-        cursor:pointer;
-        &:hover{
-            background:#128ECB;
-        }
-        .spread{
-            background:url(../img/icon_2.png) no-repeat 3px 2px;
-            padding:4px 0 4px 25px;
-        }
-        .shrink{
-            background:url(../img/icon_2.png) no-repeat 3px -18px;
-            padding:4px 0 4px 25px;
+    .title{
+        padding-left:4px;
+        font-size: 1.2em;
+        font-weight: bold;
+        height:30px;
+        line-height:30px;
+        border-bottom:1px solid @color-border;
+    }
+    .tree-view{
+        overflow: auto;
+    }
+    ul.tree-body{
+        color:@color-font;
+        background-color: #fff;
+        position: relative;
+        margin:0;
+        border-bottom:1px solid @color-border;
+        li{
+            line-height: 24px;
+            padding:3px 4px;
+            border-bottom:1px solid @color-border;
+            &:last-child{
+                border-bottom:none;
+            }
+            input{
+                vertical-align:middle;
+            }
+            .icon,.li-content{
+                display:inline-block;
+                height:24px;
+                line-height: 24px;
+                vertical-align: top;
+            }
+            .icon{
+                width:12px;
+                margin-right:5px;
+                &:hover{
+                    cursor:pointer;
+                }
+            }
+            &.selected{
+                background: @color-row-click;
+            }
+            &:hover{
+                background:@color-row-hover;
+                .icon{
+                    color:lighten(@color-line-file-icon,50%);
+                }
+            }
         }
     }
-
-    .node{
-        margin:1px 4px;
-        background:#E3E3E3;
-        height:25px;
-        line-height:25px;
-        cursor:pointer;
-        &:hover{
-            background:#BBB;
-        }
-        .spread{
-            background:url(../img/icon_2.png) no-repeat 3px -38px;;
-            padding:4px 0 4px 25px;
-        }
-
-        .shrink{
-            background:url(../img/icon_2.png) no-repeat 3px -58px;;
-            padding:4px 0 4px 25px;
-        }
-    }
-
-    .leaf{
-        background:url(../img/icon_2.png) no-repeat 3px -77px;
-        padding:4px 0 4px 25px;
-    }
-
 }

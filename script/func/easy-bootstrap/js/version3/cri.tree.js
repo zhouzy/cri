@@ -11,6 +11,17 @@
 
     "use strict";
 
+
+    var $   = window.jQuery,
+        cri = window.cri;
+
+    /**
+     * 定义表格标题，工具栏，分页高度
+     */
+    var _titleH    = 31, //标题高度
+        _toolbarH  = 31, //工具栏高度
+        _iconWidth = 12; //
+
     /**
      * 计算原始元素高度
      * 1.若初始化时，定义了高度属性
@@ -40,13 +51,34 @@
             return null;
         }
     }
-    var $   = window.jQuery,
-        cri = window.cri;
+
+    /**
+     * 1.如果组件初始化时,定义了高宽属性
+     * 2.如果table设置了高宽(style)
+     * 3.如果table设置了高宽属性
+     * 4.都未定义 默认为100%
+     * @private
+     */
+    function _getElementWidth($ele,width){
+        var styleWidth = $ele[0].style.width,
+            propWidth  = $ele[0].width,
+            calWidth   = width || styleWidth || propWidth || "100%";
+
+        var arr = ("" + calWidth).split("%");
+        if(arr.length>1){
+            return Math.floor($ele.parent().width() * arr[0] / 100);
+        }
+        calWidth = calWidth.split("px")[0];
+        return parseInt(calWidth);
+    }
+
 
     var Tree = cri.Tree = function (element, options) {
         this.options = $.extend({}, $.fn.tree.defaults, options);
         this.$element = $(element);
         this.$tree = null;
+        this.$treebody = null;
+        this.selectedRow = null;
         this._className = "tree";
         this._init();
         this._eventListen();
@@ -60,18 +92,19 @@
         },
         _eventListen:function(){
             var that = this;
-            this.$element
-                .on('click', "div[data-nodeid]", function(e){that._setSelected(e);return false;})
-                .on('click', "div span[data-nodeicon]", function(e){that._fold(e);return false;})
-                .on('dblclick', "div[data-nodeid]", function(e){that._onDblClickRow(e);return false;})
-                .on('click',"a[data-toolbar]",function(e){that._clickToolbar(e);return false;});
+            this.$treebody
+                .on('click',"li", function(e){that._setSelected(e);})
+                .on('click', "li i.icon", function(e){that._fold(e);})
+                .on('dblclick', "li", function(e){that._onDblClickRow(e);});
+            this.$toolbar
+                .on('click',"a[data-toolbar]",function(e){that._clickToolbar(e);});
         },
 
         _fold:function(e){
             var op = this.options
                 ,item = $(e.target).closest("div")
-                ,id = item.data('nodeid');
-            this.getDataById(id);
+                ,id = item.data('uid');
+            this._getDataById(id);
 
             if(op.selectedRow.state == "open") {
                 op.selectedRow.state = "closed";
@@ -113,48 +146,62 @@
         },
 
         _createTree:function(){
-            var html = ""
-                ,rownum = 0
-                ,level = 0
-                ,op = this.options;
-            var height = _getElementHeight(this.$element,this.options.height);
-            var $tree = $("<div></div>").addClass(this._className).css("height",height);
+            var op      = this.options,
+                height  = _getElementHeight(this.$element,op.height),
+                width   = _getElementWidth(this.$element,op.width),
+                $tree   = $("<div></div>").addClass(this._className).width(width).height(height),
+                $treeview = this.$treeview = $("<div></div>").addClass("tree-view"),
+                $treebody = this.$treebody = $("<ul></ul>").addClass("tree-body"),
+                textIndent = 0;
+
+            $treeview.append($treebody);
+            if(height){
+                this.options.title   && (height -= _titleH);
+                this.options.toolbar && (height -= _toolbarH);
+                this.$treeview.css("height",height);
+            }
             this.$element.wrap($tree);
             this.$element.hide();
             this.$tree = this.$element.parent();
+            this._createTitle(this.$tree);
             this._createToolbar(this.$tree);
-            var $ul = $("<ul></ul>");
 
-            !function createCol(data,isShow,id){
-                $.each(data,function(index,value){
-                    var nodeClass = level == 0 ? "topnode" : "node";
-                    var $li = $("<li></li>").data("nodeid",++id).addClass(nodeClass);
-                    $ul.append($li);
-                    isShow == "" || $li.hide();
-                    rownum ++ ;
-                    var $icon = $("<span></span>");
-                    var $text = $("<span></span>").data("nodetext",this.text);
-                    if(this.children && this.children.length > 0){
-                        if(this.state && this.state == "closed"){
-                            $icon.addClass("shrink").data("nodeicon","shrink");
-                        }
-                        else{
-                            $icon.addClass("shrink").data("nodeicon","spread");
+            var fileIcons = {"file":"icon fa fa-file","folderOpen":"icon fa fa-folder-open","folderClose":"icon fa fa-folder"};
+
+            !function eachLi(data,isShow,id){
+                for(var i = 0,len=data.length; i<len; i++){
+                    var row = data[i];
+                    var $li = $("<li></li>").data("uid",++id);
+                    $treebody.append($li);
+                    isShow == "hide" && $li.hide();
+
+                    var $text = $("<span></span>").addClass("li-content").text(row.text);
+                    var $icon = $("<i></i>").attr("class",fileIcons.file).css("marginLeft",textIndent);
+
+                    if(row.children && row.children.length > 0){
+                        if(row.hasChildren || (row.children && row.children.length)){
+                            row.state == "open" ? $icon.attr("class",fileIcons.folderOpen):$icon.attr("class",fileIcons.folderClose);
                         }
                         $li.append($icon).append($text);
-                        level++;
-                        this.state && this.state == "closed"
-                            ? createCol(this.children,"hide",id*1000)
-                            : createCol(this.children,isShow,id*1000);
-                        level--;
+                        textIndent += _iconWidth;
+                        row.state && row.state == "closed"
+                            ? eachLi(row.children,"hide",id*1000)
+                            : eachLi(row.children,isShow,id*1000);
+                        textIndent -= _iconWidth;
                     }
                     else{
-                        $icon.addClass("leaf").data("nodeicon","leaf");
                         $li.append($icon).append($text);
                     }
-                });
+                }
             }(op.rows,"show",0);
-            this.$tree.append($ul);
+            this.$tree.append($treeview);
+        },
+
+        _createTitle:function($parent){
+            if(this.options.title){
+                this.$title = $('<div class="title"><span>' + this.options.title + '</span></div>');
+                $parent.append(this.$title);
+            }
         },
 
         _createToolbar:function($parent){
@@ -166,14 +213,14 @@
                 });
                 html += "</ul>";
                 $toolbar.append(html);
-                $parent.html($toolbar);
+                $parent.append($toolbar);
                 this.$toolbar = this.$toolbar || $toolbar;
             }
         },
 
         _setSelected:function(e){
             var item = $(e.target).closest("div")
-                ,id = item.data('nodeid')
+                ,id = item.data('uid')
                 ,op = this.options;
             this._getDataById(id);
             if(op.onClick){
@@ -209,9 +256,9 @@
 
         _onDblClickRow:function(e){
             var item = $(e.target).closest("div")
-                ,id = item.data('nodeid')
+                ,id = item.data('uid')
                 ,op = this.options;
-            this.getDataById(id);
+            this._getDataById(id);
             if(op.onDblClick){
                 op.onDblClick(op.selectedRow);
             }
@@ -224,7 +271,7 @@
 
         reload:function(param){
             param && (this.options.param = param);
-            this.init();
+            this._init();
         }
     };
 

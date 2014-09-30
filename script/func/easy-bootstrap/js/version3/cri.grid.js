@@ -392,7 +392,7 @@
                 });
                 html += "</ul>";
                 $toolbar.append(html);
-                $parent.html($toolbar);
+                $parent.append($toolbar);
                 this.$toolbar = this.$toolbar || $toolbar;
             }
         },
