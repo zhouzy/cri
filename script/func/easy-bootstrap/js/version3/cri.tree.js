@@ -85,7 +85,6 @@
     };
 
     Tree.prototype = {
-
         _init:function () {
             this._getData();
             this._createTree();
@@ -93,9 +92,11 @@
         _eventListen:function(){
             var that = this;
             this.$treebody
-                .on('click',"li", function(e){that._setSelected(e);})
+                .on('click',"div.li-content",function(e){that._setSelected(e);})
                 .on('click', "li i.icon", function(e){that._fold(e);})
-                .on('dblclick', "li", function(e){that._onDblClickRow(e);});
+                .on('dblclick', "div.li-content", function(e){
+                    that._onDblClickRow(e);
+                });
             this.$toolbar
                 .on('click',"a[data-toolbar]",function(e){that._clickToolbar(e);});
         },
@@ -129,7 +130,6 @@
                 });
             }
             else{
-
                 $("ul li",$li).toggle();
             }
         },
@@ -188,7 +188,7 @@
                     $li      = $("<li></li>"),
                     $text    = $("<span></span>").addClass("li-text").text(row.text),
                     $icon    = $("<i></i>").attr("class",fileIcons.file).css("marginLeft",indent),
-                    $content = $("<div></div>").addClass("li-content").data("uid",++id).attr("data-uid",id);
+                    $content = $("<div></div>").addClass("li-content").data("uid",++id);
 
                 $ul.append($li.append($content.append($icon).append($text)));
                 isShow == "hide" && $li.hide();
