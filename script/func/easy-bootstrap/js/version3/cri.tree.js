@@ -101,33 +101,37 @@
         },
 
         _fold:function(e){
-            var op = this.options
-                ,item = $(e.target).closest("div")
-                ,id = item.data('uid');
+            var op = this.options,
+                item = $(e.target).closest("div"),
+                id = item.data('uid'),
+                $li = $(e.target).closest("li"),
+                $icon = $("i",item);
+
+            $icon.is(".fa-folder")?
+                $icon.removeClass("fa-folder").addClass("fa-folder-open"):
+                $icon.removeClass("fa-folder-open").addClass("fa-folder");
+
             this._getDataById(id);
 
-            if(op.selectedRow.state == "open") {
-                op.selectedRow.state = "closed";
+            if(op.async){
+                var pa = {};
+                $.each(op.selectedRow,function(index,data){index != "childrenList" && (pa[index] = data);});
+                op.selectedRow.childrenList || $.ajax({
+                    type: "get",
+                    url: op.asyncUrl,
+                    success: function(data){
+                        op.selectedRow.childrenList = data.rows;
+                        this._appendChildren($li,data.rows);
+                    },
+                    data:pa,
+                    dataType:"JSON",
+                    async:false
+                });
             }
+            else{
 
-            else if(op.selectedRow.state == "closed"){
-                op.selectedRow.state = "open";
-                if(op.async){
-                    var pa = {};
-                    $.each(op.selectedRow,function(index,data){index != "childrenList" && (pa[index] = data);});
-                    op.selectedRow.childrenList || $.ajax({
-                        type: "get",
-                        url: op.asyncUrl,
-                        success: function(data, textStatus){
-                            op.selectedRow.childrenList = data.rows;
-                        },
-                        data:pa,
-                        dataType:"JSON",
-                        async:false
-                    });
-                }
+                $("ul li",$li).toggle();
             }
-            this._createTree();
         },
 
         _getData:function(){
@@ -151,8 +155,7 @@
                 width   = _getElementWidth(this.$element,op.width),
                 $tree   = $("<div></div>").addClass(this._className).width(width).height(height),
                 $treeview = this.$treeview = $("<div></div>").addClass("tree-view"),
-                $treebody = this.$treebody = $("<ul></ul>").addClass("tree-body"),
-                textIndent = 0;
+                $treebody = this.$treebody = $("<ul></ul>").addClass("tree-body");
 
             $treeview.append($treebody);
             if(height){
@@ -166,35 +169,43 @@
             this._createTitle(this.$tree);
             this._createToolbar(this.$tree);
 
-            var fileIcons = {"file":"icon fa fa-file","folderOpen":"icon fa fa-folder-open","folderClose":"icon fa fa-folder"};
+            this._eachNode($treebody,op.rows,"show",0,0);
 
-            !function eachLi(data,isShow,id){
-                for(var i = 0,len=data.length; i<len; i++){
-                    var row = data[i];
-                    var $li = $("<li></li>").data("uid",++id);
-                    $treebody.append($li);
-                    isShow == "hide" && $li.hide();
-
-                    var $text = $("<span></span>").addClass("li-content").text(row.text);
-                    var $icon = $("<i></i>").attr("class",fileIcons.file).css("marginLeft",textIndent);
-
-                    if(row.children && row.children.length > 0){
-                        if(row.hasChildren || (row.children && row.children.length)){
-                            row.state == "open" ? $icon.attr("class",fileIcons.folderOpen):$icon.attr("class",fileIcons.folderClose);
-                        }
-                        $li.append($icon).append($text);
-                        textIndent += _iconWidth;
-                        row.state && row.state == "closed"
-                            ? eachLi(row.children,"hide",id*1000)
-                            : eachLi(row.children,isShow,id*1000);
-                        textIndent -= _iconWidth;
-                    }
-                    else{
-                        $li.append($icon).append($text);
-                    }
-                }
-            }(op.rows,"show",0);
             this.$tree.append($treeview);
+        },
+
+        _appendChildren:function($li,children){
+            var $ul = $("<ul></ul>");
+            var indent = $(i,$li).attr("marginLeft");
+            this._eachNode($ul,children,"show",0,indent);
+            $li.append($ul);
+        },
+
+        _eachNode:function($ul,data,isShow,id,indent){
+            var fileIcons = {"file":"icon fa fa-file","folderOpen":"icon fa fa-folder-open","folderClose":"icon fa fa-folder"};
+            for(var i = 0,len=data.length; i<len; i++){
+                var row      = data[i],
+                    $li      = $("<li></li>"),
+                    $text    = $("<span></span>").addClass("li-text").text(row.text),
+                    $icon    = $("<i></i>").attr("class",fileIcons.file).css("marginLeft",indent),
+                    $content = $("<div></div>").addClass("li-content").data("uid",++id).attr("data-uid",id);
+
+                $ul.append($li.append($content.append($icon).append($text)));
+                isShow == "hide" && $li.hide();
+
+                if(row.children && row.children.length > 0){
+                    var $parent = $("<ul></ul>");
+                    if(row.hasChildren || (row.children && row.children.length)){
+                        row.state == "open" ? $icon.attr("class",fileIcons.folderOpen):$icon.attr("class",fileIcons.folderClose);
+                    }
+                    $li.append($parent);
+                    indent += _iconWidth;
+                    row.state && row.state == "closed"
+                        ? this._eachNode($parent,row.children,"hide",id*1000,indent)
+                        : this._eachNode($parent,row.children,isShow,id*1000,indent);
+                    indent -= _iconWidth;
+                }
+            }
         },
 
         _createTitle:function($parent){
@@ -292,7 +303,6 @@
         rows:[],
         selectedRow:null,
         onDblClick:null,
-        style:"nav nav-tabs nav-stacked",
         page:true,
         async:false,
         asyncUrl:null

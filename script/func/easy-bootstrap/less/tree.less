@@ -23,38 +23,37 @@
         background-color: #fff;
         position: relative;
         margin:0;
-        border-bottom:1px solid @color-border;
         li{
             line-height: 24px;
-            padding:3px 4px;
-            border-bottom:1px solid @color-border;
-            &:last-child{
-                border-bottom:none;
-            }
-            input{
-                vertical-align:middle;
-            }
-            .icon,.li-content{
-                display:inline-block;
+            .li-content{
+                padding:3px 4px;
+                border-bottom:1px solid @color-border;
                 height:24px;
                 line-height: 24px;
                 vertical-align: top;
-            }
-            .icon{
-                width:12px;
-                margin-right:5px;
                 &:hover{
-                    cursor:pointer;
+                    background:@color-row-hover;
+                    .icon{
+                        color:lighten(@color-line-file-icon,50%);
+                    }
                 }
-            }
-            &.selected{
-                background: @color-row-click;
-            }
-            &:hover{
-                background:@color-row-hover;
+                &.selected{
+                    background: @color-row-click;
+                }
                 .icon{
-                    color:lighten(@color-line-file-icon,50%);
+                    display:inline-block;
+                    height:24px;
+                    line-height: 24px;
+                    vertical-align: top;
+                    width:12px;
+                    margin-right:5px;
+                    &:hover{
+                        cursor:pointer;
+                    }
                 }
+            }
+            input{
+                vertical-align:middle;
             }
         }
     }
