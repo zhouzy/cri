@@ -16,24 +16,21 @@ module.exports = function (grunt) {
                     yuicompress: false
                 },
                 files: {
-                    "script/func/easy-bootstrap/css/datagrid.css": "script/func/easy-bootstrap/less/datagrid.less",
-                    "script/func/easy-bootstrap/css/treegrid.css": "script/func/easy-bootstrap/less/treegrid.less",
-                    "script/func/easy-bootstrap/css/tree.css": "script/func/easy-bootstrap/less/tree.less",
-                    "script/func/easy-bootstrap/css/toolbar.css": "script/func/easy-bootstrap/less/toolbar.less",
-                    "script/func/easy-bootstrap/css/pager.css": "script/func/easy-bootstrap/less/pager.less"
+                    "script/func/cri/css/datagrid.css": "script/func/cri/less/datagrid.less",
+                    "script/func/cri/css/treegrid.css": "script/func/cri/less/treegrid.less",
+                    "script/func/cri/css/tree.css": "script/func/cri/less/tree.less",
+                    "script/func/cri/css/toolbar.css": "script/func/cri/less/toolbar.less",
+                    "script/func/cri/css/pager.css": "script/func/cri/less/pager.less"
                 }
             },
             production: {
                 options: {
                     yuicompress: true
                 },
-                files: {
-                    "script/func/easy-bootstrap/css/datagrid.css": "script/func/easy-bootstrap/less/datagrid.less",
-                    "script/func/easy-bootstrap/css/treegrid.css": "script/func/easy-bootstrap/less/treegrid.less",
-                    "script/func/easy-bootstrap/css/tree.css": "script/func/easy-bootstrap/less/tree.less",
-                    "script/func/easy-bootstrap/css/toolbar.css": "script/func/easy-bootstrap/less/toolbar.less",
-                    "script/func/easy-bootstrap/css/pager.css": "script/func/easy-bootstrap/less/pager.less"
-                }
+                files:[{
+                    src:["script/func/cri/less/*.less","!script/func/cri/less/lib.less","!script/func/cri/less/theme-default.less"],
+                    dest:"script/func/cri/final/cri.min.css"
+                }]
             }
         },
         // 合并 js css 文件
@@ -42,18 +39,10 @@ module.exports = function (grunt) {
             js:{
                 files:[{
                     src: [
-                        'script/func/easy-bootstrap/js/version3/cri.framework.js',
-                        'script/func/easy-bootstrap/js/version3/cri.widgets.js',
-                        'script/func/easy-bootstrap/js/version3/cri.grid.js',
-                        'script/func/easy-bootstrap/js/version3/*.js'
-                    ],
-                    dest:'script/func/easy-bootstrap/js/cri.js'
-                },{
-                    src: [
-                        'script/func/easy-bootstrap/js/version3/cri.framework.js',
-                        'script/func/easy-bootstrap/js/version3/cri.widgets.js',
-                        'script/func/easy-bootstrap/js/version3/cri.grid.js',
-                        'script/func/easy-bootstrap/js/version3/*.js'
+                        'script/func/cri/js/cri.framework.js',
+                        'script/func/cri/js/cri.widgets.js',
+                        'script/func/cri/js/cri.grid.js',
+                        'script/func/cri/js/*.js'
                     ],
                     dest:'script/func/cri/js/cri.js'
                 }]
@@ -61,10 +50,7 @@ module.exports = function (grunt) {
             },
             css:{
                 files:[{
-                    src:["script/func/easy-bootstrap/css/*.css","!script/func/easy-bootstrap/css/easy-*.css","!script/func/easy-bootstrap/css/reset.css"],
-                    dest:"script/func/easy-bootstrap/css/cri.css"
-                },{
-                    src:["script/func/easy-bootstrap/css/*.css","!script/func/easy-bootstrap/css/easy-*.css","!script/func/easy-bootstrap/css/reset.css"],
+                    src:["script/func/cri/css/*.css","!script/func/cri/css/easy-*.css","!script/func/cri/css/reset.css"],
                     dest:"script/func/cri/css/cri.css"
                 }]
             }
@@ -73,10 +59,12 @@ module.exports = function (grunt) {
         // 文档 https://github.com/gruntjs/grunt-contrib-uglify
         uglify: {
             build: {
-                files: {
-                    // concat 任务合并后的文件路径 可同名
-                    'public/javascripts/func/main.min.js': ['public/javascripts/func/main.js']
-                }
+                files:[
+                    {
+                        src:['script/func/cri/js/cri.js'],
+                        dest:'script/func/cri/final/cri.min.js'
+                    }
+                ]
             }
         },
 
@@ -84,24 +72,24 @@ module.exports = function (grunt) {
         // 文档 https://github.com/gruntjs/grunt-contrib-watch
         watch: {
             scripts: {
-                files: ['script/func/easy-bootstrap/js/version3/js/version3/*.js'],
+                files: ['script/func/cri/js/js/*.js'],
                 tasks: ['concat:js']
             },
             css: {
-                files: ['script/func/easy-bootstrap/css/*.css'],
+                files: ['script/func/cri/css/*.css'],
                 tasks: ['concat:css']
             },
             less: {
-                files: 'script/func/easy-bootstrap/less/*.less',
+                files: 'script/func/cri/less/*.less',
                 tasks: ['less']
             }
         }
     });
 
     // 开发环境不压缩 可调用 `grunt dev`
-    grunt.registerTask('dev', ['concat','less:development']);
+    grunt.registerTask('dev', ['less:development','concat']);
     // 生产环境压缩 可调用 `grunt pro`
-    grunt.registerTask('pro', ['concat','uglify']);
+    grunt.registerTask('pro', ['less:production','concat:js','uglify']);
     // 注册以外部调用 `grunt`
     grunt.registerTask('default', ['dev']);
 };
