@@ -38,19 +38,35 @@ module.exports = function (grunt) {
         },
         // 合并 js css 文件
         // 文档 https://github.com/gruntjs/grunt-contrib-concat
-        concat: {
-            js: {
-                options:{
-                    separator:";"
-                },
-                src: [
-                    'script/func/easy-bootstrap/js/version3/js/version3/*.js'
-                ],
-                dest:'script/func/easy-bootstrap/js/cri.js'
+        concat:{
+            js:{
+                files:[{
+                    src: [
+                        'script/func/easy-bootstrap/js/version3/cri.framework.js',
+                        'script/func/easy-bootstrap/js/version3/cri.widgets.js',
+                        'script/func/easy-bootstrap/js/version3/cri.grid.js',
+                        'script/func/easy-bootstrap/js/version3/*.js'
+                    ],
+                    dest:'script/func/easy-bootstrap/js/cri.js'
+                },{
+                    src: [
+                        'script/func/easy-bootstrap/js/version3/cri.framework.js',
+                        'script/func/easy-bootstrap/js/version3/cri.widgets.js',
+                        'script/func/easy-bootstrap/js/version3/cri.grid.js',
+                        'script/func/easy-bootstrap/js/version3/*.js'
+                    ],
+                    dest:'script/func/cri/js/cri.js'
+                }]
+
             },
             css:{
-                src:["script/func/easy-bootstrap/css/*.css","!script/func/easy-bootstrap/css/easy-*.css","!script/func/easy-bootstrap/css/reset.css"],
-                dest:"script/func/easy-bootstrap/css/cri.css"
+                files:[{
+                    src:["script/func/easy-bootstrap/css/*.css","!script/func/easy-bootstrap/css/easy-*.css","!script/func/easy-bootstrap/css/reset.css"],
+                    dest:"script/func/easy-bootstrap/css/cri.css"
+                },{
+                    src:["script/func/easy-bootstrap/css/*.css","!script/func/easy-bootstrap/css/easy-*.css","!script/func/easy-bootstrap/css/reset.css"],
+                    dest:"script/func/cri/css/cri.css"
+                }]
             }
         },
         // 压缩 js 文件
@@ -83,9 +99,9 @@ module.exports = function (grunt) {
     });
 
     // 开发环境不压缩 可调用 `grunt dev`
-    grunt.registerTask('dev', ['concat', 'uglify', 'less:development']);
+    grunt.registerTask('dev', ['concat','less:development']);
     // 生产环境压缩 可调用 `grunt pro`
-    grunt.registerTask('pro', ['concat', 'uglify']);
+    grunt.registerTask('pro', ['concat','uglify']);
     // 注册以外部调用 `grunt`
     grunt.registerTask('default', ['dev']);
 };
