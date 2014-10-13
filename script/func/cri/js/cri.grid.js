@@ -1,7 +1,7 @@
 /**
  * Author zhouzy
  * Date   2014/9/18
- * datagrid 组件
+ * grid 组件
  *
  */
 !function(window){
@@ -20,7 +20,8 @@
         _gridHeadH    = 31, //表格头高度
         _cellPadding  = 4,  //表格单元格左右Padding
         _cellDefaultW = 100,//单元格默认宽度
-        _cellBorderW  = 1;  //表格border宽度
+        _cellBorderW  = 1,  //表格border宽度
+        _cellMinW     = 5;  //单元格最小宽度
 
     /**
      * 1.如果组件初始化时,定义了高宽属性
@@ -29,10 +30,10 @@
      * 4.都未定义 默认为100%
      * @private
      */
-    function _getElementWidth($ele,width){
+    function _getElementWidth($ele){
         var styleWidth = $ele[0].style.width,
             propWidth  = $ele[0].width,
-            calWidth   = width || styleWidth || propWidth || "100%";
+            calWidth   = styleWidth || propWidth || "100%";
 
         var arr = ("" + calWidth).split("%");
         if(arr.length>1){
@@ -80,9 +81,9 @@
      * @returns {*}         处理后的列属性
      * @private
      */
-    function _getColumnsDef($table,optionWidth,optionColumns){
+    function _getColumnsDef($table,optionColumns){
 
-        var width = _getElementWidth($table, optionWidth);
+        var width = _getElementWidth($table);
 
         var columns = optionColumns || (function(){
             var fieldArr = "[";
@@ -102,10 +103,11 @@
             return (new Function("return " + fieldArr))();
         }());
 
-
         columns.map(function(column){
+
             column._width = _cellDefaultW - _cellPadding*2 - 1;
             if(column.field && column.width){
+                /*
                 var arr = ("" + column.width).split("%");
                 if(arr.length>1){
                     column._width = Math.floor(width * arr[0] / 100);
@@ -114,6 +116,9 @@
                     column._width = column.width;
                 }
                 column._width -= (_cellPadding * 2 + _cellBorderW);
+
+                */
+                column._width = column.width;
             }
             return column;
         });
@@ -169,11 +174,7 @@
         _eventListen:function(){
             var that = this;
             var op = this.options;
-            var isDrag = false;
             var dragStartX = 0;
-            var dragIndex = 0;
-            var left = 0;
-            var right = 0;
 
             this.$gridbody
                 .on("scroll",function(e){
@@ -193,30 +194,37 @@
                     }
                 });
 
+            $("body").on("mouseup",function(e){
+                that.$gridhead.css("cursor","");
+                that.$gridhead.off("mousemove");
+            });
             this.$gridhead
                 .on('mousedown',".drag-line",function(e){
-                    that.$datagrid.css("cursor","e-resize");
-                    dragIndex = $(e.target).data("drag");
-                    isDrag = true;
+                    var dragLineIndex = 0;
+                    op.rowNum && dragLineIndex++;
+                    op.checkBox && dragLineIndex++;
+
+                    dragLineIndex += $(this).data("drag");
+
+                    var $col = $("col:eq("+ dragLineIndex +")",that.$gridhead);
+                    that.$gridhead.css("cursor","e-resize");
                     dragStartX = e.pageX;
-                    left = dragStartX - that.col[dragIndex].width + 20;
-                    right = dragStartX + that.col[dragIndex + 1].width - 20;
-                })
-                .on("mouseup",function(e){
-                    if(isDrag){
-                        that.$datagrid.css("cursor","");
-                        isDrag = false;
-                    }
-                })
-                .on("mouseover",function(e){
-                    if(isDrag){
-                        if(e.pageX > left && e.pageX <right){
-                            that.col[dragIndex].width += e.pageX - dragStartX;
-                            that.col[dragIndex + 1].width -= e.pageX - dragStartX;
-                            dragStartX = e.pageX;
-                            that.refreshGridView();
+
+                    that.$gridhead.on("mousemove",function(e){
+                        var px = e.pageX - dragStartX;
+                        var width = $col.width() + px;
+                        var tableWidth = $("table",that.$gridhead).width();
+
+                        dragStartX = e.pageX;
+
+                        if(width >= _cellMinW){
+                            $("table",that.$gridbody).width(tableWidth + px);
+                            $("table",that.$gridhead).width(tableWidth + px);
+                            $col.width(width);
+                            $("col:eq("+ dragLineIndex +")",that.$gridbody).width(width);
                         }
-                    }
+                    });
+
                 })
                 .on('click',"input[type=checkbox]",function(e){
                     var isChecked = $(e.target).prop("checked");
@@ -248,7 +256,7 @@
         },
 
         _init:function () {
-            this._columns = _getColumnsDef(this.$element,this.options.width,this.options.columns);
+            this._columns = _getColumnsDef(this.$element,this.options.columns);
             this._getData();
             this._createGrid();
         },
@@ -298,6 +306,7 @@
                 op        = this.options,
                 columns   = this._columns;
 
+            $table.append($("colgroup",this.$gridbody).clone());
             $table.append($tr);
 
             if(op.checkBox){
@@ -325,59 +334,53 @@
                 }
                 $td.append($tdContent);
                 i < (len - 1) && $td.append($dragLine);
-
                 $tr.append($td);
             }
-
-            $("tr:eq(0) td",this.$gridbody).each(function(index){
-                $("td:eq(" + index + ") .td-content",$tr).width($(this).width());
-            });
-
             $parent.html($headWrap.html($table));
         },
 
         _createBody:function($parent){
             var $table   = $('<table></table>'),
+                $colgroup= $("<colgroup></colgroup>"),
                 op       = this.options,
                 id       = 0,
                 lineNum  = 1 + op.pageSize * (op.page - 1),
                 columns  = this._columns;
+            this.$colgroup = $colgroup;
+            $table.append($colgroup);
+
+            op.checkBox && $colgroup.append($("<col/>").width(30));
+            op.rowNum   && $colgroup.append($("<col/>").width(25));
+
+            for(var i= 0,len=columns.length; i<len;i++){
+                var $col = $("<col/>");
+                columns[i]._width && $col.width(columns[i]._width);
+                $colgroup.append($col);
+            }
 
             for(var i = 0,len = op.rows.length; i<len; i++){
                 var row = op.rows[i];
                 var $tr  = $('<tr></tr>').data("rowid",id);
 
                 if(op.checkBox){
-                    $tr.append($("<td></td>").addClass("line-checkbox").append('<span class="td-content"><input type="checkbox"/></span>'));
+                    $tr.append($("<td></td>").addClass("line-checkbox").append('<input type="checkbox"/>'));
                 }
                 if(op.rowNum){
-                    $tr.append($("<td></td>").addClass("line-number").append('<div class="td-content">' + lineNum + '</div>'));
+                    $tr.append($("<td></td>").addClass("line-number").append(lineNum));
                 }
-
 
                 for(var j = 0,length = columns.length; j<length;j++){
                     var $td = $('<td></td>');
                     var $content = $('<div></div>').addClass('td-content');
                     var column = columns[j],
                         text   = row[column.field] || "",
-                        _text  = ("" + text).replace(/<.\w+\s*[^<]+>/g,""),
-                        width  = column._width,
-                        divWidth = width - 2*_cellPadding;
-                    $content.prop("title",_text).width(divWidth).text(_text);
-                    $td.append($content);
+                        _text  = ("" + text).replace(/<.\w+\s*[^<]+>/g,"");
+                    $content.prop("title",_text).text(_text);
+                    $td.append(_text);
                     $tr.append($td);
                 }
                 lineNum++;id++;
                 $table.append($tr);
-            }
-
-            //调整最后一列宽度
-            var gridbodyWith = $parent.width(),
-                tableWidth   = $table.width(),
-                $lastTd      = $("tr td:last-child",$table),
-                lastTdWidth  = $lastTd.width();
-            if(gridbodyWith>(tableWidth+1)){
-                $lastTd.width(lastTdWidth + gridbodyWith-tableWidth);
             }
 
             $parent.html($table);
@@ -428,7 +431,7 @@
                     var shiftPage = i + page;
                     if(shiftPage>0 && shiftPage<=totalPage){
                         var $li = $("<li></li>"),
-                            $a  = $("<a></a>").text(sh);
+                            $a  = $("<a></a>").text(shiftPage);
                         shiftPage != page ?
                             $a.addClass("pager-num"):
                             $a.addClass("state-selected");

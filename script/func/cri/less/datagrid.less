@@ -21,6 +21,7 @@
     }
     table {
         color:@color-font;
+        width:100%;
         position: relative;
         margin: 0;
         border-collapse: separate;
@@ -31,16 +32,18 @@
         height:100%;
         display:table;
         table-layout:fixed;
+        word-wrap:break-word;
         td{
             line-height: 24px;
             padding:3px 4px;
             border-right:1px solid @color-border;
+            overflow: hidden;
+            vertical-align: middle;
+            text-overflow: ellipsis;
             &.line-number{
-                width:12px;
                 text-align:center;
             }
             &.line-checkbox{
-                width:20px;
             }
             &:last-child{
                 border-right: none;
@@ -64,10 +67,12 @@
         height:30px;
         border-bottom:1px solid @color-border;
         padding-right: 17px;
+        -moz-user-select:none;
+        -webkit-user-select:none;
+        cursor:pointer;
         .grid-head-wrap{
             overflow:hidden;
         }
-
         td{
             position:relative;
             &.line-number{
@@ -81,11 +86,11 @@
             }
             .drag-line{
                 position:absolute;
-                right:-5;
+                right:-5px;
                 width:10px;
                 height:24px;
                 &:hover{
-                    cursor:pointer;
+                    cursor:e-resize;
                 }
             }
         }

@@ -44,7 +44,7 @@ module.exports = function (grunt) {
                         'script/func/cri/js/cri.grid.js',
                         'script/func/cri/js/*.js'
                     ],
-                    dest:'script/func/cri/js/cri.js'
+                    dest:'script/func/cri/final/cri.js'
                 }]
 
             },
@@ -72,7 +72,7 @@ module.exports = function (grunt) {
         // 文档 https://github.com/gruntjs/grunt-contrib-watch
         watch: {
             scripts: {
-                files: ['script/func/cri/js/js/*.js'],
+                files: ['script/func/cri/js/*.js'],
                 tasks: ['concat:js']
             },
             css: {
@@ -81,7 +81,7 @@ module.exports = function (grunt) {
             },
             less: {
                 files: 'script/func/cri/less/*.less',
-                tasks: ['less']
+                tasks: ['less:production']
             }
         }
     });
