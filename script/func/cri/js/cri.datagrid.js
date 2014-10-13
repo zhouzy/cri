@@ -19,7 +19,11 @@
         var datagrid = null;
         this.each(function () {
             var $this   = $(this),
-                options = typeof option == 'object' && option;
+                dg      = $this.data('datagrid'),
+            options = typeof option == 'object' && option;
+            if(dg != null){
+                dg.$grid.before($this.show()).remove();
+            }
             $this.data('datagrid', (datagrid = new DataGrid(this, options)));
         });
         return datagrid;

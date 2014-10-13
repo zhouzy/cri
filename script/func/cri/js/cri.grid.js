@@ -104,20 +104,7 @@
         }());
 
         columns.map(function(column){
-
-            column._width = _cellDefaultW - _cellPadding*2 - 1;
             if(column.field && column.width){
-                /*
-                var arr = ("" + column.width).split("%");
-                if(arr.length>1){
-                    column._width = Math.floor(width * arr[0] / 100);
-                }
-                else{
-                    column._width = column.width;
-                }
-                column._width -= (_cellPadding * 2 + _cellBorderW);
-
-                */
                 column._width = column.width;
             }
             return column;
@@ -264,6 +251,8 @@
         _createGrid:function(){
             var height = _getElementHeight(this.$element,this.options.height);
             var $grid = $("<div></div>").addClass(this._gridClassName).css("height",height);
+            var tableStyle = this.$element.attr("style");
+            $grid.attr("style",tableStyle);
             this.$element.wrap($grid);
             this.$element.hide();
 
@@ -518,12 +507,20 @@
             $.ajax({
                 type: "post",
                 url: this.options.url,
-                success: function(data, textStatus){
+                success: function(data){
                     if(op.ajaxDone){
                         op.ajaxDone(data);
                     }
                     op.rows = data.rows || [];
                     op.total = data.total || 0;
+                },
+                error: function(){
+                    //TODO: warming developer
+                    op.rows = [];
+                    op.total = 0;
+                },
+                complete:function(){
+                    //TODO:clear all resource if necessary
                 },
                 data:op.param,
                 dataType:"JSON",
@@ -535,7 +532,7 @@
         _page:function(){
             this._getData();
             this.refreshGridView();
-            this.createPage(this.$page);
+            this._createPage(this.$page);
         },
 
         refreshGridView:function(){
@@ -547,7 +544,7 @@
         reload:function(param){
             param && (this.options.param = param);
             this.selectedRow = null;
-            this.getData();
+            this._getData();
             this.refreshGridView();
         },
 
