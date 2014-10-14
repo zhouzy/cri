@@ -13,7 +13,6 @@ QUnit.test("datagrid",function(assert){
     assert.equal(grid.options.rows.length,0);
     assert.equal(grid.options.total,0);
 
-
     grid = $("#grid").datagrid({
         url:"./datagrid-data.json"
     });

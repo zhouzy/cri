@@ -18,30 +18,7 @@
         _toolbarH     = 31, //工具栏高度
         _pagerH       = 41, //分页高度
         _gridHeadH    = 31, //表格头高度
-        _cellPadding  = 4,  //表格单元格左右Padding
-        _cellDefaultW = 100,//单元格默认宽度
-        _cellBorderW  = 1,  //表格border宽度
         _cellMinW     = 5;  //单元格最小宽度
-
-    /**
-     * 1.如果组件初始化时,定义了高宽属性
-     * 2.如果table设置了高宽(style)
-     * 3.如果table设置了高宽属性
-     * 4.都未定义 默认为100%
-     * @private
-     */
-    function _getElementWidth($ele){
-        var styleWidth = $ele[0].style.width,
-            propWidth  = $ele[0].width,
-            calWidth   = styleWidth || propWidth || "100%";
-
-        var arr = ("" + calWidth).split("%");
-        if(arr.length>1){
-            return Math.floor($ele.parent().width() * arr[0] / 100);
-        }
-        calWidth = calWidth.split("px")[0];
-        return parseInt(calWidth);
-    }
 
     /**
      * 计算表格高度
@@ -76,14 +53,11 @@
     /**
      * 获取Grid每列信息
      * @param $table        原始 table jquery对象
-     * @param optionWidth   使用 options.grid 初始化宽度
      * @param optionColumns 使用 options.columns 初始化列属性
      * @returns {*}         处理后的列属性
      * @private
      */
     function _getColumnsDef($table,optionColumns){
-
-        var width = _getElementWidth($table);
 
         var columns = optionColumns || (function(){
             var fieldArr = "[";
@@ -251,8 +225,7 @@
         _createGrid:function(){
             var height = _getElementHeight(this.$element,this.options.height);
             var $grid = $("<div></div>").addClass(this._gridClassName).css("height",height);
-            var tableStyle = this.$element.attr("style");
-            $grid.attr("style",tableStyle);
+            $grid.attr("style",this.$element.attr("style")).show();
             this.$element.wrap($grid);
             this.$element.hide();
 
@@ -330,22 +303,12 @@
 
         _createBody:function($parent){
             var $table   = $('<table></table>'),
-                $colgroup= $("<colgroup></colgroup>"),
                 op       = this.options,
                 id       = 0,
                 lineNum  = 1 + op.pageSize * (op.page - 1),
                 columns  = this._columns;
-            this.$colgroup = $colgroup;
-            $table.append($colgroup);
 
-            op.checkBox && $colgroup.append($("<col/>").width(30));
-            op.rowNum   && $colgroup.append($("<col/>").width(25));
-
-            for(var i= 0,len=columns.length; i<len;i++){
-                var $col = $("<col/>");
-                columns[i]._width && $col.width(columns[i]._width);
-                $colgroup.append($col);
-            }
+            $table.append(this._createColGroup());
 
             for(var i = 0,len = op.rows.length; i<len; i++){
                 var row = op.rows[i];
@@ -375,6 +338,20 @@
             $parent.html($table);
         },
 
+        _createColGroup:function(){
+            var $colgroup= $("<colgroup></colgroup>"),
+                op       = this.options,
+                columns  = this._columns;
+            op.checkBox && $colgroup.append($("<col/>").width(30));
+            op.rowNum   && $colgroup.append($("<col/>").width(25));
+
+            for(var i= 0,len=columns.length; i<len;i++){
+                var $col = $("<col/>");
+                columns[i]._width && $col.width(columns[i]._width);
+                $colgroup.append($col);
+            }
+            return $colgroup;
+        },
         _createToolbar:function($parent){
             if(this.options.toolbar){
                 var $toolbar = $('<div class="toolbar"></div>');

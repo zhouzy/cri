@@ -21,6 +21,7 @@
     }
     table {
         color:@color-font;
+        width:100%;
         position: relative;
         margin: 0;
         border-collapse: separate;
@@ -31,6 +32,7 @@
         height:100%;
         display:table;
         table-layout:fixed;
+        word-wrap:break-word;
         td{
             line-height: 24px;
             padding:3px 4px;
@@ -43,15 +45,10 @@
                 width:20px;
             }
             &.line-file-icon{
-                span{
-                    display:inline-block;
-                    height:24px;
-                    line-height: 24px;
-                    i{
-                        cursor:pointer;
-                        padding-right:5px;
-                        color:@color-line-file-icon;
-                    }
+                i{
+                    cursor:pointer;
+                    color:@color-line-file-icon;
+                    margin-right:5px;
                 }
             }
             &:last-child{

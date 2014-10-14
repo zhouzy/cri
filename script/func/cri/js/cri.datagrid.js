@@ -22,7 +22,7 @@
                 dg      = $this.data('datagrid'),
             options = typeof option == 'object' && option;
             if(dg != null){
-                dg.$grid.before($this.show()).remove();
+                dg.$grid.before($this).remove();
             }
             $this.data('datagrid', (datagrid = new DataGrid(this, options)));
         });

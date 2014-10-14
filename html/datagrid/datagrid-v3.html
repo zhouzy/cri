@@ -48,6 +48,20 @@
                 console.log(data.propB);
             }
         });
+
+        grid = $("#grid").datagrid({
+            url:"./datagrid-data.json",
+            rowNum:true,
+            title:"hello grid",
+            checkBox:true,
+            toolbar:[{"hello":"kao"}],
+            onClick:function(data){
+                console.log(data.propA);
+            },
+            onDblClick:function(data){
+                console.log(data.propB);
+            }
+        });
     </script>
 </body>
 </html>

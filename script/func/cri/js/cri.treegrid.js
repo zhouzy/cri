@@ -32,6 +32,7 @@
             lineNum = 1,
             paddingLeft = 1,
             iconWidth = 6;
+        $table.append(this._createColGroup());
         /**
          * 拼装每行HTML
          */
@@ -43,10 +44,10 @@
                 isShow == "show" || $tr.hide();
 
                 if(op.checkBox){
-                    $tr.append($("<td></td>").addClass("line-checkbox").append('<span class="td-content"><input type="checkbox"/></span>'));
+                    $tr.append($("<td></td>").addClass("line-checkbox").append('<input type="checkbox"/>'));
                 }
                 if(op.rowNum){
-                    $tr.append($("<td></td>").addClass("line-number").append('<div class="td-content">' + (lineNum++) + '</div>'));
+                    $tr.append($("<td></td>").addClass("line-number").append(lineNum++));
                 }
 
                 getColHtml($tr,columns,row,paddingLeft);
@@ -76,39 +77,23 @@
 
             $.each(colDef,function(index){
                 var $td = $("<td></td>");
-                var text  = colData[this.field] || "",
-                    width = colDef[index]._width || 100,
-                    divWidth = width - 2*4;
-
-                var $content = $("<span></span>").addClass("td-content").width(divWidth);
+                var text  = colData[this.field] || "";
 
                 if(this.field == "text"){
                     var $icon = $("<i></i>").attr("class",fileIcons.file);
                     if(colData.hasChildren || (colData.children && colData.children.length)){
                         colData.state == "open" ? $icon.attr("class",fileIcons.folderOpen):$icon.attr("class",fileIcons.folderClose);
                     }
-                    $td.css("text-indent",textIndent).addClass("line-file-icon");
-                    $content.append($icon).append(text);
+                    $td.css("text-indent",textIndent).addClass("line-file-icon").append($icon).append(text);
                 }
                 else{
-                    $content.text(text);
+                    $td.text(text);
                 }
-                $td.append($content);
                 $tr.append($td);
             });
         }
 
-
-        //调整最后一列宽度
-        var gridbodyWith = $parent.width(),
-            tableWidth   = $table.width(),
-            $lastTd      = $("tr td:last-child",$table),
-            lastTdWidth  = $lastTd.width();
-        if(gridbodyWith>(tableWidth+1)){
-            $lastTd.width(lastTdWidth + gridbodyWith-tableWidth);
-        }
-
-        $parent.html($table);
+       $parent.html($table);
     }
 
     TreeGrid.prototype._fold = function(e){
@@ -163,12 +148,12 @@
     $.fn.treegrid = function(option) {
         var treeGrid = null;
         this.each(function () {
-            var $this   = $(this),
-                options = typeof option == 'object' && option;
+            var $this    = $(this),
+                options  = typeof option == 'object' && option;
+            treeGrid = $this.data('treegrid');
+            treeGrid && treeGrid.$grid.before($this).remove();
             $this.data('treegrid', (treeGrid = new TreeGrid(this, options)));
         });
         return treeGrid;
     };
-
-
 }(window);
