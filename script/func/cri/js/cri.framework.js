@@ -3,11 +3,10 @@
  * Date   2014/9/23
  *
  * 青牛软件成都研发中心
- * 前端框架 cri
+ * 前端框架 cri 基础类
  *
  * 版本 v 2.0
  *
- * 包括组件：datagrid treegrid tree
  */
 
 !function(window){
@@ -31,8 +30,5 @@
         return subType;
     };
 
-    Class.prototype._initOptions = function(options) {
-        this.options = $.extend({}, this.options, options);
-    };
     cri.Class = Class;
 }(window);

@@ -114,7 +114,7 @@
         ajaxError:null
     };
 
-    var Grid = cri.Class.extend(function(element,options){
+    var Grid = cri.Widgets.extend(function(element,options){
         this.options     = _defaultOptions;
         this.$element    = $(element);
         this.$grid       = null;
@@ -123,12 +123,10 @@
         this.$toolbar    = null;
         this.$page       = null;
         this.$title      = null;
-        this._columns    = [];//根据table td元素和this.options.columns得出列属性
+        this._columns    = [];
         this.selectedRow = null;
         this._gridClassName = this._gridClassName || "datagrid";
-        this._initOptions(options);
-        this._init();
-        this._eventListen();
+        cri.Widgets.apply(this,arguments);
     });
 
     $.extend(Grid.prototype,{

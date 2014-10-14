@@ -1,0 +1,74 @@
+@import "./lib.less";
+@import "./theme-default.less";
+
+.window {
+    background-color: #fff;
+    color: @color-font;
+    display: inline-block;
+    position: absolute;
+    z-index: 10001;
+    border: solid 1px @color-border;
+    min-width: 110px;
+    min-height: 50px;
+    top:5px;
+    left:5px;
+    .rounded-corners(4px);
+    .box-shadow(1px,1px,7px,1px,darken(@color-background,40%));
+    .window-head{
+        position:relative;
+        height:24px;
+        line-height:24px;
+        padding:5px 0;
+        font-size:1.2em;
+        .gradient-background(lighten(@color-background,3%),@color-background);
+        border-bottom: solid 1px @color-border;
+        .title{
+            display:inline-block;
+            position:absolute;
+            right:100px;
+            left:5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .buttons{
+            position:absolute;
+            right:5px;
+            display:inline-block;
+            .button{
+                display:inline-block;
+                .rounded-corners(4px);
+                line-height: 20px;
+                height:20px;
+                width:20px;
+                text-align:center;
+                cursor:pointer;
+                background-color: #fff;
+                &:hover{
+                    background: @color-button-hover;
+                    i{
+                        color:#fff;
+                    }
+                }
+                i{
+                    color:@color-button-icon;
+                }
+            }
+        }
+    }
+    .window-content{
+        padding:4px 3px;
+    }
+}
+.overlay{
+    background-color:darken(@color-background,80%);
+    position: absolute;
+    z-index: 10000;
+    left:0;
+    right:0;
+    bottom:0;
+    top:0;
+    filter: alpha(opacity=50);
+    opacity: .5;
+}
+
