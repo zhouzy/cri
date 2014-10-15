@@ -35,11 +35,11 @@
         /**
          *
          * TODO:
-         * 1.首先卸载掉原dom对象
-         * 2.包装window div
-         * 3.生成window head
-         * 4.插入原dom 到 window div中
-         *
+         * 1.包装window div
+         * 2.insert before window head
+         * 3.修改原dom对象
+         * 4.拖拽效果
+         * 5.resize 效果
          */
 
         var thisObject = this;
