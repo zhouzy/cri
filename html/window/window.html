@@ -23,21 +23,15 @@
 <body>
 <div class="content">
     <div>back</div>
-    <div class="overlay"></div>
-    <div class="window">
-        <div class="window-head">
-            <span class="title">this is window</span>
-            <div class="buttons">
-                <span class="button"><i class="fa fa-minus"></i></span>
-                <span class="button"><i class="fa fa-expand"></i></span>
-                <span class="button"><i class="fa fa-compress"></i></span>
-                <span class="button"><i class="fa fa-close"></i></span>
-            </div>
-        </div>
-        <div class="window-content" style="width:400px;height:400px;">
-            hello window
-        </div>
+    <div id="wnd" class="window-content" style="width:400px;height:400px;">
+        hello window
     </div>
 </div>
+<script>
+    $("#wnd").window({
+        title:"hello window",
+        actions:["Close","Minimize"]
+    });
+</script>
 </body>
 </html>

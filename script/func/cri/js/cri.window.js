@@ -13,7 +13,10 @@
     var cri = window.cri,
         $   = window.jQuery;
 
+    var icons = {Minimize:"fa fa-minus",Maximize:"fa fa-expand","Close":"fa fa-close","Restore":"fa fa-compress"};
+
     var _defaultOptions = {
+        actions:["Close"],
         content:null,
         visible:true,
         model:true,//模态窗口
@@ -21,6 +24,7 @@
         height:400,
         position:{top:null,left:null}
     };
+
 
     var Window = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
@@ -42,51 +46,14 @@
          * 5.resize 效果
          */
 
-        var thisObject = this;
-        this.$element.wrap('<div class="eb_popoutWindowGroup" id="'+thisObject.id+'_subgroup"></div>');
-        this.parent = this.$element.parent();      //parent
-        this.parent.data("popoutWindow",thisObject);
-        if(thisObject.$element.data("form"))
-            this.parent.data("form",thisObject.$element.data("form"));
-        this.popoutWindowObj = this.$element;     //popoutWindowObj
-        this.parent.prepend('<div class="eb_title">'+thisObject.title+'<span class="eb_closeWindowButton">x</span></div>');
-        this.titleObj = this.parent.children('.eb_title');    //titleObj
-        if(this.dataOptions.closeHandler){
-            var func = this.dataOptions.closeHandler;
-            if(typeof func == "string")
-                func = window[func];
-            thisObject.titleObj.find('.eb_closeWindowButton').click(function(){
-                func();
-            });
-        }
-        this.parent.append('<div class="eb_buttonsBar"></div>');
-        this.buttonsBar = this.parent.children('.eb_buttonsBar');       //buttonsBar
-        this.buttonsArr = this.dataOptions.buttons;
+        this.$element.wrap('<div class="window"></div>');
 
-        if(typeof this.buttonsArr == "string"){
-            this.buttonsArr = window[thisObject.buttonsArr];
-        }                                                   //buttonsArr
-        if(thisObject.buttonsArr){
-            for(var i=0;i<thisObject.buttonsArr.length;i++){
-                var func = thisObject.buttonsArr[i].handler;
-                if(typeof func == "string")
-                    func = window[func];
-                thisObject.funcArr[i]=func;
-                this.buttonsBar.prepend($('<span class="eb_buttons" funcIndex="'+i+'"><span class="eb_icon '+thisObject.buttonsArr[i].icon+'"></span>'+thisObject.buttonsArr[i].text+'</span>').click(function(){
-                    var thisObj = this;
-                    thisObject.funcArr[$(thisObj).attr("funcIndex")]();
-                }));
-            }
-        }
-        this.buttonsObj = this.buttonsBar.children('.eb_buttons');     //buttonsObj
-        if(this.dataOptions.fullScreen == true){
-            this.setFullScreen();
-        }else{
-            this.setWidth();
-            this.setHeight();
-        }
-        this.setPosition();
-        this.setStyle();
+        this.$window = this.$element.parent();
+
+        this._createHead();
+
+        this.$element.addClass("window-content");
+
     };
 
     /**
@@ -95,11 +62,30 @@
      */
     Window.prototype._eventListen = function(){};
 
-    Window.prototype._createTitle = function(){};
+    Window.prototype._createHead = function(){
+        var $windowHead = $("<div></div>").addClass("window-head");
+        $windowHead.append(this._createTitle()).append(this._createButtons());
+        this.$window.prepend($windowHead);
+        this.$windowHead = $windowHead;
+    };
 
-    Window.prototype._createContent = function(){};
+    Window.prototype._createTitle = function(){
+        var title = this.options.title || "";
+        var $title = $("<span></span>").addClass("title").text(title);
+        return $title;
+    };
 
-    Window.prototype._createButtons = function(){};
+    Window.prototype._createButtons = function(){
+        var $buttons = $("<div></div>").addClass("buttons");
+        for(var i = 0,len = this.options.actions.length; i < len; i++){
+            var action = this.options.actions[i];
+            var $button = $("<span></span>").addClass("button");
+            var $icon = $("<i></i>").attr("class",icons[action]);
+            $button.append($icon);
+            $buttons.append($button);
+        }
+        return $buttons;
+    };
 
     Window.prototype.open = function(){};
 
@@ -112,4 +98,20 @@
     Window.prototype.destory = function(){};
 
     cri.Window = Window;
+
+
+    $.fn.window = function(option) {
+        var wnd = null;
+        this.each(function () {
+            var $this   = $(this),
+                wnd      = $this.data('window'),
+                options = typeof option == 'object' && option;
+            if(wnd != null){
+                wnd.$window.before($this).remove();
+            }
+            $this.data('window', (wnd = new Window(this, options)));
+        });
+        return wnd;
+    };
+
 }(window);
