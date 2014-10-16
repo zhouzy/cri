@@ -24,13 +24,18 @@
 <div class="content">
     <div>back</div>
     <div id="wnd" class="window-content" style="width:400px;height:400px;">
-        hello window
+        this is outter window
+        <div id="innerWnd" style="width:1000px; height:300px;">this is inner window</div>
     </div>
 </div>
 <script>
     $("#wnd").window({
         title:"hello window",
-        actions:["Close","Minimize"]
+        actions:["Maximize","Close","Minimize","Restore"]
+    });
+    $("#innerWnd").window({
+        title:"inner window",
+        actions:["Maximize","Close","Minimize","Restore"]
     });
 </script>
 </body>

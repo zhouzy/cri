@@ -15,7 +15,6 @@
 
     var Widgets = cri.Class.extend(function(element,options){
         this.$element = $(element);
-        this.options = null;
         this._initOptions(options);
         this._init();
         this._eventListen();
