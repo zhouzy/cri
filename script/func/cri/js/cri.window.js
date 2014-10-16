@@ -99,10 +99,10 @@
         //TODO:否：查看窗口组是否存在overlay 存在的话 提高overlay z-index 不存在 生成overlay
         if(this.options.modal){
 
-            var $overlay = $.find(".overlay").length || $("<div></div>").addClass("overlay");
+            var $overlay = $(".overlay")[0] || $("<div></div>").addClass("overlay")[0];
             $("body").append($overlay);
             var zIndex = +this.$window.css("zIndex");
-            $overlay.css("zIndex",zIndex);
+            $overlay.style.zIndex = zIndex;
             this.$window.css("zIndex",(zIndex+1));
         }
     };
