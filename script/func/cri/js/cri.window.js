@@ -13,19 +13,20 @@
     var cri = window.cri,
         $   = window.jQuery;
 
-    var icons = {Minimize:"fa fa-minus",Maximize:"fa fa-expand","Close":"fa fa-close","Restore":"fa fa-compress"};
-    var ZINDEX = 10000;
+    var icons = {Minimize:"fa fa-minus",Maximize:"fa fa-expand","Close":"fa fa-close","Restore":"fa fa-compress"},
+        HEAD_HEIGHT = 35,
+        MINI_WINDOW_WIDTH = 140+10,
+        ZINDEX = 10000;
 
     var _defaultOptions = {
         actions:["Close"],
         content:null,
         visible:true,
-        modal:true,//模态窗口
+        modal:false,//模态窗口
         width:600,
         height:400,
         position:{top:null,left:null}
     };
-
 
     var Window = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
@@ -37,24 +38,15 @@
      * @private
      */
     Window.prototype._init = function(){
-         //TODO:1.包装window div
-         //TODO:2.insert before window head
-         //TODO:3.修改原dom对象
-         //TODO:4.拖拽效果
-         //TODO:5.resize 效果
-
+        this.$element.detach().addClass("window-content");
         this.$element.wrap('<div class="window"></div>');
-
         this.$window = this.$element.parent();
-
-        this.$window.css("zIndex",this._zIndex());
-
+        var op = this.options,
+            position = op.position;
+        this.$window.css({zIndex:this._zIndex(),left:position.left,top:position.top,width:this.options.width,height:this.options.height});
         this._overlay();
-
         this._createHead();
-
-        this.$element.addClass("window-content");
-
+        $("body").append(this.$window);
     };
 
     /**
@@ -82,10 +74,19 @@
         return $title;
     };
 
+    /**
+     * 根据actions 生成按钮
+     * 模态窗口不生成最小化按钮
+     * @returns {*}
+     * @private
+     */
     Window.prototype._createButtons = function(){
         var $buttons = $("<div></div>").addClass("buttons");
         for(var i = 0,len = this.options.actions.length; i < len; i++){
             var action = this.options.actions[i];
+            if(action == "Minimize" && this.options.modal){
+                continue;
+            }
             var $button = $("<span></span>").addClass("button");
             var $icon = $("<i></i>").attr("class",icons[action]);
             $button.append($icon);
@@ -94,11 +95,12 @@
         return $buttons;
     };
 
+    /**
+     * 生成模态窗口背景遮罩
+     * @private
+     */
     Window.prototype._overlay = function(){
-        //TODO:当前窗口是否为模态窗口 是：不生成overlay
-        //TODO:否：查看窗口组是否存在overlay 存在的话 提高overlay z-index 不存在 生成overlay
         if(this.options.modal){
-
             var $overlay = $(".overlay")[0] || $("<div></div>").addClass("overlay")[0];
             $("body").append($overlay);
             var zIndex = +this.$window.css("zIndex");
@@ -107,6 +109,12 @@
         }
     };
 
+    /**
+     * 根据icon类名返回对应的处理函数
+     * @param icon
+     * @returns {*}
+     * @private
+     */
     Window.prototype._actionForIcon = function(icon) {
         var iconClass = /\bfa fa-\w+\b/.exec(icon[0].className)[0];
         return {
@@ -117,27 +125,85 @@
         }[iconClass];
     };
 
-    Window.prototype.open = function(){
-        console.log("open");
-    };
 
+
+    /**
+     * 关闭当前窗口
+     *
+     * 隐藏并且放置到最底层
+     */
     Window.prototype.close = function(){
-        //TODO:当窗口为模态窗口时，调整overlay的z-index
-        //TODO:销毁当前窗口
+        var max = ZINDEX;
+        var frontWnd = null;
+        this.$window.css("zIndex",ZINDEX).hide();
+        $(".window").each(function(){
+            var z = +this.style.zIndex + 1;
+            this.style.zIndex = z;
+            if(z >= max){
+                max = z;
+                frontWnd = this;
+            }
+        });
+        frontWnd.style.zIndex = max+1;
+        $(".window").is(":visible") ?
+            $(".overlay").css("zIndex",max):
+            $(".overlay").hide();
 
-        this.$window.hide();
+        this.$window.removeClass("mini-window");
     };
 
+    /**
+     * 最大化窗口
+     */
     Window.prototype.maximize = function(){
-        console.log("maximize");
+        this._setStyleByStatus("maximize");
+        $("i.fa-expand",this.$window).removeClass("fa-expand").addClass("fa-compress");
     };
 
+    /**
+     * 最小化窗口
+     * 依次排放到左下侧
+     * 模态窗口没有最小化按钮
+     */
     Window.prototype.minimize = function(){
-        console.log("minimize");
+        $(".window-content",this.$window).hide();
+        var left = $(".mini-window").size() * MINI_WINDOW_WIDTH;
+        this._setStyleByStatus("minimize");
+        this.$window.css("left",left)
     };
 
+    /**
+     * 由最小化打开窗口
+     */
+    Window.prototype.open = function(){
+        this._setStyleByStatus("normal");
+    };
+
+    /**
+     * 复原窗口到初始(缩放、移动窗口会改变初始位置尺寸信息)尺寸、位置
+     */
     Window.prototype.resume = function(){
-        console.log("resume");
+        this._setStyleByStatus("normal");
+        $("i.fa-compress",this.$window).removeClass("fa-compress").addClass("fa-expand");
+    };
+
+    /**
+     * 根据窗口的状态设置窗口样式
+     * @private
+     */
+    Window.prototype._setStyleByStatus = function(status){
+        var op    = this.options,
+            pos   = op.position,
+            KLASS = {minimize:"window mini-window",maximize:"window maxi-window",closed:"window",normal:"window"},
+            style = {width:op.width,height:op.height,left:pos.left,top:pos.top,bottom:"auto",right:"auto"};
+        this.$window.prop("class",KLASS[status]).css(style);
+    };
+
+    /**
+     * 把当前窗口顶至最前
+     */
+    Window.prototype.toFront = function(){
+
     };
 
     Window.prototype._zIndex = function(){
@@ -148,7 +214,9 @@
         return ++zindex;
     };
 
-    Window.prototype.destory = function(){};
+    Window.prototype.destory = function(){
+
+    };
 
     cri.Window = Window;
 
@@ -165,5 +233,4 @@
         });
         return wnd;
     };
-
 }(window);

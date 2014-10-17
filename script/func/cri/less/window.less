@@ -1,15 +1,14 @@
 @import "./lib.less";
 @import "./theme-default.less";
 
-.window {
+.window{
     background-color: #fff;
     color: @color-font;
     display: inline-block;
     position: absolute;
     z-index: 10001;
     border: solid 1px @color-border;
-    min-width: 110px;
-    min-height: 50px;
+    min-width: 140px;
     top:5px;
     left:5px;
     .rounded-corners(4px);
@@ -62,6 +61,21 @@
     .window-content{
         padding:4px 3px;
     }
+}
+
+.mini-window{
+    bottom:0 !important;
+    top:auto !important;
+    width:140px !important;
+    height:35px !important;
+}
+.maxi-window{
+    bottom:0 !important;
+    top:0 !important;
+    right:0 !important;
+    left:0 !important;
+    width:auto !important;
+    height:auto !important;
 }
 .overlay{
     background-color:darken(@color-background,80%);

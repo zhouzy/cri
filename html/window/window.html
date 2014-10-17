@@ -23,19 +23,34 @@
 <body>
 <div class="content">
     <div>back</div>
-    <div id="wnd" class="window-content" style="width:400px;height:400px;">
-        this is outter window
-        <div id="innerWnd" style="width:1000px; height:300px;">this is inner window</div>
+    <div id="window1" class="window-content" style="width:400px;height:400px;">
+        <p>
+            window1
+        </p>
+        <div id="window2" style="width:1000px; height:300px;"><p>
+            window2
+        </p></div>
     </div>
+    <div id="window3" style="width:400px;height:200px;"><p>window3</p></div>
 </div>
 <script>
-    $("#wnd").window({
-        title:"hello window",
-        actions:["Maximize","Close","Minimize","Restore"]
+    $("#window1").window({
+        title:"window1",
+        actions:["Maximize","Close","Minimize"],
+        position:{left:10,top:10},
+        width:200,height:200
     });
-    $("#innerWnd").window({
-        title:"inner window",
-        actions:["Maximize","Close","Minimize","Restore"]
+    $("#window2").window({
+        title:"window2",
+        actions:["Maximize","Close","Minimize"],
+        position:{left:20,top:20},
+        width:300,height:300
+    });
+    $("#window3").window({
+        title:"window3",
+        actions:["Maximize","Close","Minimize"],
+        position:{left:30,top:30},
+        width:500,height:500
     });
 </script>
 </body>
