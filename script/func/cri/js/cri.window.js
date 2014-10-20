@@ -13,7 +13,7 @@
     var cri = window.cri,
         $   = window.jQuery;
 
-    var icons = {Minimize:"fa fa-minus",Maximize:"fa fa-expand","Close":"fa fa-close","Restore":"fa fa-compress"},
+    var icons = {Minimize:"fa fa-minus",Maximize:"fa fa-expand","Close":"fa fa-close","Resume":"fa fa-compress"},
         HEAD_HEIGHT = 35,
         MINI_WINDOW_WIDTH = 140+10,
         ZINDEX = 10000;
@@ -30,8 +30,12 @@
 
     var Window = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
+        this.windowStatus = "normal";
         cri.Widgets.apply(this,arguments);
+        Window.prototype.windowStack.push(this);
     });
+
+    Window.prototype.windowStack = [];
 
     /**
      * 初始化组件DOM结构
@@ -55,8 +59,8 @@
      */
     Window.prototype._eventListen = function(){
         var that = this;
-        this.$window.on("click",".buttons .button i",function(){
-            var action = that._actionForIcon($(this));
+        this.$window.on("click",".buttons .button",function(){
+            var action = that._actionForButton($(this));
             action && typeof that[action] === "function" && that[action]();
         });
     };
@@ -75,22 +79,28 @@
     };
 
     /**
-     * 根据actions 生成按钮
+     * 根据actions 按照（最小化，放大，关闭）顺序生成按钮
      * 模态窗口不生成最小化按钮
      * @returns {*}
      * @private
      */
     Window.prototype._createButtons = function(){
+        var options = this.options;
         var $buttons = $("<div></div>").addClass("buttons");
-        for(var i = 0,len = this.options.actions.length; i < len; i++){
-            var action = this.options.actions[i];
-            if(action == "Minimize" && this.options.modal){
-                continue;
+        var defaultButtons = options.modal ? ["Maximize","Close"]:["Minimize","Maximize","Close"];
+
+        for(var i = 0, len = defaultButtons.length; i<len; i++){
+            var defBtn = defaultButtons[i];
+            for(var j = 0,l = options.actions.length; j < l; j++){
+                var action = options.actions[j];
+                if(action == defBtn){
+                    var $button = $("<span></span>").addClass("button").addClass(action.toLowerCase());
+                    var $icon = $("<i></i>").attr("class",icons[action]);
+                    $button.append($icon);
+                    $buttons.append($button);
+                }
+
             }
-            var $button = $("<span></span>").addClass("button");
-            var $icon = $("<i></i>").attr("class",icons[action]);
-            $button.append($icon);
-            $buttons.append($button);
         }
         return $buttons;
     };
@@ -115,17 +125,23 @@
      * @returns {*}
      * @private
      */
-    Window.prototype._actionForIcon = function(icon) {
-        var iconClass = /\bfa fa-\w+\b/.exec(icon[0].className)[0];
+    Window.prototype._actionForButton = function(button) {
+        var iconClass = /\bbutton \w+\b/.exec(button[0].className)[0];
         return {
-            "fa fa-minus": "minimize",
-            "fa fa-expand": "maximize",
-            "fa fa-compress": "resume",
-            "fa fa-close": "close"
+            "button minimize": "minimize",
+            "button maximize": "maximize",
+            "button resume": "resume",
+            "button close": "close"
         }[iconClass];
     };
 
-
+    /**
+     * 由最小化打开窗口
+     */
+    Window.prototype.open = function(){
+        this._setStyleByStatus("normal");
+        this.windowStatus = "normal";
+    };
 
     /**
      * 关闭当前窗口
@@ -150,14 +166,17 @@
             $(".overlay").hide();
 
         this.$window.removeClass("mini-window");
+        this.windowStatus = "close";
     };
 
     /**
      * 最大化窗口
+     * 最大化后 复原、关闭
      */
     Window.prototype.maximize = function(){
         this._setStyleByStatus("maximize");
-        $("i.fa-expand",this.$window).removeClass("fa-expand").addClass("fa-compress");
+        this._setButtons("maximize");
+        this.windowStatus = "maximize";
     };
 
     /**
@@ -166,25 +185,30 @@
      * 模态窗口没有最小化按钮
      */
     Window.prototype.minimize = function(){
+        this._setButtons("minimize");
         $(".window-content",this.$window).hide();
         var left = $(".mini-window").size() * MINI_WINDOW_WIDTH;
         this._setStyleByStatus("minimize");
-        this.$window.css("left",left)
-    };
-
-    /**
-     * 由最小化打开窗口
-     */
-    Window.prototype.open = function(){
-        this._setStyleByStatus("normal");
+        this.$window.css("left",left);
+        this.windowStatus = "minimize";
     };
 
     /**
      * 复原窗口到初始(缩放、移动窗口会改变初始位置尺寸信息)尺寸、位置
      */
     Window.prototype.resume = function(){
+        this._setButtons("normal");
         this._setStyleByStatus("normal");
-        $("i.fa-compress",this.$window).removeClass("fa-compress").addClass("fa-expand");
+        if(this.windowStatus == "minimize"){
+            this.windowStatus = "normal";
+            var i = 0;
+            $.each(Window.prototype.windowStack,function(index,wnd){
+                if(wnd.windowStatus == "minimize"){
+                    wnd._moveLeft(i++);
+                }
+            });
+        }
+        this.windowStatus = "normal";
     };
 
     /**
@@ -197,6 +221,41 @@
             KLASS = {minimize:"window mini-window",maximize:"window maxi-window",closed:"window",normal:"window"},
             style = {width:op.width,height:op.height,left:pos.left,top:pos.top,bottom:"auto",right:"auto"};
         this.$window.prop("class",KLASS[status]).css(style);
+    };
+
+    /**
+     * 根据当前窗口状态设置窗口按钮组
+     * @param buttons
+     * @private
+     */
+    Window.prototype._setButtons = function(status){
+        var BUTTONS = {minimize:["resume","close"],maximize:["resume","close"],normal:["minimize","maximize","close"]};
+        var $buttons = $(".buttons",this.$window);
+        $(".button",$buttons).hide();
+
+        if(status == "minimize"){
+            var $btn = $(".maximize",$buttons).removeClass("maximize").addClass("resume");
+            $("i",$btn).prop("class",icons["Maximize"]);
+        }
+
+        if(status == "maximize"){
+            var $btn = $(".maximize",$buttons).removeClass("maximize").addClass("resume");
+            $("i",$btn).prop("class",icons["Resume"]);
+        }
+        if(status == "normal"){
+            var $btn = $(".resume",$buttons).removeClass("resume").addClass("maximize");
+            $("i",$btn).prop("class",icons["Maximize"]);
+        }
+        $.each(BUTTONS[status],function(index,value){
+            $("." + value,$buttons).show();
+        });
+    };
+
+    /**
+     * 当左侧最小化窗口复原后，右侧最小化窗口依次左移一个窗口位置
+     */
+    Window.prototype._moveLeft = function(index){
+        this.$window.css("left",MINI_WINDOW_WIDTH * index);
     };
 
     /**
