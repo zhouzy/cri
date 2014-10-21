@@ -15,6 +15,8 @@
 
     var icons = {Minimize:"fa fa-minus",Maximize:"fa fa-expand","Close":"fa fa-close","Resume":"fa fa-compress"},
         HEAD_HEIGHT = 35,
+        WINDOW_BODY_PADDING_X = 3,
+        WINDOW_BODY_PADDING_Y = 4,
         MINI_WINDOW_WIDTH = 140+10,
         ZINDEX = 10000;
 
@@ -42,9 +44,7 @@
      * @private
      */
     Window.prototype._init = function(){
-        this.$element.detach().addClass("window-content");
-        this.$element.wrap('<div class="window"></div>');
-        this.$window = this.$element.parent();
+        this._createBody();
         var op = this.options,
             position = op.position;
         this.$window.css({zIndex:this._zIndex(),left:position.left,top:position.top,width:this.options.width,height:this.options.height});
@@ -59,9 +59,40 @@
      */
     Window.prototype._eventListen = function(){
         var that = this;
-        this.$window.on("click",".buttons .button",function(){
-            var action = that._actionForButton($(this));
-            action && typeof that[action] === "function" && that[action]();
+        this.$window
+            .on("click",".buttons .button",function(){
+                var action = that._actionForButton($(this));
+                action && typeof that[action] === "function" && that[action]();
+            })
+            .on("click",".window-head",function(){
+                that.toFront();
+            })
+            .on("mousedown",".window-head",function(e){
+                var op = that.options;
+                var position = op.position;
+                var left = position.left;
+                var top  = position.top;
+                var startX = e.pageX;
+                var startY = e.pageY;
+                $("body").on("mousemove",function(e){
+                    var currentX = e.pageX;
+                    var currentY = e.pageY;
+                    var X = currentX - startX;
+                    var Y = currentY - startY;
+                    left += X;
+                    top += Y;
+                    startX = currentX;
+                    startY = currentY;
+                    that.$window.css("left",left);
+                    that.$window.css("top",top);
+                    that.$window.css("bottom","auto");
+                    that.$window.css("right","auto");
+                    position.left = left;
+                    position.top = top;
+                });
+            });
+        $("body").on("mouseup",function(){
+            $("body").off("mousemove");
         });
     };
 
@@ -70,6 +101,20 @@
         $windowHead.append(this._createTitle()).append(this._createButtons());
         this.$window.prepend($windowHead);
         this.$windowHead = $windowHead;
+    };
+
+    Window.prototype._createBody = function(){
+        var $element = this.$element;
+        $element.detach();
+        var $window = $('<div class="window"></div>');
+        var $windowBody = $('<div class="window-content"></div>');
+        var bodyWidth = this.options.width - 2 * WINDOW_BODY_PADDING_X;
+        var bodyHeight = this.options.height - 2* WINDOW_BODY_PADDING_Y - HEAD_HEIGHT;
+        $windowBody.css({height:bodyHeight,width:bodyWidth});
+        $window.append($windowBody);
+        $windowBody.append($element);
+        this.$window = $window;
+        $("body").append(this.$window);
     };
 
     Window.prototype._createTitle = function(){
@@ -259,10 +304,33 @@
     };
 
     /**
-     * 把当前窗口顶至最前
+     * 把当前窗口顶至最前,与之前最上层窗口替换
      */
     Window.prototype.toFront = function(){
+        //TODO:轮询窗口，取最大zindex,替换zindex
+        var frontWnd = this._getFrontWindow();
+        if(this.$window != frontWnd){
+            var zIndex = +this.$window.css("zIndex");
+            this.$window.css("zIndex",frontWnd.css("zIndex"));
+            frontWnd.css("zIndex",zIndex);
+        }
+    };
 
+    /**
+     * 获取最上层窗口
+     * @private
+     */
+    Window.prototype._getFrontWindow = function(){
+        var zIndex = +this.$window.css("zIndex"),
+            wnd = this.$window;
+        $(".window").each(function(){
+            var tempZIndex = +this.style.zIndex;
+            if(tempZIndex  > zIndex){
+                wnd = $(this);
+                zIndex = tempZIndex;
+            }
+        });
+        return wnd;
     };
 
     Window.prototype._zIndex = function(){
