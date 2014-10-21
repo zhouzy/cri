@@ -47,7 +47,6 @@ module.exports = function (grunt) {
                     ],
                     dest:'script/func/cri/final/cri.js'
                 }]
-
             },
             css:{
                 files:[{
