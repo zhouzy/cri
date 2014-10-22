@@ -38,9 +38,9 @@
         if(calHeight){
             var arr = ("" + calHeight).split("%");
             if(arr.length>1){
-                calHeight = Math.floor($ele.parent().width() * arr[0] / 100);
+                calHeight = Math.floor($ele.parent().height() * arr[0] / 100);
             }
-            calHeight = calHeight.split("px")[0];
+            calHeight = (""+calHeight).split("px")[0];
             if(calHeight){
                 return parseInt(calHeight);
             }
@@ -222,8 +222,8 @@
 
         _createGrid:function(){
             var height = _getElementHeight(this.$element,this.options.height);
-            var $grid = $("<div></div>").addClass(this._gridClassName).css("height",height);
-            $grid.attr("style",this.$element.attr("style")).show();
+            var $grid = $("<div></div>").addClass(this._gridClassName);
+            $grid.attr("style",this.$element.attr("style")).show().css("height",height);
             this.$element.wrap($grid);
             this.$element.hide();
 

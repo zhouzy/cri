@@ -40,9 +40,9 @@
         if(calHeight){
             var arr = ("" + calHeight).split("%");
             if(arr.length>1){
-                calHeight = Math.floor($ele.parent().width() * arr[0] / 100);
+                calHeight = Math.floor($ele.parent().height() * arr[0] / 100);
             }
-            calHeight = calHeight.split("px")[0];
+            calHeight = (""+calHeight).split("px")[0];
             if(calHeight){
                 return parseInt(calHeight);
             }
@@ -97,7 +97,7 @@
                 .on('dblclick', "div.li-content", function(e){
                     that._onDblClickRow(e);
                 });
-            this.$toolbar
+            this.$toolbar && this.$toolbar
                 .on('click',"a[data-toolbar]",function(e){that._clickToolbar(e);});
         },
 
@@ -153,10 +153,11 @@
             var op      = this.options,
                 height  = _getElementHeight(this.$element,op.height),
                 width   = _getElementWidth(this.$element,op.width),
-                $tree   = $("<div></div>").addClass(this._className).width(width).height(height),
+                $tree   = $("<div></div>").addClass(this._className).width(width),
+
                 $treeview = this.$treeview = $("<div></div>").addClass("tree-view"),
                 $treebody = this.$treebody = $("<ul></ul>").addClass("tree-body");
-
+            $tree.attr("style",this.$element.attr("style")).show().height(height);
             $treeview.append($treebody);
             if(height){
                 this.options.title   && (height -= _titleH);

@@ -32,3 +32,24 @@
 
     cri.Class = Class;
 }(window);
+
+/*=====================================================================================
+ * easy-bootstrap-公用方法 v2.0
+ *
+ * @author:niyq
+ * @date:2013/09/05
+ * @dependce:jquery
+ *=====================================================================================*/
+ function isArray(value){
+	if (value instanceof Array ||
+	(!(value instanceof Object) &&
+	(Object.prototype.toString.call((value)) == '[object Array]') ||
+	typeof value.length == 'number' &&
+	typeof value.splice != 'undefined' &&
+	typeof value.propertyIsEnumerable != 'undefined' &&
+	!value.propertyIsEnumerable('splice'))) {
+		return 'array';
+	}else{
+		return typeof value;
+	}
+ }

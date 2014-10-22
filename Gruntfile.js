@@ -65,6 +65,14 @@ module.exports = function (grunt) {
                         dest:'script/func/cri/final/cri.min.js'
                     }
                 ]
+            },
+            move: {
+                file:[{
+                    expand:true,
+                    cwd:'src',
+                    src:"script/lib/**",
+                    dest:'script/func/cri/final/'
+                }]
             }
         },
         qunit:{
