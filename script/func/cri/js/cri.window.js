@@ -14,9 +14,6 @@
         $   = window.jQuery;
 
     var icons = {Minimize:"fa fa-minus",Maximize:"fa fa-expand","Close":"fa fa-close","Resume":"fa fa-compress"},
-        HEAD_HEIGHT = 35,
-        WINDOW_BODY_PADDING_X = 3,
-        WINDOW_BODY_PADDING_Y = 4,
         MINI_WINDOW_WIDTH = 140+10,
         ZINDEX = 10000;
 
@@ -27,7 +24,8 @@
         modal:false,//模态窗口
         width:600,
         height:400,
-        position:{top:null,left:null}
+        position:{top:0,left:0},
+        resizable:true
     };
 
     var Window = cri.Widgets.extend(function(element,options){
@@ -44,12 +42,12 @@
      * @private
      */
     Window.prototype._init = function(){
+        var op = this.options;
         this._createBody();
-        var op = this.options,
-            position = op.position;
-        this.$window.css({zIndex:this._zIndex(),left:position.left,top:position.top,width:this.options.width,height:this.options.height});
+        this.$window.css($.extend({zIndex:this._zIndex()},op.position)).width(op.width).height(op.height);
         this._overlay();
         this._createHead();
+        op.resizable && this._createResizeHandler();
         $("body").append(this.$window);
     };
 
@@ -90,8 +88,70 @@
                     position.left = left;
                     position.top = top;
                 });
+            })
+            .on("mousedown",".window-resizer",function(e){
+                var op       = that.options,
+                    position = op.position,
+                    left     = +that.$window.css("left").split("px")[0],
+                    top      = +that.$window.css("top").split("px")[0],
+                    width    = +that.$window.width(),
+                    height   = +that.$window.height(),
+                    startX   = e.pageX,
+                    startY   = e.pageY,
+                    resizer  = /[ewsn]+$/.exec(this.className)[0];
+                $("body").on("mousemove",function(e){
+                    var pageX  = e.pageX,
+                        pageY  = e.pageY,
+                        shiftX = pageX - startX,
+                        shiftY = pageY - startY;
+                    startX = pageX;
+                    startY = pageY;
+
+                    switch(resizer){
+                        //东
+                        case "e":{
+                            width += shiftX;
+                        }break;
+                        //西
+                        case "w":{
+                            left = pageX;
+                            width -= shiftX;
+                        }break;
+                        //北
+                        case "n":{
+                            top = pageY;
+                            height -= shiftY;
+                        }break;
+                        //南
+                        case "s":{
+                            height += shiftY;
+                        }break;
+                        //东北
+                        case "ne":{
+                            top = pageY;
+                            height -= shiftY;
+                            width += shiftX;
+                        }break;
+                        case "nw":{
+                            top = pageY;
+                            height -= shiftY;
+                            left = pageX;
+                            width -= shiftX;
+                        }break;
+                        case "se":{
+                            height += shiftY;
+                            width += shiftX;
+                        }break;
+                        case "sw":{
+                            height += shiftY;
+                            left = pageX;
+                            width -= shiftX;
+                        }break;
+                    }
+                    that._setPosition({top:top,left:left,width:width,height:height});
+                });
             });
-        $("body").on("mouseup",function(){
+        $(document).on("mouseup",function(){
             $("body").off("mousemove");
         });
     };
@@ -108,9 +168,6 @@
         $element.detach();
         var $window = $('<div class="window"></div>');
         var $windowBody = $('<div class="window-content"></div>');
-        var bodyWidth = this.options.width - 2 * WINDOW_BODY_PADDING_X;
-        var bodyHeight = this.options.height - 2* WINDOW_BODY_PADDING_Y - HEAD_HEIGHT;
-        $windowBody.css({height:bodyHeight,width:bodyWidth});
         $window.append($windowBody);
         $windowBody.append($element);
         this.$window = $window;
@@ -144,10 +201,22 @@
                     $button.append($icon);
                     $buttons.append($button);
                 }
-
             }
         }
         return $buttons;
+    };
+
+    Window.prototype._createResizeHandler = function(){
+        var resizerHandler = [];
+        resizerHandler.push('<div class="window-resizer window-resizer-n" style="display: block;"></div>');
+        resizerHandler.push('<div class="window-resizer window-resizer-e" style="display: block;"></div>');
+        resizerHandler.push('<div class="window-resizer window-resizer-s" style="display: block;"></div>');
+        resizerHandler.push('<div class="window-resizer window-resizer-w" style="display: block;"></div>');
+        resizerHandler.push('<div class="window-resizer window-resizer-nw" style="display: block;"></div>');
+        resizerHandler.push('<div class="window-resizer window-resizer-ne" style="display: block;"></div>');
+        resizerHandler.push('<div class="window-resizer window-resizer-se" style="display: block;"></div>');
+        resizerHandler.push('<div class="window-resizer window-resizer-sw" style="display: block;"></div>');
+        this.$window.append(resizerHandler.join(""));
     };
 
     /**
@@ -162,6 +231,25 @@
             $overlay.style.zIndex = zIndex;
             this.$window.css("zIndex",(zIndex+1));
         }
+    };
+
+    /**
+     * 获取窗口位置对象
+     * @private
+     */
+    Window.prototype._getPosition = function(){
+        return this.options.position;
+    };
+
+    /**
+     * 设置窗口位置
+     * @param position {top:number,left:number,height:number,width:number}
+     * @private
+     */
+    Window.prototype._setPosition = function(position){
+        var $window = this.$window;
+        $window.css(position);
+        this.options.position = position;
     };
 
     /**

@@ -1,6 +1,7 @@
 @import "./lib.less";
 @import "./theme-default.less";
 
+@window-head-height:35px;
 .window{
     background-color: #fff;
     color: @color-font;
@@ -11,9 +12,11 @@
     min-width: 140px;
     top:5px;
     left:5px;
+    padding-top:@window-head-height;
     .rounded-corners(4px);
     .box-shadow(1px,1px,7px,1px,darken(@color-background,40%));
     .window-head{
+        margin-top:-@window-head-height;
         position:relative;
         height:24px;
         line-height:24px;
@@ -60,8 +63,77 @@
         }
     }
     .window-content{
-        padding:4px 3px;
+        height:100%;
         overflow: auto;
+    }
+    .window-resizer{
+        position: absolute;
+        z-index: 1;
+        background-color: #fff;
+        font-size: 0;
+        line-height: 6px;
+        filter: alpha(opacity=0);
+        opacity: 0;
+        zoom: 1;
+    }
+    .window-resizer-n{
+        top: -3px;
+        left: 0;
+        width: 100%;
+        height: 6px;
+        cursor: n-resize;
+    }
+    .window-resizer-e{
+        top: 0;
+        right: -3px;
+        width: 6px;
+        height: 100%;
+        cursor: e-resize;
+    }
+    .window-resizer-s{
+        bottom: -3px;
+        left: 0;
+        width: 100%;
+        height: 6px;
+        cursor: s-resize;
+    }
+
+    .window-resizer-w{
+
+        top: 0;
+        left: -3px;
+        width: 6px;
+        height: 100%;
+        cursor: w-resize;
+    }
+    .window-resizer-se{
+        bottom: -3px;
+        right: -3px;
+        width: 16px;
+        height: 16px;
+        cursor: se-resize;
+
+    }
+    .window-resizer-sw{
+        bottom: -3px;
+        left: -3px;
+        width: 6px;
+        height: 6px;
+        cursor: sw-resize;
+    }
+    .window-resizer-ne{
+        top: -3px;
+        right: -3px;
+        width: 6px;
+        height: 6px;
+        cursor: ne-resize;
+    }
+    .window-resizer-nw{
+        top: -3px;
+        left: -3px;
+        width: 6px;
+        height: 6px;
+        cursor: nw-resize;
     }
 }
 
