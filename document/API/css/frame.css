@@ -13,17 +13,18 @@
     background: linear-gradient(top, #fcfcfc 0%, #bababa 100%); /* W3C */
 }
 .info{
-    color: #55677a;
+    color: #8ee060;
     padding-left:15px;
     height:44px;
     line-height: 44px;
-    font-size: 1.2em;
-    font-style:italic;
-    font-weight: bold;
+    font-size: 2em;
+    font-weight:bold;
+    text-shadow:2px 5px 4px #373737;
+    letter-spacing:4px;
 }
 #left{
     position:fixed;
-    top:50px;
+    top:80px;
     bottom:50px;
     width:200px;
 }
