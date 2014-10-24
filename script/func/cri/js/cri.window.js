@@ -66,93 +66,59 @@
                 that.toFront();
             })
             .on("mousedown",".window-head",function(e){
-                var op = that.options;
-                var position = op.position;
-                var left = position.left;
-                var top  = position.top;
-                var startX = e.pageX;
-                var startY = e.pageY;
-                $("body").on("mousemove",function(e){
-                    var currentX = e.pageX;
-                    var currentY = e.pageY;
-                    var X = currentX - startX;
-                    var Y = currentY - startY;
-                    left += X;
-                    top += Y;
-                    startX = currentX;
-                    startY = currentY;
-                    that.$window.css("left",left);
-                    that.$window.css("top",top);
-                    that.$window.css("bottom","auto");
-                    that.$window.css("right","auto");
-                    position.left = left;
-                    position.top = top;
+                var left     = +that.$window.css("left").split("px")[0],
+                    top      = +that.$window.css("top").split("px")[0],
+                    width    = +that.$window.width(),
+                    height   = +that.$window.height(),
+                    startX   = e.pageX,
+                    startY   = e.pageY;
+                $(document).on("mousemove",function(e){
+                    var pageX  = e.pageX,
+                        pageY  = e.pageY,
+                        shiftX = pageX - startX,
+                        shiftY = pageY - startY;
+                    left += shiftX;
+                    top  += shiftY;
+                    startX = pageX;
+                    startY = pageY;
+                    that._setPosition({top:top,left:left,width:width,height:height});
                 });
             })
             .on("mousedown",".window-resizer",function(e){
-                var op       = that.options,
-                    position = op.position,
-                    left     = +that.$window.css("left").split("px")[0],
+                var left     = +that.$window.css("left").split("px")[0],
                     top      = +that.$window.css("top").split("px")[0],
                     width    = +that.$window.width(),
                     height   = +that.$window.height(),
                     startX   = e.pageX,
                     startY   = e.pageY,
                     resizer  = /[ewsn]+$/.exec(this.className)[0];
-                $("body").on("mousemove",function(e){
+
+                $(document).on("mousemove",function(e){
                     var pageX  = e.pageX,
                         pageY  = e.pageY,
                         shiftX = pageX - startX,
                         shiftY = pageY - startY;
                     startX = pageX;
                     startY = pageY;
-
-                    switch(resizer){
-                        //东
-                        case "e":{
-                            width += shiftX;
-                        }break;
-                        //西
-                        case "w":{
-                            left = pageX;
-                            width -= shiftX;
-                        }break;
-                        //北
-                        case "n":{
-                            top = pageY;
-                            height -= shiftY;
-                        }break;
-                        //南
-                        case "s":{
-                            height += shiftY;
-                        }break;
-                        //东北
-                        case "ne":{
-                            top = pageY;
-                            height -= shiftY;
-                            width += shiftX;
-                        }break;
-                        case "nw":{
-                            top = pageY;
-                            height -= shiftY;
-                            left = pageX;
-                            width -= shiftX;
-                        }break;
-                        case "se":{
-                            height += shiftY;
-                            width += shiftX;
-                        }break;
-                        case "sw":{
-                            height += shiftY;
-                            left = pageX;
-                            width -= shiftX;
-                        }break;
+                    if(resizer.indexOf("e") >= 0){
+                        width += shiftX;
+                    }
+                    if(resizer.indexOf("w") >= 0){
+                        left = pageX;
+                        width -= shiftX;
+                    }
+                    if(resizer.indexOf("n") >= 0){
+                        top = pageY;
+                        height -= shiftY;
+                    }
+                    if(resizer.indexOf("s") >= 0){
+                        height += shiftY;
                     }
                     that._setPosition({top:top,left:left,width:width,height:height});
                 });
             });
         $(document).on("mouseup",function(){
-            $("body").off("mousemove");
+            $(document).off("mousemove");
         });
     };
 
@@ -206,16 +172,16 @@
         return $buttons;
     };
 
+    /**
+     * 生成 8个方位的 resizeHandler
+     * @private
+     */
     Window.prototype._createResizeHandler = function(){
-        var resizerHandler = [];
-        resizerHandler.push('<div class="window-resizer window-resizer-n" style="display: block;"></div>');
-        resizerHandler.push('<div class="window-resizer window-resizer-e" style="display: block;"></div>');
-        resizerHandler.push('<div class="window-resizer window-resizer-s" style="display: block;"></div>');
-        resizerHandler.push('<div class="window-resizer window-resizer-w" style="display: block;"></div>');
-        resizerHandler.push('<div class="window-resizer window-resizer-nw" style="display: block;"></div>');
-        resizerHandler.push('<div class="window-resizer window-resizer-ne" style="display: block;"></div>');
-        resizerHandler.push('<div class="window-resizer window-resizer-se" style="display: block;"></div>');
-        resizerHandler.push('<div class="window-resizer window-resizer-sw" style="display: block;"></div>');
+        var resizerHandler = [],
+            resizer = "n e s w nw ne se sw";
+        $.each(resizer.split(" "),function(index,value){
+            resizerHandler.push('<div class="window-resizer window-resizer-' + value + '" style="display: block;"></div>');
+        });
         this.$window.append(resizerHandler.join(""));
     };
 
@@ -268,6 +234,7 @@
         }[iconClass];
     };
 
+    Window.prototype._windowMoving = function(){};
     /**
      * 由最小化打开窗口
      */
@@ -427,10 +394,6 @@
             zindex = Math.max(+this.style.zIndex,zindex);
         });
         return ++zindex;
-    };
-
-    Window.prototype.destory = function(){
-
     };
 
     cri.Window = Window;
