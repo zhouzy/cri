@@ -122,6 +122,10 @@
         });
     };
 
+    /**
+     * 生成window 头部
+     * @private
+     */
     Window.prototype._createHead = function(){
         var $windowHead = $("<div></div>").addClass("window-head");
         $windowHead.append(this._createTitle()).append(this._createButtons());
@@ -129,6 +133,10 @@
         this.$windowHead = $windowHead;
     };
 
+    /**
+     * 包装window 内容部分
+     * @private
+     */
     Window.prototype._createBody = function(){
         var $element = this.$element;
         $element.detach();
@@ -140,6 +148,11 @@
         $("body").append(this.$window);
     };
 
+    /**
+     * 生成标题栏
+     * @returns {*}
+     * @private
+     */
     Window.prototype._createTitle = function(){
         var title = this.options.title || "";
         var $title = $("<span></span>").addClass("title").text(title);
@@ -200,14 +213,6 @@
     };
 
     /**
-     * 获取窗口位置对象
-     * @private
-     */
-    Window.prototype._getPosition = function(){
-        return this.options.position;
-    };
-
-    /**
      * 设置窗口位置
      * @param position {top:number,left:number,height:number,width:number}
      * @private
@@ -234,7 +239,6 @@
         }[iconClass];
     };
 
-    Window.prototype._windowMoving = function(){};
     /**
      * 由最小化打开窗口
      */
@@ -353,6 +357,8 @@
 
     /**
      * 当左侧最小化窗口复原后，右侧最小化窗口依次左移一个窗口位置
+     * @param index
+     * @private
      */
     Window.prototype._moveLeft = function(index){
         this.$window.css("left",MINI_WINDOW_WIDTH * index);
@@ -388,6 +394,11 @@
         return wnd;
     };
 
+    /**
+     * 获取最大zIndex
+     * @returns {number}
+     * @private
+     */
     Window.prototype._zIndex = function(){
         var zindex = ZINDEX;
         $(".window").each(function(i,element){
