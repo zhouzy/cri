@@ -13,27 +13,36 @@
     <title>cri-api-index</title>
 </head>
 <body class="wrapper">
-<h2 class="item-body">欢迎使用cri前端框架</h2>
-<h3 class="item-head header">
-    <div class="name">cri</div>
-    <div class="type">version:2.0 <span style="margin-left:20px;">2014/9/23</span></div>
-</h3>
-<h3>BUG提交:</h3>
-<p class="item-body">
-    <email>zhouzy@channelsoft.com</email></br>
-    <email>niyq@channelsoft.com</email>
-</p>
-<p class="item-body">1.初始化方式</p>
-<pre><code>
-    $("#id").TreeGrid({
-        prop:"prop",
-        event:function(row){}
-    });
-</code></pre>
-<p class="item-body">2.调用方法</p>
-<pre><code>
-    var grid = $("#id").data("treegrid");
-    var row = grid.getSelected();
-</code></pre>
+    <h2 id="welcome-msg">欢迎使用cri前端框架</h2>
+    <div id="disclaimer">
+        <div class="name">cri</div>
+        <div class="type">version:2.0 <span style="margin-left:20px;">2014/9/23</span></div>
+        <div class="contact">
+            BUG提交:<email>zhouzy@channelsoft.com</email></br>
+                   <email>niyq@channelsoft.com</email>
+        </div>
+    </div>
+
+    <h3 class="item-head">说明</h3>
+    <p class="item-body">
+        easy-bootstrap 是一整套运用于CMS类WEB项目，JQuery 插件集合。包含了datagrid、tree、treegrid、window、tabpage、input等常用插件。
+    </p>
+
+    <h3 class="item-head">1.初始化方式</h3>
+    <p class="item-body">
+        <pre><code>
+            $("#id").TreeGrid({
+                prop:"prop",
+                event:function(row){}
+            });
+        </code></pre>
+    </p>
+    <h3 class="item-head">2.调用方法</h3>
+    <p class="item-body">
+        <pre><code>
+            var grid = $("#id").data("treegrid");
+            var row = grid.getSelected();
+        </code></pre>
+    </p>
 </body>
 </html>

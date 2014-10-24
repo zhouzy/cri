@@ -54,3 +54,11 @@ h2 + h3.item-head{
 .item-body{
     margin:20px 0;
 }
+#welcome-msg{
+    margin: 2em 0 0;
+    font-size:2em;
+}
+#disclaimer{
+    margin: 1em 0 0;
+    font-size:1.2em;
+}
