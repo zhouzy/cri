@@ -77,7 +77,7 @@
             return (new Function("return " + fieldArr))();
         }());
 
-        columns.map(function(column){
+        $.map(columns,function(column){
             if(column.field && column.width){
                 column._width = column.width;
             }
@@ -297,6 +297,10 @@
                 $tr.append($td);
             }
             $parent.html($headWrap.html($table));
+
+            //根据gird-body 纵向滚动条决定headWrap rightPadding
+            var scrollBarW = this.$gridbody.width()-this.$gridbody.prop("clientWidth");
+            this.$gridhead.css("paddingRight",scrollBarW);
         },
 
         _createBody:function($parent){
