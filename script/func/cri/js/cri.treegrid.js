@@ -32,7 +32,7 @@
             lineNum = 1,
             paddingLeft = 1,
             iconWidth = 6;
-        $table.append(this._createColGroup());
+        $table.append(this._createColGroup($parent.width()));
         /**
          * 拼装每行HTML
          */

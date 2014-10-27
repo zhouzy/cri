@@ -310,7 +310,7 @@
                 lineNum  = 1 + op.pageSize * (op.page - 1),
                 columns  = this._columns;
 
-            $table.append(this._createColGroup());
+            $table.append(this._createColGroup(),$parent.width());
 
             for(var i = 0,len = op.rows.length; i<len; i++){
                 var row = op.rows[i];
@@ -340,16 +340,23 @@
             $parent.html($table);
         },
 
-        _createColGroup:function(){
+        _createColGroup:function(parentWidth){
             var $colgroup= $("<colgroup></colgroup>"),
                 op       = this.options,
-                columns  = this._columns;
-            op.checkBox && $colgroup.append($("<col/>").width(30));
-            op.rowNum   && $colgroup.append($("<col/>").width(25));
-
+                columns  = this._columns,
+                width    = 0;
+            op.checkBox && $colgroup.append($("<col/>").width(30)) && (width+=30);
+            op.rowNum   && $colgroup.append($("<col/>").width(25)) && (width+=20);
+            /**
+             * 当表格列宽总长度小于table宽度，设置最后一列宽度为auto,避免checkBox与rowNum列自动计算宽度
+             */
             for(var i= 0,len=columns.length; i<len;i++){
                 var $col = $("<col/>");
-                columns[i]._width && $col.width(columns[i]._width);
+                var columnWidth = columns[i]._width;
+                columnWidth && $col.width(columnWidth) && (width+=columnWidth);
+                if(width < parentWidth){
+                    $col.width("auto");
+                }
                 $colgroup.append($col);
             }
             return $colgroup;

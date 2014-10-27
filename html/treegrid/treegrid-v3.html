@@ -22,27 +22,17 @@
 </head>
 <body>
 <div class="content">
-    <table id="treegrid" style="height:400px;width:400px;">
+    <table id="treegrid" style="height:400px;">
         <tr>
             <th data-options="field:'text',width:200">Text</th>
-            <th data-options="field:'name',width:220">Name</th>
-            <th data-options="field:'size',width:100" align="right">Size</th>
-            <th data-options="field:'date',width:150">Modified Date</th>
         </tr>
     </table>
 </div>
 <script type="text/javascript">
     var grid = $("#treegrid").treegrid({
         url:"./treegrid-data.json",
-        rowNum:true,
         title:"treegrid",
-        checkBox:true,
-        onClick:function(data){
-            //console.log(data.propA);
-        },
-        onDblClick:function(data){
-            //console.log(data.propB);
-        }
+        checkBox:true
     });
 
     grid = $("#treegrid").treegrid({
