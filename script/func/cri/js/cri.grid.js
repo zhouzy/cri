@@ -384,7 +384,10 @@
                     page      = parseInt(op.page) || 1,
                     totalPage = Math.ceil(total / pageSize),
                     lastPage  = page - 1,
-                    nextPage  = page + 1;
+                    nextPage  = page + 1,
+                    rowLen    = op.rows.length,
+                    numStart  = (page-1) * pageSize + 1,
+                    numEnd    = (page-1) * pageSize + rowLen;
 
                 var $pagerNav   = $("<div></div>").addClass("pager-nav"),
                     $firstPage  = $("<a></a>").append('<span class="fa fa-angle-double-left"></span>'),
@@ -392,7 +395,7 @@
                     $nextPage   = $("<a></a>").append('<span class="fa fa-angle-right"></span>'),
                     $totalPage  = $("<a></a>").append('<span class="fa fa-angle-double-right"></span>'),
                     $numberPage = $("<ul></ul>").addClass("pager-number"),
-                    $pageInfo   = $("<div></div>").addClass("pager-info").text(((page-1) * pageSize + 1) + ' - ' + (page * pageSize) + ' of ' + total + ' items');
+                    $pageInfo  = $("<div></div>").addClass("pager-info").text(numStart + ' - ' + numEnd + ' of ' + total + ' items');
 
                 if(page <= 1){
                     $firstPage.addClass("state-disabled");
@@ -445,14 +448,18 @@
                     page      = parseInt(op.page) || 1,
                     totalPage = Math.ceil(total / pageSize),
                     lastPage  = page - 1,
-                    nextPage  = page + 1;
+                    nextPage  = page + 1,
+                    rowLen    = op.rows.length,
+                    numStart  = (page-1) * pageSize + 1,
+                    numEnd    = (page-1) * pageSize + rowLen;
+
 
                 var $pagerNav  = $("<div></div>").addClass("pager-nav"),
                     $firstPage = $("<a></a>").addClass("pager-nav first-page").append('<span class="fa fa-angle-double-left"></span>'),
                     $lastPage  = $("<a></a>").addClass("pager-nav last-page").append('<span class="fa fa-angle-left"></span>'),
                     $nextPage  = $("<a></a>").addClass("pager-nav next-page").append('<span class="fa fa-angle-right"></span>'),
                     $totalPage = $("<a></a>").addClass("pager-nav totalPage").append('<span class="fa fa-angle-double-right"></span>'),
-                    $pageInfo  = $("<div></div>").addClass("pager-info").text(((page-1) * pageSize + 1) + ' - ' + (page * pageSize) + ' of ' + total + ' items');
+                    $pageInfo  = $("<div></div>").addClass("pager-info").text(numStart + ' - ' + numEnd + ' of ' + total + ' items');
 
                 $pagerNav.append($firstPage).append($lastPage);
                 if(page <= 1){

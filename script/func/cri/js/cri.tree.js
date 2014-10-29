@@ -93,7 +93,10 @@
             var that = this;
             this.$treebody
                 .on('click',"div.li-content",function(e){that._setSelected(e);})
-                .on('click', "li i.icon", function(e){that._fold(e);})
+                .on('click', "li i.icon", function(e){
+                    that._fold(e);
+                    return false;
+                })
                 .on('dblclick', "div.li-content", function(e){
                     that._onDblClickRow(e);
                 });

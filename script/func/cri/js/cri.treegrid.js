@@ -44,7 +44,10 @@
                 isShow == "show" || $tr.hide();
 
                 if(op.checkBox){
-                    $tr.append($("<td></td>").addClass("line-checkbox").append('<input type="checkbox"/>'));
+                    row.check ?
+                        $tr.append($("<td></td>").addClass("line-checkbox").append('<input type="checkbox" checked/>')):
+                        $tr.append($("<td></td>").addClass("line-checkbox").append('<input type="checkbox"/>'));
+
                 }
                 if(op.rowNum){
                     $tr.append($("<td></td>").addClass("line-number").append(lineNum++));
