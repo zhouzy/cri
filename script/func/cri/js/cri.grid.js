@@ -102,6 +102,7 @@
         async:false,
         onClick:null,
         onDblClick:null,
+        onLoad:null,//构造表格结束时触发
         rowNum:true,
         checkBox:false,
         onChecked:null,//每行checkbox被选中时触发回调函数,当该回调函数返回,参数row,rowid
@@ -146,11 +147,8 @@
                     that.onDblClickRow(e);
                 })
                 .on("change", "input[type=checkbox]",function(e){
-                    var isChecked = $(e.target).prop("checked");
-                    var rowid = $(e.target).closest("tr").data("rowid");
-                    if(isChecked && op.onChecked){
-                        op.onChecked(that.getRowDataById(rowid),rowid);
-                    }
+                    that._checkbox(e);
+
                 });
 
             $("body").on("mouseup",function(e){
@@ -232,6 +230,9 @@
             this._createToolbar(this.$grid);
             this._createGridView(this.$grid,height);
             this._createPage(this.$grid);
+            if(this.options.onLoad && typeof(this.options.onLoad) === 'function'){
+                this.options.onLoad.call(this);
+            }
         },
 
         _createGridView:function($parent,height){
@@ -310,11 +311,11 @@
                 lineNum  = 1 + op.pageSize * (op.page - 1),
                 columns  = this._columns;
 
-            $table.append(this._createColGroup(),$parent.width());
+            $table.append(this._createColGroup($parent.width()));
 
             for(var i = 0,len = op.rows.length; i<len; i++){
                 var row = op.rows[i];
-                var $tr  = $('<tr></tr>').data("rowid",id);
+                var $tr  = $('<tr></tr>').data("rowid",id).prop("data-rowid",id);
 
                 if(op.checkBox){
                     $tr.append($("<td></td>").addClass("line-checkbox").append('<input type="checkbox"/>'));
@@ -521,6 +522,15 @@
             this._createPage(this.$page);
         },
 
+        _checkbox:function(e){
+            var op = this.options;
+            var isChecked = $(e.target).prop("checked");
+            var rowid = $(e.target).closest("tr").data("rowid");
+            if(isChecked && op.onChecked){
+                op.onChecked(this.getRowDataById(rowid),rowid);
+            }
+        },
+
         refreshGridView:function(){
             this._createBody(this.$gridbody);
             this._createHead(this.$gridhead);
@@ -544,7 +554,7 @@
         getMulSelected:function(){
             var mulSelectRow = [],
                 that = this;
-            $("tr[data-rowid] input[type='checkbox']:checked",this.$gridbody).each(function(){
+            $("tr input[type='checkbox']:checked",this.$gridbody).each(function(){
                 var rowid = $(this).closest("tr").data("rowid");
                 mulSelectRow.push(that.getRowDataById(rowid));
             });

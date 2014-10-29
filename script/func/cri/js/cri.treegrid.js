@@ -38,7 +38,7 @@
          */
         !function getRowHtml(rows,isShow,id){
             for(var i = 0,len = rows.length; i<len; i++){
-                var $tr = $("<tr></tr>").data("rowid",++id);
+                var $tr = $("<tr></tr>").data("rowid",++id).attr("data-rowid",id);
                 var row = rows[i];
 
                 isShow == "show" || $tr.hide();
@@ -123,6 +123,32 @@
             }
         }
         this.refreshGridView();
+    };
+
+    TreeGrid.prototype._checkbox = function(e){
+        var input = $(e.target),
+            tr    = $(e.target).closest("tr"),
+            rowid = parseInt(tr.data('rowid')),
+            id    = rowid,
+            row   = this.getRowDataById(rowid),
+            isChecked = input.prop("checked");
+
+        !function(data){
+            if(data.children && data.children.length > 0){
+                id *= 1000;
+                !function ita(data){
+                    $.each(data,function(){
+                        id += 1;
+                        $("tr[data-rowid="+ id +"] input[type=checkbox]").prop("checked",isChecked);
+                        if(this.children && this.children.length > 0){
+                            id*=1000;
+                            ita(this.children);
+                            id= Math.floor(id/=1000);
+                        }
+                    });
+                }(data.children);
+            }
+        }(row);
     };
 
     TreeGrid.prototype.getRowDataById = function(rowid){
