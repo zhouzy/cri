@@ -2,7 +2,7 @@
  * Author zhouzy
  * Date   2014/9/18
  * grid 组件
- *
+ * dependens Pager
  */
 !function(window){
 
@@ -110,7 +110,6 @@
         pagination:true,
         page:1,
         pageSize:10,
-        total:0,
         ajaxDone:null,
         ajaxError:null
     };
@@ -122,7 +121,7 @@
         this.$gridhead   = null;
         this.$gridbody   = null;
         this.$toolbar    = null;
-        this.$page       = null;
+        this.pager       = null;
         this.$title      = null;
         this._columns    = [];
         this.selectedRow = null;
@@ -155,6 +154,7 @@
                 that.$gridhead.css("cursor","");
                 that.$gridhead.off("mousemove");
             });
+
             this.$gridhead
                 .on('mousedown',".drag-line",function(e){
                     var dragLineIndex = 0;
@@ -197,25 +197,16 @@
 
             this.$toolbar && this.$toolbar
                 .on('click',"li[data-toolbar]",function(e){that.clickToolbar(e);});
-
-            this.$page && this.$page
-                .on('click',"a[data-page]",function(e){
-                    op.page = $(e.target).closest("a").data('page');
-                    that.page();
-                })
-                .on('click','input.renovate',function(e){
-                    var pagesize = $("input[name=pagesize]",that.$page).val();
-                    var pagenum = $("input[name=pagenum]",that.$page).val();
-                    op.page = pagenum;
-                    op.pageSize = pagesize;
-                    that.page();
-                });
         },
 
-        _init:function () {
+        _init:function() {
             this._columns = _getColumnsDef(this.$element,this.options.columns);
             this._getData();
             this._createGrid();
+            this._createPage();
+            if(this.options.onLoad && typeof(this.options.onLoad) === 'function'){
+                this.options.onLoad.call(this);
+            }
         },
 
         _createGrid:function(){
@@ -224,15 +215,10 @@
             $grid.attr("style",this.$element.attr("style")).show().css("height",height);
             this.$element.wrap($grid);
             this.$element.hide();
-
             this.$grid = this.$element.parent();
             this._createTitle(this.$grid);
             this._createToolbar(this.$grid);
             this._createGridView(this.$grid,height);
-            this._createPage(this.$grid);
-            if(this.options.onLoad && typeof(this.options.onLoad) === 'function'){
-                this.options.onLoad.call(this);
-            }
         },
 
         _createGridView:function($parent,height){
@@ -339,6 +325,8 @@
             }
 
             $parent.html($table);
+            //fixed IE8 do not support nth-child selector;
+            $("tr:nth-child(odd)",$table).css("background","#FFF");
         },
 
         _createColGroup:function(parentWidth){
@@ -376,124 +364,31 @@
             }
         },
 
-        _createPage:function($parent){
+        _createPage:function(){
+            var op = this.options;
+            var grid = this;
             if(this.options.pagination){
-                var op        = this.options,
-                    pageSize  = op.pageSize || 10,
-                    total     = op.total || 0,
-                    page      = parseInt(op.page) || 1,
-                    totalPage = Math.ceil(total / pageSize),
-                    lastPage  = page - 1,
-                    nextPage  = page + 1,
-                    rowLen    = op.rows.length,
-                    numStart  = (page-1) * pageSize + 1,
-                    numEnd    = (page-1) * pageSize + rowLen;
-
-                var $pagerNav   = $("<div></div>").addClass("pager-nav"),
-                    $firstPage  = $("<a></a>").append('<span class="fa fa-angle-double-left"></span>'),
-                    $lastPage   = $("<a></a>").append('<span class="fa fa-angle-left"></span>'),
-                    $nextPage   = $("<a></a>").append('<span class="fa fa-angle-right"></span>'),
-                    $totalPage  = $("<a></a>").append('<span class="fa fa-angle-double-right"></span>'),
-                    $numberPage = $("<ul></ul>").addClass("pager-number"),
-                    $pageInfo  = $("<div></div>").addClass("pager-info").text(numStart + ' - ' + numEnd + ' of ' + total + ' items');
-
-                if(page <= 1){
-                    $firstPage.addClass("state-disabled");
-                    $lastPage.addClass("state-disabled");
-                }
-                else{
-                    $firstPage.data("page",1);
-                    $lastPage.data("page",lastPage);
-                }
-
-                for(var i=-2; i<3; i++){
-                    var shiftPage = i + page;
-                    if(shiftPage>0 && shiftPage<=totalPage){
-                        var $li = $("<li></li>"),
-                            $a  = $("<a></a>").text(shiftPage);
-                        shiftPage != page ?
-                            $a.addClass("pager-num"):
-                            $a.addClass("state-selected");
-                        $numberPage.append($li.append($a));                    }
-                }
-
-                $pagerNav.append($firstPage).append($lastPage).append($numberPage).append($nextPage).append($totalPage);
-
-                if(page >= totalPage){
-                    $nextPage.addClass("state-disabled");
-                    $totalPage.addClass("state-disabled");
-                }else{
-                    $nextPage.data("page",nextPage);
-                    $totalPage.data("page",totalPage);
-                }
-
-                if(this.$page){
-                    this.$page.html($pagerNav);
-                    this.$page.append($pageInfo);
-                }
-                else{
-                    var $pager = this.$page = $("<div></div>").addClass("pager");
-                    $pager.html($pagerNav);
-                    $pager.append($pageInfo);
-                    $parent.append($pager);
-                }
-            }
-        },
-
-        _refreshPage:function(){
-            if(this.$page){
-                var op        = this.options,
-                    pageSize  = op.pageSize || 10,
-                    total     = op.total || 0,
-                    page      = parseInt(op.page) || 1,
-                    totalPage = Math.ceil(total / pageSize),
-                    lastPage  = page - 1,
-                    nextPage  = page + 1,
-                    rowLen    = op.rows.length,
-                    numStart  = (page-1) * pageSize + 1,
-                    numEnd    = (page-1) * pageSize + rowLen;
-
-
-                var $pagerNav  = $("<div></div>").addClass("pager-nav"),
-                    $firstPage = $("<a></a>").addClass("pager-nav first-page").append('<span class="fa fa-angle-double-left"></span>'),
-                    $lastPage  = $("<a></a>").addClass("pager-nav last-page").append('<span class="fa fa-angle-left"></span>'),
-                    $nextPage  = $("<a></a>").addClass("pager-nav next-page").append('<span class="fa fa-angle-right"></span>'),
-                    $totalPage = $("<a></a>").addClass("pager-nav totalPage").append('<span class="fa fa-angle-double-right"></span>'),
-                    $pageInfo  = $("<div></div>").addClass("pager-info").text(numStart + ' - ' + numEnd + ' of ' + total + ' items');
-
-                $pagerNav.append($firstPage).append($lastPage);
-                if(page <= 1){
-                    $firstPage.addClass("state-disabled").data("page",null);
-                    $lastPage.addClass("state-disabled").data("page",null);
-                }
-                else{
-                    $firstPage.removeClass("state-disabled").data("page",1);
-                    $lastPage.removeClass("state-disabled").data("page",lastPage);
-                }
-                if(page >= totalPage){
-                    $nextPage.addClass("state-disabled").data("page",null);
-                    $totalPage.addClass("state-disabled").data("page",null);
-                }
-                else{
-                    $nextPage.removeClass("state-disabled").data("page",nextPage);
-                    $totalPage.removeClass("state-disabled").data("page",totalPage);
-                }
-
-                for(var i=-2; i<3; i++){
-                    var shiftPage = i + page;
-                    if(shiftPage>0 && shiftPage<=totalPage){
-                        var $numPage = $("<a>").addClass("pager-nav").text(shiftPage);
-                        shiftPage != page ?
-                            $numPage.addClass("pager-num"):
-                            $numPage.addClass("state-selected");
-                        $pagerNav.append($numPage);                    }
-                }
+                this.pager = new cri.Pager(this.$grid,{
+                    page:op.page,
+                    pageSize:op.pageSize,
+                    total:op.total,
+                    rowsLen:op.rows.length,
+                    onPage:function(page,pageSize){
+                        op.page = page;
+                        op.pageSize = pageSize;
+                        grid._getData();
+                    },
+                    onUpdate:function(){
+                        grid.refreshGridView();
+                    }
+                });
             }
         },
 
         _getData:function(){
             var result = true,
-                op = this.options;
+                op     = this.options,
+                that   = this;
             if(op.pagination){
                 op.param.page = op.page;
                 op.param.rows = op.pageSize;
@@ -507,11 +402,14 @@
                     }
                     op.rows = data.rows || [];
                     op.total = data.total || 0;
+                    that.pager && that.pager.update(op.page,op.pageSize,op.total,op.rows.length);
+                    //that.refreshGridView();
                 },
                 error: function(){
                     //TODO: warming developer
                     op.rows = [];
                     op.total = 0;
+                    that.pager && that.pager.update(op.page,op.pageSize,op.total,op.rows.length);
                 },
                 complete:function(){
                     //TODO:clear all resource if necessary
@@ -521,12 +419,6 @@
                 async:false
             });
             return result;
-        },
-
-        _page:function(){
-            this._getData();
-            this.refreshGridView();
-            this._createPage(this.$page);
         },
 
         _checkbox:function(e){
@@ -541,7 +433,6 @@
         refreshGridView:function(){
             this._createBody(this.$gridbody);
             this._createHead(this.$gridhead);
-            this._createPage(this.$page);
         },
 
         reload:function(param){
