@@ -201,8 +201,8 @@
 
         _init:function() {
             this._columns = _getColumnsDef(this.$element,this.options.columns);
-            this._getData();
             this._createGrid();
+            this._getData();
             this._createPage();
             if(this.options.onLoad && typeof(this.options.onLoad) === 'function'){
                 this.options.onLoad.call(this);
@@ -223,20 +223,17 @@
 
         _createGridView:function($parent,height){
             this.$gridview = $("<div></div>").addClass("grid-view");
-            this.$gridbody = $("<div></div>").addClass("grid-body");
             this.$gridhead = $("<div></div>").addClass("grid-head");
             $parent.append(this.$gridview.append(this.$gridhead).append(this.$gridbody));
-
             if(height){
                 height -= _gridHeadH;
                 this.options.title      && (height -= _titleH);
                 this.options.toolbar    && (height -= _toolbarH);
                 this.options.pagination && (height -= _pagerH);
-                this.$gridbody.css("height",height);
             }
-
-            this._createBody(this.$gridbody);
             this._createHead(this.$gridhead);
+            this.$gridbody = this._createBody(height);
+            this.$grid.append(this.$gridbody);
         },
 
         _createTitle:function($grid){
@@ -253,7 +250,7 @@
                 op        = this.options,
                 columns   = this._columns;
 
-            $table.append($("colgroup",this.$gridbody).clone());
+            $table.append(this._createColGroup($parent.width()));
             $table.append($tr);
 
             if(op.checkBox){
@@ -285,19 +282,32 @@
             }
             $parent.html($headWrap.html($table));
 
-            //根据gird-body 纵向滚动条决定headWrap rightPadding
-            var scrollBarW = this.$gridbody.width()-this.$gridbody.prop("clientWidth");
-            this.$gridhead.css("paddingRight",scrollBarW);
         },
 
-        _createBody:function($parent){
+        _createBody:function(gridBodyHeight){
+            var $gridbody = $("<div></div>").addClass("grid-body").height(gridBodyHeight);
+            if(gridBodyHeight){
+                $gridbody.height(gridBodyHeight);
+            }else{
+                $gridbody.addClass("loading");
+            }
+            var $loadingIcon = $('<i class="fa fa-spinner fa-spin"></i>').addClass("loadingIcon");
+            $gridbody.append($loadingIcon);
+            return $gridbody;
+        },
+
+        /**
+         * 刷新Grid Body数据行
+         * @private
+         */
+        _refreshBody:function($parent){
             var $table   = $('<table></table>'),
                 op       = this.options,
                 id       = 0,
                 lineNum  = 1 + op.pageSize * (op.page - 1),
                 columns  = this._columns;
 
-            $table.append(this._createColGroup($parent.width()));
+            $table.append($("colgroup",this.$gridhead).clone());
 
             for(var i = 0,len = op.rows.length; i<len; i++){
                 var row = op.rows[i];
@@ -323,10 +333,13 @@
                 lineNum++;id++;
                 $table.append($tr);
             }
-
-            $parent.html($table);
+            $parent.removeClass("loading").html($table);
             //fixed IE8 do not support nth-child selector;
             $("tr:nth-child(odd)",$table).css("background","#FFF");
+
+            //根据gird-body 纵向滚动条决定headWrap rightPadding
+            var scrollBarW = $parent.width()-$parent.prop("clientWidth");
+            this.$gridhead.css("paddingRight",scrollBarW);
         },
 
         _createColGroup:function(parentWidth){
@@ -350,6 +363,7 @@
             }
             return $colgroup;
         },
+
         _createToolbar:function($parent){
             if(this.options.toolbar){
                 var $toolbar = $('<div class="toolbar"></div>');
@@ -379,7 +393,6 @@
                         grid._getData();
                     },
                     onUpdate:function(){
-                        grid.refreshGridView();
                     }
                 });
             }
@@ -403,7 +416,7 @@
                     op.rows = data.rows || [];
                     op.total = data.total || 0;
                     that.pager && that.pager.update(op.page,op.pageSize,op.total,op.rows.length);
-                    //that.refreshGridView();
+                    that._refreshBody(that.$gridbody);
                 },
                 error: function(){
                     //TODO: warming developer

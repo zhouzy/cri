@@ -96,6 +96,7 @@
         }
     }
     .grid-body{
+        position:relative;
         overflow:auto;
         background: #FFF;
         table{
@@ -116,6 +117,22 @@
 
         .click td{
             background: @color-row-click;
+        }
+    }
+    .loading{
+        height:400px;
+        background-color:darken(@color-background,30%);
+        .loadingIcon{
+            color:@color-font-blue;
+            font-size:40px;
+            width:40px;
+            height:40px;
+            line-height: 40px;
+            margin-left:-20px;
+            margin-top:-20px;
+            position:absolute;
+            top:50%;
+            left:50%;
         }
     }
 }

@@ -100,7 +100,6 @@
         },
 
         _fourBtn:function($firstPage,$prevPage,$nextPage,$lastPage,page,lastPage){
-            console.log(page +":"+ lastPage);
             var nextPage = page + 1,
                 prevPage = page - 1;
             if(page <= 1){

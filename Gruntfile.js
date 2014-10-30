@@ -90,19 +90,14 @@ module.exports = function (grunt) {
             less: {
                 files: 'script/func/cri/less/*.less',
                 tasks: ['less:production']
-            },
-            qunit:{
-                files: ['script/func/cri/js/*.js'],
-                tasks: ['qunit:all']
             }
-
         }
     });
 
     // 开发环境不压缩 可调用 `grunt dev`
-    grunt.registerTask('dev', ['less:development','concat','qunit']);
+    grunt.registerTask('dev', ['less:development','concat']);
     // 生产环境压缩 可调用 `grunt pro`
-    grunt.registerTask('pro', ['less:production','concat:js','uglify','qunit']);
+    grunt.registerTask('pro', ['less:production','concat:js','uglify']);
     // 注册以外部调用 `grunt`
     grunt.registerTask('default', ['dev']);
 };
