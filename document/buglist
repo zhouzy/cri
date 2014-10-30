@@ -9,3 +9,4 @@
 9.当表格td无内容时，无高度(fixed)
 10.翻页不起作用(fixed)
 11.IE8 表格奇偶行 tr:nth-child 不识别(fixed)
+12.表格先构造后请求数据，请求数据时，出现loading标志
