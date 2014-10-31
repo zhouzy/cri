@@ -202,8 +202,8 @@
         _init:function() {
             this._columns = _getColumnsDef(this.$element,this.options.columns);
             this._createGrid();
-            this._getData();
             this._createPage();
+            this._getData();
             if(this.options.onLoad && typeof(this.options.onLoad) === 'function'){
                 this.options.onLoad.call(this);
             }
@@ -211,7 +211,7 @@
 
         _createGrid:function(){
             var height = _getElementHeight(this.$element,this.options.height);
-            var $grid = $("<div></div>").addClass(this._gridClassName);
+            var $grid = $("<div></div>").addClass("grid").addClass(this._gridClassName);
             $grid.attr("style",this.$element.attr("style")).show().css("height",height);
             this.$element.wrap($grid);
             this.$element.hide();
@@ -300,7 +300,7 @@
          * 刷新Grid Body数据行
          * @private
          */
-        _refreshBody:function($parent){
+        _refreshBody:function(){
             var $table   = $('<table></table>'),
                 op       = this.options,
                 id       = 0,
@@ -333,12 +333,11 @@
                 lineNum++;id++;
                 $table.append($tr);
             }
-            $parent.removeClass("loading").html($table);
+            this.$gridbody.removeClass("loading").html($table);
             //fixed IE8 do not support nth-child selector;
             $("tr:nth-child(odd)",$table).css("background","#FFF");
-
             //根据gird-body 纵向滚动条决定headWrap rightPadding
-            var scrollBarW = $parent.width()-$parent.prop("clientWidth");
+            var scrollBarW = this.$gridbody.width()-this.$gridbody.prop("clientWidth");
             this.$gridhead.css("paddingRight",scrollBarW);
         },
 
@@ -385,14 +384,12 @@
                 this.pager = new cri.Pager(this.$grid,{
                     page:op.page,
                     pageSize:op.pageSize,
-                    total:op.total,
-                    rowsLen:op.rows.length,
+                    total:0,
+                    rowsLen:0,
                     onPage:function(page,pageSize){
                         op.page = page;
                         op.pageSize = pageSize;
                         grid._getData();
-                    },
-                    onUpdate:function(){
                     }
                 });
             }
@@ -443,22 +440,16 @@
             }
         },
 
-        refreshGridView:function(){
-            this._createBody(this.$gridbody);
-            this._createHead(this.$gridhead);
-        },
-
         reload:function(param){
             param && (this.options.param = param);
             this.selectedRow = null;
             this._getData();
-            this.refreshGridView();
         },
 
         loadData:function(param){
             if(param.push){
                 this.options.rows = param;
-                this.refreshGridView();
+                this._refreshBody();
             }
         },
 

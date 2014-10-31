@@ -25,9 +25,10 @@
             });
     };
 
-    TreeGrid.prototype._createBody = function($parent){
-        var $table = $("<table></table>"),
-            op = this.options,
+    TreeGrid.prototype._refreshBody = function(){
+        var $parent = this.$gridbody,
+            $table  = $("<table></table>"),
+            op      = this.options,
             columns = this._columns,
             lineNum = 1,
             paddingLeft = 1,
@@ -95,8 +96,12 @@
                 $tr.append($td);
             });
         }
-
-       $parent.html($table);
+        this.$gridbody.removeClass("loading").html($table);
+        //fixed IE8 do not support nth-child selector;
+        $("tr:nth-child(odd)",$table).css("background","#FFF");
+        //根据gird-body 纵向滚动条决定headWrap rightPadding
+        var scrollBarW = $parent.width()-$parent.prop("clientWidth");
+        this.$gridhead.css("paddingRight",scrollBarW);
     }
 
     TreeGrid.prototype._fold = function(e){
@@ -125,7 +130,7 @@
                 });
             }
         }
-        this.refreshGridView();
+        this._refreshBody();
     };
 
     TreeGrid.prototype._checkbox = function(e){

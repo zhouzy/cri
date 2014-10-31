@@ -172,7 +172,7 @@
             op.pageSize = pageSize;
             this._updatePagerBtn();
             this._updatePagerInfo();
-            this.options.onUpdate(this);
+            op.onUpdate && op.onUpdate(this);
         }
     });
     cri.Pager = Pager;
