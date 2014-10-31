@@ -25,13 +25,14 @@
         onUpdate:null //更新翻页信息结束触发
     };
 
-    var FIRST = ".first-page",
-        PREV  = ".prev-page",
-        NEXT  = ".next-page",
-        LAST  = ".last-page",
-        PAGENUMBER = ".pager-number",
-        PAGEBTN    = ".pager-nav",
-        PAGEINFO   = ".pager-info";
+    var FIRSTPAGE = "first-page",
+        PREVPAGE  = "prev-page",
+        NEXTPAGE  = "next-page",
+        LASTPAGE  = "last-page",
+        PAGENUMBER = "pager-number",
+        PAGENAV    = "pager-nav",
+        PAGEINFO   = "pager-info",
+        STATEDISABLED = "state-disabled";
 
     var Pager = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
@@ -42,7 +43,7 @@
     $.extend(Pager.prototype,{
         _eventListen:function(){
             var that = this;
-            this.$pager.on("click","a:not('.state-disabled')",function(e){
+            this.$pager.on("click","a:not('."+STATEDISABLED+"')",function(e){
                 var $a = $(e.target).closest("a");
                 var page = $a.data("page");
                 that._page(page);
@@ -66,12 +67,12 @@
                 page      = parseInt(op.page) || 1,
                 lastPage  = Math.ceil(total / pageSize);
 
-            var $pagerBtn   = $("<div></div>").addClass("pager-nav"),
-                $firstPage  = $('<a class="first-page"></a>').append('<span class="fa fa-angle-double-left"></span>'),
-                $prevPage   = $('<a class="prev-page"></a>').append('<span class="fa fa-angle-left"></span>'),
-                $nextPage   = $('<a class="next-page"></a>').append('<span class="fa fa-angle-right"></span>'),
-                $lastPage   = $('<a class="last-page"></a>').append('<span class="fa fa-angle-double-right"></span>'),
-                $numberPage = $("<ul></ul>").addClass("pager-number");
+            var $pagerBtn   = $("<div></div>").addClass(PAGENAV),
+                $firstPage  = $('<a></a>').addClass(FIRSTPAGE).append('<span class="fa fa-angle-double-left"></span>'),
+                $prevPage   = $('<a></a>').addClass(PREVPAGE).append('<span class="fa fa-angle-left"></span>'),
+                $nextPage   = $('<a></a>').addClass(NEXTPAGE).append('<span class="fa fa-angle-right"></span>'),
+                $lastPage   = $('<a></a>').addClass(LASTPAGE).append('<span class="fa fa-angle-double-right"></span>'),
+                $numberPage = $("<ul></ul>").addClass(PAGENUMBER);
 
             this._fourBtn($firstPage,$prevPage,$nextPage,$lastPage,page,lastPage);
             this._numberPage($numberPage,page,lastPage);
@@ -87,12 +88,12 @@
                 page     = parseInt(op.page) || 1,
                 lastPage = Math.ceil(total / pageSize),
 
-                $pagerBtn   = $(PAGEBTN,this.$pager),
-                $firstPage  = $(FIRST,$pagerBtn),
-                $prevPage   = $(PREV,$pagerBtn),
-                $nextPage   = $(NEXT,$pagerBtn),
-                $lastPage   = $(LAST,$pagerBtn),
-                $numberPage = $(PAGENUMBER,$pagerBtn);
+                $pagerBtn   = $("." + PAGENAV,this.$pager),
+                $firstPage  = $("." + FIRSTPAGE,$pagerBtn),
+                $prevPage   = $("." + PREVPAGE,$pagerBtn),
+                $nextPage   = $("." + NEXTPAGE,$pagerBtn),
+                $lastPage   = $("." + LASTPAGE,$pagerBtn),
+                $numberPage = $("." + PAGENUMBER,$pagerBtn);
 
             this._fourBtn($firstPage,$prevPage,$nextPage,$lastPage,page,lastPage);
             $numberPage.empty();
@@ -103,20 +104,20 @@
             var nextPage = page + 1,
                 prevPage = page - 1;
             if(page <= 1){
-                $firstPage.addClass("state-disabled");
-                $prevPage.addClass("state-disabled");
+                $firstPage.addClass(STATEDISABLED);
+                $prevPage.addClass(STATEDISABLED);
             }
             else{
-                $firstPage.removeClass("state-disabled").data("page",1).attr("data-page",1);
-                $prevPage.removeClass("state-disabled").data("page",prevPage).attr("data-page",prevPage);
+                $firstPage.removeClass(STATEDISABLED).data("page",1);
+                $prevPage.removeClass(STATEDISABLED).data("page",prevPage);
             }
 
             if(page >= lastPage){
-                $nextPage.addClass("state-disabled");
-                $lastPage.addClass("state-disabled");
+                $nextPage.addClass(STATEDISABLED);
+                $lastPage.addClass(STATEDISABLED);
             }else{
-                $nextPage.removeClass("state-disabled").data("page",nextPage).attr("data-page",nextPage);
-                $lastPage.removeClass("state-disabled").data("page",lastPage).attr("data-page",lastPage);
+                $nextPage.removeClass(STATEDISABLED).data("page",nextPage);
+                $lastPage.removeClass(STATEDISABLED).data("page",lastPage);
             }
         },
 
@@ -128,7 +129,7 @@
                         $a  = $("<a></a>").data("page",shiftPage).text(shiftPage);
                     shiftPage != page ?
                         $a.addClass("pager-num"):
-                        $a.addClass("state-selected");
+                        $a.addClass(STATEDISABLED);
                     $numberPage.append($li.append($a));                    }
             }
         },
@@ -155,7 +156,7 @@
                 numStart  = (page-1) * pageSize + 1,
                 numEnd    = (page-1) * pageSize + op.rowsLen;
 
-            return $("<div></div>").addClass("pager-info").text(numStart + ' - ' + numEnd + ' of ' + total + ' items');
+            return $("<div></div>").addClass(PAGEINFO).text(numStart + ' - ' + numEnd + ' of ' + total + ' items');
         },
 
         _page:function(page){

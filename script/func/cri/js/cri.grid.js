@@ -58,7 +58,6 @@
      * @private
      */
     function _getColumnsDef($table,optionColumns){
-
         var columns = optionColumns || (function(){
             var fieldArr = "[";
             $("tr th,td", $table).each(function(){
@@ -251,7 +250,6 @@
                 columns   = this._columns;
 
             $table.append(this._createColGroup($parent.width()));
-            $table.append($tr);
 
             if(op.checkBox){
                 var $lineCheckbox = $("<td></td>").addClass("line-checkbox").append('<span class="td-content"><input type="checkbox"/></span>');
@@ -280,18 +278,14 @@
                 i < (len - 1) && $td.append($dragLine);
                 $tr.append($td);
             }
+            $table.append($tr);
             $parent.html($headWrap.html($table));
-
         },
 
         _createBody:function(gridBodyHeight){
-            var $gridbody = $("<div></div>").addClass("grid-body").height(gridBodyHeight);
-            if(gridBodyHeight){
-                $gridbody.height(gridBodyHeight);
-            }else{
-                $gridbody.addClass("loading");
-            }
-            var $loadingIcon = $('<i class="fa fa-spinner fa-spin"></i>').addClass("loadingIcon");
+            var $gridbody = $('<div class="grid-body loading"></div>'),
+                $loadingIcon = $('<i class="fa fa-spinner fa-spin"></i>').addClass("loadingIcon");
+            gridBodyHeight && $gridbody.height(gridBodyHeight);
             $gridbody.append($loadingIcon);
             return $gridbody;
         },
@@ -311,7 +305,7 @@
 
             for(var i = 0,len = op.rows.length; i<len; i++){
                 var row = op.rows[i];
-                var $tr  = $('<tr></tr>').data("rowid",id).prop("data-rowid",id);
+                var $tr  = $('<tr></tr>').data("rowid",id);
 
                 if(op.checkBox){
                     $tr.append($("<td></td>").addClass("line-checkbox").append('<input type="checkbox"/>'));
@@ -334,9 +328,13 @@
                 $table.append($tr);
             }
             this.$gridbody.removeClass("loading").html($table);
-            //fixed IE8 do not support nth-child selector;
+            /**
+             *fixed IE8 do not support nth-child selector;
+             */
             $("tr:nth-child(odd)",$table).css("background","#FFF");
-            //根据gird-body 纵向滚动条决定headWrap rightPadding
+            /**
+             *根据gird-body纵向滚动条宽度决定headWrap rightPadding
+             */
             var scrollBarW = this.$gridbody.width()-this.$gridbody.prop("clientWidth");
             this.$gridhead.css("paddingRight",scrollBarW);
         },
