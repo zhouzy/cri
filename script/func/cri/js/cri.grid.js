@@ -362,17 +362,9 @@
         },
 
         _createToolbar:function($parent){
-            if(this.options.toolbar){
-                var $toolbar = $('<div class="toolbar"></div>');
-                var html = "<ul>"
-                $.each(this.options.toolbar,function(index,data){
-                    html += "<li data-toolbar=\"" + index + "\">" + this.text + "</li>";
-                });
-                html += "</ul>";
-                $toolbar.append(html);
-                $parent.append($toolbar);
-                this.$toolbar = this.$toolbar || $toolbar;
-            }
+            this.toolbar = new cri.ToolBar($parent,{
+                buttons:this.options.toolbar
+            });
         },
 
         _createPage:function(){
