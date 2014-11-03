@@ -24,7 +24,7 @@
     function button(button){
         var $button = $("<li></li>");
         button.iconCls && $button.append(icon(button.iconCls));
-        button.text && $button.append(text);
+        button.text && $button.append(button.text);
         button.handle && $button.on("click",button.handle);
         return $button;
     }
@@ -38,10 +38,7 @@
     $.extend(ToolBar.prototype,{
         _eventListen:function(){
             var that = this;
-            this.$toolBar.on("click","a:not('."+STATEDISABLED+"')",function(e){
-                var $a = $(e.target).closest("a");
-                var page = $a.data("page");
-                that._page(page);
+            this.$toolBar.on("click","li",function(e){
             });
         },
 
