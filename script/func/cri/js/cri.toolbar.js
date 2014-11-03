@@ -12,7 +12,7 @@
         $   = window.jQuery;
 
     var _defaultOptions = {
-        buttons:[] //按钮组{text:按钮文本,handle:按钮回调函数,iconCls:按钮图标}
+        buttons:[] //按钮组{text:按钮文本,handler:按钮回调函数,iconCls:按钮图标}
     };
 
     var TOOLBAR = "toolbar";
@@ -25,7 +25,7 @@
         var $button = $("<li></li>");
         button.iconCls && $button.append(icon(button.iconCls));
         button.text && $button.append(button.text);
-        button.handle && $button.on("click",button.handle);
+        button.handler && $button.on("click",button.handler);
         return $button;
     }
 

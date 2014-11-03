@@ -403,11 +403,13 @@
                     that.pager && that.pager.update(op.page,op.pageSize,op.total,op.rows.length);
                     that._refreshBody(that.$gridbody);
                 },
-                error: function(){
+                error: function(XMLHttpRequest, textStatus, errorThrown){
                     //TODO: warming developer
+                    console && console.error(XMLHttpRequest.readyState + XMLHttpRequest.status + XMLHttpRequest.responseText);
                     op.rows = [];
                     op.total = 0;
                     that.pager && that.pager.update(op.page,op.pageSize,op.total,op.rows.length);
+                    that._refreshBody(that.$gridbody);
                 },
                 complete:function(){
                     //TODO:clear all resource if necessary

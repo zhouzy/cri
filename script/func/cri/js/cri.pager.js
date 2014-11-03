@@ -29,10 +29,11 @@
         PREVPAGE  = "prev-page",
         NEXTPAGE  = "next-page",
         LASTPAGE  = "last-page",
-        PAGENUMBER = "pager-number",
-        PAGENAV    = "pager-nav",
-        PAGEINFO   = "pager-info",
-        STATEDISABLED = "state-disabled";
+        PAGENUMBER    = "pager-number",
+        PAGENAV       = "pager-nav",
+        PAGEINFO      = "pager-info",
+        STATEDISABLED = "state-disabled",
+        STATEDSTATE   = "state-selected";
 
     var Pager = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
@@ -129,8 +130,9 @@
                         $a  = $("<a></a>").data("page",shiftPage).text(shiftPage);
                     shiftPage != page ?
                         $a.addClass("pager-num"):
-                        $a.addClass(STATEDISABLED);
-                    $numberPage.append($li.append($a));                    }
+                        $a.addClass(STATEDSTATE);
+                    $numberPage.append($li.append($a));
+                }
             }
         },
 
@@ -143,7 +145,7 @@
                 numEnd   = (page-1) * pageSize + op.rowsLen,
 
                 $pager     = this.$pager,
-                $pagerInfo = $(PAGEINFO,$pager);
+                $pagerInfo = $("."+PAGEINFO,$pager);
 
             $pagerInfo.text(numStart + ' - ' + numEnd + ' of ' + total + ' items');
         },
