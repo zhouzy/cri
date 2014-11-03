@@ -149,9 +149,9 @@
 
                 });
 
-            $("body").on("mouseup",function(e){
+            $(document).on("mouseup",function(e){
                 that.$gridhead.css("cursor","");
-                that.$gridhead.off("mousemove");
+                $(document).off("mousemove");
             });
 
             this.$gridhead
@@ -159,25 +159,21 @@
                     var dragLineIndex = 0;
                     op.rowNum && dragLineIndex++;
                     op.checkBox && dragLineIndex++;
-
                     dragLineIndex += $(this).data("drag");
-
-                    var $col = $("col:eq("+ dragLineIndex +")",that.$gridhead);
+                    var $td = $("td:eq("+ dragLineIndex +")",that.$gridhead);
                     that.$gridhead.css("cursor","e-resize");
                     dragStartX = e.pageX;
-
-                    that.$gridhead.on("mousemove",function(e){
+                    $(document).on("mousemove",function(e){
                         var px = e.pageX - dragStartX;
-                        var width = $col.width() + px;
+                        var width = $td.width() + px;
                         var tableWidth = $("table",that.$gridhead).width();
-
                         dragStartX = e.pageX;
-
+                        console.log(width);
                         if(width >= _cellMinW){
                             $("table",that.$gridbody).width(tableWidth + px);
                             $("table",that.$gridhead).width(tableWidth + px);
-                            $col.width(width);
-                            $("col:eq("+ dragLineIndex +")",that.$gridbody).width(width);
+                            $td.width(width);
+                            $("tr:eq(0) td:eq("+ dragLineIndex +")",that.$gridbody).width(width);
                         }
                     });
 
@@ -362,9 +358,11 @@
         },
 
         _createToolbar:function($parent){
-            this.toolbar = new cri.ToolBar($parent,{
-                buttons:this.options.toolbar
-            });
+            if(this.options.toolbar) {
+                this.toolbar = new cri.ToolBar($parent, {
+                    buttons: this.options.toolbar
+                });
+            }
         },
 
         _createPage:function(){

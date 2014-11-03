@@ -36,11 +36,7 @@
     });
 
     $.extend(ToolBar.prototype,{
-        _eventListen:function(){
-            var that = this;
-            this.$toolBar.on("click","li",function(e){
-            });
-        },
+        _eventListen:function(){},
 
         _init:function () {
             this._create(this.$element);
