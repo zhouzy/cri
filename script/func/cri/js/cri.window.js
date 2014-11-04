@@ -204,11 +204,14 @@
      */
     Window.prototype._overlay = function(){
         if(this.options.modal){
-            var $overlay = $(".overlay")[0] || $("<div></div>").addClass("overlay")[0];
-            $("body").append($overlay);
             var zIndex = +this.$window.css("zIndex");
-            $overlay.style.zIndex = zIndex;
             this.$window.css("zIndex",(zIndex+1));
+            var $overlay = $(".overlay");
+            if($overlay.length == 0){
+                $overlay = $("<div></div>").addClass("overlay");
+                $("body").append($overlay);
+            }
+            $overlay.css("zIndex",zIndex).show();
         }
     };
 

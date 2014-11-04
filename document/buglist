@@ -1,13 +1,18 @@
-1.表格未指定列宽度，表格宽度（fixed）
+//树
+1.树，折叠节点会同时触发onSelect事件(fixed)
+
+//Grid
+1.树形菜单点击文件按钮，会触发click事件(fixed)
+2.表格多选方法返回值为空(fixed)
+3.表格未指定列宽度，表格宽度（fixed）
+4.分页信息不对(fixed)
+5.后台数据指定表格checkbox勾选 功能未实现(fixed)
+6.当表格td无内容时，无高度(fixed)
+7.翻页不起作用(fixed)
+8.IE8 表格奇偶行 tr:nth-child 不识别(fixed)
+9.表格先构造后请求数据，请求数据时，出现loading标志(fixed)
+10.表格头拖动未考虑到(col width:auto)情况(fixed)
+
+//窗口
+1.窗口组件，初始化未指定位置高宽，应该居中显示
 2.模态窗口关闭，遮罩未关闭
-3.窗口组件，初始化未指定位置高宽，应该居中显示
-4.树形菜单点击文件按钮，会触发click事件(fixed)
-5.表格多选方法返回值为空(fixed)
-6.树，折叠节点会同时触发onSelect事件(fixed)
-7.分页信息不对(fixed)
-8.后台数据指定表格checkbox勾选 功能未实现(fixed)
-9.当表格td无内容时，无高度(fixed)
-10.翻页不起作用(fixed)
-11.IE8 表格奇偶行 tr:nth-child 不识别(fixed)
-12.表格先构造后请求数据，请求数据时，出现loading标志(fixed)
-13.表格头拖动未考虑到(col width:auto)情况(fixed)
