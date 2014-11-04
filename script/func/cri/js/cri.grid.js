@@ -88,7 +88,7 @@
 
     /**
      * 表格默认属性
-     * @type {{url: null, param: {}, title: null, toolbar: null, columns: null, rows: null, async: boolean, onClick: null, onDblClick: null, rowNum: boolean, checkBox: boolean, onChecked: null, changeRowCheck: null, pagination: boolean, page: number, pageSize: number, total: number, ajaxDone: null, ajaxError: null}}
+     * @type {{url: null, param: {}, title: null, toolbar: null, columns: null, rows: null, onClick: null, onDblClick: null, rowNum: boolean, checkBox: boolean, onChecked: null, pagination: boolean, page: number, pageSize: number, total: number, ajaxDone: null, ajaxError: null}}
      * @private
      */
     var _defaultOptions = {
@@ -98,19 +98,18 @@
         toolbar:null,
         columns:null,
         rows:null,
-        async:false,
-        onClick:null,
-        onDblClick:null,
-        onLoad:null,//构造表格结束时触发
         rowNum:true,
         checkBox:false,
-        onChecked:null,//每行checkbox被选中时触发回调函数,当该回调函数返回,参数row,rowid
-        changeRowCheck:null,//使某行checkbox为选中或不选中,参数 rowid, isChecked
         pagination:true,
         page:1,
         pageSize:10,
+
         ajaxDone:null,
-        ajaxError:null
+        ajaxError:null,
+        onChecked:null,//每行checkbox被选中时触发回调函数,当该回调函数返回,参数row,rowid
+        onClick:null,
+        onDblClick:null,
+        onLoad:null//构造表格结束时触发
     };
 
     var Grid = cri.Widgets.extend(function(element,options){
@@ -139,10 +138,10 @@
                     $(".grid-head-wrap",that.$gridhead).scrollLeft($(this).scrollLeft());
                 })
                 .on('click', "tr", function(e){
-                    that.setSelected(e);
+                    that._setSelected(e);
                 })
                 .on('dblclick', "tr", function(e){
-                    that.onDblClickRow(e);
+                    that._onDblClickRow(e);
                 })
                 .on("change", "input[type=checkbox]",function(e){
                     that._checkbox(e);
@@ -189,9 +188,6 @@
                         }
                     }
                 });
-
-            this.$toolbar && this.$toolbar
-                .on('click',"li[data-toolbar]",function(e){that.clickToolbar(e);});
         },
 
         _init:function() {
@@ -426,7 +422,33 @@
             var isChecked = $(e.target).prop("checked");
             var rowid = $(e.target).closest("tr").data("rowid");
             if(isChecked && op.onChecked){
-                op.onChecked(this.getRowDataById(rowid),rowid);
+                op.onChecked(this._getRowDataById(rowid),rowid);
+            }
+        },
+
+        _setSelected:function(e){
+            var item = $(e.target).closest("tr")
+                ,rowid = item.data('rowid');
+            $("tr",this.$gridbody).toggleClass("click",false);
+            this.selectedRow = this._getRowDataById(rowid);
+            item.toggleClass("click");
+            if(this.options.onClick){
+                this.options.onClick(this.selectedRow);
+            }
+        },
+
+        _getRowDataById:function(rowid){
+            return this.options.rows[parseInt(rowid)];
+        },
+
+        _onDblClickRow:function(e){
+            var op = this.options
+                ,item = $(e.target).closest("tr")
+                ,rowid = item.data('rowid')
+                ,that = this;
+            this.selectedRow = this._getRowDataById(rowid);
+            if(op.onDblClick){
+                op.onDblClick(that.selectedRow);
             }
         },
 
@@ -448,51 +470,15 @@
                 that = this;
             $("tr input[type='checkbox']:checked",this.$gridbody).each(function(){
                 var rowid = $(this).closest("tr").data("rowid");
-                mulSelectRow.push(that.getRowDataById(rowid));
+                mulSelectRow.push(that._getRowDataById(rowid));
             });
             return mulSelectRow;
         },
 
         getSelected:function(){
             return this.selectedRow;
-        },
-
-        setSelected:function(e){
-            var item = $(e.target).closest("tr")
-                ,rowid = item.data('rowid');
-            $("tr",this.$gridbody).toggleClass("click",false);
-            this.selectedRow = this.getRowDataById(rowid);
-            item.toggleClass("click");
-            if(this.options.onClick){
-                this.options.onClick(this.selectedRow);
-            }
-        },
-
-        getRowDataById:function(rowid){
-            return this.options.rows[parseInt(rowid)];
-        },
-
-        onDblClickRow:function(e){
-            var op = this.options
-                ,item = $(e.target).closest("tr")
-                ,rowid = item.data('rowid')
-                ,that = this;
-            this.selectedRow = this.getRowDataById(rowid);
-            if(op.onDblClick){
-                op.onDblClick(that.selectedRow);
-            }
-        },
-
-        clickToolbar:function(e){
-            var toolbar = $(e.target)
-                ,index = toolbar.data('toolbar');
-            this.options.toolbar[index].handler();
-        },
-
-        changeRowCheck:function(rowid,isChecked){
-            this.options.checkBox &&
-            $("tr:eq("+rowid+") input[type=checkbox]",this.$gridbody).prop("checked",isChecked);
         }
+
     });
 
     cri.Grid = Grid;
