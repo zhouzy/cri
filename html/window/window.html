@@ -21,32 +21,27 @@
     </style>
 </head>
 <body>
-<div class="content">
-    <div id="window1" class="window-content">
-    </div>
+<div id="adddiv">
+    <select id="select_color" name="color" title="颜色" class="eb_selectBox" data-options="required:true,defaultVal:'0'">
+        <option value="0">黑色</option>
+        <option value="1">白色</option>
+    </select>
+    <select id="select_type" name="type" title="类型" class="eb_selectBox" data-options="required:true,defaultVal:'0'">
+        <option value="0">参数</option>
+        <option value="1">IP</option>
+    </select>
+    <input type="text" class="eb_input" title="值" name="bwlistValue" placeholder="请输入值" value="" id="bwlistValueAdd" data-options="required:true" />
+    <textarea name="description" class="eb_textarea" title="描述" data-options="width:510"></textarea>
 </div>
 <script>
-    $("#window1").window({
+    $("#adddiv").window({
         title:"window1",
         actions:["Maximize","Close","Minimize"],
         position:{left:10,top:10},
-        width:200,height:200,
-        modal:true
+        modal:true,
+        content:"./windowContent.html"
     });
-    /*
-    $("#window2").window({
-        title:"window2",
-        actions:["Maximize","Close","Minimize"],
-        position:{left:20,top:20},
-        width:300,height:300
-    });
-    $("#window3").window({
-        title:"window3",
-        actions:["Maximize","Close","Minimize"],
-        position:{left:30,top:30},
-        width:300,height:300
-    });
-    */
+    function buttonAdd(){}
 </script>
 </body>
 </html>

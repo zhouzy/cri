@@ -145,7 +145,11 @@
         $window.append($windowBody);
         $windowBody.append($element);
         this.$window = $window;
+        if(this.options.content){
+            $windowBody.load(this.options.content);
+        }
         $("body").append(this.$window);
+
     };
 
     /**
@@ -240,6 +244,10 @@
             "button resume": "resume",
             "button close": "close"
         }[iconClass];
+    };
+
+    Window.prototype._loadContent = function(){
+        $.load();
     };
 
     /**
