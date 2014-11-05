@@ -1882,198 +1882,6 @@
 }(window.jQuery);
 
 /*=====================================================================================
- * easy-bootstrap-marquee v1.0
- * 
- * @author:zhouzy
- * @date:2013/09/16
- * @dependce:jquery
- *=====================================================================================*/
-!function($){
-    "use strict";
-
-    var Marquee = function (element, options) {
-        this.options = $.extend({}, $.fn.marquee.defaults, options);
-        this.$element = $(element);
-        this.scrollInterval = null;
-        this.contentInterval = null;
-        this.$one = null;
-        this.$two = null;
-        this.ita = 0;
-        this.init();
-    };
-
-    Marquee.prototype = {
-        eventListen:function(){
-            var that = this;
-            this.$element.on("mouseenter",function(){
-                clearInterval(that.scrollInterval);
-            }).on("mouseleave",function(){
-                that.start();
-            });
-        },
-
-        init:function () {
-            var that = this;
-            this.ita = 0;
-            if(this.options.content.length > 0){
-                this.createEle();
-                this.contentInterval = window.setInterval(function(){
-                    that.start();
-                },3000);
-                this.eventListen();
-            }
-        },
-
-        createEle:function(){
-            this.$one || this.$element.append("<div class=\"contentOne\"></div>");
-            this.$two || this.$element.append("<div class=\"contentTwo\"></div>");
-            this.$one = $(".contentOne",this.$element);
-            this.$two = $(".contentTwo",this.$element);
-            if(this.options.content){
-                this.$one.html("<span>" + this.options.content[0].text + "</span>");
-                this.$two.html("<span>" + this.options.content[0].text + "</span>");
-            }
-        },
-        start:function(){
-            this.ita++;
-            this.ita>=this.options.content.length && (this.ita=0);
-            this.$two.html("<span>" + this.options.content[this.ita].text + "</span>");
-            this.$element.scrollTop(0);
-            clearInterval(this.scrollInterval);
-            var that = this;
-            this.scrollInterval = window.setInterval(function(){
-                that.scroll();
-            },20);
-        },
-        stop:function(){
-            clearInterval(this.contentInterval);
-        },
-        scroll:function(){
-            this.$element.scrollTop(this.$element.scrollTop() + 1);
-            if(this.$element.scrollTop % 20 == 20){
-                clearInterval(this.scrollInterval);
-            }
-        },
-
-        refreshContent:function(param){
-            this.options.content = param;
-            this.init();
-        }
-    };
-
-    $.fn.marquee = function (option,param) {
-        var result = null;
-        var $marquee = this.each(function () {
-            var $this = $(this)
-                , data = $this.data('marquee')
-                , options = typeof option == 'object' && option;
-            if(typeof option == 'string' ){
-                result = data[option](param);
-            }else{
-                $this.data('marquee', (data = new Marquee(this, options)));
-            }
-        });
-        if(typeof option == 'string')return result;
-        return $marquee;
-    };
-
-    $.fn.marquee.defaults = {
-        content:[],
-        delayTime:3000,
-        height:20
-    };
-
-    $(window).on('load', function(){
-        $("[class='marquee']").each(function () {
-            var $this = $(this)
-                ,data = $this.data('options');
-            if(!data) return;
-            $this.marquee((new Function("return {" + data + "}"))());
-        });
-    });
-
-}(window.jQuery);
-
-/*=====================================================================================
- * easy-bootstrap-messager v1.0
- * 
- * @author:zhouzy
- * @date:2013/10/18
- * @dependce:jquery
- *=====================================================================================*/
-!function($){
-    var Messager = function(){
-        this.messagerQueue = [];
-        var that = this;
-        window.MessagerOkBtn = function(){
-            $("#EASYBOOTSTARPMSGWND").popoutWindow("hide");
-            $("#EASYBOOTSTARPMSGWND").html("");
-            var msg = that.messagerQueue.pop();
-            if(msg.length == 3){
-                msg[2](true);
-            }
-        };
-        window.MessagerCancelBtn = function(){
-            $("#EASYBOOTSTARPMSGWND").popoutWindow("hide");
-            $("#EASYBOOTSTARPMSGWND").html("");
-            var msg = that.messagerQueue.pop();
-            if(msg.length == 3){
-                msg[2](false);
-            }
-        };
-        window.MessagerCloseBtn = function(){
-            $("#EASYBOOTSTARPMSGWND").popoutWindow("hide");
-            $("#EASYBOOTSTARPMSGWND").html("");
-            var msg = that.messagerQueue.pop();
-            if(msg.length == 3){
-                msg[2](false);
-            }
-        };
-    };
-    Messager.prototype = {
-        alert:function(title,content,iconSty){
-            this.messagerQueue.push(arguments);
-            var id = "EASYBOOTSTARPMSGWND";
-            $("#EASYBOOTSTARPMSGWND").length > 0 || $("body").append("<div class=\"eb_popoutWindow\" id=\"" + id + "\"></div>");
-            var $wnd = $("#EASYBOOTSTARPMSGWND");
-            $wnd.html(content);
-            $wnd.popoutWindow({
-                title:title,
-                buttons:[
-                    {text:'确定',icon:'eb_iconOK',handler:'MessagerOkBtn'}
-                ],
-                width:500,
-                height:300,
-                left:440,
-                top:100
-            });
-            $wnd.popoutWindow("show");
-        },
-        confirm:function(title,content,callBack){
-            this.messagerQueue.push(arguments);
-            var id = "EASYBOOTSTARPMSGWND";
-            $("#EASYBOOTSTARPMSGWND").length > 0 || $("body").append("<div class=\"eb_popoutWindow\" id=\"" + id + "\"></div>");
-            var $wnd = $("#EASYBOOTSTARPMSGWND");
-            $wnd.html(content);
-            $wnd.popoutWindow({
-                title:title,
-                buttons:[
-                    {text:'确定',icon:'eb_iconOK',handler:'MessagerOkBtn'},
-                    {text:'取消',icon:'eb_iconCancel',handler:'MessagerCancelBtn'}
-                ],
-                width:500,
-                height:300,
-                left:440,
-                top:100
-            });
-            $wnd.popoutWindow("show");
-        }
-    };
-    $.messager = new Messager();
-}(jQuery);
-
-
-/*=====================================================================================
  * easy-bootstrap-floatContainer01 v2.0
  * 
  * @author:niyq
@@ -2203,20 +2011,10 @@
         var thisObject = this;
         this.$element = $(element);
         this.dataOptions = $.extend({}, $.fn.popoutWindow.defaults, dataOptions);
-        this.title = this.$element.attr("title");
-        if(this.dataOptions.title)
-            this.title = this.dataOptions.title;
+        this.title = this.dataOptions.title || this.$element.attr("title") || "";
         this.id = this.$element.attr("id");
         this.funcArr = {};
         this.init();     //初始化popoutWindowGroup组件
-        //this.setStyle();
-        /*this.$element.focus(function(){
-         var result = thisObject.check();
-         if(result == false)
-         return false;
-         else
-         return true;
-         });*/
     };
 
     PopoutWindow.prototype.init = function(){
@@ -2227,7 +2025,6 @@
         if(thisObject.$element.data("form"))
             this.parent.data("form",thisObject.$element.data("form"));
         this.popoutWindowObj = this.$element;     //popoutWindowObj
-        //this.popoutWindowObj.attr("id","");
         this.parent.prepend('<div class="eb_title">'+thisObject.title+'<span class="eb_closeWindowButton">x</span></div>');
         this.titleObj = this.parent.children('.eb_title');    //titleObj
         if(this.dataOptions.closeHandler){
@@ -2246,18 +2043,22 @@
         }                                                   //buttonsArr
         if(thisObject.buttonsArr){
             for(var i=0;i<thisObject.buttonsArr.length;i++){
-                var func = thisObject.buttonsArr[i].handler;
-                if(typeof func == "string")
-                    func = window[func];
-                thisObject.funcArr[i]=func;
-                this.buttonsBar.prepend($('<span class="eb_buttons" funcIndex="'+i+'"><span class="eb_icon '+thisObject.buttonsArr[i].icon+'"></span>'+thisObject.buttonsArr[i].text+'</span>').click(function(){
+                var button = thisObject.buttonsArr[i];
+                var func = button.handler;
+                typeof func == "string" && (func = window[func]);
+                thisObject.funcArr[i] = func;
+                var $button = $('<span class="eb_buttons" funcIndex="'+i+'"></span>');
+                button.icon && $button.append('<i class="eb_icon '+button.icon+'"></i>');
+                $button.append(button.text);
+                $button.on("click",function(){
                     var thisObj = this;
                     thisObject.funcArr[$(thisObj).attr("funcIndex")]();
-                }));
+                });
+                this.buttonsBar.prepend($button);
             }
         }
         this.buttonsObj = this.buttonsBar.children('.eb_buttons');     //buttonsObj
-        if(this.dataOptions.fullScreen == true){
+        if(this.dataOptions.fullScreen){
             this.setFullScreen();
         }else{
             this.setWidth();

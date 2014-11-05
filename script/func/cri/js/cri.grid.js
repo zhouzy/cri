@@ -106,10 +106,10 @@
 
         ajaxDone:null,
         ajaxError:null,
-        onChecked:null,//每行checkbox被选中时触发回调函数,当该回调函数返回,参数row,rowid
-        onClick:null,
+        onChecked:null, //每行checkbox被选中时触发回调函数,当该回调函数返回,参数row,rowid
+        onClick:null,   //行点击时触发
         onDblClick:null,
-        onLoad:null//构造表格结束时触发
+        onLoad:null     //构造表格结束时触发
     };
 
     var Grid = cri.Widgets.extend(function(element,options){
@@ -427,8 +427,8 @@
         },
 
         _setSelected:function(e){
-            var item = $(e.target).closest("tr")
-                ,rowid = item.data('rowid');
+            var item = $(e.target).closest("tr"),
+                rowid = item.data('rowid');
             $("tr",this.$gridbody).toggleClass("click",false);
             this.selectedRow = this._getRowDataById(rowid);
             item.toggleClass("click");

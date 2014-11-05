@@ -109,7 +109,7 @@
             item = $(e.target).closest("tr"),
             rowid = item.data('rowid'),
             that = this;
-        this.selectedRow = this.getRowDataById(rowid);
+        this.selectedRow = this._getRowDataById(rowid);
         if(this.selectedRow.state == "open") {
             this.selectedRow.state = "closed";
         }
@@ -138,7 +138,7 @@
             tr    = $(e.target).closest("tr"),
             rowid = parseInt(tr.data('rowid')),
             id    = rowid,
-            row   = this.getRowDataById(rowid),
+            row   = this._getRowDataById(rowid),
             isChecked = input.prop("checked");
 
         !function(data){
@@ -159,7 +159,7 @@
         }(row);
     };
 
-    TreeGrid.prototype.getRowDataById = function(rowid){
+    TreeGrid.prototype._getRowDataById = function(rowid){
         var op = this.options
             ,rowdata = null;
         rowid = parseInt(rowid);
