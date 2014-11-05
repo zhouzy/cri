@@ -1,0 +1,73 @@
+@import "./lib.less";
+@import "./theme-default.less";
+
+@input-group-width:240px;
+@input-width:160px;
+.input-group{
+    display:inline-block;
+    word-spacing:-1px;
+    font-size: 0;
+    -webkit-text-size-adjust:none;
+    width:@input-group-width;
+    input,.input-btn,label{
+        display:inline-block;
+        font-size:14px;
+    }
+    label{
+        width:@input-group-width - @input-width - 5px;
+        padding-right:5px;
+        height:26px;
+        line-height:26px;
+        text-align: right;
+        word-break: normal;
+        white-space: nowrap;
+        &:after{
+            content:":";
+            margin:0 2px;
+        }
+    }
+
+    input{
+        padding:5px 8px;
+        color: #BBB;
+        width:@input-width - 8*2 - 1*2;
+        line-height:14px;
+        height:14px;
+        border-radius: 3px;
+        border:1px solid @color-input-border;
+        &:focus {
+            border: 1px solid @color-input-focus;
+            outline:0;
+            .box-shadow(0,0,6px,1px,@color-input-focus-rgba);
+        }
+    }
+
+    .with-btn{
+        border-bottom-right-radius:0;
+        border-top-right-radius:0;
+        border-right-style:none;
+        width:@input-width - 8*2 - 1px - 20px;
+        &:focus{
+            border-right-style:none;
+        }
+    }
+    .input-btn{
+        border:1px solid @color-input-border;
+        background:#fff;
+        text-align:center;
+        line-height:24px;
+        height:24px;
+        width:18px;
+        border-bottom-right-radius:3px;
+        border-top-right-radius:3px;
+        cursor:pointer;
+        &:hover{
+            color:#fff;
+            background-color:lighten(@color-input-border,10%);
+        }
+        &:active{
+            color:#fff;
+            background-color:#444;
+        }
+    }
+}

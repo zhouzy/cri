@@ -31,6 +31,20 @@
     };
 
     cri.Class = Class;
+    cri.isArray = function(value){
+        if (value instanceof Array ||
+            (!(value instanceof Object) &&
+                (Object.prototype.toString.call((value)) == '[object Array]') ||
+                typeof value.length == 'number' &&
+                typeof value.splice != 'undefined' &&
+                typeof value.propertyIsEnumerable != 'undefined' &&
+                !value.propertyIsEnumerable('splice'))) {
+            return true;
+        }else{
+            return false;
+        }
+    };
+
 }(window);
 
 /*=====================================================================================
