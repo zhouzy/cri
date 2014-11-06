@@ -1,0 +1,115 @@
+@import "./lib.less";
+@import "./theme-default.less";
+
+@selectBox-group-width:240px;
+@selectBox-width:160px;
+@selectBox-btn-width:20px;
+.selectBox-group{
+    display:inline-block;
+    word-spacing:-1px;
+    font-size: 0;
+    -webkit-text-size-adjust:none;
+    width:@selectBox-group-width;
+    margin:5px 0;
+    position:relative;
+    .selectBox-body,.options,label{
+        font-size:14px;
+        width:@selectBox-width;
+    }
+    label{
+        vertical-align: top;
+        display:inline-block;
+        width:@selectBox-group-width - @selectBox-width - 5px;
+        padding-right:5px;
+        height:26px;
+        line-height:26px;
+        text-align: right;
+        word-break: normal;
+        white-space: nowrap;
+        &:after{
+            content:":";
+            margin:0 2px;
+        }
+    }
+    .selectBox-body{
+        background:#F2F2F2;
+        height:26px;
+        line-height:26px;
+        display:inline-block;
+        .box-shadow(0,-1px,2px,0,#CCC);
+        &:hover{
+            background:#E3E3E3;
+        }
+
+        &.active{
+        }
+
+        .selectBox-input,.selectBox-btn,label{
+            display:inline-block;
+            cursor:pointer;
+        }
+
+        .selectBox-input{
+            padding:5px 8px;
+            width:@selectBox-width - 8*2 - 1px - @selectBox-btn-width;
+            line-height:14px;
+            height:14px;
+            border-radius: 3px 0 0 3px;
+            border:1px solid @color-input-border;
+            border-right-style:none;
+            &:focus {
+                border: 1px solid @color-input-focus;
+                outline:0;
+                .box-shadow(0,0,6px,1px,@color-input-focus-rgba);
+            }
+        }
+
+        .selectBox-btn{
+            border:1px solid @color-input-border;
+            border-left-style:none;
+            text-align:center;
+            line-height:24px;
+            height:24px;
+            width:@selectBox-btn-width - 1px;
+            border-bottom-right-radius:3px;
+            border-top-right-radius:3px;
+            vertical-align: top;
+            &:hover{
+                color:#fff;
+                background-color:lighten(@color-input-border,10%);
+            }
+            &:active{
+                color:#fff;
+                background-color:#444;
+            }
+        }
+    }
+    .options{
+        display:block;
+        position:absolute;
+        top:26px;
+        left:@selectBox-group-width - @selectBox-width - 1px;
+        width:@selectBox-width - 2px;
+        border:1px solid @color-input-border;
+        background:#F2F2F2;
+        .rounded-corners(3px);
+        .box-shadow(0,2px,2px,0,#CCC);
+        padding:4px 0;
+        li{
+            display:inline-block;
+            width:96%;
+            margin:0 2%;
+            .rounded-corners(3px);
+            height:26px;
+            line-height:26px;
+            text-align:center;
+            &:hover{
+                background:@color-selectBox-option-hover;
+            }
+        }
+        li.selected{
+            background:@color-selectBox-option-selected;
+            color:#fff;
+        }
+    }
+}

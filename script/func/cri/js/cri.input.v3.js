@@ -11,33 +11,18 @@
     var cri = window.cri,
         $   = window.jQuery;
 
-    /**
-     * 默认属性
-     * @type {{page: number, pageSize: number, total: number}}
-     * @private
-     */
     var _defaultOptions = {
-        page:1,      //当前页数
-        pageSize:10, //每页条数
-        total:0,     //总条数
-        rowsLen:0,   //实际数据length
-        onPage:null,  //当用户点击翻页按钮时触发
-        onUpdate:null //更新翻页信息结束触发
+        label:null,
+        button:null//button={iconCls:"",handler:""}
     };
 
-    var FIRSTPAGE = "first-page",
-        PREVPAGE  = "prev-page",
-        NEXTPAGE  = "next-page",
-        LASTPAGE  = "last-page",
-        PAGENUMBER    = "pager-number",
-        PAGENAV       = "pager-nav",
-        PAGEINFO      = "pager-info",
-        STATEDISABLED = "state-disabled",
-        STATEDSTATE   = "state-selected";
+    var INPUT_GROUP = "input-group",
+        INPUT_BTN  = "input-btn",
+        WITH_BTN = "with-btn";
 
     var Input = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
-        this.pager = null;
+        this.$inputGroup = null;
         cri.Widgets.apply(this,arguments);
     });
 
@@ -46,13 +31,41 @@
 
         },
 
-        _init:function () {
+        _init:function(){
+            this._createInputGroup();
         },
 
-        _createInput:function($parent){
-            var $inputGroup = $('<div class="input-group"></div>'),
-                $label = $('<label></label>').text();
+        _createInputGroup:function(){
+            var op = this.options,
+                label = op.label || "",
+                $label = $('<label></label>').text(label),
+                $input = this.$element;
+
+            $input.wrap('<div class="'+ INPUT_GROUP + '"></div>');
+            var $inputGroup = $input.parent();
+            this.$inputGroup = $inputGroup;
+            if(op.button){
+                var $icon = $('<i class="' + INPUT_BTN + " " + op.button.iconCls + '"></i>').on("click",function(){
+                    op.button.handler.call();
+                });
+                $inputGroup.append($icon);
+                $input.addClass(WITH_BTN);
+            }
+            $inputGroup.prepend($label);
         }
     });
     cri.Input = Input;
+
+    $.fn.newInput = function(option) {
+        var input = null;
+        this.each(function () {
+            var $this   = $(this),
+                input   = $this.data('input'),
+                options = typeof option == 'object' && option;
+            if(input != null){
+            }
+            $this.data('input', (input = new Input(this, options)));
+        });
+        return input;
+    };
 }(window);

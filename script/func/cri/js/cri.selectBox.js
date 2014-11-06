@@ -91,11 +91,6 @@
                 this.dropdownMenu.height(length*30 + 26);
                 this.displayAreaObj.height(length*30);
             }
-            /*if(this.dataOptions.onselectHandler){
-             this.buttonOKObj.click(function(){
-             thisObject.dataOptions.onselectHandler(thisObject.selectBoxObj);
-             });
-             }*/
         }
     };
 

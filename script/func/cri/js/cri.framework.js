@@ -31,6 +31,7 @@
     };
 
     cri.Class = Class;
+
     cri.isArray = function(value){
         if (value instanceof Array ||
             (!(value instanceof Object) &&
