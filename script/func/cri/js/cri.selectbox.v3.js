@@ -61,21 +61,60 @@
             return $('<i class="' + SELECTBOX_BTN +' fa fa-caret-down"></i>');
         },
 
+
+        /**
+         * 初始化下拉选择框
+         * @returns {*|HTMLElement}
+         * @private
+         */
+        _createOptions:function(){
+            var data = this._data();
+            var $options = this.$selectBoxOptions = $('<ul class="' + OPTIONS + '"></ul>').hide();
+            if(data){
+                for(var i = 0,len = data.length; i<len; i++){
+                    $options.append(this._createOption(data[i]));
+                }
+            }
+            return $options;
+        },
+
+        /**
+         * 构造单个option
+         * @param option
+         * @private
+         */
+        _createOption:function(option){
+            var $li = $('<li></li>').text(option.text),
+                that = this;
+            $li.on("click",function(e){
+                $("li."+SELECTED,that.$selectBoxOptions).removeClass(SELECTED);
+                $li.addClass(SELECTED);
+                that._select(option.text,option.value);
+                //TODO:set value to select
+                return false;
+            });
+            return $li;
+        },
+
         /**
          * 显示隐藏切换options选择框
          * @private
          */
         _toggleOptions:function(){
-            var isHide = true,//当前是否显示
-                that = this;
+            var isHide = false,//当前是否显示
+                that = this,
+                $selectBoxGroup = that.$selectBoxGroup;
             return function(){
                 if(isHide){
                     that._hideOptions();
                 }else{
                     that._showOptions();
-                    $(document).one("click",function(){
-                        that._hideOptions();
-                        isHide = false;
+                    $(document).mouseup(function(e){
+                        var _con = $selectBoxGroup;
+                        if(!_con.is(e.target) && _con.has(e.target).length === 0){
+                            that._hideOptions();
+                            isHide = false;
+                        }
                     });
                 }
                 isHide = !isHide;
@@ -101,40 +140,6 @@
             this.$selectBoxOptions.animate({
                 height:'hide'
             },200);
-        },
-
-        /**
-         * 初始化下拉选择框
-         * @returns {*|HTMLElement}
-         * @private
-         */
-        _createOptions:function(){
-            var data = this._data();
-            var $options = this.$selectBoxOptions = $('<ul class="' + OPTIONS + '"></ul>');
-            if(data){
-                for(var i = 0,len = data.length; i<len; i++){
-                    $options.append(this._createOption(data[i]));
-                }
-            }
-            return $options;
-        },
-
-        /**
-         * 构造单个option
-         * @param option
-         * @private
-         */
-        _createOption:function(option){
-            var $li = $('<li></li>').text(option.text),
-                that = this;
-            $li.on("click",function(e){
-                $("li."+SELECTED,that.$selectBoxOptions).removeClass(SELECTED);
-                $li.addClass(SELECTED);
-                that._select(option.text,option.value);
-                //TODO:set value to select
-                return false;
-            });
-            return $li;
         },
 
         /**
@@ -164,6 +169,25 @@
          */
         _select:function(text,value){
             this.$selectBoxInput.text(text);
+            this.$selectBoxInput.val(value);
+        },
+
+        /**
+         * get or set selectBox value
+         * @param value
+         * @returns {*}
+         */
+        value:function(value){
+            return this.$element.val();
+        },
+
+        /**
+         * get or set selectBox text
+         * @param text
+         * @returns {*}
+         */
+        text:function(text){
+            return this.$element.text();
         }
     });
 
