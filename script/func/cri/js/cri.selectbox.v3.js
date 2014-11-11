@@ -27,6 +27,9 @@
         OPTIONS  = "options",
         SELECTED = "selected";
 
+    /**
+     * TODO:1.增加级联下拉框特性
+     */
     var SelectBox = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
         this.$selectBoxGroup = null;
