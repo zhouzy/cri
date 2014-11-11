@@ -12,9 +12,12 @@
         $   = window.jQuery;
 
     var _defaultOptions = {
-        label:'',
-        data:null,//Array [{value:"",text:""},{value:"",text:""}]
-        optionLabel:''
+        label:''
+        ,data:null//Array [{value:"",text:""},{value:"",text:""}]
+        ,optionLabel:''
+        ,value:null//Function: get or set selectBox value
+        ,text:null//Function: get or set selectBox text
+        ,change:null//Function: call back after select option
     };
 
     var SELECTBOX_GROUP = "selectBox-group",
@@ -29,6 +32,8 @@
         this.$selectBoxGroup = null;
         this.$selectBoxInput = null;
         this.$selectBoxOptions = null;
+        this._value = null;
+        this._text = null;
         cri.Widgets.apply(this,arguments);
     });
 
@@ -51,16 +56,11 @@
         _createBody:function(){
             var $selectBody = $('<span class="' + SELECTBOX_BODY + '"></span>'),
                 $selectInput = this.$selectBoxInput = $('<span class="' + SELECTBOX_INPUT + '"></span>'),
-                $btn = this._createSlectBtn();
+                $btn = $('<i class="' + SELECTBOX_BTN +' fa fa-caret-down"></i>');
             $selectBody.append($selectInput,$btn);
             $selectBody.on("click",this._toggleOptions());
             return $selectBody;
         },
-
-        _createSlectBtn:function(){
-            return $('<i class="' + SELECTBOX_BTN +' fa fa-caret-down"></i>');
-        },
-
 
         /**
          * 初始化下拉选择框
@@ -87,12 +87,14 @@
             var $li = $('<li></li>').text(option.text),
                 that = this;
             $li.on("click",function(e){
-                $("li."+SELECTED,that.$selectBoxOptions).removeClass(SELECTED);
-                $li.addClass(SELECTED);
-                that._select(option.text,option.value);
-                //TODO:set value to select
-                return false;
-            });
+                if(!$li.is("." + SELECTED)){
+                    $("li."+SELECTED,that.$selectBoxOptions).removeClass(SELECTED);
+                    $li.addClass(SELECTED);
+                    that._select(option.text,option.value);
+                    that.options.change && that.options.change.call(that);
+                }
+            })
+            .on("click",that._toggleOptions());
             return $li;
         },
 
@@ -101,45 +103,33 @@
          * @private
          */
         _toggleOptions:function(){
-            var isHide = false,//当前是否显示
-                that = this,
-                $selectBoxGroup = that.$selectBoxGroup;
+            var that = this;
             return function(){
-                if(isHide){
-                    that._hideOptions();
-                }else{
-                    that._showOptions();
-                    $(document).mouseup(function(e){
-                        var _con = $selectBoxGroup;
-                        if(!_con.is(e.target) && _con.has(e.target).length === 0){
-                            that._hideOptions();
-                            isHide = false;
-                        }
-                    });
-                }
-                isHide = !isHide;
+                that.$selectBoxOptions.animate({
+                    height:'toggle'
+                },200,function(){
+                    if(!that.$selectBoxOptions.is(":hidden")){
+                        that._clickBlank();
+                    }
+                });
                 return false;
             };
         },
 
         /**
-         * 显示Options选择框
+         * 当在非本元素范围内点击，收缩下拉框
          * @private
          */
-        _showOptions:function(){
-            this.$selectBoxOptions.animate({
-                height:'show'
-            },200);
-        },
-
-        /**
-         * 隐藏Options选择框
-         * @private
-         */
-        _hideOptions:function(){
-            this.$selectBoxOptions.animate({
-                height:'hide'
-            },200);
+        _clickBlank:function(){
+            var that = this;
+            $(document).mouseup(function(e) {
+                var _con = that.$selectBoxGroup;
+                if (!_con.is(e.target) && _con.has(e.target).length === 0) {
+                    that.$selectBoxOptions.animate({
+                        height:'hide'
+                    },200);
+                }
+            });
         },
 
         /**
@@ -159,6 +149,7 @@
                     }
                 );
             }
+            this.options.data = data;
             return data;
         },
 
@@ -168,8 +159,14 @@
          * @private
          */
         _select:function(text,value){
+            //TODO:原来元素必须为select
+            var $select = this.$element;
+            if($select.is("select")){
+                $select.val(value);
+            }
             this.$selectBoxInput.text(text);
-            this.$selectBoxInput.val(value);
+            this._text = text;
+            this._value = value;
         },
 
         /**
@@ -178,7 +175,14 @@
          * @returns {*}
          */
         value:function(value){
-            return this.$element.val();
+            if(arguments.length>0){
+                this._value = value;
+                this.$element.val(value);
+                this.$selectBoxInput.text(this.options.data[value]);
+            }
+            else{
+                return this._value;
+            }
         },
 
         /**
@@ -187,7 +191,20 @@
          * @returns {*}
          */
         text:function(text){
-            return this.$element.text();
+            if(arguments.length>0){
+                var value = null;
+                for(var p in this.options.data){
+                    if(p.text === text){
+                        value = p.value || "";
+                    }
+                }
+                this._value = value;
+                this.$element.val(value);
+                this.$selectBoxInput.text(text);
+            }
+            else{
+                return this._text;
+            }
         }
     });
 
