@@ -25,6 +25,7 @@
         width:600,
         height:400,
         position:{top:0,left:0},
+        center:true,//初始时是否居中
         resizable:true
     };
 
@@ -43,7 +44,14 @@
      */
     Window.prototype._init = function(){
         var op = this.options;
+        var viewWidth = $(window).width();
+        var viewHeight = $(window).height();
+
         this._createBody();
+        if(op.center){
+            op.position.left = (viewWidth - op.width) / 2;
+            op.position.top  = (viewHeight - op.height) / 2;
+        }
         this.$window.css($.extend({zIndex:this._zIndex()},op.position)).width(op.width).height(op.height);
         this._overlay();
         this._createHead();

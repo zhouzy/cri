@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>template</title>
+    <meta charset="utf-8" content="text/html"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href="../../script/lib/font-awesome/css/font-awesome.css" type="text/css" rel="stylesheet"/>
+    <link href="../../script/func/easy-bootstrap/css/reset.css" type="text/css" rel="stylesheet"/>
+    <link href="../../script/func/cri/final/cri.css" type="text/css" rel="stylesheet"/>
+    <script src="../../script/lib/jquery/jquery-1.9.1.js" type="text/javascript"></script>
+    <script src="../../script/func/cri/final/cri.js" type="text/javascript"></script>
+    <style>
+        html{
+            font-family:Georgia,"Times New Roman","Microsoft YaHei","微软雅黑",STXihei,"华文细黑",serif;
+            font-size:12px;
+        }
+        .content{
+            width:605px;
+            height:200px;
+            margin:5px auto;
+        }
+        .search-bar{
+            margin:10px 0;
+        }
+        .search-btn{
+            color: #666666;
+            text-align: center;
+            display: inline-block;
+            height: 24px;
+            line-height: 24px;
+            border: 1px solid #c5c5c5;
+            cursor: pointer;
+            list-style: none outside none;
+            min-width: 60px;
+            margin-left: 5px;
+            padding: 0 5px;
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            -khtml-user-select: none;
+            user-select: none;
+            -webkit-border-radius: 4px;
+            -moz-border-radius: 4px;
+            -ms-border-radius: 4px;
+            -o-border-radius: 4px;
+            border-radius: 4px;
+            text-shadow: 0 -1px 1px #eeeeee;
+        }
+    </style>
+</head>
+<body>
+<div class="content">
+    <div class="search-bar">
+        <input name="fieldName"/>
+        <input name="fieldValue"/>
+        <a href="javascript:void(0);" class="search-btn">search</a>
+    </div>
+    <div class="grid-bar">
+        <table id="grid">
+            <tr>
+                <td data-options="field:'propA'">propA</td>
+                <td data-options="field:'propB'">propB</td>
+                <td data-options="field:'propC'">propC</td>
+                <td data-options="field:'propD'">propD</td>
+                <td data-options="field:'propE'">propE</td>
+                <td data-options="field:'propF'">propF</td>
+            </tr>
+        </table>
+    </div>
+    <div id="modifyWnd" style="display:none;">
+        <input name="propA"/>
+        <input name="propB"/>
+        <input name="propC"/>
+        <input name="propD"/>
+        <input name="propE"/>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function(){
+        var grid = $("#grid").datagrid({
+            url:"./datagrid-data.json",
+            rowNum:true,
+            title:"hello grid",
+            checkBox:true,
+            toolbar:[{text:"button",handle:function(){console.log('hello hutton')},iconCls:"fa fa-circle-o"},{text:"按钮"}],
+            pageSize:4,
+            onClick:function(data){
+            },
+            onDblClick:function(data){
+                modify(data);
+            }
+        });
+
+        $(".search-bar input").each(function(){
+            var titles = {fieldName:"fieldName",fieldValue:"fieldValue"};
+            $(this).input({
+                label:titles[this.name]
+            });
+        });
+    });
+
+    function modify(data){
+        $("#modifyWnd input").each(function(){
+            $(this).input({
+                label:this.name,
+                value:data[this.name]
+            });
+        });
+        $("#modifyWnd").window({
+            title:"修改对象属性",
+            modal:true,
+            width:400,
+            height:200
+        });
+        $("#modifyWnd").show();
+    }
+</script>
+</body>
+</html>

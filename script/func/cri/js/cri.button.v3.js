@@ -1,7 +1,7 @@
 /**
  * Author zhouzy
  * Date   2014/9/18
- * Input 组件
+ * Button 组件
  *
  */
 !function(window){
@@ -12,22 +12,22 @@
         $   = window.jQuery;
 
     var _defaultOptions = {
-        label:null,
-        button:null,//button={iconCls:"",handler:""}
-        value:null
+        icon:null,
+        onClick:null,//button={iconCls:"",handler:""}
+        enable:true
     };
 
     var INPUT_GROUP = "input-group",
         INPUT_BTN  = "input-btn",
         WITH_BTN = "with-btn";
 
-    var Input = cri.Widgets.extend(function(element,options){
+    var Button = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
         this.$inputGroup = null;
         cri.Widgets.apply(this,arguments);
     });
 
-    $.extend(Input.prototype,{
+    $.extend(Button.prototype,{
         _eventListen:function(){
 
         },
@@ -63,9 +63,10 @@
             this.$inputGroup.replaceWith($input);
         }
     });
-    cri.Input = Input;
 
-    $.fn.input = function(option) {
+    cri.Button = Button;
+
+    $.fn.Button = function(option) {
         var input = null;
         this.each(function () {
             var $this   = $(this),
