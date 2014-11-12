@@ -18,7 +18,7 @@
         ZINDEX = 10000;
 
     var _defaultOptions = {
-        actions:["Close"],
+        actions:["Close","Minimize","Maximize"],//Colse:关闭,Minimize:最下化,Maximize:最大化
         content:null,
         visible:true,
         modal:false,//模态窗口
