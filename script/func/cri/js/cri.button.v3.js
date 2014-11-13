@@ -12,14 +12,12 @@
         $   = window.jQuery;
 
     var _defaultOptions = {
-        icon:null,
+        iconCls:null,
         onClick:null,//button={iconCls:"",handler:""}
         enable:true
     };
 
-    var INPUT_GROUP = "input-group",
-        INPUT_BTN  = "input-btn",
-        WITH_BTN = "with-btn";
+    var BUTTON = "button";
 
     var Button = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
@@ -33,50 +31,41 @@
         },
 
         _init:function(){
-            this._createInputGroup();
+            this._create();
         },
 
-        _createInputGroup:function(){
+        _create:function(){
             var op = this.options,
-                label = op.label || "",
-                $label = $('<label></label>').text(label),
-                $input = this.$element;
+                $e = this.$element.hide();
 
-            $input.wrap('<div class="'+ INPUT_GROUP + '"></div>');
-            if(op.value != null){
-                $input.val(op.value);
-            }
-            var $inputGroup = $input.parent();
-            this.$inputGroup = $inputGroup;
-            if(op.button){
-                var $icon = $('<i class="' + INPUT_BTN + " " + op.button.iconCls + '"></i>').on("click",function(){
-                    op.button.handler.call();
-                });
-                $inputGroup.append($icon);
-                $input.addClass(WITH_BTN);
-            }
-            $inputGroup.prepend($label);
+            $e.wrap('<div class="'+ BUTTON + '"></div>');
+
+            var $button = this.$button = $e.parent();
+            var $icon = $('<i class="' + op.iconCls + '"></i>');
+            $button.append($icon, $e.text());
+            $button.on("click",function(){
+                op.onClick.call();
+            });
         },
 
         _destory:function(){
-            var $input = this.$element;
-            this.$inputGroup.replaceWith($input);
+
         }
     });
 
     cri.Button = Button;
 
-    $.fn.Button = function(option) {
-        var input = null;
+    $.fn.button = function(option) {
+        var o = null;
         this.each(function () {
             var $this   = $(this),
-                input   = $this.data('input'),
+                o   = $this.data('button'),
                 options = typeof option == 'object' && option;
-            if(input != null){
-                input._destory();
+            if(o != null){
+                o._destory();
             }
-            $this.data('input', (input = new Input(this, options)));
+            $this.data('button', (o = new Button(this, options)));
         });
-        return input;
+        return o;
     };
 }(window);

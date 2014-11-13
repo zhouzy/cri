@@ -7,53 +7,25 @@
     <link href="../../script/lib/font-awesome/css/font-awesome.css" type="text/css" rel="stylesheet"/>
     <link href="../../script/func/easy-bootstrap/css/reset.css" type="text/css" rel="stylesheet"/>
     <link href="../../script/func/cri/final/cri.css" type="text/css" rel="stylesheet"/>
+    <link href="../style/common.css" type="text/css" rel="stylesheet"/>
+    <link href="../style/template.css" type="text/css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" media="screen and (max-device-width: 480px)" href="../style/mobile.css" />
     <script src="../../script/lib/jquery/jquery-1.9.1.js" type="text/javascript"></script>
     <script src="../../script/func/cri/final/cri.js" type="text/javascript"></script>
-    <style>
-        html{
-            font-family:Georgia,"Times New Roman","Microsoft YaHei","微软雅黑",STXihei,"华文细黑",serif;
-            font-size:12px;
-        }
-        .content{
-            width:605px;
-            height:200px;
-            margin:5px auto;
-        }
-        .search-bar{
-            margin:10px 0;
-        }
-        .search-btn{
-            color: #666666;
-            text-align: center;
-            display: inline-block;
-            height: 24px;
-            line-height: 24px;
-            border: 1px solid #c5c5c5;
-            cursor: pointer;
-            list-style: none outside none;
-            min-width: 60px;
-            margin-left: 5px;
-            padding: 0 5px;
-            -moz-user-select: none;
-            -webkit-user-select: none;
-            -ms-user-select: none;
-            -khtml-user-select: none;
-            user-select: none;
-            -webkit-border-radius: 4px;
-            -moz-border-radius: 4px;
-            -ms-border-radius: 4px;
-            -o-border-radius: 4px;
-            border-radius: 4px;
-            text-shadow: 0 -1px 1px #eeeeee;
-        }
-    </style>
 </head>
 <body>
-<div class="content">
+    <div id="top">青牛软件新框架模板页面</div>
+    <div id="left">
+        <div id="tree" style="height:100%"></div>
+    </div>
+    <div id="right">
     <div class="search-bar">
         <input name="fieldName"/>
         <input name="fieldValue"/>
-        <a href="javascript:void(0);" class="search-btn">search</a>
+        <div class="search-btns">
+            <a href="javascript:void(0);" class="search-btn">search</a>
+            <a href="javascript:void(0);" class="reset-btn">clear</a>
+        </div>
     </div>
     <div class="grid-bar">
         <table id="grid">
@@ -74,7 +46,7 @@
         <input name="propD"/>
         <input name="propE"/>
     </div>
-</div>
+    </div>
 <script type="text/javascript">
     $(function(){
         var grid = $("#grid").datagrid({
@@ -91,11 +63,37 @@
             }
         });
 
+        var tree = $("#tree").tree({
+            url:"./tree-data.json",
+            rowNum:true,
+            title:"tree",
+            onClick:function(data){
+                console.log(data.propA);
+            },
+            onDblClick:function(data){
+                console.log(data.propB);
+            }
+        });
+
         $(".search-bar input").each(function(){
             var titles = {fieldName:"fieldName",fieldValue:"fieldValue"};
             $(this).input({
                 label:titles[this.name]
             });
+        });
+
+        $(".search-btn").button({
+            iconCls:"fa fa-search",
+            onClick:function(){
+                console.log("search");
+            }
+        });
+
+        $(".reset-btn").button({
+            iconCls:"fa fa-times",
+            onClick:function(){
+                console.log("reset");
+            }
         });
     });
 

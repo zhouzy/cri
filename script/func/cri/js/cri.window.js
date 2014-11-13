@@ -66,7 +66,7 @@
     Window.prototype._eventListen = function(){
         var that = this;
         this.$window
-            .on("click",".buttons .button",function(){
+            .on("click",".action",function(){
                 var action = that._actionForButton($(this));
                 action && typeof that[action] === "function" && that[action]();
             })
@@ -136,7 +136,7 @@
      */
     Window.prototype._createHead = function(){
         var $windowHead = $("<div></div>").addClass("window-head");
-        $windowHead.append(this._createTitle()).append(this._createButtons());
+        $windowHead.append(this._createTitle()).append(this._createActions());
         this.$window.prepend($windowHead);
         this.$windowHead = $windowHead;
     };
@@ -177,9 +177,9 @@
      * @returns {*}
      * @private
      */
-    Window.prototype._createButtons = function(){
+    Window.prototype._createActions = function(){
         var options = this.options;
-        var $buttons = $("<div></div>").addClass("buttons");
+        var $buttons = $("<div></div>").addClass("actions");
         var defaultButtons = options.modal ? ["Maximize","Close"]:["Minimize","Maximize","Close"];
 
         for(var i = 0, len = defaultButtons.length; i<len; i++){
@@ -187,7 +187,7 @@
             for(var j = 0,l = options.actions.length; j < l; j++){
                 var action = options.actions[j];
                 if(action == defBtn){
-                    var $button = $("<span></span>").addClass("button").addClass(action.toLowerCase());
+                    var $button = $("<span></span>").addClass("action").addClass(action.toLowerCase());
                     var $icon = $("<i></i>").attr("class",icons[action]);
                     $button.append($icon);
                     $buttons.append($button);
@@ -245,12 +245,12 @@
      * @private
      */
     Window.prototype._actionForButton = function(button) {
-        var iconClass = /\bbutton \w+\b/.exec(button[0].className)[0];
+        var iconClass = /\baction \w+\b/.exec(button[0].className)[0];
         return {
-            "button minimize": "minimize",
-            "button maximize": "maximize",
-            "button resume": "resume",
-            "button close": "close"
+            "action minimize": "minimize",
+            "action maximize": "maximize",
+            "action resume": "resume",
+            "action close": "close"
         }[iconClass];
     };
 

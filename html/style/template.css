@@ -1,0 +1,30 @@
+#top{
+    position:fixed;
+    height:50px;
+    width:100%;
+    background:#444;
+    color:#fff;
+}
+#left{
+    position:absolute;
+    top:50px;
+    width:200px;
+    bottom:0;
+    background: #fff;
+}
+#right{
+    position:absolute;
+    left:200px;
+    top:50px;
+    padding:0 15px;
+}
+.search-bar{
+    padding:10px 0;
+    position:relative;
+}
+.search-btns{
+    margin:5px 0;
+    display:inline-block;
+    position:absolute;
+    right:0;
+}

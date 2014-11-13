@@ -41,17 +41,21 @@
             overflow: hidden;
             vertical-align: middle;
             text-overflow: ellipsis;
+            .user-not-select;
             &.line-number{
                 text-align:center;
             }
-            &.line-checkbox{
-            }
+
+            &.line-checkbox{}
+
             &:last-child{
                 border-right: none;
             }
+
             input{
                 vertical-align:middle;
             }
+
             .td-content{
                 display:inline-block;
                 height:24px;
@@ -75,6 +79,11 @@
         td{
             position:relative;
             &.line-number{
+                div{
+                    &:before{
+                        content:"#";
+                    }
+                }
                 .empty{
                     display:inline-block;
                     width:13px;

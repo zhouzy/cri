@@ -44,7 +44,8 @@ module.exports = function (grunt) {
                         'script/func/cri/js/cri.widgets.js',
                         'script/func/cri/js/cri.grid.js',
                         'script/func/cri/js/*.js',
-                        '!script/func/cri/js/cri.selectBox.js'
+                        '!script/func/cri/js/cri.selectBox.js',
+                        '!script/func/cri/js/cri.button.js'
                     ],
                     dest:'script/func/cri/final/cri.js'
                 }]
