@@ -20,7 +20,7 @@
      */
     var _titleH    = 31, //标题高度
         _toolbarH  = 31, //工具栏高度
-        _iconWidth = 12; //
+        _iconWidth = 16; //
 
     /**
      * 计算原始元素高度
@@ -133,7 +133,9 @@
                 });
             }
             else{
-                $("ul li",$li).toggle();
+                $("ul li",$li).animate({
+                    height:"toggle"
+                });
             }
         },
 

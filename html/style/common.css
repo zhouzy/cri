@@ -1,5 +1,7 @@
 html{
     font-family:Georgia,"Times New Roman","Microsoft YaHei","微软雅黑",STXihei,"华文细黑",serif;
     font-size:12px;
-    background:#F2F2F2;
+}
+body{
+    background: rgba(240,240,240,0.8);
 }

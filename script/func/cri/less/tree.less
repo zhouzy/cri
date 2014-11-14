@@ -4,7 +4,7 @@
 .tree{
     color:@color-font;
     border:1px solid @color-border;
-    .title,.toolbar,.tree-view{
+    .title,.toolbar{
         .gradient-background(lighten(@color-background,3%),@color-background);
     }
     .title{
@@ -17,11 +17,9 @@
     }
     .tree-view{
         overflow: auto;
-        background: #fff;
     }
     ul.tree-body{
         color:@color-font;
-        background-color: #fff;
         position: relative;
         margin:0;
         li{
@@ -29,15 +27,24 @@
             .user-not-select;
             .li-content{
                 padding:3px 4px;
-                border-bottom:1px dashed lighten(@color-border,10%);
                 height:24px;
                 line-height: 24px;
                 vertical-align: top;
                 cursor:pointer;
+                border: 1px solid @color-tree-content-border;
+                background:@color-tree-content-bg;
+                margin:3px;
                 &:hover{
                     background:@color-row-hover;
                     .icon{
                         color:lighten(@color-line-file-icon,50%);
+                        animation: left2right 0.1s linear forwards;
+                        /* Firefox: */
+                        -moz-animation: left2right 0.1s linear forwards;
+                        /* Safari 和 Chrome: */
+                        -webkit-animation: left2right 0.1s linear forwards;
+                        /* Opera: */
+                        -o-animation: left2right 0.1s linear forwards;
                     }
                 }
                 &.selected{
