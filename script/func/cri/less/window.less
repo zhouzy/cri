@@ -4,11 +4,11 @@
 @window-head-height:35px;
 .window{
     background-color: #fff;
-    color: @color-font;
+    color: @color-window-font;
     display: inline-block;
     position: absolute;
     z-index: 10001;
-    border: solid 1px @color-border;
+    border: solid 1px @color-window-border;
     min-width: 140px;
     top:5px;
     left:5px;
@@ -23,7 +23,7 @@
         padding:5px 0;
         font-size:1.2em;
         .gradient-background(lighten(@color-background,3%),@color-background);
-        border-bottom: solid 1px @color-border;
+        border-bottom: solid 1px @color-window-border;
         .user-not-select;
         .title{
             display:inline-block;
@@ -51,13 +51,13 @@
                 background-color: #fff;
                 border:1px solid lighten(@color-button-hover,50%);
                 &:hover{
-                    background: @color-button-hover;
+                    background: @color-window-button-hover;
                     i{
                         color:#fff;
                     }
                 }
                 i{
-                    color:@color-button-icon;
+                    color:@color-window-button-icon;
                 }
             }
         }

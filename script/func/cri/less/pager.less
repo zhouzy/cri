@@ -6,11 +6,12 @@
     height:33px;
     line-height:33px;
     padding:4px 0 4px 2px;
-    border-top:1px solid @color-border;
+    border-top:1px solid @color-pager-border;
     position:relative;
     .pager-nav,.pager-number,.pager-info{
         display:inline-block;
     }
+
     .pager-nav{
         margin-right: 20px;
         a{
@@ -20,7 +21,7 @@
             width:30px;
             line-height: 30px;
             border-radius:15px;
-            border:1px solid @color-border;
+            border:1px solid @color-pager-border;
             text-align: center;
             cursor:pointer;
             .user-not-select;
@@ -34,7 +35,7 @@
             &.state-disabled{
                 cursor:inherit;
                 &:hover{
-                    border-color:@color-border;
+                    border-color:@color-pager-border;
                     background: none;
                     color:inherit;
                 }
@@ -43,7 +44,7 @@
             &.state-selected{
                 color:#fff;
                 background:@color-pager-selected;
-                border-color:@color-background;
+                border-color:@color-pager-selected-border;
                 &:hover{
                     border-color:@color-pager-nav;
                     cursor:inherit;

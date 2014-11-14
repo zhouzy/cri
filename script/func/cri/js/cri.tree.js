@@ -41,6 +41,7 @@
             var arr = ("" + calHeight).split("%");
             if(arr.length>1){
                 calHeight = Math.floor($ele.parent().height() * arr[0] / 100);
+                calHeight -= 2;
             }
             calHeight = (""+calHeight).split("px")[0];
             if(calHeight){
@@ -72,13 +73,13 @@
         return parseInt(calWidth);
     }
 
-
     var Tree = cri.Tree = function (element, options) {
         this.options = $.extend({}, $.fn.tree.defaults, options);
         this.$element = $(element);
         this.$tree = null;
         this.$treebody = null;
         this.selectedRow = null;
+        this.toolbar = null;
         this._className = "tree";
         this._init();
         this._eventListen();
@@ -89,6 +90,7 @@
             this._getData();
             this._createTree();
         },
+
         _eventListen:function(){
             var that = this;
             this.$treebody
@@ -100,10 +102,13 @@
                 .on('dblclick', "div.li-content", function(e){
                     that._onDblClickRow(e);
                 });
-            this.$toolbar && this.$toolbar
-                .on('click',"a[data-toolbar]",function(e){that._clickToolbar(e);});
         },
 
+        /**
+         * 展开、收缩子节点
+         * @param e
+         * @private
+         */
         _fold:function(e){
             var op = this.options,
                 item = $(e.target).closest("div"),
@@ -133,8 +138,22 @@
                 });
             }
             else{
-                $("ul li",$li).animate({
-                    height:"toggle"
+                this._expand($li);
+            }
+        },
+
+        /**
+         * 收缩、展开后代节点
+         * @param $li
+         * @private
+         */
+        _expand:function($li){
+            var $ul = $li.children("ul");
+            if($ul.length){
+                $ul.children("li").each(function(){
+                    $(this).animate({
+                        height:"toggle"
+                    },500);
                 });
             }
         },
@@ -174,9 +193,7 @@
             this.$tree = this.$element.parent();
             this._createTitle(this.$tree);
             this._createToolbar(this.$tree);
-
             this._eachNode($treebody,op.rows,"show",0,0);
-
             this.$tree.append($treeview);
         },
 
@@ -222,16 +239,10 @@
         },
 
         _createToolbar:function($parent){
-            if(this.options.toolbar){
-                var $toolbar = $('<div class="toolbar"></div>');
-                var html = "<ul>"
-                $.each(this.options.toolbar,function(index,data){
-                    html += "<li data-toolbar=\"" + index + "\">" + this.text + "</li>";
+            if(this.options.toolbar) {
+                this.toolbar = new cri.ToolBar($parent, {
+                    buttons: this.options.toolbar
                 });
-                html += "</ul>";
-                $toolbar.append(html);
-                $parent.append($toolbar);
-                this.$toolbar = this.$toolbar || $toolbar;
             }
         },
 

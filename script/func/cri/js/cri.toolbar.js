@@ -50,7 +50,7 @@
                 var btn = buttons[i];
                 $toolbar.append(button(btn));
             }
-            $parent.html($toolbar);
+            $parent.append($toolbar);
         }
     });
     cri.ToolBar = ToolBar;

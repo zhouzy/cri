@@ -4,20 +4,20 @@
 .treegrid {
     table td.line-file-icon i{
         cursor:pointer;
-        color:@color-line-file-icon;
+        color:@color-treegrid-file-icon;
         margin-right:5px;
     }
     .grid-body{
         tr{
             background-color: #FFF;
             td{
-                border-bottom: 1px solid @color-border;
+                border-bottom: 1px solid @color-grid-border;
             }
             &:hover td{
-                background:@color-row-hover;
+                background:@color-grid-row-hover;
                 &.line-file-icon{
                     i{
-                        color:lighten(@color-line-file-icon,50%);
+                        color:lighten(@color-treegrid-file-icon,50%);
                     }
                 }
             }

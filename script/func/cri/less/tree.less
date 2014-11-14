@@ -3,17 +3,16 @@
 
 .tree{
     color:@color-font;
-    border:1px solid @color-border;
+    border:1px solid @color-tree-border;
     .title,.toolbar{
         .gradient-background(lighten(@color-background,3%),@color-background);
     }
     .title{
         padding-left:4px;
         font-size: 1.2em;
-        font-weight: bold;
         height:30px;
         line-height:30px;
-        border-bottom:1px solid @color-border;
+        border-bottom:1px solid @color-tree-border;
     }
     .tree-view{
         overflow: auto;
@@ -35,20 +34,17 @@
                 background:@color-tree-content-bg;
                 margin:3px;
                 &:hover{
-                    background:@color-row-hover;
+                    background:@color-tree-content-hover;
+                    color:#fff;
                     .icon{
-                        color:lighten(@color-line-file-icon,50%);
                         animation: left2right 0.1s linear forwards;
-                        /* Firefox: */
                         -moz-animation: left2right 0.1s linear forwards;
-                        /* Safari 和 Chrome: */
                         -webkit-animation: left2right 0.1s linear forwards;
-                        /* Opera: */
                         -o-animation: left2right 0.1s linear forwards;
                     }
                 }
                 &.selected{
-                    background: @color-row-click;
+                    background: @color-tree-content-selected;
                 }
                 .icon{
                     display:inline-block;

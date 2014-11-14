@@ -429,11 +429,13 @@
         _setSelected:function(e){
             var item = $(e.target).closest("tr"),
                 rowid = item.data('rowid');
-            $("tr",this.$gridbody).toggleClass("click",false);
+            $("tr",this.$gridbody).toggleClass("selected",false);
             this.selectedRow = this._getRowDataById(rowid);
-            item.toggleClass("click");
+            item.toggleClass("selected");
+//            var $checkbox = $("input[type=checkbox]",item);
+//            $checkbox.prop("checked",true);
             if(this.options.onClick){
-                this.options.onClick(this.selectedRow);
+                this.options.onClick.call(this,this.selectedRow);
             }
         },
 
