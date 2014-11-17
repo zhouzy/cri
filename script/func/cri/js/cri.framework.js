@@ -46,9 +46,48 @@
         }
     };
 
-    cri.getformValue = function($form){
+    /**
+     * 获取表单值
+     * @param $form
+     * @returns {{}}
+     */
+    cri.getFormValue = function($form){
+        var nameValues = $form.serialize().split(/&/) || [],
+            o = {};
+        for(var i= 0,len=nameValues.length;i<len;i++){
+            var nameValue = nameValues[i].split(/=/);
+            var name = nameValue[0];
+            var value = nameValue[1]
+            o[name] = value;
+        }
+        return o;
+    };
 
-    }
+    /**
+     * 设置表单值
+     * @param $form
+     * @param o
+     */
+    cri.setFormValue = function($form,o){
+        for(var name in o){
+            $("[name=" + name + "]",$form).val(o[name]);
+        }
+    };
+
+    /**
+     * 拓展 jquery formValue 方法
+     *
+     * @param o
+     * @returns {{}}
+     */
+    $.fn.formValue = function(o){
+        if(arguments.length>0){
+            cri.setFormValue($(this),o);
+        }
+        else{
+            return cri.getFormValue($(this));
+        }
+    };
 
 }(window);
 

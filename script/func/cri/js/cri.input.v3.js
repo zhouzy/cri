@@ -18,8 +18,8 @@
     };
 
     var INPUT_GROUP = "input-group",
-        INPUT_BTN  = "input-btn",
-        WITH_BTN = "with-btn";
+        INPUT_BTN   = "input-btn",
+        WITH_BTN    = "with-btn";
 
     var Input = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
