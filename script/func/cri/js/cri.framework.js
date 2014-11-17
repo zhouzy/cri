@@ -33,7 +33,7 @@
     cri.Class = Class;
 
     cri.isArray = function(value){
-        if (value instanceof Array ||
+        if(value instanceof Array ||
             (!(value instanceof Object) &&
                 (Object.prototype.toString.call((value)) == '[object Array]') ||
                 typeof value.length == 'number' &&
@@ -45,6 +45,10 @@
             return false;
         }
     };
+
+    cri.getformValue = function($form){
+
+    }
 
 }(window);
 
