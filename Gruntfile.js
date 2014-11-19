@@ -9,19 +9,15 @@ module.exports = function (grunt) {
     // 配置
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        // 合并压缩 less 文件
-        // 文档 https://github.com/gruntjs/grunt-contrib-less
+        //编译 less 文件(https://github.com/gruntjs/grunt-contrib-less)
         less: {
             development: {
                 options: {
                     yuicompress: false
                 },
                 files: {
-                    "script/func/cri/css/datagrid.css": "script/func/cri/less/datagrid.less",
-                    "script/func/cri/css/treegrid.css": "script/func/cri/less/treegrid.less",
-                    "script/func/cri/css/tree.css": "script/func/cri/less/tree.less",
-                    "script/func/cri/css/toolbar.css": "script/func/cri/less/toolbar.less",
-                    "script/func/cri/css/pager.css": "script/func/cri/less/pager.less"
+                    src:["script/func/cri/less/*.less","!script/func/cri/less/lib.less","!script/func/cri/less/theme-default.less"],
+                    dest:"script/func/cri/final/cri.css"
                 }
             },
             production: {
@@ -34,8 +30,7 @@ module.exports = function (grunt) {
                 }]
             }
         },
-        // 合并 js css 文件
-        // 文档 https://github.com/gruntjs/grunt-contrib-concat
+        //合并 js css 文件(文档 https://github.com/gruntjs/grunt-contrib-concat)
         concat:{
             js:{
                 files:[{
@@ -57,8 +52,7 @@ module.exports = function (grunt) {
                 }]
             }
         },
-        // 压缩 js 文件
-        // 文档 https://github.com/gruntjs/grunt-contrib-uglify
+        // 压缩 js 文件(https://github.com/gruntjs/grunt-contrib-uglify)
         uglify: {
             build: {
                 files:[
@@ -69,6 +63,8 @@ module.exports = function (grunt) {
                 ]
             }
         },
+
+        //单元测试
         qunit:{
             all: {
                 options: {
@@ -78,8 +74,8 @@ module.exports = function (grunt) {
                 }
             }
         },
-        // 监控文件变化并动态执行任务
-        // 文档 https://github.com/gruntjs/grunt-contrib-watch
+
+        //监控文件变化并动态执行任务(https://github.com/gruntjs/grunt-contrib-watch)
         watch: {
             scripts: {
                 files: ['script/func/cri/js/*.js'],
