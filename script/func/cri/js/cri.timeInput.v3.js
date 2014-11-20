@@ -5,54 +5,285 @@
  * @date:2013/09/05
  * @dependce:jquery
  *=====================================================================================*/
-!function($){
+!function(window){
 
     "use strict";
 
+    var cri = window.cri,
+        $   = window.jQuery;
+
     var TIME_INPUT_GROUP = "eb_timeInputGroup",
-        TIME_BOX    = "eb_timeBox";
+        TIME_BOX         = "eb_timeBox",
+        TIME_INPUT_ICON  = "fa fa-table";
 
-    var TimeInput = function(element,dataOptions){
-        this.$element = $(element);
-        this.$element.keypress(function(){
+    function getDate(yyyy,MM,dd,HH,mm,ss){
+        var date = new Date();
+        date.setFullYear(yyyy);
+        date.setMonth(MM);
+        date.setDate(dd);
+        date.setHours(HH);
+        date.setMinutes(mm);
+        date.setSeconds(ss);
+        return date;
+    }
+    /**
+     * 判断是否为闰年
+     * @param year
+     * @returns {boolean}
+     */
+    function isLeapYear(year){
+        if(year%4==0 && (year%100!= 0 || year%400 == 0))
+            return true;
+        else
             return false;
-        }).val("");
-        this.dataOptions = $.extend({}, $.fn.timeInput.defaults, dataOptions);
-        this.name = this.$element.attr("name");
-        this.id = this.$element.attr("id");
-        this.thisYear = new Date().getFullYear();
-        this.thisMonth = new Date().getMonth()+1;
-        if(this.thisMonth<10)
-            this.thisMonth = "0"+this.thisMonth;
-        this.today = new Date().getDate();
-        this.year = new Date().getFullYear();
-        this.month = new Date().getMonth()+1;
-        if(this.month<10)
-            this.month = "0"+this.month;
-        this.monthArr = [];
-        this.ifEnable = true;
-        this.value = "";
+    }
 
-        //TODO:这个有BUG 如果未指定id 则是 undefined 并且出现多个相同的id
-        this.id = this.$element.attr("id") || "";
+    /**
+     * 获取某年的月份数组
+     * @param year
+     * @returns {number[]}
+     */
+    function getMonthArr (year){
+        if(isLeapYear(year))
+            return [31,29,31,30,31,30,31,31,30,31,30,31];
+        else
+            return [31,28,31,30,31,30,31,31,30,31,30,31];
+    }
 
-        this.timeBoxId = "timeBox_"+this.id;
+    var TimeSlectView = function(options){
+        var date = new Date();
+        this.options = $.extend({
+            HMS:false,
+            onChange:null,
+            date:{
+                yyyy:date.getFullYear(),
+                MM:date.getMonth(),
+                dd:date.getDate(),
+                HH:date.getHours(),
+                mm:date.getMinutes(),
+                ss:date.getSeconds()
+            }
+        },options);
 
-        this.title = "时间";
-        if(this.$element.attr("title"))
-            this.title = this.$element.attr("title");
-        if(this.dataOptions.title)
-            this.title = this.dataOptions.title;
-        this.init();
-
+        this._create();
     };
 
-    TimeInput.prototype.enabled = function(){
-        this.ifEnable = true;
+    TimeSlectView.prototype = {
+        /**
+         * 生成时间选择下拉面板
+         * @returns {*|HTMLElement}
+         * @private
+         */
+        _create:function(){
+            var $timeBox = this.$timeBox = $('<div class="' + TIME_BOX + '" id="'+this.timeBoxId+'"></div>');
+            var $titleBar = $('<div class="eb_titleBar"></div>');
+            $titleBar.append(this._yearSelect(),this._monthSelect(),'<span style="position:absolute;top:5px;right:23px;">月</span>');
+            $timeBox.append($titleBar,this._daySelect());
+            if(this.options.HMS == true){
+                $timeBox.append(this._hmsSelect());
+            }
+            return $timeBox;
+        },
+
+        _yearSelect : function(){
+            var that = this;
+            var date = this.options.date;
+            var $yearSelect = $('<div class="eb_yearSelecter"></div>');
+            var $minusBtn   = $('<span class="eb_toLastYear eb_yearButton">－</span>');
+            var $plusBtn    = $('<span class="eb_toNextYear eb_yearButton">＋</span>');
+            var $year       = $('<span class="eb_year">' + date.yyyy + '</span>');
+
+            $minusBtn.on("click",function(){
+                $year.html(--that.yyyy);
+                that._change();
+            });
+            $plusBtn.on("click",function(){
+                $year.html(++that.yyyy);
+                that._change();
+            });
+            $yearSelect.append($minusBtn,$year,'年',$plusBtn);
+            return $yearSelect;
+        },
+
+        _monthSelect : function(){
+            var that = this,
+                date = this.options.date,
+                $select = $('<select name="month" class="eb_monthSelect">');
+
+            $.each([0,1,2,3,4,5,6,7,8,9,10,11],function(index,value){
+                index<9 && (value += "");
+                $select.append('<option value="' + value + '">' + (value+1) + '</option>');
+            });
+            $select.val(date.mm);
+
+            $select.on("change",function(){
+                date.mm = $select.val();
+                that._refreshDaySelect();
+                that._change();
+            });
+
+            return $select;
+        },
+
+        _daySelect:function(){
+            var $daySelect = $('<table></table>');
+            var $week = $('<tr class="week"></tr>');
+            var week = {"Sunday":"日","Monday":"一","Tuesday":"二","Wednesday":"三",Thursday:"四","Friday":"五","Saturday":"六"};
+            for(var day in week){
+                var $day = $('<th>' + week[day] + '</th>');
+                day == "Sunday" && $day.addClass("eb_red");
+                day == "Saturday" && $day.addClass("red");
+                $week.append($day);
+            }
+            $daySelect.append($week);
+            for(var i=0; i< 6; i++){
+                var $tr = $('<tr class="days"></tr>');
+                for(var j=0; j<7;j++){
+                    var $td = $("<td></td>").on("click",function(){
+                            //TODO:选择天数
+                            //TODO:排除空td
+                        });
+                    $tr.append($td);
+                }
+                $daySelect.append($tr);
+            }
+            return $daySelect;
+        },
+
+        _refreshDaySelect:function(){
+            //TODO:当月份改变后，每月的天数改变
+            var date = this.options.date;
+            var maxDay = getMonthArr(date.yyyy)[date.MM];
+
+        },
+
+        _hmsSelect:function(){
+            var $hmsBar      = $('<div class="eb_HMSBar">'),
+                $hourInput   = $('<input class="eb_HMSInput eb_Hour" value="00" />'),
+                $minuteInput = $('<input class="eb_HMSInput eb_minute"  value="00" />'),
+                $secondInput = $('<input class="eb_HMSInput eb_second"  value="00" />'),
+                date         = this.options.date,
+                that         = this;
+
+            $hourInput.on("change",_handleNumF(0,23));
+            $minuteInput.on("change",_handleNumF(0,59));
+            $secondInput.on("change",_handleNumF(0,59));
+            function _handleNumF(min,max){
+                return function(){
+                    var value = +$(this).val();
+                    if(value>max){
+                        $(this).val(max);
+                    }
+                    else if(value<min){
+                        $(this).val(min);
+                    }
+                    date.HH = +$hourInput.val();
+                    date.mm = +$minuteInput.val();
+                    date.ss = +$secondInput.val();
+                    that._change();
+                };
+            }
+
+            $hmsBar.append($hourInput,":",$minuteInput,":",$secondInput);
+            $(".eb_HMSInput",$hmsBar).on("keydown",function(e){
+                var keycode=e.keyCode||e.which||e.charCode;
+                if((keycode>=48 && keycode<=57) || keycode == 8){
+                    return true;
+                }else{
+                    return false;
+                }
+            });
+            return $hmsBar;
+        },
+
+        _change:function(){
+            this.options.onChange && this.options.onChange.call(this);
+        },
+
+        getDate:function(){
+            var date = this.options.date;
+            return getDate(date.yyyy,date.MM,date.dd,date.HH,date.mm,date.ss);
+        },
+
+        setDate:function(date){
+            this.options.date = {
+                yyyy:date.getFullYear(),
+                MM:date.getMonth(),
+                dd:date.getDate(),
+                HH:date.getHours(),
+                mm:date.getMinutes(),
+                ss:date.getSeconds()
+            }
+        }
     };
 
-    TimeInput.prototype.disabled = function(){
-        this.ifEnable = false;
+    var _defaultOptions = {
+        value:null,
+        format:"yyyy/MM/dd"
+    };
+
+    var TimeInput = cri.Widgets.extend(function(element,dataOptions){
+        cri.Widgets.apply(this,arguments);
+    });
+
+    TimeInput.prototype._eventListen = function(){
+        this.$element.keypress(function(){return false;}).val("");
+    };
+
+    TimeInput.prototype._init = function(){
+        var that = this,
+            $element = this.$element,
+            op = this.options;
+
+        $element.wrap('<div class="'+TIME_INPUT_GROUP+'"></div>');
+
+        var $timeInputGroup = this.$timeInputGroup = $element.parent();
+
+        this._wrapInput();
+
+        var timeBoxArea = $(".eb_timeBoxArea");
+
+        if(timeBoxArea.length <= 0){
+            $("body").prepend('<div class="eb_timeBoxArea"></div>');
+            timeBoxArea = $(".eb_timeBoxArea");
+        }
+
+        timeBoxArea.append(that._timeBox());
+
+        this.$element.click(function(){
+            $(".eb_dropdownMenu.eb_show").hide().removeClass("eb_show");
+            $(".eb_timeInput.focus").not(that.$element).removeClass('focus');
+            that.toggleBox();
+        });
+        this.$element.focus(function(){
+            that.$element.addClass("focus");
+        });
+        this.refreshDate();
+        this.$element.on("click",function(){
+            return false;
+        });
+    };
+
+    /**
+     * 包装Input
+     * @private
+     */
+    TimeInput.prototype._wrapInput = function(){
+        //TODO:value 类型为Date类型
+        //TODO:format Date
+        var value = this.options || new Date();
+        var buttons = [{iconCls:TIME_INPUT_ICON,handler:function(){
+            //TODO:展开timeSelectView
+        }}];
+        this.input = new cri.Input(this.$element,{value:""+value,button:buttons});
+    };
+
+    /**
+     * 包装时期选择下拉面板
+     * @private
+     */
+    TimeInput.prototype._timeSelectView = function(){
+        var selectView = new TimeSlectView();
     };
 
     TimeInput.prototype.setWidth = function(widthParam){
@@ -88,231 +319,34 @@
         this.titleObj.css("line-height",height+"px");
     };
 
-    TimeInput.prototype.init = function(){
-        var that = this;
-        var $element = this.$element;
-        this.dataOptions.required && $element.attr("placeholder",that.$element.attr("placeholder")+" (必填)");
-        $element.wrap('<div class="'+TIME_INPUT_GROUP+'"></div>');
-        var $timeInput = this.$timeInput = this.parent = $element.parent();
-        $timeInput
-            .data("timeInput",that)
-            .attr("name",that.name)
-            .attr("id",that.id + "_subgroup")
-            .data("options",$element.data("options"));
-
-        if(this.dataOptions && this.dataOptions.defaultVal){
-            this.inputObj.val(that.dataOptions.defaultVal);
-            this.parent.attr("value",that.dataOptions.defaultVal);
-        }
-        function _title(title){
-            return $('<span class="eb_title">' + title + '</span>');
-        }
-        var $title = this.titleObj = _title(that.title);
-        $timeInput.prepend($title);
-        var redStar = '<span class="redStar" style="color:red;">*</span>';
-        this.dataOptions && this.dataOptions.required == true && $timeInput.append(redStar);
-        this.setWidth();
-        this.setHeight();
-        var timeBoxArea = $(".eb_timeBoxArea");
-        if(timeBoxArea.length <= 0){
-            $("body").prepend('<div class="eb_timeBoxArea"></div>');
-            timeBoxArea = $(".eb_timeBoxArea");
-        }
-        timeBoxArea.append(that._timeBox());
-        this.$element.click(function(){
-            $(".eb_dropdownMenu.eb_show").hide().removeClass("eb_show");
-            $(".eb_timeInput.focus").not(that.$element).removeClass('focus');
-            that.toggleBox();
-        });
-        this.$element.focus(function(){
-            that.$element.addClass("focus");
-        });
-        this.refreshDate();
-        this.$element.on("click",function(){
-            return false;
-        });
+    TimeInput.prototype.enabled = function(){
+        this.ifEnable = true;
     };
 
-    TimeInput.prototype._timeBox = function(){
-        var $timeBox = this.timeBoxObj = $('<div class="' + TIME_BOX + '" id="'+this.timeBoxId+'"></div>');
-        var $titleBar = this.titleBarObj = $('<div class="eb_titleBar"></div>');
-        $titleBar.append(this._yearSelect(),this._monthSelect(),'<span style="position:absolute;top:5px;right:23px;">月</span>');
-        $timeBox.append($titleBar,this._daySelect());
-        if(this.dataOptions.HMS == true){
-            $timeBox.height($timeBox.height()+30);
-            this.timeBoxObj.append(this._hmsSelect());
-        }
-        return $timeBox;
-    };
-
-    TimeInput.prototype._yearSelect = function(){
-        var that = this;
-        var $yearSelect = $('<div class="eb_yearSelecter"></div>');
-        var $minusBtn   = $('<span class="eb_toLastYear eb_yearButton">－</span>');
-        var $plusBtn    = $('<span class="eb_toNextYear eb_yearButton">＋</span>');
-        var $year       = $('<span class="eb_year">' + this.year + '</span>');
-        $minusBtn.on("click",function(){
-            that.year--;
-            $("#"+that.timeBoxId).find(".eb_year").html(that.year);
-            that.refreshDate();
-        });
-        $plusBtn.on("click",function(){
-            that.year++;
-            $("#"+that.timeBoxId).find(".eb_year").html(that.year);
-            that.refreshDate();
-        });
-        $yearSelect.append($minusBtn,$year,'年',$plusBtn);
-
-        $(".eb_yearButton",$yearSelect)
-            .on("mouseover",function(){
-                $(this).addClass("mouseover");
-            })
-            .on("mouseout",function(){
-                $(this).removeClass("mouseover");
-            })
-            .on("mousedown",function(){
-                $(this).addClass("mousedown");
-            })
-            .on("mouseup",function(){
-                $(this).removeClass("mousedown");
-            });
-        return $yearSelect;
-    }
-
-    TimeInput.prototype._monthSelect = function(){
-        var that = this;
-        var $select = $('<select name="month" class="eb_monthSelect">');
-        "1,2,3,4,5,6,7,8,9,10,11,12".split(/,/).each(function(index,value){
-            index<9 && (value += "");
-            $select.append('<option value="' + value + '">' + value + '</option>');
-        });
-        $select.val(that.thisMonth);
-        $select.on("change",function(){
-            that.refreshDate();
-        });
-        return $select;
-    }
-
-    TimeInput.prototype._daySelect = function(){
-        var $daySelect = $('<table></table>');
-        var $week = $("<tr></tr>");
-        var week = {"Sunday":"日","Monday":"一","Tuesday":"二","Wednesday":"三",Thursday:"四","Friday":"五","Saturday":"六"};
-        for(var day in week) {
-            var $day = '<th class="eb_' + day + '">' + week[day] + '</th>';
-            day == "Sunday" && $day.addClass("eb_red");
-            day == "Saturday" && $day.addClass("red");
-            $week.append($day);
-        }
-        $daySelect.append($week);
-        for(var i=0; i< 6; i++){
-            var $tr = $("<tr></tr>");
-            for(var j=0; j<7;j++){
-                var $td = $("<td></td>").on("mouseover",function(){
-                    $(this).addClass("eb_dateMouseover");
-                }).on("mouseout",function(){
-                    $(this).removeClass("eb_dateMouseover");
-                });
-                $tr.append($td);
-            }
-            $daySelect.append($tr);
-        }
-        return $daySelect;
-    };
-
-    TimeInput.prototype._hmsSelect = function(){
-        var $hmsBar      = $('<div class="eb_HMSBar">'),
-            $hourInput   = $('<input class="eb_HMSInput eb_Hour" value="00" />'),
-            $minuteInput = $('<input class="eb_HMSInput eb_minute"  value="00" />'),
-            $secondInput = $('<input class="eb_HMSInput eb_second"  value="00" />'),
-            $okBtn       = $('<div class="timeInputOK">确定</div>'),
-            $cancelBtn   = $('<div class="timeInputCancel">取消</div>'),
-            that         = this;
-
-        $hourInput.on("change",_handleNumF(0,23));
-        $minuteInput.on("change",_handleNumF(0,59));
-        $secondInput.on("change",_handleNumF(0,59));
-        function _handleNumF(min,max){
-            return function(){
-                var value = +$(this).val();
-                if(value>max){
-                    $(this).val("59");
-                }else if(value<min){
-                    $(this).val("00");
-                }
-            };
-        }
-
-        $okBtn
-            .on("mouseover",function(){
-                $(this).addClass("mouseover");
-            })
-            .on("mouseout",function(){
-                $(this).removeClass("mouseover");
-            })
-            .on("click",function(){
-                var date = that.timeBoxObj.find(".choosed").html();
-                if(!date)
-                    date = "1";
-                if(date<10 && date.length == 1)
-                    date = "0"+date;
-                var YMD = that.year + "-" + that.month + "-" + date;
-                var hour = that.timeBoxObj.find(".eb_Hour").val();
-                if(hour<10 && hour.length == 1)
-                    hour = "0" + hour;
-                var min = that.timeBoxObj.find(".eb_minute").val();
-                if(min<10 && min.length == 1)
-                    min = "0" + min;
-                var second = that.timeBoxObj.find(".eb_second").val();
-                if(second<10 && second.length == 1)
-                    second = "0" + second;
-                var HMS = hour + ":" + min + ":" + second;
-                var result = YMD + "  " + HMS;
-                that.setValue(result);
-                that.timeBoxObj.hide().removeClass("show");
-                that.$element.change();
-            });
-
-        $cancelBtn
-            .on("mouseover",function(){
-                $(this).addClass("mouseover");
-            })
-            .on("mouseout",function(){
-                $(this).removeClass("mouseover");
-            })
-            .on("click",function(){
-                that.timeBoxObj.hide().removeClass("show");
-            });
-
-        $hmsBar.append($hourInput,":",$minuteInput,":",$secondInput,$okBtn,$cancelBtn);
-        $(".eb_HMSInput",$hmsBar)
-            .on("focus",function(){
-                $(this).addClass("focus");
-                $(this).select();
-            })
-            .on("blur",function(){
-                $(this).removeClass("focus");
-            })
-            .on("keydown",function(e){
-                var keycode=e.keyCode||e.which||e.charCode;
-                if((keycode>=48 && keycode<=57) || keycode == 8){
-                    return true;
-                }else{
-                    return false;
-                }
-            });
-        return $hmsBar;
+    TimeInput.prototype.disabled = function(){
+        this.ifEnable = false;
     };
 
     TimeInput.prototype.refreshDate = function(){
-        var thisObject = this;
-        this.timeBoxObj.find(".choosed").removeClass("choosed");
-        $("#"+this.timeBoxId).find("table td").html("").unbind("click");
+        var that = this,
+            $timeBox = this.$timeBox;
+
+        this.$timeBox.find(".choosed").removeClass("choosed");
+
+        this.$timeBox.find("table td").html("").unbind("click");
+
         this.month = this.monthSelectObj.val();
-        var maxDay = this.getMonthArr(this.year)[this.month-1];
+
+        var maxDay = getMonthArr(this.year)[this.month-1];
+
         var firstDay = new Date(this.year,this.month-1,1).getDay();
+
         var index = firstDay%7;
+
         for(var i=0;i<maxDay;i++){
-            $("#"+this.timeBoxId).find("table td").eq(index).html(i+1);
+
+            $timeBox.find("table td").eq(index).html(i+1);
+
             if(this.dataOptions.defaultVal){
                 var value = this.dataOptions.defaultVal;
                 if(this.inputObj.val())
@@ -327,29 +361,30 @@
                     $("#"+this.timeBoxId).find(".choosed").removeClass("choosed");
                     $("#"+this.timeBoxId).find("table td").eq(index).addClass('choosed');
                 }
-            }else if(this.year == this.thisYear && this.month == this.thisMonth && i+1 == thisObject.today){
+            }else if(this.year == this.thisYear && this.month == this.thisMonth && i+1 ==that.today){
                 $("#"+this.timeBoxId).find(".choosed").removeClass("choosed");
                 $("#"+this.timeBoxId).find("table td").eq(index).addClass('choosed');
             }
-            if(thisObject.dataOptions.HMS != true){
-                $("#"+this.timeBoxId).find("table td").eq(index).click(function(){
-                    $("#"+thisObject.timeBoxId).find(".choosed").removeClass("choosed");
+            if(that.dataOptions.HMS != true){
+                $timeBox.find("table td").eq(index).click(function(){
+                    $timeBox.find(".choosed").removeClass("choosed");
                     $(this).addClass("choosed");
-                    thisObject.date = $(this).html();
-                    if(thisObject.date<10)
-                        thisObject.date = "0" + thisObject.date;
-                    var data = thisObject.year + "-" + thisObject.month + "-" + thisObject.date;
-                    thisObject.setValue(data);
-                    thisObject.timeBoxObj.hide().removeClass("show");
-                    thisObject.$element.change();
+                    that.date = $(this).html();
+                    if(that.date<10)
+                        that.date = "0" +that.date;
+                    var data = that.year + "-" + that.month + "-" + that.date;
+                    that.setValue(data);
+                    that.timeBoxObj.hide().removeClass("show");
+                    that.$element.change();
                 });
-            }else{
-                $("#"+this.timeBoxId).find("table td").eq(index).click(function(){
-                    thisObject.date = $(this).html();
-                    if(thisObject.date<10)
-                        thisObject.date = "0" + thisObject.date;
-                    var data = thisObject.year + "-" + thisObject.month + "-" + thisObject.date;
-                    thisObject.timeBoxObj.find(".choosed").removeClass("choosed");
+            }
+            else{
+                $timeBox.find("table td").eq(index).click(function(){
+                    that.date = $(this).html();
+                    if(that.date<10)
+                        that.date = "0" +that.date;
+                    var data =that.year + "-" +that.month + "-" +that.date;
+                    $timeBox.find(".choosed").removeClass("choosed");
                     $(this).addClass("choosed");
                 });
             }
@@ -357,19 +392,7 @@
         }
     };
 
-    TimeInput.prototype.isLeapYear = function(year){
-        if(year%4==0 && (year%100!= 0 || year%400 == 0))
-            return true;
-        else
-            return false;
-    };
 
-    TimeInput.prototype.getMonthArr = function(year){
-        if(this.isLeapYear(year))
-            return [31,29,31,30,31,30,31,31,30,31,30,31];
-        else
-            return [31,28,31,30,31,30,31,31,30,31,30,31];
-    };
 
     TimeInput.prototype.toggleBox = function(){
         this.locatBox();
@@ -384,13 +407,14 @@
         }
     };
 
-    TimeInput.prototype.getValue = function(){
-        return this.inputObj.val();
-    };
-
-    TimeInput.prototype.setValue = function(value){
-        this.inputObj.val(value);
-        this.parent.attr("value",value);
+    TimeInput.prototype.value = function(value){
+        if(value == undefined){
+            return this.inputObj.val();
+        }
+        else{
+            this.inputObj.val(value);
+            this.parent.attr("value",value);
+        }
     };
 
     TimeInput.prototype.clearValue = function(){
@@ -398,7 +422,6 @@
     };
 
     TimeInput.prototype.check = function(){
-        var thisObject = this;
         var result = {length:0,result:true};
         var val = this.$element.val();
         if(this.dataOptions.required == true){
@@ -414,14 +437,10 @@
     TimeInput.prototype.locatBox = function(){
         var top = this.$element.offset().top;
         var left = this.$element.offset().left;
-        var scrollTop = $(window).scrollTop();
-        var scrollLeft = $(window).scrollLeft();
-        top = top;
-        left = left;
-        $("#"+this.timeBoxId).css("left",left).css("top",top+this.$element.height()+3);
+        this.$timeBox.css({"left":left,"top":top+this.$element.height()+3});
     }
 
-    $.fn.timeInsput = function (option,param) {
+    $.fn.timeInput = function (option,param) {
         var result = null;
         var thisObj = this.each(function () {
             var $this = $(this)
@@ -437,11 +456,4 @@
         return thisObj;
     };
 
-    $.fn.timeInput.defaults = {
-        required:false,
-        width:250,
-        height:20,
-        titleWidth:73
-    };
-
-}(window.jQuery);
+}(window);

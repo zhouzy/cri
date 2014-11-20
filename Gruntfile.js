@@ -25,7 +25,10 @@ module.exports = function (grunt) {
                     yuicompress: true
                 },
                 files:[{
-                    src:["script/func/cri/less/*.less","!script/func/cri/less/lib.less","!script/func/cri/less/theme-default.less"],
+                    src:[
+                        "script/func/cri/less/*.less",
+                        "!script/func/cri/less/lib.less",
+                        "!script/func/cri/less/theme-default.less"],
                     dest:"script/func/cri/final/cri.css"
                 }]
             }
@@ -40,6 +43,7 @@ module.exports = function (grunt) {
                         'script/func/cri/js/cri.grid.js',
                         'script/func/cri/js/*.js',
                         '!script/func/cri/js/cri.selectBox.js',
+                        '!script/func/cri/js/cri.timeInput.js',
                         '!script/func/cri/js/cri.button.js'
                     ],
                     dest:'script/func/cri/final/cri.js'
