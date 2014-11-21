@@ -17,21 +17,19 @@
     </style>
 </head>
 <body style="padding:50px;">
-<input/>
-<input/>
-    <input/>
-    <input/>
-    <input/>
-    <input/>
-    <input/>
-    <input/>
-    <input/>
-    <input/>
-    <input/>
+<input id="timeinput"/>
+<select id="select">
+    <option value="red">f00</option>
+    <option value="green">0f0</option>
+    <option value="blue">00f</option>
+</select>
+<input id="input"/>
 <script>
-    $("input").newInput({
-        label:"helloa"
+    $("#timeinput").timeInput({HMS:true});
+    $("#input").input();
+    $("#select").selectBox({
     });
-    </script>
+
+</script>
 </body>
 </html>

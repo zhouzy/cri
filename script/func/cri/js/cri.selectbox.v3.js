@@ -52,8 +52,13 @@
             this.$element.hide();
             this.$element.wrap('<span class="' + SELECTBOX_GROUP + '"></span>');
             var $selectBoxGroup = this.$selectBoxGroup = this.$element.parent();
-            $selectBoxGroup.append('<label>' + this.options.label + '</label>');
+            $selectBoxGroup.append(this._label());
             $selectBoxGroup.append(this._createBody(),this._createOptions())
+        },
+
+        _label:function(){
+            var label = this.options.label || this.$element.attr("title") || this.$element.attr("name") || "";
+            return $('<label></label>').text(label);
         },
 
         _createBody:function(){

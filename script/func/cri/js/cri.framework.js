@@ -89,6 +89,77 @@
         }
     };
 
+    cri.isLeapYear = function(year){
+        return (0==year%4&&((year%100!=0)||(year%400==0)));
+    }
+
+    /**
+     * 日期格式化
+     * 格式 YYYY/yyyy/YY/yy 表示年份
+     * MM/M 月份
+     * W/w 星期
+     * dd/DD/d/D 日期
+     * hh/HH/h/H 时间
+     * mm/m 分钟
+     * ss/SS/s/S 秒
+     */
+    cri.formatDate = function(date,formatStr){
+        var str    = formatStr,
+            year   = date.getFullYear(),
+            month  = date.getMonth()+1,
+            day    = date.getDate(),
+            hour   = date.getHours(),
+            minute = date.getMinutes(),
+            second = date.getSeconds();
+
+        str=str.replace(/yyyy|YYYY/,year);
+        str=str.replace(/yy|YY/,(year % 100)>9?(year % 100).toString():'0' + (year % 100));
+
+        str=str.replace(/MM/,month>9?month.toString():'0' + month);
+        str=str.replace(/M/g,month);
+
+        str=str.replace(/dd|DD/,day>9?day.toString():'0' + day);
+        str=str.replace(/d|D/g,day);
+
+        str=str.replace(/hh|HH/,hour>9?hour.toString():'0' + hour);
+        str=str.replace(/h|H/g,hour);
+
+        str=str.replace(/mm/,minute>9?minute.toString():'0' + minute);
+        str=str.replace(/m/g,minute);
+
+        str=str.replace(/ss|SS/,second>9?second.toString():'0' + second);
+        str=str.replace(/s|S/g,second);
+        return str;
+    }
+
+    /**
+     *把日期分割成数组
+     */
+    cri.date2Array = function(myDate){
+        var myArray = Array();
+        myArray[0] = myDate.getFullYear();
+        myArray[1] = myDate.getMonth();
+        myArray[2] = myDate.getDate();
+        myArray[3] = myDate.getHours();
+        myArray[4] = myDate.getMinutes();
+        myArray[5] = myDate.getSeconds();
+        return myArray;
+    };
+
+    /**
+     * 字符串转成日期类型
+     * 格式 MM/dd/YYYY MM-dd-YYYY YYYY/MM/dd YYYY-MM-dd
+     */
+    cri.StringToDate  = function(DateStr){
+        var converted = Date.parse(DateStr);
+        var myDate = new Date(converted);
+        if (isNaN(myDate))
+        {
+            var arys= DateStr.split('-');
+            myDate = new Date(arys[0],--arys[1],arys[2]);
+        }
+        return myDate;
+    }
 }(window);
 
 /*=====================================================================================

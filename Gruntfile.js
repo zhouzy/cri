@@ -27,6 +27,7 @@ module.exports = function (grunt) {
                 files:[{
                     src:[
                         "script/func/cri/less/*.less",
+                        "!script/func/cri/less/easybootstrap.less",
                         "!script/func/cri/less/lib.less",
                         "!script/func/cri/less/theme-default.less"],
                     dest:"script/func/cri/final/cri.css"

@@ -14,7 +14,9 @@
     var _defaultOptions = {
         label:null,
         button:null,//button={iconCls:"",handler:""}
-        value:null
+        value:null,
+        onFocus:null,
+        onClick:null
     };
 
     var INPUT_GROUP = "input-group",
@@ -38,8 +40,6 @@
 
         _createInputGroup:function(){
             var op = this.options,
-                label = op.label || "",
-                $label = $('<label></label>').text(label),
                 $input = this.$element;
 
             $input.wrap('<div class="'+ INPUT_GROUP + '"></div>');
@@ -55,12 +55,26 @@
                 $inputGroup.append($icon);
                 $input.addClass(WITH_BTN);
             }
-            $inputGroup.prepend($label);
+            $inputGroup.prepend(this._label());
+        },
+
+        _label:function(){
+            var label = this.options.label || this.$element.attr("title") || this.$element.attr("name") || "";
+            return $('<label></label>').text(label);
         },
 
         _destory:function(){
             var $input = this.$element;
             this.$inputGroup.replaceWith($input);
+        },
+
+        value:function(value){
+            if(arguments.length>0){
+                this.$element.val(value);
+            }
+            else{
+                return this.$element.val();
+            }
         }
     });
     cri.Input = Input;

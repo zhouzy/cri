@@ -1,8 +1,8 @@
 @import "./lib.less";
 @import "./theme-default.less";
 
-@input-group-width:240px;
-@input-width:160px;
+@input-group-width:260px;
+@input-width:180px;
 .input-group{
     display:inline-block;
     word-spacing:-1px;
@@ -10,9 +10,11 @@
     -webkit-text-size-adjust:none;
     width:@input-group-width;
     margin:5px 0;
+    vertical-align:top;
     input,.input-btn,label{
         display:inline-block;
         font-size:14px;
+        vertical-align:top;
     }
     label{
         width:@input-group-width - @input-width - 5px;
@@ -22,10 +24,6 @@
         text-align: right;
         word-break: normal;
         white-space: nowrap;
-        &:after{
-            content:":";
-            margin:0 2px;
-        }
     }
 
     input{
