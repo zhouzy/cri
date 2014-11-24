@@ -21,33 +21,40 @@
         <div id="tree" style="height:100%"></div>
     </div>
     <div id="right">
-    <div class="search-bar">
-        <input name="fieldName"/>
-        <input name="fieldValue"/>
-        <div class="search-btns">
-            <a href="javascript:void(0);" class="search-btn">search</a>
-            <a href="javascript:void(0);" class="reset-btn">clear</a>
+        <div class="search-bar">
+            <input name="fieldName" data-label="fieldName"/>
+            <input name="fieldValue" data-label="fieldValue"/>
+            <input name="startTime" data-label="startTime"/>
+            <input name="endTime" data-label="endTime"/>
+            <select name="type" data-label="type">
+                <option value="1">typeA</option>
+                <option value="2">typeB</option>
+                <option value="3">typeC</option>
+            </select>
+            <div class="search-btns">
+                <a href="javascript:void(0);" class="search-btn">search</a>
+                <a href="javascript:void(0);" class="reset-btn">clear</a>
+            </div>
         </div>
-    </div>
-    <div class="grid-bar">
-        <table id="grid">
-            <tr>
-                <td data-options="field:'propA'">propA</td>
-                <td data-options="field:'propB'">propB</td>
-                <td data-options="field:'propC'">propC</td>
-                <td data-options="field:'propD'">propD</td>
-                <td data-options="field:'propE'">propE</td>
-                <td data-options="field:'propF'">propF</td>
-            </tr>
-        </table>
-    </div>
-    <div id="modifyWnd" style="display:none;">
-        <input name="propA"/>
-        <input name="propB"/>
-        <input name="propC"/>
-        <input name="propD"/>
-        <input name="propE"/>
-    </div>
+        <div class="grid-bar">
+            <table id="grid">
+                <tr>
+                    <td data-options="field:'propA'">propA</td>
+                    <td data-options="field:'propB'">propB</td>
+                    <td data-options="field:'propC'">propC</td>
+                    <td data-options="field:'propD'">propD</td>
+                    <td data-options="field:'propE'">propE</td>
+                    <td data-options="field:'propF'">propF</td>
+                </tr>
+            </table>
+        </div>
+        <div id="modifyWnd" style="display:none;">
+            <input name="propA"/>
+            <input name="propB"/>
+            <input name="propC"/>
+            <input name="propD"/>
+            <input name="propE"/>
+        </div>
     </div>
 <script type="text/javascript">
     $(function(){
@@ -77,12 +84,12 @@
             }
         });
 
-        $(".search-bar input").each(function(){
-            var titles = {fieldName:"fieldName",fieldValue:"fieldValue"};
-            $(this).input({
-                label:titles[this.name]
-            });
+        $(".search-bar input[name=fieldName],.search-bar input[name=fieldValue]").each(function(){
+            $(this).input();
         });
+        $(".search-bar input[name=startTime],.search-bar input[name=endTime]").timeInput();
+        $(".search-bar select[name=type]").selectBox();
+
 
         $(".search-btn").button({
             iconCls:"fa fa-search",

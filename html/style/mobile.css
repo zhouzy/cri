@@ -4,3 +4,12 @@
 #right{
     left:0;
 }
+.search-bar{
+    position:relative;
+    padding:10px 0;
+}
+.search-btns{
+    padding-right:0;
+    padding-left:80px;
+    text-align:left;
+}

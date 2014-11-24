@@ -4,6 +4,7 @@
     width:100%;
     background:#444;
     color:#fff;
+    z-index:10000;
 }
 .info{
     color: #ffffff;
@@ -32,8 +33,6 @@
     position:relative;
 }
 .search-btns{
-    margin:5px 0;
-    display:inline-block;
-    position:absolute;
-    right:0;
+    padding-right:80px;
+    text-align:right;
 }

@@ -52,14 +52,18 @@
      * @returns {{}}
      */
     cri.getFormValue = function($form){
-        var nameValues = $form.serialize().split(/&/) || [],
-            o = {};
-        for(var i= 0,len=nameValues.length;i<len;i++){
-            var nameValue = nameValues[i].split(/=/);
-            var name = nameValue[0];
-            var value = nameValue[1]
-            o[name] = value;
-        }
+        var o = {};
+        $("input[name],select[name],textarea[name]",$form).each(function(){
+            if($(this).is("[type=checkbox]")){
+                if($(this).prop("checked")) {
+                    o[this.name] = this.value;
+                }
+                else{
+                    return true;
+                }
+            }
+            o[this.name] = this.value;
+        });
         return o;
     };
 
@@ -162,23 +166,3 @@
     }
 }(window);
 
-/*=====================================================================================
- * easy-bootstrap-公用方法 v2.0
- *
- * @author:niyq
- * @date:2013/09/05
- * @dependce:jquery
- *=====================================================================================*/
- function isArray(value){
-	if (value instanceof Array ||
-	(!(value instanceof Object) &&
-	(Object.prototype.toString.call((value)) == '[object Array]') ||
-	typeof value.length == 'number' &&
-	typeof value.splice != 'undefined' &&
-	typeof value.propertyIsEnumerable != 'undefined' &&
-	!value.propertyIsEnumerable('splice'))) {
-		return 'array';
-	}else{
-		return typeof value;
-	}
- }

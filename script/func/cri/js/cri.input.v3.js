@@ -16,7 +16,8 @@
         button:null,//button={iconCls:"",handler:""}
         value:null,
         onFocus:null,
-        onClick:null
+        onClick:null,
+        readonly:false
     };
 
     var INPUT_GROUP = "input-group",
@@ -39,27 +40,55 @@
         },
 
         _createInputGroup:function(){
-            var op = this.options,
+            var $element = this.$element;
+            $element.wrap('<div class="'+ INPUT_GROUP + '"></div>');
+            this.$inputGroup = $element.parent();
+            this._wrapInput();
+            this.$input.before(this._label());
+        },
+
+        _wrapInput:function(){
+            var that = this,
+                op   = that.options,
                 $input = this.$element;
 
-            $input.wrap('<div class="'+ INPUT_GROUP + '"></div>');
+            if(!this.$element.is("input")) {
+                $input = $("<input/>");
+                this.$element.hide().after($input);
+                $input.attr({
+                    name:this.$element.attr("name"),
+                    value:this.$element.val()
+                });
+                this.$element.removeAttr("name").attr("disable",true);
+            }
+
+            $input.on("focus",function(){
+                that.options.onFocus && that.options.onFocus.call(this);
+            });
+
             if(op.value != null){
                 $input.val(op.value);
             }
-            var $inputGroup = $input.parent();
-            this.$inputGroup = $inputGroup;
+
+            op.readonly && $input.attr("readonly",true);
+
             if(op.button){
                 var $icon = $('<i class="' + INPUT_BTN + " " + op.button.iconCls + '"></i>').on("click",function(){
                     op.button.handler.call();
                 });
-                $inputGroup.append($icon);
+                $input.after($icon);
                 $input.addClass(WITH_BTN);
             }
-            $inputGroup.prepend(this._label());
+
+            this.$input = $input;
         },
 
         _label:function(){
-            var label = this.options.label || this.$element.attr("title") || this.$element.attr("name") || "";
+            var label = this.options.label ||
+                this.$element.data("label") ||
+                this.$element.attr("title") ||
+                this.$element.attr("name") ||
+                "";
             return $('<label></label>').text(label);
         },
 
@@ -70,10 +99,10 @@
 
         value:function(value){
             if(arguments.length>0){
-                this.$element.val(value);
+                this.$input.val(value);
             }
             else{
-                return this.$element.val();
+                return this.$input.val();
             }
         }
     });

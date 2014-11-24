@@ -66,16 +66,13 @@
      * @private
      */
     TimeInput.prototype._wrapInput = function(){
-        //TODO:value 类型为Date类型
-        //TODO:format Date
         var that = this,
             value = this.options.value || new Date(),
             button = {iconCls:TIME_INPUT_ICON,handler:function(){
                 that.selectView.toggle();
             }};
 
-        this.input = new cri.Input(this.$element,{value:cri.formatDate(value,this.options.format),button:button,onFocus:function(){
-            //TODO:展开timeSelectView
+        this.input = new cri.Input(this.$element,{readonly:true,value:cri.formatDate(value,this.options.format),button:button,onFocus:function(){
             that.selectView.toggle();
         }});
     };
@@ -135,7 +132,7 @@
          * @private
          */
         _create:function($parent){
-            var $timeBox = this.$timeBox = $('<div class="' + TIME_BOX + '" id="'+this.timeBoxId+'"></div>');
+            var $timeBox = this.$timeBox = $('<div class="' + TIME_BOX + '"></div>');
             var $titleBar = $('<div class="eb_titleBar"></div>');
             $titleBar.append(this._yearSelect(),this._monthSelect(),'<span style="position:absolute;top:5px;right:23px;">月</span>');
             $timeBox.append($titleBar,this._daySelect());
@@ -168,7 +165,7 @@
         _monthSelect : function(){
             var that = this,
                 date = this.options.date,
-                $select = $('<select name="month" class="eb_monthSelect">');
+                $select = $('<select class="eb_monthSelect">');
 
             $.each([1,2,3,4,5,6,7,8,9,10,11,12],function(index,value){
                 value < 10 && (value = "0" + value);
@@ -324,20 +321,18 @@
             }
         }
     };
-    $.fn.timeInput = function (option,param) {
-        var result = null;
-        var thisObj = this.each(function () {
-            var $this = $(this)
-                , thisObject = $this.data('timeInput')
-                , dataOptions = typeof option == 'object' && option;
-            if(typeof option == 'string' ){
-                result = thisObject[option](param);
-            }else{
-                $this.data('timeInput', (thisObject = new TimeInput(this, dataOptions)));
+    $.fn.timeInput = function (option) {
+        var o = null;
+        this.each(function () {
+            var $this = $(this),
+                options = typeof option == 'object' && option;
+            o = $this.data('timeInput');
+            if(o != null){
+
             }
+            $this.data('timeInput', (o = new TimeInput(this, options)));
         });
-        if(typeof option == 'string' )return result;
-        return thisObj;
+        return o;
     };
 
 }(window);
