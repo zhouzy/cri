@@ -15,9 +15,10 @@
         label:null,
         button:null,//button={iconCls:"",handler:""}
         value:null,
+        readonly:false,
         onFocus:null,
-        onClick:null,
-        readonly:false
+        onBlur:null,
+        onClick:null
     };
 
     var INPUT_GROUP = "input-group",
@@ -63,7 +64,9 @@
             }
 
             $input.on("focus",function(){
-                that.options.onFocus && that.options.onFocus.call(this);
+                that.options.onFocus && that.options.onFocus.call(that);
+            }).blur(function(){
+                that.options.onBlur && that.options.onBlur.call(that);
             });
 
             if(op.value != null){
