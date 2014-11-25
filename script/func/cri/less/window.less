@@ -3,7 +3,7 @@
 
 @window-head-height:35px;
 .window{
-    background-color: #fff;
+    background-color: @color-window-bg;
     color: @color-window-font;
     display: inline-block;
     position: absolute;
@@ -14,7 +14,7 @@
     left:5px;
     padding-top:@window-head-height;
     .rounded-corners(4px);
-    .box-shadow(1px,1px,7px,1px,darken(@color-background,40%));
+    .box-shadow(1px,1px,7px,1px,darken(@color-window-bg,40%));
     .window-head{
         margin-top:-@window-head-height;
         position:relative;
@@ -22,7 +22,7 @@
         line-height:24px;
         padding:5px 0;
         font-size:1.2em;
-        .gradient-background(lighten(@color-background,3%),@color-background);
+        .gradient-background(lighten(@color-window-head-bg,5%),@color-window-head-bg);
         border-bottom: solid 1px @color-window-border;
         .user-not-select;
         .title{
@@ -41,15 +41,15 @@
             display:inline-block;
             .action{
                 display:inline-block;
-                .rounded-corners(4px);
+                cursor:pointer;
+                .rounded-corners(10px);
                 line-height: 20px;
                 height:20px;
                 width:20px;
                 margin-right:2px;
                 text-align:center;
-                cursor:pointer;
-                background-color: #fff;
-                border:1px solid lighten(@color-button-hover,50%);
+                font-size: 10px;
+                font-weight: 400;
                 &:hover{
                     background: @color-window-button-hover;
                     i{
@@ -63,6 +63,7 @@
         }
     }
     .window-content{
+        background:@color-window-bg;
         height:100%;
         overflow: auto;
     }
@@ -152,7 +153,7 @@
     height:auto !important;
 }
 .overlay{
-    background-color:darken(@color-background,80%);
+    background-color:darken(@color-window-bg,80%);
     position: absolute;
     z-index: 10000;
     left:0;

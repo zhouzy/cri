@@ -4,10 +4,9 @@
 .tree{
     color:@color-font;
     border:1px solid @color-tree-border;
-    .title,.toolbar{
-        .gradient-background(lighten(@color-background,3%),@color-background);
-    }
+    background:@color-tree-bg;
     .title{
+        background:@color-tree-title-bg;
         padding-left:4px;
         font-size: 1.2em;
         height:30px;
@@ -31,23 +30,36 @@
                 vertical-align: top;
                 cursor:pointer;
                 border: 1px solid @color-tree-content-border;
-                background:@color-tree-content-bg;
                 margin:3px;
+                position:relative;
                 &:hover{
                     background:@color-tree-content-hover;
                     color:#fff;
                     .icon{
+                        color:#fff;
                         animation: left2right 0.1s linear forwards;
                         -moz-animation: left2right 0.1s linear forwards;
                         -webkit-animation: left2right 0.1s linear forwards;
                         -o-animation: left2right 0.1s linear forwards;
+                    }
+                    &:before{
+                        content:" ";
+                        position:absolute;
+                        display:inline-block;
+                        width:5px;
+                        height:32px;
+                        top:-1px;
+                        left:-1px;
+                        background:#444;
                     }
                 }
                 &.selected{
                     background: @color-tree-content-selected;
                 }
                 .icon{
+                    color:@color-tree-content-icon;
                     display:inline-block;
+                    font-size:1.2em;
                     height:24px;
                     line-height: 24px;
                     vertical-align: top;
@@ -61,6 +73,7 @@
             input{
                 vertical-align:middle;
             }
+
         }
     }
 }

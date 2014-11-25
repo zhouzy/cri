@@ -5,7 +5,7 @@
     <meta charset="utf-8" content="text/html"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link href="../../script/lib/font-awesome/css/font-awesome.css" type="text/css" rel="stylesheet"/>
-    <link href="../../script/func/easy-bootstrap/css/reset.css" type="text/css" rel="stylesheet"/>
+    <link href="../../script/func/cri/css/reset.css" type="text/css" rel="stylesheet"/>
     <link href="../../script/func/cri/final/cri.css" type="text/css" rel="stylesheet"/>
     <link href="../style/common.css" type="text/css" rel="stylesheet"/>
     <link href="../style/template.css" type="text/css" rel="stylesheet"/>
@@ -63,7 +63,9 @@
             rowNum:true,
             title:"hello grid",
             checkBox:true,
-            toolbar:[{text:"button",handle:function(){console.log('hello hutton')},iconCls:"fa fa-circle-o"},{text:"按钮"}],
+            toolbar:[{text:"删除",handle:function(){console.log('hello hutton')},iconCls:"fa fa-times"},{text:"修改",iconCls:"fa fa-pencil",handler:function(){
+                modify(grid.getSelected());
+            }}],
             pageSize:4,
             onClick:function(data){
             },
@@ -116,7 +118,7 @@
         $("#modifyWnd").window({
             title:"修改对象属性",
             modal:true,
-            width:500,
+            width:550,
             height:300
         });
         $("#modifyWnd").show();

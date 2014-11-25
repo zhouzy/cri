@@ -1,7 +1,6 @@
 @import "./lib.less";
 @import "./theme-default.less";
 ul.toolbar {
-    .gradient-background(lighten(@color-background,3%),@color-background);
     border-bottom:1px solid @color-toolbar-border;
     height:30px;
     line-height:30px;
@@ -9,26 +8,19 @@ ul.toolbar {
         color:@color-font;
         text-align: center;
         display:inline-block;
-        height:22px;
-        line-height:22px;
-        border: 1px solid @color-toolbar-border;
+        height:30px;
+        line-height:30px;
         cursor: pointer;
         list-style: none outside none;
         min-width: 60px;
-        margin-left:5px;
-        padding:0 5px;
+        margin-right:10px;
         .user-not-select;
-        .rounded-corners(4px);
-        .text-shadow-sunken(#EEE);
         &:hover{
-            .gradient-background(lighten(@color-background,30%),@color-background);
-            border-color:@color-pager-nav;
         }
         &:active{
             -webkit-box-shadow: inset 0px 1px 1px @color-toolbar-button-active, 0px 1px 0px @color-toolbar-button-active;
             -moz-box-shadow: inset 0px 1px 1px @color-toolbar-button-active, 0px 1px 0px @color-toolbar-button-active;
             box-shadow: inset 0px 1px 1px @color-toolbar-button-active, 0px 1px 0px @color-toolbar-button-active;
-            text-shadow: 0px 1px 0px darken(@color-toolbar-button-font,20%);
             color:@color-toolbar-button-font;
             .gradient-background(lighten(@color-toolbar-button-active,20%),darken(@color-toolbar-button-active,20%));
             border-top-color:lighten(@color-toolbar-button-active,20%);
