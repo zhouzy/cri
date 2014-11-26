@@ -42,10 +42,14 @@
 
     var _defaultOptions = {
         value:null,
-        format:"yyyy/MM/dd HH:mm:ss"
+        format:"yyyy/MM/dd",
+        HMS:false
     };
 
     var TimeInput = cri.Widgets.extend(function(element,options){
+        if(!options.HMS && options.format){
+            options.format = options.format.replace(/\s*[Hh].*$/,"");
+        }
         this.options = _defaultOptions;
         cri.Widgets.apply(this,arguments);
     });

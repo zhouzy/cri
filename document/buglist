@@ -26,3 +26,6 @@
 4.初始化设置值
 
 //SelectBox
+
+//TimeInput
+1.未选择HMS时，输入框显示了小时分钟秒信息（fixed）
