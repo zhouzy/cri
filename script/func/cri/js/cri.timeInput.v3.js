@@ -146,8 +146,8 @@
             var that = this;
             var date = this.options.date;
             var $yearSelect = $('<div class="eb_yearSelecter"></div>');
-            var $minusBtn   = $('<span class="eb_toLastYear eb_yearButton">－</span>');
-            var $plusBtn    = $('<span class="eb_toNextYear eb_yearButton">＋</span>');
+            var $minusBtn   = $('<i class="eb_toLastYear eb_yearButton fa fa-minus"></i>');
+            var $plusBtn    = $('<i class="eb_toNextYear eb_yearButton fa fa-plus"></i>');
             var $year       = $('<span class="eb_year">' + date.yyyy + '</span>');
 
             $minusBtn.on("click",function(){

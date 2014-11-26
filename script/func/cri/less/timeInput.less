@@ -1,257 +1,187 @@
-.eb_timeInputGroup{
-    position:relative;
-    display:inline-block;
-    vertical-align: top;
-}
-.eb_timeInputGroup>.eb_title{
-    width:72px;
-    display:inline-block;
-    font-size:12px;
-    line-height:20px;
-    position:absolute;
-    top:0;
-    left:0;
-    text-align:right;
-    word-break:keep-all;
-}
-.eb_timeInputGroup>.eb_timeInput{
-    border: 1px solid #dedede;
-    font-family: arial;
-    font-size: 12px;
-    width: 170px;
-    height: 18px;
-    line-height:20px;
-    position: absolute;
-    top:0;
-    right:0;
-    padding-left: 5px;
-    width:165px;
-}
-.eb_timeInputGroup>.eb_timeInput.focus{
-    border: 1px solid #8A95E9;
-    box-shadow:0 0 4px 2px rgba(120, 190, 255, 0.2);
-}
-.eb_timeInputGroup>.redStar{
-    color:red;
-    position:absolute;
-    right:-7px;
-    top:4px;
-    font-size:12px;
-}
+@import "./lib.less";
+@import "./theme-default.less";
 
-.eb_timeBox{
-    border: 1px solid #383eab;
-    border-radius: 0 0 5px 5px;
-    box-shadow: 1px 3px 2px 2px rgba(0,0,0,0.2);
-    position: absolute;
-    left:80px;
-    margin-top:-5px;
-    background-color: #fff;
-    z-index:200;
-    width: 240px;
-    height: 190px;
-    font-family: Microsoft YaHei,arial;
-    display: none;
-    background: -webkit-linear-gradient(top,#fff 30px,#eee);
-    background: -moz-linear-gradient(top,#fff 30px,#eee);
-    background: -w-linear-gradient(top,#fff 30px,#eee);
-    filter:progid:DXImageTransform.Microsoft.Gradient(GradientType=0,StartColorStr='#ffffff',EndColorStr='#eeeeee');
-}
-.eb_titleBar{
-    top: 0;
-    left: 0;
-    height: 25px;
-    width: 100%;
-    background-color: #383eab;
-    color: white;
-    font-size: 13px;
-    text-align: center;
-    font-weight: 600;
-    font-family: arial;
-}
-
-.eb_yearSelecter{
-    height: 16px;
-    width:120px;
-    line-height: 14px;
-    font-size: 12px;
+.eb_timeInputGroup {
     position: relative;
-    left: 0;
-    top: 5px;
-}
-.eb_yearButton{
-    border-top:1px solid rgba(255,255,255,0.7);
     display: inline-block;
-    height: 13px;
-    line-height: 13px;
-    width: 14px;
-    background-color: light-blue;
-    font-family: arial;
-    text-align: center;
-    font-weight: 600;
-    margin: auto 8px;
-    cursor:pointer;
-    background: -webkit-linear-gradient(top,#7a80f1,#2f3486);
-    background: -moz-linear-gradient(top,#7a80f1,#2f3486);
-    background: -o-linear-gradient(top,#7a80f1,#2f3486);
-    filter:progid:DXImageTransform.Microsoft.Gradient(GradientType=0,StartColorStr='#7a80f1',EndColorStr='#2f3486');
-    border-radius: 3px;
-    box-shadow: 0 1px 1px 1px rgba(0,0,0,0.4);
-    margin-top: -1px;
-    -moz-user-select: none;
-    user-select:none;
-}
-.eb_yearButton.mouseover{
-    background: -webkit-linear-gradient(top,#ff3939,#9c0000);
-    background: -moz-linear-gradient(top,#ff3939,#9c0000);
-    background: -o-linear-gradient(top,#ff3939,#9c0000);
-    filter:progid:DXImageTransform.Microsoft.Gradient(GradientType=0,StartColorStr='#ff3939',EndColorStr='#9c0000');
-}
-.eb_yearButton.mousedown{
-    background: -webkit-linear-gradient(top,#9c0000,#9c0000) !important;
-    background: -moz-linear-gradient(top,#9c0000,#9c0000) !important;
-    background: -o-linear-gradient(top,#9c0000,#9c0000) !important;
-    filter:progid:DXImageTransform.Microsoft.Gradient(GradientType=0,StartColorStr='#9c0000',EndColorStr='#9c0000');
-    box-shadow: 0 0 1px 1px rgba(0,0,0,0.4) !important;
-}
-.eb_monthSelect{
-    position:absolute;
-    top:3px;
-    right:40px;
-    width:40px;
-    height:18px;
-    border:1px solid #333;
-    line-height:20px;
-    cursor:pointer;
-}
-.eb_dateMouseover{
-    background: -webkit-linear-gradient(top,#eee,#fff 70%) !important;
-    background: -moz-linear-gradient(top,#eee,#fff 70%) !important;
-    background: -o-linear-gradient(top,#eee,#fff 70%) !important;
-    filter:progid:DXImageTransform.Microsoft.Gradient(GradientType=0,StartColorStr='#eeeeee',EndColorStr='#ffffff',starty=0,finishy=70%);
-    border-top:1px solid rgba(255,255,255,0.8);
-    padding-top: 0 !important;
-    box-shadow: 0 1px 1px 1px rgba(0,0,0,0.3);
-    color:red !important;
-    font-weight: 400;
-    text-shadow: 0 1px 0 rgba(255,255,255,0) !important;
-}
-.eb_year{
-    display: inline-block;
-    width: 30px;
-}
-.eb_focus{
-    border: 1px solid #383eab !important;
-}
-.eb_timeBox>table{
-    width: 210px;
-    margin: auto 15px;
-    font-size: 12px;
-    color: #333;
-    margin-top: 3px;
-    -moz-user-select: none;
-    user-select: none;
-}
-.eb_timeBox>table tr{
-    height: 20px;
-}
-.eb_timeBox>table th{
-    font-family: Microsoft YaHei;
-    cursor:default;
-}
-.eb_timeBox>table td{
-    font-family: arial;
-    cursor:pointer;
-    font-family: arial;
-    text-align: center;
-    color: #00037c;
-    text-shadow: 0 1px 0 rgba(255,255,255,0.8);
-    padding-top: 2px;
-}
-.eb_timeBox>table td.choosed{
-    background-color:#7681d5;
-    color:white;
-    text-shadow: 0 0 0 rgba(255,255,255,0.8);
-}
-.eb_timeBox>table td.choosed.eb_dateMouseover{
-    background: -webkit-linear-gradient(top,#7681d5,#7681d5 70%) !important;
-    background: -moz-linear-gradient(top,#7681d5,#7681d5 70%) !important;
-    background: -o-linear-gradient(top,#7681d5,#7681d5 70%) !important;
-    filter:progid:DXImageTransform.Microsoft.Gradient(GradientType=0,StartColorStr='#7681d5',EndColorStr='#7681d5',starty=0,finishy=70%);
-    border-top:0px solid rgba(255,255,255,0.8);
-    padding-top: 3px !important;
-    box-shadow: 0 0 0 0 rgba(0,0,0,0.3);
-    color:white !important;
-    font-weight: 400;
-    text-shadow: 0 0 0 rgba(255,255,255,0) !important;
-}
-.eb_red{
-    color: red !important;
-}
-.eb_HMSBar{
-    height:20px;
-    width:100%;
-    text-align:right;
-    font-size:12px;
-    line-height:20px;
-}
-.eb_HMSInput{
-    position:relative;
-    right:15px;
-    width:22px;
-    height:14px;
-    border:1px solid #aaa;
-    text-indent:3px;
-    color:#666;
-    font-size:12px;
-}
-.eb_HMSInput.focus{
-    border:1px solid #626dbb;
-}
-.eb_timeBox .timeInputOK{
-    width:40px;
-    height:22px;
-    line-height:20px;
-    background: -webkit-linear-gradient(top,#3b52ff,#202973);
-    background: -moz-linear-gradient(top,#3b52ff,#202973);
-    background: -o-linear-gradient(top,#3b52ff,#202973);
-    filter:progid:DXImageTransform.Microsoft.Gradient(GradientType=0,StartColorStr='#3b52ff',EndColorStr='#202973');
-    position:absolute;
-    top:189px;
-    left:150px;
-    color:white;
-    font-size:11px;
-    border-radius: 10px 0 0 10px;
-    text-align:center;
-    cursor:pointer;
-}
-.eb_timeBox .timeInputOK.mouseover{
-    background: -webkit-linear-gradient(top,#3edc5f,#1e8934);
-    background: -moz-linear-gradient(top,#3edc5f,#1e8934);
-    background: -o-linear-gradient(top,#3edc5f,#1e8934);
-    filter:progid:DXImageTransform.Microsoft.Gradient(GradientType=0,StartColorStr='#3edc5f',EndColorStr='#1e8934');
-}
-.eb_timeBox .timeInputCancel{
-    width:40px;
-    height:22px;
-    line-height:20px;
-    background: -webkit-linear-gradient(top,#3b52ff,#202973);
-    background: -moz-linear-gradient(top,#3b52ff,#202973);
-    background: -o-linear-gradient(top,#3b52ff,#202973);
-    filter:progid:DXImageTransform.Microsoft.Gradient(GradientType=0,StartColorStr='#3b52ff',EndColorStr='#202973');
-    position:absolute;
-    top:189px;
-    left:190px;
-    color:white;
-    font-size:11px;
-    border-radius: 0 10px 10px 0;
-    text-align:center;
-    cursor:pointer;
-    text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
-}
-.eb_timeBox .timeInputCancel.mouseover{
-    background: -webkit-linear-gradient(top,#f72323,#941717);
-    background: -moz-linear-gradient(top,#f72323,#941717);
-    background: -o-linear-gradient(top,#f72323,#941717);
-    filter:progid:DXImageTransform.Microsoft.Gradient(GradientType=0,StartColorStr='#f72323',EndColorStr='#941717');
+    vertical-align: top;
+    .eb_timeBox {
+        background:@color-timeinput-timebox-bg;
+        border: 1px solid @color-timeinput-timebox-border;
+        border-radius: 0 0 5px 5px;
+        .box-shadow(0,2px,2px,0,#CCC);
+        position: absolute;
+        left: 80px;
+        margin-top: -5px;
+        z-index: 200;
+        width: 240px;
+        height: 190px;
+        display: none;
+        .eb_titleBar {
+            top:0;
+            left:0;
+            height:25px;
+            width:100%;
+            font-size: 13px;
+            text-align: center;
+            font-weight: 600;
+            font-family: arial;
+            background:@color-timeinput-timebox-title-bg;
+        }
+
+        .eb_yearSelecter {
+            height: 16px;
+            width: 120px;
+            line-height: 14px;
+            font-size: 12px;
+            position: relative;
+            left: 0;
+            top: 5px;
+        }
+        .eb_yearButton{
+            font-size:12px;
+            width:12px;
+            height:12px;
+            padding:2px;
+            margin:0 5px;
+            .rounded-corners(8px);
+            color:@color-timeinput-timebox-icon;
+            cursor:pointer;
+            &:hover{
+                color:#FFF;
+                background:@color-timeinput-timebox-icon-hover;
+            }
+        }
+
+        .eb_monthSelect {
+            position: absolute;
+            top: 3px;
+            right: 40px;
+            width: 40px;
+            height: 20px;
+            border: 1px solid @color-timeinput-timebox-border;
+            .rounded-corners(2px);
+            line-height: 20px;
+            cursor: pointer;
+        }
+
+        .eb_dateMouseover {
+            background: -webkit-linear-gradient(top, #eee, #fff 70%) !important;
+            background: -moz-linear-gradient(top, #eee, #fff 70%) !important;
+            background: -o-linear-gradient(top, #eee, #fff 70%) !important;
+            filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#eeeeee', EndColorStr='#ffffff', starty=0, finishy=70%);
+            border-top: 1px solid rgba(255, 255, 255, 0.8);
+            padding-top: 0 !important;
+            box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.3);
+            color: red !important;
+            font-weight: 400;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0) !important;
+        }
+        .eb_year {
+            display:inline-block;
+            width:30px;
+        }
+        & > table {
+            width: 210px;
+            margin: auto 15px;
+            font-size: 12px;
+            margin-top: 3px;
+            -moz-user-select: none;
+            user-select: none;
+            tr{
+                height: 20px;
+                &>td:hover{
+                    background:@color-timeinput-timebox-day-hover;
+                }
+            }
+            th{
+                font-family: Microsoft YaHei;
+                cursor: default;
+            }
+            td{
+                cursor: pointer;
+                text-align: center;
+                vertical-align: middle;
+            }
+        }
+
+        & > table td.choosed {
+            background-color:@color-timeinput-timebox-day-selected;
+            color:#fff;
+        }
+    }
+    .eb_focus {
+        border: 1px solid #383eab !important;
+    }
+
+    .eb_red {
+        color: red !important;
+    }
+    .eb_HMSBar {
+        height: 20px;
+        width: 100%;
+        text-align: right;
+        font-size: 12px;
+        line-height: 20px;
+    }
+    .eb_HMSInput {
+        position: relative;
+        right: 15px;
+        width: 22px;
+        height: 14px;
+        border: 1px solid #aaa;
+        text-indent: 3px;
+        color: #666;
+        font-size: 12px;
+    }
+    .eb_HMSInput.focus {
+        border: 1px solid #626dbb;
+    }
+    .eb_timeBox .timeInputOK {
+        width: 40px;
+        height: 22px;
+        line-height: 20px;
+        background: -webkit-linear-gradient(top, #3b52ff, #202973);
+        background: -moz-linear-gradient(top, #3b52ff, #202973);
+        background: -o-linear-gradient(top, #3b52ff, #202973);
+        filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#3b52ff', EndColorStr='#202973');
+        position: absolute;
+        top: 189px;
+        left: 150px;
+        color: white;
+        font-size: 11px;
+        border-radius: 10px 0 0 10px;
+        text-align: center;
+        cursor: pointer;
+    }
+    .eb_timeBox .timeInputOK.mouseover {
+        background: -webkit-linear-gradient(top, #3edc5f, #1e8934);
+        background: -moz-linear-gradient(top, #3edc5f, #1e8934);
+        background: -o-linear-gradient(top, #3edc5f, #1e8934);
+        filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#3edc5f', EndColorStr='#1e8934');
+    }
+    .eb_timeBox .timeInputCancel {
+        width: 40px;
+        height: 22px;
+        line-height: 20px;
+        background: -webkit-linear-gradient(top, #3b52ff, #202973);
+        background: -moz-linear-gradient(top, #3b52ff, #202973);
+        background: -o-linear-gradient(top, #3b52ff, #202973);
+        filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#3b52ff', EndColorStr='#202973');
+        position: absolute;
+        top: 189px;
+        left: 190px;
+        color: white;
+        font-size: 11px;
+        border-radius: 0 10px 10px 0;
+        text-align: center;
+        cursor: pointer;
+        text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+    }
+    .eb_timeBox .timeInputCancel.mouseover {
+        background: -webkit-linear-gradient(top, #f72323, #941717);
+        background: -moz-linear-gradient(top, #f72323, #941717);
+        background: -o-linear-gradient(top, #f72323, #941717);
+        filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#f72323', EndColorStr='#941717');
+    }
 }
