@@ -35,9 +35,9 @@
         border-radius: 3px;
         border:1px solid @color-input-border;
         &:focus {
-            border: 1px solid @color-input-focus;
+            border:1px solid @color-input-focus-border;
             outline:0;
-            .box-shadow(0,0,6px,1px,@color-input-focus-rgba);
+            .box-shadow(0,0,6px,1px,@color-input-focus-border);
         }
     }
 
@@ -66,7 +66,7 @@
         }
         &:active{
             color:#fff;
-            background-color:#444;
+            background-color:@color-input-btn-active-bg;
         }
     }
 }

@@ -1,6 +1,7 @@
-@color-focus:rgba(72,154,240,1);
-@color-hover:rgba(0,120,255,0.8);
+@color-focus:rgb(66, 106, 179);
+@color-hover:rgba(123,191,234,0.9);
 @color-font:#666;
+@color-icon:#555;
 @color-border:rgba(200,200,200,0.6);
 @color-bg:rgba(255, 255, 255, 0.90);
 @color-title-bg: rgba(227, 227, 227, 0.90);
@@ -23,7 +24,9 @@
 @color-grid-font:@color-font;
 
 @color-pager-bg:@color-bg;
-@color-pager-nav:#8590a0;
+@color-pager-nav-border:@color-border;
+@color-pager-nav-hover-bg:@color-hover;
+@color-pager-nav-hover-border:@color-hover;
 @color-pager-border:@color-border;
 @color-pager-selected:@color-focus;
 @color-pager-selected-border:#FFF;
@@ -33,36 +36,41 @@
 @color-button-bg:@color-bg;
 @color-button-border:@color-border;
 @color-button-hover:@color-hover;
-@color-button-icon: #535dff;
+@color-button-hover-border:darken(@color-border,50%);
+@color-button-icon:@color-icon;
+@color-button-hover-icon: #FFF;
+@color-button-active-icon: #FFF;
 
 @color-toolbar-bg:@color-bg;
-@color-toolbar-button-hover:#4fa7e3;
-@color-toolbar-button-active:rgba(100,100,100,1);
-@color-toolbar-button-font:#FFF;
-@color-toolbar-button-icon: #7c7c7c;
-@color-toolbar-border: #c5c5c5;
+@color-toolbar-button-hover:@color-hover;
+@color-toolbar-button-active:@color-focus;
+@color-toolbar-button-icon:@color-icon;
+@color-toolbar-button-active-icon:#FFF;
+@color-toolbar-button-hover-icon:#FFF;
+@color-toolbar-border:@color-border;
 
 @color-input-font:@color-font;
-@color-input-focus:#66b0e8;
-@color-input-focus-rgba:rgba(102,175,233,.6);
-@color-input-border:#A0A0A0;
+@color-input-focus:@color-hover;
+@color-input-focus-border:@color-hover;
+@color-input-border:@color-border;
+@color-input-btn-active-bg:@color-focus;
 
 @color-timeinput-timebox-bg:#FFF;
 @color-timeinput-timebox-border:@color-border;
 @color-timeinput-timebox-title-bg:@color-title-bg;
-@color-timeinput-timebox-icon:#444;
+@color-timeinput-timebox-icon:@color-icon;
 @color-timeinput-timebox-icon-hover:@color-focus;
 @color-timeinput-timebox-icon-border:@color-border;
 @color-timeinput-timebox-day-selected:@color-focus;
 @color-timeinput-timebox-day-hover:@color-hover;
 
-@color-selectBox-option-hover: #4043e3;
+@color-selectBox-option-hover:@color-hover;
 @color-selectBox-option-selected: @color-focus;
 
 @color-window-bg:@color-bg;
 @color-window-head-bg:@color-tree-title-bg;
-@color-window-border:#c5c5c5;
+@color-window-border:@color-border;
 @color-window-font:@color-font;
-@color-window-button-icon:#444;
+@color-window-button-icon:@color-icon;
 @color-window-button-hover:@color-focus;
 @color-window-button-border:@color-border;

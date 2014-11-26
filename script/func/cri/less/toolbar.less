@@ -16,12 +16,16 @@ ul.toolbar {
         margin-right:10px;
         .user-not-select;
         &:hover{
+            background:@color-toolbar-button-hover;
+            i{
+                color:@color-toolbar-button-hover-icon;
+            }
         }
         &:active{
             -webkit-box-shadow: inset 0px 1px 1px @color-toolbar-button-active, 0px 1px 0px @color-toolbar-button-active;
             -moz-box-shadow: inset 0px 1px 1px @color-toolbar-button-active, 0px 1px 0px @color-toolbar-button-active;
             box-shadow: inset 0px 1px 1px @color-toolbar-button-active, 0px 1px 0px @color-toolbar-button-active;
-            color:@color-toolbar-button-font;
+            color:@color-toolbar-button-active-icon;
             .gradient-background(lighten(@color-toolbar-button-active,20%),darken(@color-toolbar-button-active,20%));
             border-top-color:lighten(@color-toolbar-button-active,20%);
             border-bottom-color:darken(@color-toolbar-button-active,20%);

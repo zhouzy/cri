@@ -15,20 +15,16 @@
     padding:0 5px;
     .user-not-select;
     .rounded-corners(4px);
-    .text-shadow-sunken(#EEE);
     &:hover{
-        .gradient-background(lighten(@color-button-bg,30%),@color-button-bg);
-        border-color:@color-pager-nav;
+        border-color:@color-button-hover-border;
     }
     &:active{
+        color:@color-button-active-icon;
+        background:@color-toolbar-button-active;
         -webkit-box-shadow: inset 0px 1px 1px @color-toolbar-button-active, 0px 1px 0px @color-toolbar-button-active;
         -moz-box-shadow: inset 0px 1px 1px @color-toolbar-button-active, 0px 1px 0px @color-toolbar-button-active;
         box-shadow: inset 0px 1px 1px @color-toolbar-button-active, 0px 1px 0px @color-toolbar-button-active;
-        text-shadow: 0px 1px 0px darken(@color-toolbar-button-font,20%);
-        color:@color-toolbar-button-font;
-        .gradient-background(lighten(@color-toolbar-button-active,20%),darken(@color-toolbar-button-active,20%));
-        border-top-color:lighten(@color-toolbar-button-active,20%);
-        border-bottom-color:darken(@color-toolbar-button-active,20%);
+        border-color:darken(@color-toolbar-button-active,20%);
     }
     i{
         font-size:1.2em;
