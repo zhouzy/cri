@@ -13,7 +13,7 @@
     var cri = window.cri,
         $   = window.jQuery;
 
-    var _Rules = {
+    var Rules = {
         required: function(input) {
             var checkbox = input.filter("[type=checkbox]").length && !input.is(":checked"),
                 value = input.val();
@@ -44,22 +44,7 @@
             }
             return true;
         },
-        step: function(input){
-            if (input.filter(NUMBERINPUTSELECTOR + ",[" + kendo.attr("type") + "=number]").filter("[step]").length && input.val() !== "") {
-                var min = parseFloat(input.attr("min")) || 0,
-                    step = parseFloat(input.attr("step")) || 1,
-                    val = parseFloat(input.val()),
-                    decimals = numberOfDecimalDigits(step),
-                    raise;
 
-                if (decimals) {
-                    raise = Math.pow(10, decimals);
-                    return (((val-min)*raise)%(step*raise)) / Math.pow(100, decimals) === 0;
-                }
-                return ((val-min)%step) === 0;
-            }
-            return true;
-        },
         email: function(input) {
             return matcher(input, "[type=email],[" + kendo.attr("type") + "=email]", emailRegExp);
         },
@@ -74,7 +59,24 @@
         }
     };
 
+    var Messages = {
+        required:"请输入",
+        min:"请输入大于的数字",
+        max:"请输入小于的数字",
+        email:"请输入合法的邮箱地址，例如name@domain.com",
+        url:"请输入合法的URL地址,例如http://domain.com",
+        date:"请输入合法的日期,例如2014/01/01"
+    };
+
+    var _defaultOptions = {
+        rules : Rules,
+        messages:Messages,
+        validateOnBlur:false,
+        onValidate:null
+    };
+
     var Validator = cri.Widgets.extend(function(element,options){
+        this.options = _defaultOptions;
         cri.Widgets.apply(this,arguments);
     });
 
