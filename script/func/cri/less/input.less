@@ -27,7 +27,9 @@
         white-space: nowrap;
     }
 
-    input{
+    .input{
+        display:inline-block;
+        background:@color-input-bg;
         padding:5px 8px;
         color: @color-input-font;
         width:@input-width - 8*2 - 1*2;
@@ -35,6 +37,11 @@
         height:14px;
         border-radius: 3px;
         border:1px solid @color-input-border;
+        font-size:14px;
+    }
+
+    input{
+        .input;
         &:focus {
             border:1px solid @color-input-focus-border;
             outline:0;
@@ -42,6 +49,10 @@
         }
     }
 
+    .readonly{
+        .input;
+        cursor:pointer;
+    }
     .with-btn{
         border-bottom-right-radius:0;
         border-top-right-radius:0;

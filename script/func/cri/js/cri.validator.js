@@ -111,8 +111,10 @@
         _init: function(element, options) {
         },
         _eventListen:function(){
-            //TODO:如果是表单,在提交时验证
-            //TODO:如果设置validateOnBlur,则在input blur事件中验证
+            /**
+             * 如果是表单,在提交时验证
+             * 如果设置validateOnBlur,则在input blur事件中验证
+             */
             var that = this,
                 $element = this.$element;
             if(this.$element.is("form")){
@@ -169,9 +171,7 @@
         _validateInput:function($input){
             var result = this._checkValidity($input),
                 valid = result.valid;
-
             if(!valid){
-                //TODO:验证未通过，显示提示信息
                 var $errormsg = $input.next(".input-warm");
                 if($errormsg.length == 0){
                     $input.after($('<span class="input-warm">' + this.options.messages[result.key] + '</span>'));

@@ -53,37 +53,52 @@
                 op   = that.options,
                 $input = this.$element;
 
-            if(!this.$element.is("input")) {
-                $input = $("<input/>");
-                this.$element.hide().after($input);
-                $input.attr({
-                    name:this.$element.attr("name"),
-                    value:this.$element.val()
+            if(op.readonly){
+                $input = this._readonlyInput($input);
+            }
+            else{
+                $input.on("focus",function(){
+                    that.options.onFocus && that.options.onFocus.call(that);
+                }).blur(function(){
+                    that.options.onBlur && that.options.onBlur.call(that);
                 });
-                this.$element.removeAttr("name").attr("disable",true);
             }
 
-            $input.on("focus",function(){
+            op.button && $input.after(this._button()) && $input.addClass(WITH_BTN);
+
+            this.$input = $input;
+
+            if(op.value != null){
+                this._setValue(op.value)
+            }
+        },
+
+        /**
+         * 返回包装 readonly input
+         * @param $element
+         * @private
+         */
+        _readonlyInput:function($element){
+            var that = this,
+                $input = $('<span class="readonly" role="readonly">'+this.$element.val()+'</span>');
+            $input.on("click",function(){
                 that.options.onFocus && that.options.onFocus.call(that);
             }).blur(function(){
                 that.options.onBlur && that.options.onBlur.call(that);
             });
+            this.$element.attr("readonly",true).hide().after($input);
+            return $input;
+        },
 
-            if(op.value != null){
-                $input.val(op.value);
-            }
-
-            op.readonly && $input.attr("readonly",true);
-
+        _button:function(){
+            var op    = this.options,
+                $icon = null;
             if(op.button){
-                var $icon = $('<i class="' + INPUT_BTN + " " + op.button.iconCls + '"></i>').on("click",function(){
+                $icon = $('<i class="' + INPUT_BTN + " " + op.button.iconCls + '"></i>').on("click",function(){
                     op.button.handler.call();
                 });
-                $input.after($icon);
-                $input.addClass(WITH_BTN);
             }
-
-            this.$input = $input;
+            return $icon;
         },
 
         _label:function(){
@@ -100,12 +115,25 @@
             this.$inputGroup.replaceWith($input);
         },
 
+        _setValue:function(value){
+            if(this.$input.is("input")){
+                this.$input.val(value);
+            }else{
+                this.$element.val(value);
+                this.$input.text(value);
+            }
+        },
+
+        _getValue:function(){
+            return this.$element.val();
+        },
+
         value:function(value){
             if(arguments.length>0){
-                this.$input.val(value);
+                this._setValue(value)
             }
             else{
-                return this.$input.val();
+                return this._getValue();
             }
         }
     });
