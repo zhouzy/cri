@@ -12,6 +12,7 @@
         $   = window.jQuery;
 
     var _defaultOptions = {
+        text:"",
         iconCls:null,
         onClick:null,//button={iconCls:"",handler:""}
         enable:true
@@ -42,9 +43,10 @@
 
             var $button = this.$button = $e.parent();
             var $icon = $('<i class="' + op.iconCls + '"></i>');
-            $button.append($icon, $e.text());
+            var text = op.text || $e.text() || $e.val();
+            $button.append($icon, text);
             $button.on("click",function(){
-                op.onClick.call();
+                op.onClick && op.onClick.call();
             });
         },
 
