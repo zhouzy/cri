@@ -48,10 +48,6 @@
             $button.on("click",function(){
                 op.onClick && op.onClick.call();
             });
-        },
-
-        _destory:function(){
-
         }
     });
 

@@ -435,7 +435,7 @@
                 wnd     = $this.data('window'),
                 options = typeof option == 'object' && option;
             if(wnd != null){
-                wnd.$window.before($this).remove();
+                wnd._destory();
             }
             $this.data('window', (wnd = new Window(this, options)));
         });

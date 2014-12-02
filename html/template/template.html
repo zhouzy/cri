@@ -22,10 +22,10 @@
     </div>
     <div id="right">
         <div class="search-bar">
-            <input name="fieldName" data-label="fieldName"/>
-            <input name="fieldValue" data-label="fieldValue"/>
-            <input name="startTime" data-label="startTime"/>
-            <input name="endTime" data-label="endTime"/>
+            <input name="fieldName" data-label="fieldName" required/>
+            <input name="fieldValue" data-label="fieldValue" required/>
+            <input name="startTime" data-label="startTime" required/>
+            <input name="endTime" data-label="endTime" required/>
             <select name="type" data-label="type">
                 <option value="1">typeA</option>
                 <option value="2">typeB</option>
@@ -49,11 +49,16 @@
             </table>
         </div>
         <div id="modifyWnd" style="display:none;">
-            <input name="propA"/>
-            <input name="propB"/>
-            <input name="propC"/>
-            <input name="propD"/>
-            <input name="propE"/>
+            <input name="propA" required/>
+            <input name="propB" required/>
+            <input name="propC" required/>
+            <input name="propD" required/>
+            <input name="propE" required/>
+
+            <div class="modify-btns" style="position:absolute;bottom:10px;right:10px;">
+                <a href="javascript:void(0);" class="ok-btn">OK</a>
+                <a href="javascript:void(0);" class="cancel-btn">CANCEL</a>
+            </div>
         </div>
     </div>
 <script type="text/javascript">
@@ -79,24 +84,54 @@
             rowNum:true,
             title:"tree",
             onClick:function(data){
-                console.log(data.propA);
             },
             onDblClick:function(data){
-                console.log(data.propB);
             }
         });
 
         $(".search-bar input[name=fieldName],.search-bar input[name=fieldValue]").each(function(){
             $(this).input();
         });
+
         $(".search-bar input[name=startTime],.search-bar input[name=endTime]").timeInput();
+
         $(".search-bar select[name=type]").selectBox();
 
+
+        var validator = $(".search-bar").validator({
+            validateOnBlur:true,
+            rules:{
+                endDate:function($input){
+                    if($input.is('[name=endTime]')){
+                        var endDate = $input.data("input").value();
+                        var startDate = $('.search-bar input[name=startTime]').data("input").value();
+                        if(startDate.getTime()>endDate.getTime()){
+                            return false;
+                        }
+                    }
+                    return true;
+                },
+                startDate:function($input){
+                    if($input.is('[name=startTime]')){
+                        var startDate = $input.data("input").value();
+                        var endDate = $('.search-bar input[name=endTime]').data("input").value();
+                        if(startDate.getTime()>endDate.getTime()){
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            },
+            messages:{
+                endDate:"结束时间不能小于结束时间",
+                startDate:"开始时间不能大于结束时间"
+            }
+        });
 
         $(".search-btn").button({
             iconCls:"fa fa-search",
             onClick:function(){
-                console.log("search");
+                validator.validate();
             }
         });
 
@@ -106,6 +141,8 @@
                 console.log("reset");
             }
         });
+
+
     });
 
     function modify(data){
@@ -122,6 +159,29 @@
             height:300
         });
         $("#modifyWnd").show();
+
+        var modifyValidator = $('#modifyWnd').validator();
+
+        $(".ok-btn").button({
+            iconCls:"fa fa-circle-o",
+            onClick:function(){
+                if(modifyValidator.validate()){
+                    cri.notification.success("提交成功!");
+                    $('#modifyWnd').data("window").close();
+                }
+                else{
+                    cri.notification.error("请检查表单!");
+                }
+            }
+        });
+
+        $(".cancel-btn").button({
+            iconCls:"fa fa-times",
+            onClick:function(){
+                cri.notification.warming("您已经放弃此次修改!");
+                $('#modifyWnd').data("window").close();
+            }
+        });
     }
 </script>
 </body>

@@ -158,14 +158,16 @@
          */
         validate:function(){
             var that = this,
-                $element = this.$element;
+                $element = this.$element,
+                result = true;
             if(!$element.is(INPUTSELECTOR)){
                 $element.find(INPUTSELECTOR).each(function(){
-                    that._validateInput($(this));
+                    result = result && that._validateInput($(this));
                 });
             }else{
-                that._validateInput($element)
+                result = result && that._validateInput($element)
             }
+            return result;
         },
 
         _validateInput:function($input){
@@ -182,6 +184,7 @@
             }else{
                 $input.next(".input-warm").remove();
             }
+            return valid;
         }
     });
 

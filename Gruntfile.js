@@ -5,6 +5,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify'); // 压缩 js 文件
     grunt.loadNpmTasks('grunt-contrib-watch'); // 动态执行任务
     grunt.loadNpmTasks('grunt-contrib-qunit');//js 单元测试
+    grunt.loadNpmTasks('grunt-tomcat-deploy');//tomcat 动态发布
 
     // 配置
     grunt.initConfig({
@@ -79,7 +80,16 @@ module.exports = function (grunt) {
                 }
             }
         },
-
+        tomcat_deploy: {
+            host: 'http://10.132.10.203',
+            login: 'tomcat',
+            password: 'tomcat',
+            path: '/cri',
+            port: 8180,
+            dist: 'api',
+            deploy: '/manager/text/deploy',
+            undeploy: '/manager/text/undeploy'
+        },
         //监控文件变化并动态执行任务(https://github.com/gruntjs/grunt-contrib-watch)
         watch: {
             scripts: {

@@ -262,7 +262,9 @@
             var $this = $(this),
                 options = typeof option == 'object' && option;
             o = $this.data('selectBox');
-            if(o != null){}
+            if(o != null){
+                o._destory();
+            }
             $this.data('selectBox', (o = new SelectBox(this, options)));
         });
         return o;

@@ -26,7 +26,7 @@
      * @private
      */
     Widgets.prototype._initOptions = function(options) {
-        this.options = $.extend({}, this.options, options);
+        this.options = $.extend(true,{}, this.options, options);
     };
 
     /**
@@ -40,6 +40,16 @@
      * @private
      */
     Widgets.prototype._eventListen = function(){};
+
+    /**
+     * 销毁组件
+     * @private
+     */
+    Widgets.prototype._destory = function(){
+        var $element = this.$element;
+        var $warpper = $element.parent();
+        $warpper.after($element).remove();
+    };
 
     cri.Widgets = Widgets;
 }(window);

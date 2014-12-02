@@ -332,7 +332,7 @@
                 options = typeof option == 'object' && option;
             o = $this.data('timeInput');
             if(o != null){
-
+                o._destory();
             }
             $this.data('timeInput', (o = new TimeInput(this, options)));
         });

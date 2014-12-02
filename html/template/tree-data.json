@@ -1,84 +1,75 @@
 {
     "rows":[{
         "id":1,
-        "text":"C",
-        "name":"C",
+        "text":"四川省",
+        "name":"SC",
         "size":"",
         "date":"02/19/2010",
         "state":"open",
         "children":[{
             "id":2,
-            "text":"Program Files",
+            "text":"成都市",
             "name":"Program Files",
             "size":"120 MB",
             "state":"open",
             "date":"03/20/2010",
             "children":[{
                 "id":21,
-                "text":"Java",
-                "name":"Java",
+                "text":"成华区",
+                "name":"CHQ",
                 "size":"",
                 "date":"01/13/2010",
-                "state":"open",
-                "children":[{
-                    "id":211,
-                    "text":"java.exe",
-                    "name":"java.exe",
-                    "size":"142 KB",
-                    "date":"01/13/2010"
-                },{
-                    "id":212,
-                    "text":"jawt.dll",
-                    "name":"jawt.dll",
-                    "size":"5 KB",
-                    "date":"01/13/2010"
-                }]
+                "state":"open"
             },{
                 "id":22,
-                "text":"MySQL",
-                "name":"MySQL",
+                "text":"金牛区",
+                "name":"JNQ",
                 "size":"",
-                "date":"01/13/2010",
-                "state":"closed",
-                "children":[{
-                    "id":221,
-                    "text":"my.ini",
-                    "name":"my.ini",
-                    "size":"10 KB",
-                    "date":"02/26/2009"
-                },{
-                    "id":222,
-                    "name":"my-huge.ini",
-                    "size":"5 KB",
-                    "date":"02/26/2009"
-                },{
-                    "id":223,
-                    "name":"my-large.ini",
-                    "size":"5 KB",
-                    "date":"02/26/2009"
-                }]
+                "date":"01/13/2010"
+            },{
+                "id":22,
+                "text":"武侯区",
+                "name":"WHQ",
+                "size":"",
+                "date":"01/13/2010"
+            },{
+                "id":22,
+                "text":"锦江区",
+                "name":"JJQ",
+                "size":"",
+                "date":"01/13/2010"
+            },{
+                "id":22,
+                "text":"高新区",
+                "name":"GXQ",
+                "size":"",
+                "date":"01/13/2010"
             }]
         },{
             "id":3,
-            "text":"eclipse",
-            "name":"eclipse",
+            "text":"德阳市",
+            "name":"DYS",
             "size":"",
             "date":"01/20/2010",
             "children":[{
-                "id":31,
-                "name":"eclipse.exe",
-                "size":"56 KB",
-                "date":"05/19/2009"
+                "id":21,
+                "text":"旌阳区",
+                "name":"JYQ",
+                "size":"",
+                "date":"01/13/2010",
+                "state":"open"
             },{
-                "id":32,
-                "name":"eclipse.ini",
-                "size":"1 KB",
-                "date":"04/20/2010"
+                "id":22,
+                "text":"中江县",
+                "name":"ZJX",
+                "size":"",
+                "date":"01/13/2010"
             },{
-                "id":33,
-                "name":"notice.html",
-                "size":"7 KB",
-                "date":"03/17/2005"
+                "id":22,
+                "text":"罗江县",
+                "name":"LJX",
+                "size":"",
+                "date":"01/13/2010"
             }]
         }]
     }]}
