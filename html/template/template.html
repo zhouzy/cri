@@ -103,8 +103,8 @@
             rules:{
                 endDate:function($input){
                     if($input.is('[name=endTime]')){
-                        var endDate = $input.data("input").value();
-                        var startDate = $('.search-bar input[name=startTime]').data("input").value();
+                        var endDate = $input.data("timeInput").value();
+                        var startDate = $('.search-bar input[name=startTime]').data("timeInput").value();
                         if(startDate.getTime()>endDate.getTime()){
                             return false;
                         }
@@ -113,8 +113,8 @@
                 },
                 startDate:function($input){
                     if($input.is('[name=startTime]')){
-                        var startDate = $input.data("input").value();
-                        var endDate = $('.search-bar input[name=endTime]').data("input").value();
+                        var startDate = $input.data("timeInput").value();
+                        var endDate = $('.search-bar input[name=endTime]').data("timeInput").value();
                         if(startDate.getTime()>endDate.getTime()){
                             return false;
                         }
@@ -141,8 +141,6 @@
                 console.log("reset");
             }
         });
-
-
     });
 
     function modify(data){

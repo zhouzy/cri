@@ -51,16 +51,17 @@
             options.format = options.format.replace(/\s*[Hh].*$/,"");
         }
         this.options = _defaultOptions;
+        this.date  = null;
+        this.input = null;
+        this.selectView = null;
         cri.Widgets.apply(this,arguments);
     });
-
-    TimeInput.prototype._eventListen = function(){
-    };
 
     TimeInput.prototype._init = function(){
         var $element = this.$element;
         $element.wrap('<div class="'+TIME_INPUT_GROUP+'"></div>');
         this.$timeInputGroup = $element.parent();
+        this.date = this.options.value || new Date();
         this._wrapInput();
         this._timeSelectView();
     };
@@ -71,7 +72,7 @@
      */
     TimeInput.prototype._wrapInput = function(){
         var that = this,
-            value = this.options.value || new Date(),
+            value = this.date,
             button = {iconCls:TIME_INPUT_ICON,handler:function(){
                 that.selectView.toggle();
             }};
@@ -86,25 +87,34 @@
      * @private
      */
     TimeInput.prototype._timeSelectView = function(){
-        var that = this;
-        this.options.value = this.options.value || new Date();
+        var that = this,
+            date = this.date;
         this.selectView = new TimeSelectView(this.$timeInputGroup,{
-            value:this.options.value,
+            value:date,
             HMS:this.options.HMS,
             onChange:function(){
-                var date = this.getDate();
-                that.input.value(cri.formatDate(date,that.options.format));
+                that.date = this.getDate();
+                that.input.value(cri.formatDate(that.date,that.options.format));
             }
         });
     };
 
+    /**
+     * 设置值
+     * @private
+     */
+    TimeInput.prototype._setValue = function(value){
+        this.date = value;
+        this.input.value(cri.formatDate(value,this.options.format));
+        this.selectView.setDate(value);
+    };
+
     TimeInput.prototype.value = function(value){
         if(value == undefined){
-            return this.input.value();
+            return this.date;
         }
         else{
-            this.input.value(value);
-            //TODO:刷新timeSelectView
+            this._setValue(value);
         }
     };
 
@@ -325,6 +335,7 @@
             }
         }
     };
+
     $.fn.timeInput = function (option) {
         var o = null;
         this.each(function () {

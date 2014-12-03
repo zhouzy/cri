@@ -3,14 +3,12 @@
  * Date   2014/9/23
  *
  * Tree
- *
- * 依赖 Class
+ * 继承 Widgets
  */
 
 !function(window){
 
     "use strict";
-
 
     var $   = window.jQuery,
         cri = window.cri;
@@ -21,6 +19,20 @@
     var _titleH    = 31, //标题高度
         _toolbarH  = 31, //工具栏高度
         _iconWidth = 16; //
+
+    var fileIcons = {"file":"icon fa fa-file","folderOpen":"icon fa fa-folder-open","folderClose":"icon fa fa-folder"};
+
+    var _defaultOptions = {
+        url:"",
+        title:null,
+        param:null,
+        rows:[],
+        selectedRow:null,
+        onDblClick:null,
+        page:true,
+        async:false,
+        asyncUrl:null
+    };
 
     /**
      * 计算原始元素高度
@@ -73,19 +85,17 @@
         return parseInt(calWidth);
     }
 
-    var Tree = cri.Tree = function (element, options) {
-        this.options = $.extend({}, $.fn.tree.defaults, options);
-        this.$element = $(element);
+    var Tree = cri.Tree = cri.Widgets.extend(function (element,options) {
+        this.options = _defaultOptions;
         this.$tree = null;
         this.$treebody = null;
         this.selectedRow = null;
         this.toolbar = null;
         this._className = "tree";
-        this._init();
-        this._eventListen();
-    };
+        cri.Widgets.apply(this,arguments);
+    });
 
-    Tree.prototype = {
+    $.extend(Tree.prototype,{
         _init:function () {
             this._getData();
             this._createTree();
@@ -181,6 +191,7 @@
 
                 $treeview = this.$treeview = $("<div></div>").addClass("tree-view"),
                 $treebody = this.$treebody = $("<ul></ul>").addClass("tree-body");
+
             $tree.attr("style",this.$element.attr("style")).show().height(height);
             $treeview.append($treebody);
             if(height){
@@ -197,36 +208,81 @@
             this.$tree.append($treeview);
         },
 
+        /**
+         * 递归生成节点
+         * 节点默认显示打开
+         * @param $li
+         * @param children
+         * @private
+         */
         _appendChildren:function($li,children){
-            var $ul = $("<ul></ul>");
-            var indent = $(i,$li).attr("marginLeft");
+            var $ul    = $("<ul></ul>"),
+                indent = $(i,$li).attr("marginLeft");
             this._eachNode($ul,children,"show",0,indent);
             $li.append($ul);
         },
 
+        /**
+         * 生成每个节点
+         * 同步树(当点击fold节点，不查询后台数据)
+         * 异步树(当点击fold检点，实时查询后台后代节点)
+         * 当为同步树，检查children进行递归生成节点
+         * 当为异步树，检查hasChildren,children字段，hasChildren==true && (!children || children.length==0)时，访问后台
+         *
+         * @param $ul
+         * @param data
+         * @param isShow
+         * @param id
+         * @param indent
+         * @private
+         */
         _eachNode:function($ul,data,isShow,id,indent){
-            var fileIcons = {"file":"icon fa fa-file","folderOpen":"icon fa fa-folder-open","folderClose":"icon fa fa-folder"};
             for(var i = 0,len=data.length; i<len; i++){
                 var row      = data[i],
-                    $li      = $("<li></li>"),
-                    $text    = $("<span></span>").addClass("li-text").text(row.text),
-                    $icon    = $("<i></i>").attr("class",fileIcons.file).css("marginLeft",indent),
-                    $content = $("<div></div>").addClass("li-content").data("uid",++id);
-
-                $ul.append($li.append($content.append($icon).append($text)));
+                    $li      = $('<li></li>'),
+                    $text    = $('<span class="li-text">' + row.text + '</span>'),
+                    $icon    = $('<i class="' + fileIcons.file + '"></i>').css("marginLeft",indent),
+                    $content = $('<div class="li-content"></div>').data("uid",++id);
+                this._dealNodeData(row);
+                $icon.attr("class",fileIcons[row.iconType]);
+                $ul.append($li.append($content.append($icon,$text)));
                 isShow == "hide" && $li.hide();
-
-                if(row.children && row.children.length > 0){
+                if(row.hasChildren){
                     var $parent = $("<ul></ul>");
-                    if(row.hasChildren || (row.children && row.children.length)){
-                        row.state == "open" ? $icon.attr("class",fileIcons.folderOpen):$icon.attr("class",fileIcons.folderClose);
-                    }
                     $li.append($parent);
                     indent += _iconWidth;
-                    row.state && row.state == "closed"
+                    row.state && row.state == "close"
                         ? this._eachNode($parent,row.children,"hide",id*1000,indent)
                         : this._eachNode($parent,row.children,isShow,id*1000,indent);
                     indent -= _iconWidth;
+                }
+            }
+        },
+
+        /**
+         * 处理node数据的默认值
+         * state：默认值open
+         * 获取节点图标类型
+         * 如果节点指定 hasChildren 则图标显示为文件夹，
+         * 如果 children 不存在，则显示为关闭文件夹
+         * 如果未指定 state ，则默认为 close
+         * @param node
+         * @private
+         */
+        _dealNodeData:function(node){
+            node.iconType = "file";
+            if(node.children && node.children.length>0){
+                node.hasChildren = true;
+            }
+            if(node.hasChildren){
+                if(node["state"] == undefined || node["state"] == null){
+                    node["state"] = "open";
+                }
+                if(node.state && node.state=="open" && node.children && node.children.length>0){
+                    node.iconType = "folderOpen";
+                }
+                else{
+                    node.iconType = "folderClose";
                 }
             }
         },
@@ -301,7 +357,7 @@
             param && (this.options.param = param);
             this._init();
         }
-    };
+    });
 
     $.fn.tree = function (option,param) {
         var tree = null;
@@ -313,16 +369,6 @@
         return tree;
     };
 
-    $.fn.tree.defaults = {
-        url:"",
-        title:null,
-        param:null,
-        rows:[],
-        selectedRow:null,
-        onDblClick:null,
-        page:true,
-        async:false,
-        asyncUrl:null
-    };
+
 
 }(window);

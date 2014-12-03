@@ -3,9 +3,7 @@
         "id":1,
         "text":"四川省",
         "name":"SC",
-        "size":"",
         "date":"02/19/2010",
-        "state":"open",
         "children":[{
             "id":2,
             "text":"成都市",
@@ -51,6 +49,7 @@
             "name":"DYS",
             "size":"",
             "date":"01/20/2010",
+            "state":"close",
             "children":[{
                 "id":21,
                 "text":"旌阳区",

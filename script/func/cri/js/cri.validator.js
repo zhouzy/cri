@@ -13,7 +13,7 @@
     var cri = window.cri,
         $   = window.jQuery;
 
-    var INPUTSELECTOR = ":input:not(:button,[type=submit],[type=reset],[disabled],[readonly])",
+    var INPUTSELECTOR = ":input:not(:button,[type=submit],[type=reset],[disabled])",
         CHECKBOXSELECTOR = ":checkbox:not([disabled],[readonly])",
         NUMBERINPUTSELECTOR = "[type=number],[type=range]";
 
@@ -66,7 +66,6 @@
             if (input.filter(NUMBERINPUTSELECTOR + ",[role=number]").filter("[max]").length && input.val() !== "") {
                 var max = parseFloat(input.attr("max")) || 0,
                     val = parseFloat(input.val());
-
                 return max >= val;
             }
             return true;
@@ -108,8 +107,7 @@
     });
 
     $.extend(Validator.prototype,{
-        _init: function(element, options) {
-        },
+        _init: function(element, options){},
         _eventListen:function(){
             /**
              * 如果是表单,在提交时验证
@@ -162,7 +160,8 @@
                 result = true;
             if(!$element.is(INPUTSELECTOR)){
                 $element.find(INPUTSELECTOR).each(function(){
-                    result = result && that._validateInput($(this));
+                    var isValidity = that._validateInput($(this));
+                    result = result && isValidity;
                 });
             }else{
                 result = result && that._validateInput($element)
@@ -170,6 +169,12 @@
             return result;
         },
 
+        /**
+         * 验证每个Input
+         * @param $input
+         * @returns {boolean|Validator._checkValidity.valid|exports.valid|valid}
+         * @private
+         */
         _validateInput:function($input){
             var result = this._checkValidity($input),
                 valid = result.valid;

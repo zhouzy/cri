@@ -3,7 +3,7 @@
  * Date   2014/10/14
  * window 组件
  *
- * 依赖Widgets
+ * 继承 Widgets
  *
  */
 !function(window){
@@ -178,19 +178,19 @@
      * @private
      */
     Window.prototype._createActions = function(){
-        var options = this.options;
-        var $buttons = $("<div></div>").addClass("actions");
-        var defaultButtons = options.modal ? ["Maximize","Close"]:["Minimize","Maximize","Close"];
+        var options = this.options,
+            $buttons = $("<div></div>").addClass("actions"),
+            defaultButtons = options.modal ? ["Maximize","Close"]:["Minimize","Maximize","Close"];
 
         for(var i = 0, len = defaultButtons.length; i<len; i++){
             var defBtn = defaultButtons[i];
             for(var j = 0,l = options.actions.length; j < l; j++){
                 var action = options.actions[j];
                 if(action == defBtn){
-                    var $button = $("<span></span>").addClass("action").addClass(action.toLowerCase());
-                    var $icon = $("<i></i>").attr("class",icons[action]);
-                    $button.append($icon);
+                    var $button = $('<span class="action"></span>').addClass(action.toLowerCase()),
+                        $icon   = $('<i class="' + icons[action] + '"></i>');
                     $buttons.append($button);
+                    $button.append($icon);
                 }
             }
         }
@@ -353,24 +353,24 @@
      */
     Window.prototype._setButtons = function(status){
         var BUTTONS = {minimize:["resume","close"],maximize:["resume","close"],normal:["minimize","maximize","close"]};
-        var $buttons = $(".buttons",this.$window);
-        $(".button",$buttons).hide();
+        var $actions = $(".actions",this.$window);
+        $(".action",$actions).hide();
 
         if(status == "minimize"){
-            var $btn = $(".maximize",$buttons).removeClass("maximize").addClass("resume");
+            var $btn = $(".maximize",$actions).removeClass("maximize").addClass("resume");
             $("i",$btn).prop("class",icons["Maximize"]);
         }
 
         if(status == "maximize"){
-            var $btn = $(".maximize",$buttons).removeClass("maximize").addClass("resume");
+            var $btn = $(".maximize",$actions).removeClass("maximize").addClass("resume");
             $("i",$btn).prop("class",icons["Resume"]);
         }
         if(status == "normal"){
-            var $btn = $(".resume",$buttons).removeClass("resume").addClass("maximize");
+            var $btn = $(".resume",$actions).removeClass("resume").addClass("maximize");
             $("i",$btn).prop("class",icons["Maximize"]);
         }
         $.each(BUTTONS[status],function(index,value){
-            $("." + value,$buttons).show();
+            $("." + value,$actions).show();
         });
     };
 
@@ -387,7 +387,9 @@
      * 把当前窗口顶至最前,与之前最上层窗口替换
      */
     Window.prototype.toFront = function(){
-        //TODO:轮询窗口，取最大zindex,替换zindex
+        /**
+         * 轮询窗口，取最大zindex,替换zindex
+         */
         var frontWnd = this._getFrontWindow();
         if(this.$window != frontWnd){
             var zIndex = +this.$window.css("zIndex");
