@@ -97,8 +97,7 @@
     var _defaultOptions = {
         rules : Rules,
         messages:Messages,
-        validateOnBlur:false,
-        onValidate:null
+        validateOnBlur:false
     };
 
     var Validator = cri.Widgets.extend(function(element,options){
