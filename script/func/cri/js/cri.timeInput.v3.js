@@ -58,7 +58,7 @@
     });
 
     TimeInput.prototype._init = function(){
-        var $element = this.$element;
+        var $element = this.$element.attr("role","timeInput");
         $element.wrap('<div class="'+TIME_INPUT_GROUP+'"></div>');
         this.$timeInputGroup = $element.parent();
         this.date = this.options.value || new Date();

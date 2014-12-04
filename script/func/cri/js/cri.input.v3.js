@@ -121,6 +121,7 @@
             }else{
                 this.$element.val(value);
                 this.$input.text(value);
+                this.$element.trigger("change");
             }
         },
 

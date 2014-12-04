@@ -122,9 +122,15 @@
             if(that.options.validateOnBlur){
                 if(!$element.is(INPUTSELECTOR)){
                     $element.find(INPUTSELECTOR).each(function(){
-                        $(this).on("blur",function(){
-                            that._validateInput($(this));
-                        });
+                        if($(this).is('[role=timeInput]')){
+                            $(this).on("change",function(){
+                                that._validateInput($(this));
+                            });
+                        }else{
+                            $(this).on("blur",function(){
+                                that._validateInput($(this));
+                            });
+                        }
                     });
                 }else{
                     $element.on("blur",function(){
