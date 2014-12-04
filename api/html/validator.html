@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" content="text/html"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href="../lib/font-awesome/css/font-awesome.css" type="text/css" rel="stylesheet"/>
+    <link href="../css/reset.css" type="text/css" rel="stylesheet"/>
+    <link href="../css/cri.css" type="text/css" rel="stylesheet"/>
+    <link href="../css/common.css" type="text/css" rel="stylesheet"/>
+    <link href="../css/frame.css" type="text/css" rel="stylesheet"/>
+    <script src="../lib/jquery/jquery-1.9.1.js" type="text/javascript"></script>
+    <script src="../js/cri.js" type="text/javascript"></script>
+    <title>cri-api-grid</title>
+</head>
+<body class="wrapper">
+
+<div class="header">
+    <div class="name">cri.validator</div>
+    <div class="type">Validator</div>
+    <div class="des">验证器</div>
+</div>
+
+<h2>属性</h2>
+<h3 class="item-head">
+    <div class="name">rules</div>
+    <div class="type">Object</div>
+</h3>
+<p class="item-body">
+    定义验证规则
+    <pre><code>
+        rules:{
+            endDate:function($input){
+                if($input.is('[name=endTime]')){
+                    var endDate = $input.data("timeInput").value();
+                    var startDate = $('.search-bar input[name=startTime]').data("timeInput").value();
+                    if(startDate.getTime()>endDate.getTime()){
+                        return false;
+                    }
+                }
+                return true;
+            },
+            startDate:function($input){
+                if($input.is('[name=startTime]')){
+                    var startDate = $input.data("timeInput").value();
+                    var endDate = $('.search-bar input[name=endTime]').data("timeInput").value();
+                    if(startDate.getTime()>endDate.getTime()){
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+    </code></pre>
+</p>
+
+<h3 class="item-head">
+    <div class="name">messages</div>
+    <div class="type">Object</div>
+</h3>
+<p class="item-body">
+    定义rules对应的错误提示消息
+    <pre><code>
+    messages:{
+        endDate:"结束时间不能小于结束时间",
+        startDate:"开始时间不能大于结束时间"
+    }
+    </code></pre>
+</p>
+
+<h3 class="item-head">
+    <div class="name">validateOnBlur</div>
+    <div class="type">Boolean</div>
+</h3>
+<p class="item-body">是否在输入框失去焦点时进行验证</p>
+
+<h2>方法</h2>
+<h3 class="item-head">
+    <div class="name">validate</div>
+    <div class="type">Function</div>
+</h3>
+<p class="item-body">
+    开始验证
+    <pre><code>
+    说明：请在标签上，通过添加属性，指定验证类型，内置的验证类型如下：
+    1.required ([required])
+    2.email ([role=email])
+    3.url ([role=url])
+    4.date ([role=date])
+    5.pattern (在[role=text]|[role=email]|[role=url]|[role=tel]|[role=search]|[role=password]类型中根据[pattern]值进行正则验证)
+    6.min(在[role=number]类型的输入框中根据[min='number']指定的值进行验证，当输入框中的值小于min指定的值，验证通过)
+    7.max(在[role=number]类型的输入框中根据[max='number']指定的值进行验证，当输入框中的值大于max指定的值，验证通过)
+    </code></pre>
+</p>
+</body>
+</html>

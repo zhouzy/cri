@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" content="text/html"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href="../lib/font-awesome/css/font-awesome.css" type="text/css" rel="stylesheet"/>
+    <link href="../css/reset.css" type="text/css" rel="stylesheet"/>
+    <link href="../css/cri.css" type="text/css" rel="stylesheet"/>
+    <link href="../css/common.css" type="text/css" rel="stylesheet"/>
+    <link href="../css/frame.css" type="text/css" rel="stylesheet"/>
+    <script src="../lib/jquery/jquery-1.9.1.js" type="text/javascript"></script>
+    <script src="../js/cri.js" type="text/javascript"></script>
+    <title>cri-api-index</title>
+</head>
+<body class="wrapper">
+<div class="header">
+    <div class="name">cri.Window</div>
+    <div class="type">Window</div>
+    <div class="des">窗口组件，继承自 <a href="./widgets">Widgets</a></div>
+</div>
+
+<h2>属性</h2>
+<h3 class="item-head">
+    <div class="name">actions</div>
+    <div class="type">Array</div>
+</h3>
+<p class="item-body">定义窗口按钮,候选值:"Close","Minimize","Maximize",模态窗口下(modal:true),忽略最小化action</p>
+
+<h3 class="item-head">
+    <div class="name">visible</div>
+    <div class="type">Boolean</div>
+</h3>
+<p class="item-body">是否隐藏窗口,默认值:true</p>
+
+<h3 class="item-head">
+    <div class="name">modal</div>
+    <div class="type">Boolean</div>
+</h3>
+<p class="item-body">定义为模态窗口,默认值:false</p>
+
+<h3 class="item-head">
+    <div class="name">width</div>
+    <div class="type">Number</div>
+</h3>
+<p class="item-body">定义窗口宽度,默认值:600</p>
+
+<h3 class="item-head">
+    <div class="name">height</div>
+    <div class="type">Number</div>
+</h3>
+<p class="item-body">定义窗口高度,默认值:400</p>
+
+<h3 class="item-head">
+    <div class="name">position</div>
+    <div class="type">Object</div>
+</h3>
+<p class="item-body">定义窗口位置,默认值:{top:0,left:0};该值在center:false时起作用</p>
+
+<h3 class="item-head">
+    <div class="name">center</div>
+    <div class="type">Boolean</div>
+</h3>
+<p class="item-body">居中显示窗口,该值为真时会屏蔽掉position设置</p>
+
+<h3 class="item-head">
+    <div class="name">resizable</div>
+    <div class="type">Boolean</div>
+</h3>
+<p class="item-body">是否能缩放窗口</p>
+
+<h2>方法</h2>
+<h3 class="item-head">
+    <div class="name">open</div>
+    <div class="type">void</div>
+</h3>
+<p class="item-body">打开窗口</p>
+
+<h3 class="item-head">
+    <div class="name">resume</div>
+    <div class="type">void</div>
+</h3>
+<p class="item-body">还原窗口</p>
+
+<h3 class="item-head">
+    <div class="name">minimize</div>
+    <div class="type">void</div>
+</h3>
+<p class="item-body">最小化窗口</p>
+
+<h3 class="item-head">
+    <div class="name">maximize</div>
+    <div class="type">void</div>
+</h3>
+<p class="item-body">最大化窗口</p>
+
+<h3 class="item-head">
+    <div class="name">close</div>
+    <div class="type">void</div>
+</h3>
+<p class="item-body">关闭窗口</p>
+
+</body>
+</html>

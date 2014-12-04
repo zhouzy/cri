@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" content="text/html"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href="../lib/font-awesome/css/font-awesome.css" type="text/css" rel="stylesheet"/>
+    <link href="../css/reset.css" type="text/css" rel="stylesheet"/>
+    <link href="../css/cri.css" type="text/css" rel="stylesheet"/>
+    <link href="../css/common.css" type="text/css" rel="stylesheet"/>
+    <link href="../css/frame.css" type="text/css" rel="stylesheet"/>
+    <script src="../lib/jquery/jquery-1.9.1.js" type="text/javascript"></script>
+    <script src="../js/cri.js" type="text/javascript"></script>
+    <title>cri-api-selectBox</title>
+</head>
+<body class="wrapper">
+<div class="header">
+    <div class="name">cri.Input</div>
+    <div class="type">Input</div>
+    <div class="des">Input输入框</div>
+</div>
+
+<h2>属性</h2>
+<h3 class="item-head">
+    <div class="name">label</div>
+    <div class="type">String</div>
+</h3>
+<p class="item-body">设置label,当未设置时,默认使用标签data-label,title,name属性值</p>
+
+<h3 class="item-head">
+    <div class="name">value</div>
+    <div class="type">String|Number</div>
+</h3>
+<p class="item-body">初始化时值</p>
+
+<h3 class="item-head">
+    <div class="name">button</div>
+    <div class="type">Object</div>
+</h3>
+<p class="item-body">
+    input右侧按钮
+    <pre><code>
+    button={
+        iconCls:"fa fa-times", //按钮图标
+        handler:function(){}   //点击按钮回调函数,this指向Input实例
+    };
+    </code></pre>
+</p>
+
+<h3 class="item-head">
+    <div class="name">readonly</div>
+    <div class="type">Boolean</div>
+</h3>
+<p class="item-body">是否只读</p>
+
+<h2>方法</h2>
+<h3 class="item-head">
+    <div class="name">value</div>
+    <div class="type">String</div>
+</h3>
+<p class="item-body">设置、获取输入框值</p>
+
+<h2>事件</h2>
+<h3 class="item-head">
+    <div class="name">onFocus</div>
+    <div class="type">Function</div>
+</h3>
+<p class="item-body">当输入框获取焦点时触发</p>
+
+<h3 class="item-head">
+    <div class="name">onBlur</div>
+    <div class="type">Function</div>
+</h3>
+<p class="item-body">当输入框失去焦点时触发</p>
+
+<h3 class="item-head">
+    <div class="name">onClick</div>
+    <div class="type">Function</div>
+</h3>
+<p class="item-body">当点击输入框时触发</p>
+
+</body>
+</html>

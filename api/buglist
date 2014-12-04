@@ -1,0 +1,37 @@
+Tree
+1.折叠节点会同时触发onSelect事件(fixed)
+2.未指定节点状态时，图标为closed,同时子节点未隐藏(fixed)
+
+Grid
+1.树形菜单点击文件按钮，会触发click事件(fixed)
+2.表格多选方法返回值为空(fixed)
+3.表格未指定列宽度，表格宽度(fixed)
+4.分页信息不对(fixed)
+5.后台数据指定表格checkbox勾选 功能未实现(fixed)
+6.当表格td无内容时，无高度(fixed)
+7.翻页不起作用(fixed)
+8.IE8 表格奇偶行 tr:nth-child 不识别(fixed)
+9.表格先构造后请求数据，请求数据时，出现loading标志(fixed)
+10.表格头拖动未考虑到(col width:auto)情况(fixed)
+11.表头拖动后，再翻页，grid-body变成原来尺寸
+
+Window
+1.模态窗口关闭，遮罩未关闭(fixed)
+2.原DIV隐藏，初始化为窗口后，未显示(fixed)
+3.增加center配置，指定初始化时上下左右居中(fixed)
+4.窗口最大化后，按钮状态错误(fixed)
+
+Input
+1.重复初始化(fixed)
+2.label处理(fixed)
+3.初始化设置值(fixed)
+
+SelectBox
+1.失去焦点，未触发validator(validateOnBlur=true) validate方法
+
+TimeInput
+1.未选择HMS时，输入框显示了小时分钟秒信息(fixed)
+
+Validator
+1.错误提示 'undefined' (fixed)
+2.timeInput 未触发validator(validateOnBlur=true) validate方法(fixed)

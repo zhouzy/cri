@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" content="text/html"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href="../lib/font-awesome/css/font-awesome.css" type="text/css" rel="stylesheet"/>
+    <link href="../css/reset.css" type="text/css" rel="stylesheet"/>
+    <link href="../css/cri.css" type="text/css" rel="stylesheet"/>
+    <link href="../css/common.css" type="text/css" rel="stylesheet"/>
+    <link href="../css/frame.css" type="text/css" rel="stylesheet"/>
+    <script src="../lib/jquery/jquery-1.9.1.js" type="text/javascript"></script>
+    <script src="../js/cri.js" type="text/javascript"></script>
+    <title>cri-api-index</title>
+</head>
+<body class="wrapper">
+
+<div class="header">
+    <div class="name">cri.Tree</div>
+    <div class="type">Tree</div>
+    <div class="des">树形菜单组件,继承自 <a href="./widgets">Widgets</a></div>
+</div>
+
+<h2>属性</h2>
+<h3 class="item-head">
+    <div class="name">title</div>
+    <div class="type">String</div>
+</h3>
+<p class="item-body">定义树形菜单题标</p>
+
+<h3 class="item-head">
+    <div class="name">toolbar</div>
+    <div class="type">Array</div>
+</h3>
+<p class="item-body">定义树形菜单工具栏</p>
+
+<h3 class="item-head">
+    <div class="name">url</div>
+    <div class="type">String</div>
+</h3>
+<p class="item-body">数据请求地址</p>
+
+<h3 class="item-head">
+    <div class="name">Param</div>
+    <div class="type">Object</div>
+</h3>
+<p class="item-body">请求数据参数</p>
+
+<h3 class="item-head">
+    <div class="name">async</div>
+    <div class="type">Boolean</div>
+</h3>
+<p class="item-body">请求数据是否异步执行 true:异步 false：同步</p>
+
+<h3 class="item-head">
+    <div class="name">asyncUrl</div>
+    <div class="type">String</div>
+</h3>
+<p class="item-body">当async为true,请求该地址请求数据</p>
+
+<h2>方法</h2>
+<h3 class="item-head">
+    <div class="name">reload</div>
+    <div class="type">void</div>
+</h3>
+<p class="item-body">根据参数重新请求数据并生成树</p>
+
+<h3 class="item-head">
+    <div class="name">getSelected</div>
+    <div class="type">Object</div>
+</h3>
+<p class="item-body">获取当前选择节点数据</p>
+<h2>事件</h2>
+<h3 class="item-head">
+    <div class="name">onClickRow</div>
+    <div class="type">Function</div>
+</h3>
+<p class="item-body">当点击节点时，触发该事件</p>
+
+<h3 class="item-head">
+    <div class="name">onDblClickRow</div>
+    <div class="type">Function</div>
+</h3>
+<p class="item-body">双击树形控件节点时触发</p>
+<script type="text/javascript">
+</script>
+</body>
+</html>
