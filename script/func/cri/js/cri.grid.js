@@ -147,7 +147,6 @@
                     that._checkbox(e);
 
                 });
-
             $(document).on("mouseup",function(e){
                 that.$gridhead.css("cursor","");
                 $(document).off("mousemove");
@@ -155,27 +154,26 @@
 
             this.$gridhead
                 .on('mousedown',".drag-line",function(e){
+                    that.$gridhead.css("cursor","e-resize");
                     var dragLineIndex = 0;
                     op.rowNum && dragLineIndex++;
                     op.checkBox && dragLineIndex++;
                     dragLineIndex += $(this).data("drag");
-                    var $td = $("td:eq("+ dragLineIndex +")",that.$gridhead);
-                    that.$gridhead.css("cursor","e-resize");
+                    var $col = $("col:eq("+ dragLineIndex +")",that.$gridhead);
                     dragStartX = e.pageX;
                     $(document).on("mousemove",function(e){
                         var px = e.pageX - dragStartX;
-                        var width = $td.width() + px;
+                        var width = +$col.width() + px;
                         var tableWidth = $("table",that.$gridhead).width();
                         dragStartX = e.pageX;
                         console.log(width);
                         if(width >= _cellMinW){
                             $("table",that.$gridbody).width(tableWidth + px);
                             $("table",that.$gridhead).width(tableWidth + px);
-                            $td.width(width);
-                            $("tr:eq(0) td:eq("+ dragLineIndex +")",that.$gridbody).width(width);
+                            $("col:eq("+ dragLineIndex +")",that.$gridhead).width(width);
+                            $("col:eq("+ dragLineIndex +")",that.$gridbody).width(width);
                         }
                     });
-
                 })
                 .on('click',"input[type=checkbox]",function(e){
                     var isChecked = $(e.target).prop("checked");
@@ -198,6 +196,7 @@
             if(this.options.onLoad && typeof(this.options.onLoad) === 'function'){
                 this.options.onLoad.call(this);
             }
+            this._colswidth();
         },
 
         _createGrid:function(){
@@ -400,7 +399,6 @@
                     that._refreshBody(that.$gridbody);
                 },
                 error: function(XMLHttpRequest, textStatus, errorThrown){
-                    console && console.error(XMLHttpRequest.readyState + XMLHttpRequest.status + XMLHttpRequest.responseText);
                     op.rows = [];
                     op.total = 0;
                     that.pager && that.pager.update(op.page,op.pageSize,op.total,op.rows.length);
@@ -428,11 +426,21 @@
             $("tr",this.$gridbody).toggleClass("selected",false);
             this.selectedRow = this._getRowDataById(rowid);
             item.toggleClass("selected");
-//            var $checkbox = $("input[type=checkbox]",item);
-//            $checkbox.prop("checked",true);
             if(this.options.onClick){
                 this.options.onClick.call(this,this.selectedRow);
             }
+        },
+
+        /**
+         * 根据td计算col的宽度
+         * @private
+         */
+        _colswidth:function(){
+            var that = this;
+            $("tr:eq(0) td",this.$gridhead).each(function(index){
+                $('col:eq('+ index +')',that.$gridbody).width($(this).width() + 2*4);
+                $('col:eq('+ index +')',that.$gridhead).width($(this).width() + 2*4);
+            });
         },
 
         _getRowDataById:function(rowid){

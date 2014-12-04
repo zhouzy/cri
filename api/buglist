@@ -13,7 +13,7 @@ Grid
 8.IE8 表格奇偶行 tr:nth-child 不识别(fixed)
 9.表格先构造后请求数据，请求数据时，出现loading标志(fixed)
 10.表格头拖动未考虑到(col width:auto)情况(fixed)
-11.表头拖动后，再翻页，grid-body变成原来尺寸
+11.表头拖动后，再翻页，grid-body变成原来尺寸(fixed)
 
 Window
 1.模态窗口关闭，遮罩未关闭(fixed)
