@@ -1,10 +1,11 @@
 module.exports = function (grunt) {
     // grunt 组件
-    grunt.loadNpmTasks('grunt-contrib-less'); // 合并压缩 less 文件
+    grunt.loadNpmTasks('grunt-contrib-less');   // 合并压缩 less 文件
     grunt.loadNpmTasks('grunt-contrib-concat'); // 合并 js 文件
     grunt.loadNpmTasks('grunt-contrib-uglify'); // 压缩 js 文件
-    grunt.loadNpmTasks('grunt-contrib-watch'); // 动态执行任务
-    grunt.loadNpmTasks('grunt-contrib-qunit');//js 单元测试
+    grunt.loadNpmTasks('grunt-contrib-watch');  // 动态执行任务
+    grunt.loadNpmTasks('grunt-contrib-qunit');  //js 单元测试
+    grunt.loadNpmTasks('grunt-tomcat-deploy');  //发布
 
     // 配置
     grunt.initConfig({
@@ -79,6 +80,18 @@ module.exports = function (grunt) {
                 }
             }
         },
+
+        tomcat_deploy: {
+            host: '10.132.10.203',
+            login: 'tomcat',
+            password: 'tomcat',
+            path: '/cri',
+            port: 8180,
+            dist: 'api',
+            deploy: '/manager/deploy',
+            undeploy: '/manager/undeploy'
+        },
+
         //监控文件变化并动态执行任务(https://github.com/gruntjs/grunt-contrib-watch)
         watch: {
             scripts: {
