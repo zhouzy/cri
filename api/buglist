@@ -14,13 +14,15 @@ Grid
 9.表格先构造后请求数据，请求数据时，出现loading标志(fixed)
 10.表格头拖动未考虑到(col width:auto)情况(fixed)
 11.表头拖动后，再翻页，grid-body变成原来尺寸(fixed)
-12.当checkBox=true，打击行checkBox未勾选
+12.当checkBox=true，单击行checkBox未勾选(fixed)
 
 Window
 1.模态窗口关闭，遮罩未关闭(fixed)
 2.原DIV隐藏，初始化为窗口后，未显示(fixed)
 3.增加center配置，指定初始化时上下左右居中(fixed)
 4.窗口最大化后，按钮状态错误(fixed)
+5.窗口初始化再次构造异常
+6.窗口构造成功后需要暴露事件
 
 Input
 1.重复初始化(fixed)

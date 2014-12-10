@@ -88,7 +88,7 @@
 
     /**
      * 表格默认属性
-     * @type {{url: null, param: {}, title: null, toolbar: null, columns: null, rows: null, onClick: null, onDblClick: null, rowNum: boolean, checkBox: boolean, onChecked: null, pagination: boolean, page: number, pageSize: number, total: number, ajaxDone: null, ajaxError: null}}
+     * @type {{url: null, param: {}, title: null, toolbar: null, columns: null, rows: null, onChange: null, onDblClick: null, rowNum: boolean, checkBox: boolean, onChecked: null, pagination: boolean, page: number, pageSize: number, total: number, ajaxDone: null, ajaxError: null}}
      * @private
      */
     var _defaultOptions = {
@@ -106,7 +106,7 @@
 
         ajaxDone:null,
         ajaxError:null,
-        onClick:null,    //行点击时触发
+        onChange:null,    //行点击时触发
         onDblClick:null, //双击行时触发
         onSelected:null, //当选择一行或者多行时触发
         onLoad:null      //构造表格结束时触发
@@ -128,7 +128,6 @@
     });
 
     $.extend(Grid.prototype,{
-
         _eventListen:function(){
             var that = this;
             var op = this.options;
@@ -141,7 +140,7 @@
                 .on('click', "tr", function(e){
                     $("input[type=checkbox]",that.$gridhead).prop("checked",false);
                     that._setSelected(e);
-                    that.options.onClick && that.options.onClick.call(that);
+                    that.options.onChange && that.options.onChange.call(that);
                 })
                 .on('dblclick', "tr", function(e){
                     that._onDblClickRow(e);
@@ -191,11 +190,7 @@
                     $("input[type=checkbox]",that.$gridbody).each(function(){
                         $(this).prop("checked",isChecked);
                     });
-                    if(isChecked && op.onChecked){
-                        for(var i=0;i<op.rows.length;i++){
-                            op.onChecked(op.rows[i],i);
-                        }
-                    }
+                    op.onChange && op.onChange.call(that);
                 });
         },
 
@@ -437,26 +432,19 @@
                 if(item.hasClass("selected")){
                     this.selectedId = [];
                     item.removeClass("selected");
-                    this.options.onClick && this.options.onClick.call(this);
                 }else{
                     this.selectedId = this.selectedId || [];
                     $("tr.selected",this.$gridbody).removeClass("selected");
                     item.addClass("selected");
-                    this.selectedId.push(rowId);
+                    this.selectedId = [rowId];
                 }
             }
             else{
                 if(item.hasClass("selected")){
-                    $.map(this.selectedId,function(val){
-                        if(val == rowId){
-                            return null;
-                        }
-                    });
+                    var index = $.inArray(rowId,this.selectedId);
+                    index >= 0 && this.selectedId.splice(index,1);
                     item.removeClass("selected");
-                    if(this.options.checkBox){
-                        $("input[type=checkbox]",item).prop("checked",false);
-                    }
-                    this.options.onClick && this.options.onClick.call(this);
+                    $("input[type=checkbox]",item).prop("checked",false);
                 }else{
                     this.selectedId = this.selectedId || [];
                     item.addClass("selected");
