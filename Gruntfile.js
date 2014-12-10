@@ -105,6 +105,10 @@ module.exports = function (grunt) {
             less: {
                 files: 'script/func/cri/less/*.less',
                 tasks: ['less:production']
+            },
+            redeploy:{
+                files: 'api/**',
+                tasks: "tomcat_redeploy"
             }
         }
     });

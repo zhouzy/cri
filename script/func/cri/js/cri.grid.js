@@ -106,10 +106,10 @@
 
         ajaxDone:null,
         ajaxError:null,
-        onChecked:null, //每行checkbox被选中时触发回调函数,当该回调函数返回,参数row,rowid
-        onClick:null,   //行点击时触发
-        onDblClick:null,
-        onLoad:null     //构造表格结束时触发
+        onClick:null,    //行点击时触发
+        onDblClick:null, //双击行时触发
+        onSelected:null, //当选择一行或者多行时触发
+        onLoad:null      //构造表格结束时触发
     };
 
     var Grid = cri.Widgets.extend(function(element,options){
@@ -122,12 +122,13 @@
         this.pager       = null;
         this.$title      = null;
         this._columns    = [];
-        this.selectedRow = null;
+        this.selectedId  = [];
         this._gridClassName = this._gridClassName || "datagrid";
         cri.Widgets.apply(this,arguments);
     });
 
     $.extend(Grid.prototype,{
+
         _eventListen:function(){
             var that = this;
             var op = this.options;
@@ -138,14 +139,12 @@
                     $(".grid-head-wrap",that.$gridhead).scrollLeft($(this).scrollLeft());
                 })
                 .on('click', "tr", function(e){
+                    $("input[type=checkbox]",that.$gridhead).prop("checked",false);
                     that._setSelected(e);
+                    that.options.onClick && that.options.onClick.call(that);
                 })
                 .on('dblclick', "tr", function(e){
                     that._onDblClickRow(e);
-                })
-                .on("change", "input[type=checkbox]",function(e){
-                    that._checkbox(e);
-
                 });
             $(document).on("mouseup",function(e){
                 that.$gridhead.css("cursor","");
@@ -177,6 +176,18 @@
                 })
                 .on('click',"input[type=checkbox]",function(e){
                     var isChecked = $(e.target).prop("checked");
+                    if(isChecked){
+                        that.selectedId = [];
+                        $("tr",that.$gridbody).each(function(){
+                            var $tr = $(this);
+                            that.selectedId.push($tr.data("rowid"));
+                            $tr.addClass("selected");
+                            $('input[type=checkbox]',$tr).prop("checked",isChecked);
+                        });
+                    }else{
+                        that.selectedId = [];
+                        $("tr",that.$gridbody).removeClass("selected");
+                    }
                     $("input[type=checkbox]",that.$gridbody).each(function(){
                         $(this).prop("checked",isChecked);
                     });
@@ -196,7 +207,7 @@
             if(this.options.onLoad && typeof(this.options.onLoad) === 'function'){
                 this.options.onLoad.call(this);
             }
-            this._colswidth();
+            this._colsWidth();
         },
 
         _createGrid:function(){
@@ -301,6 +312,7 @@
                 if(op.checkBox){
                     $tr.append($("<td></td>").addClass("line-checkbox").append('<input type="checkbox"/>'));
                 }
+
                 if(op.rowNum){
                     $tr.append($("<td></td>").addClass("line-number").append(lineNum));
                 }
@@ -411,23 +423,51 @@
             return result;
         },
 
-        _checkbox:function(e){
-            var op = this.options;
-            var isChecked = $(e.target).prop("checked");
-            var rowid = $(e.target).closest("tr").data("rowid");
-            if(isChecked && op.onChecked){
-                op.onChecked(this._getRowDataById(rowid),rowid);
-            }
-        },
-
+        /**
+         * 当用户点击选中行时触发onSelected事件
+         * 当options.checkbox=true为多选,否则为单选
+         * @param e
+         * @private
+         */
         _setSelected:function(e){
-            var item = $(e.target).closest("tr"),
-                rowid = item.data('rowid');
-            $("tr",this.$gridbody).toggleClass("selected",false);
-            this.selectedRow = this._getRowDataById(rowid);
-            item.toggleClass("selected");
-            if(this.options.onClick){
-                this.options.onClick.call(this,this.selectedRow);
+            var item  = $(e.target).closest("tr"),
+                rowId = item.data('rowid');
+
+            if(!this.options.checkBox){
+                if(item.hasClass("selected")){
+                    this.selectedId = [];
+                    item.removeClass("selected");
+                    this.options.onClick && this.options.onClick.call(this);
+                }else{
+                    this.selectedId = this.selectedId || [];
+                    $("tr.selected",this.$gridbody).removeClass("selected");
+                    item.addClass("selected");
+                    this.selectedId.push(rowId);
+                }
+            }
+            else{
+                if(item.hasClass("selected")){
+                    $.map(this.selectedId,function(val){
+                        if(val == rowId){
+                            return null;
+                        }
+                    });
+                    item.removeClass("selected");
+                    if(this.options.checkBox){
+                        $("input[type=checkbox]",item).prop("checked",false);
+                    }
+                    this.options.onClick && this.options.onClick.call(this);
+                }else{
+                    this.selectedId = this.selectedId || [];
+                    item.addClass("selected");
+                    this.selectedId.push(rowId);
+                    if(this.options.checkBox){
+                        $("input[type=checkbox]",item).prop("checked",true);
+                    }
+                }
+            }
+            if(this.selectedId && this.selectedId.length){
+                this.options.onSelected && this.options.onSelected.call(this);
             }
         },
 
@@ -435,7 +475,7 @@
          * 根据td计算col的宽度
          * @private
          */
-        _colswidth:function(){
+        _colsWidth:function(){
             var that = this;
             $("tr:eq(0) td",this.$gridhead).each(function(index){
                 $('col:eq('+ index +')',that.$gridbody).width($(this).width() + 2*4);
@@ -452,15 +492,15 @@
                 ,item = $(e.target).closest("tr")
                 ,rowid = item.data('rowid')
                 ,that = this;
-            this.selectedRow = this._getRowDataById(rowid);
+            this.selectedId = [rowid];
             if(op.onDblClick){
-                op.onDblClick(that.selectedRow);
+                op.onDblClick();
             }
         },
 
         reload:function(param){
             param && (this.options.param = param);
-            this.selectedRow = null;
+            this.selectedId = [];
             this._getData();
         },
 
@@ -471,18 +511,12 @@
             }
         },
 
-        getMulSelected:function(){
-            var mulSelectRow = [],
-                that = this;
-            $("tr input[type='checkbox']:checked",this.$gridbody).each(function(){
-                var rowid = $(this).closest("tr").data("rowid");
-                mulSelectRow.push(that._getRowDataById(rowid));
-            });
-            return mulSelectRow;
-        },
-
         getSelected:function(){
-            return this.selectedRow;
+            var selected = [];
+            for(var i=0; i<this.selectedId.length;i++){
+                selected.push(this._getRowDataById(this.selectedId[i]));
+            }
+            return selected;
         }
 
     });

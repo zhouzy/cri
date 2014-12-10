@@ -18,8 +18,8 @@
     $.fn.datagrid = function(option) {
         var datagrid = null;
         this.each(function () {
-            var $this   = $(this),
-                dg      = $this.data('datagrid'),
+            var $this = $(this),
+                dg    = $this.data('datagrid'),
             options = typeof option == 'object' && option;
             if(dg != null){
                 dg._distory();
