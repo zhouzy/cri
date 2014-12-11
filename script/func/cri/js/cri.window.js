@@ -48,9 +48,9 @@
          * @private
          */
         _init : function(){
-            var op = this.options;
-            var viewWidth = $(window).width();
-            var viewHeight = $(window).height();
+            var op = this.options,
+                viewWidth = $(window).width(),
+                viewHeight = $(window).height();
 
             this._createBody();
             if(op.center){
