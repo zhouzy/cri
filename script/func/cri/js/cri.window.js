@@ -13,6 +13,8 @@
     var cri = window.cri,
         $   = window.jQuery;
 
+    var WINDOW_HEAD = "window-head";
+
     var icons = {Minimize:"fa fa-minus",Maximize:"fa fa-expand","Close":"fa fa-close","Resume":"fa fa-compress"},
         MINI_WINDOW_WIDTH = 140+10,
         ZINDEX = 10000;
@@ -60,7 +62,6 @@
             this._createHead();
             op.resizable && this._createResizeHandler();
             $("body").append(this.$window);
-            op.onReady && op.onReady.call(this,$window);
         },
 
         /**
@@ -139,7 +140,7 @@
          * @private
          */
         _createHead : function(){
-            var $windowHead = $("<div></div>").addClass("window-head");
+            var $windowHead = $('<div class="' + WINDOW_HEAD + '"></div>');
             $windowHead.append(this._createTitle()).append(this._createActions());
             this.$window.prepend($windowHead);
             this.$windowHead = $windowHead;
@@ -150,18 +151,24 @@
          * @private
          */
         _createBody : function(){
-            var $element = this.$element;
+            var that     = this,
+                op       = this.options,
+                $element = this.$element,
+                $window  = $('<div class="window"></div>'),
+                $windowBody = $('<div class="window-content"></div>');
+
             $element.detach();
-            var $window = $('<div class="window"></div>');
-            var $windowBody = $('<div class="window-content"></div>');
             $window.append($windowBody);
-            $windowBody.append($element);
             this.$window = $window;
             if(this.options.content){
-                $windowBody.load(this.options.content);
+                $windowBody.load(this.options.content,function(){
+                    op.onReady && op.onReady.call(that,that.$window);
+                });
+            }else{
+                $windowBody.append($element);
+                op.onReady && op.onReady.call(that,that.$window);
             }
             $("body").append(this.$window);
-
         },
 
         /**
@@ -258,10 +265,6 @@
             }[iconClass];
         },
 
-        _loadContent : function(){
-            $.load();
-        },
-
         /**
          * 由最小化打开窗口
          */
@@ -276,10 +279,13 @@
          * 隐藏并且放置到最底层
          */
         close : function(){
-            var max = ZINDEX;
-            var frontWnd = null;
+            var max      = ZINDEX,
+                frontWnd = null,
+                $windows = $(".window"),
+                $overlay = $(".overlay");
+
             this.$window.css("zIndex",ZINDEX).hide();
-            $(".window").each(function(){
+            $windows.each(function(){
                 var z = +this.style.zIndex + 1;
                 this.style.zIndex = z;
                 if(z >= max){
@@ -288,9 +294,7 @@
                 }
             });
             frontWnd.style.zIndex = max+1;
-            $(".window").is(":visible") ?
-                $(".overlay").css("zIndex",max):
-                $(".overlay").hide();
+            $windows.is(":visible") ? $overlay.css("zIndex",max) : $overlay.hide();
 
             this.$window.removeClass("mini-window");
             this.windowStatus = "close";
