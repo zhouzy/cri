@@ -62,6 +62,11 @@
             this._createHead();
             op.resizable && this._createResizeHandler();
             $("body").append(this.$window);
+            if(op.visible){
+                this.$window.show();
+            }else{
+                this.$window.hide();
+            }
         },
 
         /**
@@ -160,12 +165,12 @@
             $element.detach();
             $window.append($windowBody);
             this.$window = $window;
+            $windowBody.append($element);
             if(this.options.content){
-                $windowBody.load(this.options.content,function(){
+                $element.load(this.options.content,function(){
                     op.onReady && op.onReady.call(that,that.$window);
                 });
             }else{
-                $windowBody.append($element);
                 op.onReady && op.onReady.call(that,that.$window);
             }
             $("body").append(this.$window);
@@ -434,6 +439,12 @@
                 zindex = Math.max(+this.style.zIndex,zindex);
             });
             return ++zindex;
+        },
+
+        _destory : function(){
+            var $element = this.$element,
+                $warpper = $element.parents(".window");
+            $warpper.after($element).remove();
         }
     });
     cri.Window = Window;
