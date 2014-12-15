@@ -20,6 +20,9 @@
     <div id="menu" style="height:100%;"></div>
 </div>
 <div id="right">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <span class="nav">cri</span>
+    </div>
     <iframe id="iframe" src="./html/welcome.html"></iframe>
 </div>
 <script type="text/javascript">
@@ -27,11 +30,29 @@
         title:"cri widget",
         url:"./html/data/menu-data.json",
         onClick:function(row){
+            getRefreshF(row)();
             open(row.url);
         }
     });
+
+    function getRefreshF(row){
+        var $breadcrumbs = $("#breadcrumbs"),
+            $firstNav = $('<span class="nav active">cri</span>'),
+            $split = $('<span class="split">/</span>');
+        return function(){
+            var $currentNav = $('<span class="nav">'+row.text+'</span>');
+            $breadcrumbs.empty();
+            $firstNav.click(function(){
+                $("#right iframe").prop("src","./html/welcome.html");
+                $split.remove();
+                $currentNav.remove();
+                $firstNav.removeClass("active");
+                $firstNav.unbind("click");
+            });
+            $breadcrumbs.append($firstNav,$split,$currentNav);
+        }
+    }
     function open(url){
-        console.log("更新右侧内容");
         $("#right iframe").prop("src",url);
     }
 </script>

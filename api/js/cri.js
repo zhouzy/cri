@@ -52,14 +52,18 @@
      * @returns {{}}
      */
     cri.getFormValue = function($form){
-        var nameValues = $form.serialize().split(/&/) || [],
-            o = {};
-        for(var i= 0,len=nameValues.length;i<len;i++){
-            var nameValue = nameValues[i].split(/=/);
-            var name = nameValue[0];
-            var value = nameValue[1]
-            o[name] = value;
-        }
+        var o = {};
+        $("input[name],select[name],textarea[name]",$form).each(function(){
+            if($(this).is("[type=checkbox]")){
+                if($(this).prop("checked")) {
+                    o[this.name] = this.value;
+                }
+                else{
+                    return true;
+                }
+            }
+            o[this.name] = this.value;
+        });
         return o;
     };
 
@@ -89,28 +93,80 @@
         }
     };
 
+    cri.isLeapYear = function(year){
+        return (0==year%4&&((year%100!=0)||(year%400==0)));
+    }
+
+    /**
+     * 日期格式化
+     * 格式 YYYY/yyyy/YY/yy 表示年份
+     * MM/M 月份
+     * W/w 星期
+     * dd/DD/d/D 日期
+     * hh/HH/h/H 时间
+     * mm/m 分钟
+     * ss/SS/s/S 秒
+     */
+    cri.formatDate = function(date,formatStr){
+        var str    = formatStr,
+            year   = date.getFullYear(),
+            month  = date.getMonth()+1,
+            day    = date.getDate(),
+            hour   = date.getHours(),
+            minute = date.getMinutes(),
+            second = date.getSeconds();
+
+        str=str.replace(/yyyy|YYYY/,year);
+        str=str.replace(/yy|YY/,(year % 100)>9?(year % 100).toString():'0' + (year % 100));
+
+        str=str.replace(/MM/,month>9?month.toString():'0' + month);
+        str=str.replace(/M/g,month);
+
+        str=str.replace(/dd|DD/,day>9?day.toString():'0' + day);
+        str=str.replace(/d|D/g,day);
+
+        str=str.replace(/hh|HH/,hour>9?hour.toString():'0' + hour);
+        str=str.replace(/h|H/g,hour);
+
+        str=str.replace(/mm/,minute>9?minute.toString():'0' + minute);
+        str=str.replace(/m/g,minute);
+
+        str=str.replace(/ss|SS/,second>9?second.toString():'0' + second);
+        str=str.replace(/s|S/g,second);
+        return str;
+    }
+
+    /**
+     *把日期分割成数组
+     */
+    cri.date2Array = function(myDate){
+        var myArray = Array();
+        myArray[0] = myDate.getFullYear();
+        myArray[1] = myDate.getMonth();
+        myArray[2] = myDate.getDate();
+        myArray[3] = myDate.getHours();
+        myArray[4] = myDate.getMinutes();
+        myArray[5] = myDate.getSeconds();
+        return myArray;
+    };
+
+    /**
+     * 字符串转成日期类型
+     * 格式 MM/dd/YYYY MM-dd-YYYY YYYY/MM/dd YYYY-MM-dd
+     */
+    cri.StringToDate  = function(DateStr){
+        var converted = Date.parse(DateStr);
+        var myDate = new Date(converted);
+        if (isNaN(myDate))
+        {
+            var arys= DateStr.split('-');
+            myDate = new Date(arys[0],--arys[1],arys[2]);
+        }
+        return myDate;
+    }
 }(window);
 
-/*=====================================================================================
- * easy-bootstrap-公用方法 v2.0
- *
- * @author:niyq
- * @date:2013/09/05
- * @dependce:jquery
- *=====================================================================================*/
- function isArray(value){
-	if (value instanceof Array ||
-	(!(value instanceof Object) &&
-	(Object.prototype.toString.call((value)) == '[object Array]') ||
-	typeof value.length == 'number' &&
-	typeof value.splice != 'undefined' &&
-	typeof value.propertyIsEnumerable != 'undefined' &&
-	!value.propertyIsEnumerable('splice'))) {
-		return 'array';
-	}else{
-		return typeof value;
-	}
- }
+
 /**
  * Author zhouzy
  * Date   2014/10/14
@@ -139,7 +195,7 @@
      * @private
      */
     Widgets.prototype._initOptions = function(options) {
-        this.options = $.extend({}, this.options, options);
+        this.options = $.extend(true,{}, this.options, options);
     };
 
     /**
@@ -153,6 +209,16 @@
      * @private
      */
     Widgets.prototype._eventListen = function(){};
+
+    /**
+     * 销毁组件
+     * @private
+     */
+    Widgets.prototype._destory = function(){
+        var $element = this.$element;
+        var $warpper = $element.parent();
+        $warpper.after($element).remove();
+    };
 
     cri.Widgets = Widgets;
 }(window);
@@ -246,7 +312,7 @@
 
     /**
      * 表格默认属性
-     * @type {{url: null, param: {}, title: null, toolbar: null, columns: null, rows: null, onClick: null, onDblClick: null, rowNum: boolean, checkBox: boolean, onChecked: null, pagination: boolean, page: number, pageSize: number, total: number, ajaxDone: null, ajaxError: null}}
+     * @type {{url: null, param: {}, title: null, toolbar: null, columns: null, rows: null, onChange: null, onDblClick: null, rowNum: boolean, checkBox: boolean, onChecked: null, pagination: boolean, page: number, pageSize: number, total: number, ajaxDone: null, ajaxError: null}}
      * @private
      */
     var _defaultOptions = {
@@ -264,10 +330,10 @@
 
         ajaxDone:null,
         ajaxError:null,
-        onChecked:null, //每行checkbox被选中时触发回调函数,当该回调函数返回,参数row,rowid
-        onClick:null,   //行点击时触发
-        onDblClick:null,
-        onLoad:null     //构造表格结束时触发
+        onChange:null,    //行点击时触发
+        onDblClick:null, //双击行时触发
+        onSelected:null, //当选择一行或者多行时触发
+        onLoad:null      //构造表格结束时触发
     };
 
     var Grid = cri.Widgets.extend(function(element,options){
@@ -280,7 +346,7 @@
         this.pager       = null;
         this.$title      = null;
         this._columns    = [];
-        this.selectedRow = null;
+        this.selectedId  = [];
         this._gridClassName = this._gridClassName || "datagrid";
         cri.Widgets.apply(this,arguments);
     });
@@ -296,16 +362,13 @@
                     $(".grid-head-wrap",that.$gridhead).scrollLeft($(this).scrollLeft());
                 })
                 .on('click', "tr", function(e){
+                    $("input[type=checkbox]",that.$gridhead).prop("checked",false);
                     that._setSelected(e);
+                    that.options.onChange && that.options.onChange.call(that);
                 })
                 .on('dblclick', "tr", function(e){
                     that._onDblClickRow(e);
-                })
-                .on("change", "input[type=checkbox]",function(e){
-                    that._checkbox(e);
-
                 });
-
             $(document).on("mouseup",function(e){
                 that.$gridhead.css("cursor","");
                 $(document).off("mousemove");
@@ -313,38 +376,45 @@
 
             this.$gridhead
                 .on('mousedown',".drag-line",function(e){
+                    that.$gridhead.css("cursor","e-resize");
                     var dragLineIndex = 0;
                     op.rowNum && dragLineIndex++;
                     op.checkBox && dragLineIndex++;
                     dragLineIndex += $(this).data("drag");
-                    var $td = $("td:eq("+ dragLineIndex +")",that.$gridhead);
-                    that.$gridhead.css("cursor","e-resize");
+                    var $col = $("col:eq("+ dragLineIndex +")",that.$gridhead);
                     dragStartX = e.pageX;
                     $(document).on("mousemove",function(e){
                         var px = e.pageX - dragStartX;
-                        var width = $td.width() + px;
+                        var width = +$col.width() + px;
                         var tableWidth = $("table",that.$gridhead).width();
                         dragStartX = e.pageX;
                         console.log(width);
                         if(width >= _cellMinW){
                             $("table",that.$gridbody).width(tableWidth + px);
                             $("table",that.$gridhead).width(tableWidth + px);
-                            $td.width(width);
-                            $("tr:eq(0) td:eq("+ dragLineIndex +")",that.$gridbody).width(width);
+                            $("col:eq("+ dragLineIndex +")",that.$gridhead).width(width);
+                            $("col:eq("+ dragLineIndex +")",that.$gridbody).width(width);
                         }
                     });
-
                 })
                 .on('click',"input[type=checkbox]",function(e){
                     var isChecked = $(e.target).prop("checked");
+                    if(isChecked){
+                        that.selectedId = [];
+                        $("tr",that.$gridbody).each(function(){
+                            var $tr = $(this);
+                            that.selectedId.push($tr.data("rowid"));
+                            $tr.addClass("selected");
+                            $('input[type=checkbox]',$tr).prop("checked",isChecked);
+                        });
+                    }else{
+                        that.selectedId = [];
+                        $("tr",that.$gridbody).removeClass("selected");
+                    }
                     $("input[type=checkbox]",that.$gridbody).each(function(){
                         $(this).prop("checked",isChecked);
                     });
-                    if(isChecked && op.onChecked){
-                        for(var i=0;i<op.rows.length;i++){
-                            op.onChecked(op.rows[i],i);
-                        }
-                    }
+                    op.onChange && op.onChange.call(that);
                 });
         },
 
@@ -356,6 +426,7 @@
             if(this.options.onLoad && typeof(this.options.onLoad) === 'function'){
                 this.options.onLoad.call(this);
             }
+            this._colsWidth();
         },
 
         _createGrid:function(){
@@ -460,6 +531,7 @@
                 if(op.checkBox){
                     $tr.append($("<td></td>").addClass("line-checkbox").append('<input type="checkbox"/>'));
                 }
+
                 if(op.rowNum){
                     $tr.append($("<td></td>").addClass("line-number").append(lineNum));
                 }
@@ -558,15 +630,10 @@
                     that._refreshBody(that.$gridbody);
                 },
                 error: function(XMLHttpRequest, textStatus, errorThrown){
-                    //TODO: warming developer
-                    console && console.error(XMLHttpRequest.readyState + XMLHttpRequest.status + XMLHttpRequest.responseText);
                     op.rows = [];
                     op.total = 0;
                     that.pager && that.pager.update(op.page,op.pageSize,op.total,op.rows.length);
                     that._refreshBody(that.$gridbody);
-                },
-                complete:function(){
-                    //TODO:clear all resource if necessary
                 },
                 data:op.param,
                 dataType:"JSON",
@@ -575,26 +642,57 @@
             return result;
         },
 
-        _checkbox:function(e){
-            var op = this.options;
-            var isChecked = $(e.target).prop("checked");
-            var rowid = $(e.target).closest("tr").data("rowid");
-            if(isChecked && op.onChecked){
-                op.onChecked(this._getRowDataById(rowid),rowid);
+        /**
+         * 当用户点击选中行时触发onSelected事件
+         * 当options.checkbox=true为多选,否则为单选
+         * @param e
+         * @private
+         */
+        _setSelected:function(e){
+            var item  = $(e.target).closest("tr"),
+                rowId = item.data('rowid');
+
+            if(!this.options.checkBox){
+                if(item.hasClass("selected")){
+                    this.selectedId = [];
+                    item.removeClass("selected");
+                }else{
+                    this.selectedId = this.selectedId || [];
+                    $("tr.selected",this.$gridbody).removeClass("selected");
+                    item.addClass("selected");
+                    this.selectedId = [rowId];
+                }
+            }
+            else{
+                if(item.hasClass("selected")){
+                    var index = $.inArray(rowId,this.selectedId);
+                    index >= 0 && this.selectedId.splice(index,1);
+                    item.removeClass("selected");
+                    $("input[type=checkbox]",item).prop("checked",false);
+                }else{
+                    this.selectedId = this.selectedId || [];
+                    item.addClass("selected");
+                    this.selectedId.push(rowId);
+                    if(this.options.checkBox){
+                        $("input[type=checkbox]",item).prop("checked",true);
+                    }
+                }
+            }
+            if(this.selectedId && this.selectedId.length){
+                this.options.onSelected && this.options.onSelected.call(this);
             }
         },
 
-        _setSelected:function(e){
-            var item = $(e.target).closest("tr"),
-                rowid = item.data('rowid');
-            $("tr",this.$gridbody).toggleClass("selected",false);
-            this.selectedRow = this._getRowDataById(rowid);
-            item.toggleClass("selected");
-//            var $checkbox = $("input[type=checkbox]",item);
-//            $checkbox.prop("checked",true);
-            if(this.options.onClick){
-                this.options.onClick.call(this,this.selectedRow);
-            }
+        /**
+         * 根据td计算col的宽度
+         * @private
+         */
+        _colsWidth:function(){
+            var that = this;
+            $("tr:eq(0) td",this.$gridhead).each(function(index){
+                $('col:eq('+ index +')',that.$gridbody).width($(this).width() + 2*4);
+                $('col:eq('+ index +')',that.$gridhead).width($(this).width() + 2*4);
+            });
         },
 
         _getRowDataById:function(rowid){
@@ -606,15 +704,15 @@
                 ,item = $(e.target).closest("tr")
                 ,rowid = item.data('rowid')
                 ,that = this;
-            this.selectedRow = this._getRowDataById(rowid);
+            this.selectedId = [rowid];
             if(op.onDblClick){
-                op.onDblClick(that.selectedRow);
+                op.onDblClick();
             }
         },
 
         reload:function(param){
             param && (this.options.param = param);
-            this.selectedRow = null;
+            this.selectedId = [];
             this._getData();
         },
 
@@ -625,18 +723,12 @@
             }
         },
 
-        getMulSelected:function(){
-            var mulSelectRow = [],
-                that = this;
-            $("tr input[type='checkbox']:checked",this.$gridbody).each(function(){
-                var rowid = $(this).closest("tr").data("rowid");
-                mulSelectRow.push(that._getRowDataById(rowid));
-            });
-            return mulSelectRow;
-        },
-
         getSelected:function(){
-            return this.selectedRow;
+            var selected = [];
+            for(var i=0; i<this.selectedId.length;i++){
+                selected.push(this._getRowDataById(this.selectedId[i]));
+            }
+            return selected;
         }
 
     });
@@ -657,6 +749,7 @@
         $   = window.jQuery;
 
     var _defaultOptions = {
+        text:"",
         iconCls:null,
         onClick:null,//button={iconCls:"",handler:""}
         enable:true
@@ -687,14 +780,11 @@
 
             var $button = this.$button = $e.parent();
             var $icon = $('<i class="' + op.iconCls + '"></i>');
-            $button.append($icon, $e.text());
+            var text = op.text || $e.text() || $e.val();
+            $button.append($icon, text);
             $button.on("click",function(){
-                op.onClick.call();
+                op.onClick && op.onClick.call();
             });
-        },
-
-        _destory:function(){
-
         }
     });
 
@@ -734,11 +824,11 @@
     $.fn.datagrid = function(option) {
         var datagrid = null;
         this.each(function () {
-            var $this   = $(this),
-                dg      = $this.data('datagrid'),
+            var $this = $(this),
+                dg    = $this.data('datagrid'),
             options = typeof option == 'object' && option;
             if(dg != null){
-                dg.$grid.before($this).remove();
+                dg._distory();
             }
             $this.data('datagrid', (datagrid = new DataGrid(this, options)));
         });
@@ -746,120 +836,6 @@
     };
 
 }(window);
-
-/*=====================================================================================
- * easy-bootstrap-floatContainer01 v2.0
- * 
- * @author:niyq
- * @date:2013/08/22
- * @dependce:jquery
- *=====================================================================================*/
-!function($){
-
-    "use strict";
-
-    var FloatContainer01 = function(element,dataOptions){
-        var thisObject = this;
-        this.$element = $(element);
-        this.dataOptions = $.extend({}, $.fn.floatContainer01.defaults, dataOptions);
-        this.title = this.$element.attr("title");
-        this.id = this.$element.attr("id");
-        this.init();
-    };
-
-    FloatContainer01.prototype.init = function(){
-        var thisObject = this;
-        thisObject.$element.append('<div style="clear:both"></div>');
-    };
-
-    $.fn.floatContainer01 = function (option,param) {
-        var result = null;
-        var thisObj = this.each(function () {
-            var $this = $(this)
-                , thisObject = $this.data('floatContainer01')
-                , dataOptions = typeof option == 'object' && option;
-            if(typeof option == 'string' ){
-                result = thisObject[option](param);
-            }else{
-                $this.data('floatContainer01', (thisObject = new FloatContainer01(this, dataOptions)));
-            }
-        });
-        if(typeof option == 'string' )return result;
-        return thisObj;
-    };
-
-    $.fn.floatContainer01.defaults = {
-
-    };
-
-    $(window).on('load', function(){
-        $(".eb_floatContainer01").each(function () {
-            var thisObj = $(this)
-                , dataOptionsStr = thisObj.data('options');
-            if(!dataOptionsStr)
-                thisObj.floatContainer01($.fn.floatContainer01.defaults);
-            else
-                thisObj.floatContainer01((new Function("return {" + dataOptionsStr + "}"))());
-        });
-    });
-}(window.jQuery);
-
-/*=====================================================================================
- * easy-bootstrap-floatContainer02 v2.0
- * 
- * @author:niyq
- * @date:2013/08/22
- * @dependce:jquery
- *=====================================================================================*/
-!function($){
-
-    "use strict";
-
-    var FloatContainer02 = function(element,dataOptions){
-        var thisObject = this;
-        this.$element = $(element);
-        this.dataOptions = $.extend({}, $.fn.floatContainer02.defaults, dataOptions);
-        this.title = this.$element.attr("title");
-        this.id = this.$element.attr("id");
-        this.init();
-    };
-
-    FloatContainer02.prototype.init = function(){
-        var thisObject = this;
-        thisObject.$element.append('<div style="clear:both"></div>');
-    };
-
-    $.fn.floatContainer02 = function (option,param) {
-        var result = null;
-        var thisObj = this.each(function () {
-            var $this = $(this)
-                , thisObject = $this.data('floatContainer02')
-                , dataOptions = typeof option == 'object' && option;
-            if(typeof option == 'string' ){
-                result = thisObject[option](param);
-            }else{
-                $this.data('floatContainer02', (thisObject = new FloatContainer02(this, dataOptions)));
-            }
-        });
-        if(typeof option == 'string' )return result;
-        return thisObj;
-    };
-
-    $.fn.floatContainer02.defaults = {
-
-    };
-
-    $(window).on('load', function(){
-        $(".eb_floatContainer02").each(function () {
-            var thisObj = $(this)
-                , dataOptionsStr = thisObj.data('options');
-            if(!dataOptionsStr)
-                thisObj.floatContainer02($.fn.floatContainer02.defaults);
-            else
-                thisObj.floatContainer02((new Function("return {" + dataOptionsStr + "}"))());
-        });
-    });
-}(window.jQuery);
 
 
 /*=====================================================================================
@@ -1044,773 +1020,6 @@
     });
 }(window.jQuery);
 
-
-/*=====================================================================================
- * easy-bootstrap-form v2.0
- *
- * @author:niyq
- * @date:2013/08/22
- * @dependce:jquery
- *=====================================================================================*/
-!function($){
-
-    "use strict";
-
-    var Form = function(element,dataOptions){
-        var thisObject = this;
-        this.$element = $(element);
-        this.dataOptions = $.extend({}, $.fn.form.defaults, dataOptions);
-        this.title = this.$element.attr("title");
-        this.id = this.$element.attr("id");
-        this.init();
-    };
-
-    Form.prototype.init = function(){
-        var thisObject = this;
-        var formPanel = $('body').get(0);
-        if(this.dataOptions.ajax == true){//----------------------------------------------------------ajax-----------------------------------------------------------
-            $('body').append(formPanel = $('<iframe src="ajaxFileUpload.html" id="ajaxFileUploadTest"></iframe>'));
-            var myWindow = formPanel.get(0).contentWindow;
-            myWindow.onload = function(){
-                formPanel = myWindow.$('#eb_ajaxFileUploadFormPanel').get(0);
-                $(formPanel).append(thisObject.realFormObj = $('<form class="eb_realForm" style="display:none" id="eb_form_'+thisObject.id+'"></form>'));                   //realFormObj
-                thisObject.realFormObj.attr('action',thisObject.dataOptions.action).attr('method',thisObject.dataOptions.method);
-                var fileUploadArr = thisObject.$element.find('.eb_fileUpload');
-                if(fileUploadArr.length > 0){
-                    fileUploadArr.each(function(){
-                        $(this).fileUpload('initInForm',thisObject.realFormObj);
-                    });
-                    thisObject.realFormObj.attr('enctype','multipart/form-data');
-                }
-                var nameValueArr = {};
-                thisObject.$element.find('[name]').each(function(){
-                    var name = $(this).attr('name');
-                    var value = $(this).attr('value');
-                    if($(this).val())
-                        value = $(this).val();
-                    if(!nameValueArr[name]){
-                        nameValueArr[name] = value;
-                    }else{
-                        nameValueArr[name] = nameValueArr[name] + "," + value;
-                    }
-                });
-                for(var index in nameValueArr){
-                    if(thisObject.realFormObj.find('[name="'+index+'"]').length<=0){
-                        thisObject.realFormObj.append($('<input type="hidden" name="'+index+'" value="'+nameValueArr[index]+'" />'));
-                    }
-                }
-            };
-            //formPanel = myWindow.document.getElementById('eb_ajaxFileUploadFormPanel');
-        }else{ //-------------------------------------------------------------------------------------------------------------------------------------------------------------
-            $(formPanel).append(thisObject.realFormObj = $('<form class="eb_realForm" style="display:none" id="eb_form_'+thisObject.id+'"></form>'));                   //realFormObj
-            this.realFormObj.attr('action',thisObject.dataOptions.action).attr('method',thisObject.dataOptions.method);
-            var fileUploadArr = this.$element.find('.eb_fileUpload');
-            if(fileUploadArr.length > 0){
-                fileUploadArr.each(function(){
-                    $(this).fileUpload('initInForm',thisObject.realFormObj);
-                });
-                thisObject.realFormObj.attr('enctype','multipart/form-data');
-            }
-            var nameValueArr = {};
-            this.$element.find('[name]').each(function(){
-                var name = $(this).attr('name');
-                var value = $(this).attr('value');
-                if($(this).val())
-                    value = $(this).val();
-                if(!nameValueArr[name]){
-                    nameValueArr[name] = value;
-                }else{
-                    nameValueArr[name] = nameValueArr[name] + "," + value;
-                }
-            });
-            for(var index in nameValueArr){
-                if(thisObject.realFormObj.find('[name="'+index+'"]').length<=0){
-                    thisObject.realFormObj.append($('<input type="hidden" name="'+index+'" value="'+nameValueArr[index]+'" />'));
-                }
-            }
-        }
-    };
-
-    Form.prototype.submit = function(param){
-        var thisObject = this;
-        if(param && param.type && (param.type == "get" || param.type == "post")){
-            this.realFormObj.attr("action",type);
-        }
-        var valueArr = this.getValue();
-        for(var index in valueArr){
-            var value = valueArr[index];
-            if(value && isArray(value)=="array"){
-                var newValue = value[0];
-                for(var i = 1;i<value.length;i++){
-                    newValue = newValue + "," + value[i];
-                }
-                value = newValue;
-            }
-            thisObject.realFormObj.find('[name="'+index+'"]').each(function(){
-                $(this).val(value);
-            });
-        }
-        if(param && param.action){
-            this.realFormObj.attr("action",param.action);
-        }
-        this.realFormObj.submit();
-    }
-
-    Form.prototype.getValue = function(){
-        var result = {};
-        var requiredFailArr = [];
-        this.$element.find("div[name]").each(function(){
-            var thisObj = this;
-            if($(this).attr("class") == "eb_inputGroup"){
-                var checkResult = $(this).input('check');
-                if(checkResult.result == true){
-                    if(!result[$(thisObj).attr("name")] && result[$(thisObj).attr("name")]!=""){
-                        result[$(thisObj).attr("name")] = $(thisObj).input("getValue");
-                    }else if(isArray(result[$(thisObj).attr("name")])!='array'){
-                        var value1 = result[$(thisObj).attr("name")];
-                        result[$(thisObj).attr("name")] = [];
-                        result[$(thisObj).attr("name")].push(value1);
-                        result[$(thisObj).attr("name")].push($(thisObj).input("getValue"));
-                    }else if(isArray(result[$(thisObj).attr("name")])=='array'){
-                        result[$(thisObj).attr("name")].push($(thisObj).input("getValue"));
-                    }
-                }else{
-                    if(checkResult.required == 'fail'){
-                        requiredFailArr.push($(thisObj).find('.eb_title').html());
-                    }
-                }
-            }else if($(this).attr("class") == "eb_timeInputGroup"){
-                var checkResult = $(this).timeInput('check');
-                if(checkResult.result == true){
-                    if(!result[$(thisObj).attr("name")] && result[$(thisObj).attr("name")]!=""){
-                        result[$(thisObj).attr("name")] = $(thisObj).timeInput("getValue");
-                    }else if(isArray(result[$(thisObj).attr("name")])!='array'){
-                        var value1 = result[$(thisObj).attr("name")];
-                        result[$(thisObj).attr("name")] = [];
-                        result[$(thisObj).attr("name")].push(value1);
-                        result[$(thisObj).attr("name")].push($(thisObj).timeInput("getValue"));
-                    }else if(isArray(result[$(thisObj).attr("name")])=='array'){
-                        result[$(thisObj).attr("name")].push($(thisObj).timeInput("getValue"));
-                    }
-                }else{
-                    if(checkResult.required == 'fail'){
-                        requiredFailArr.push($(thisObj).find('.eb_title').html());
-                    }
-                }
-            }else if($(this).attr("class") == "eb_selectBoxGroup"){
-                //result[$(thisObj).attr("name")] = $(thisObj).selectBox("getValue");
-                var checkResult = $(this).selectBox('check');
-                if(checkResult.result == true){
-                    if(!result[$(thisObj).attr("name")] && result[$(thisObj).attr("name")]!=""){
-                        result[$(thisObj).attr("name")] = $(thisObj).selectBox("getValue");
-                    }else if(isArray(result[$(thisObj).attr("name")])!='array'){
-                        var value1 = result[$(thisObj).attr("name")];
-                        result[$(thisObj).attr("name")] = [];
-                        result[$(thisObj).attr("name")].push(value1);
-                        result[$(thisObj).attr("name")].push($(thisObj).selectBox("getValue"));
-                    }else if(isArray(result[$(thisObj).attr("name")])=='array'){
-                        result[$(thisObj).attr("name")].push($(thisObj).selectBox("getValue"));
-                    }
-                }else{
-                    if(checkResult.required == 'fail'){
-                        requiredFailArr.push($(thisObj).find('.eb_title').html());
-                    }
-                }
-            }else if($(this).attr("class") == "eb_textareaGroup"){
-                //result[$(thisObj).attr("name")] = $(thisObj).textarea("getValue");
-                var checkResult = $(this).textarea('check');
-                if(checkResult.result == true){
-                    if(!result[$(thisObj).attr("name")] && result[$(thisObj).attr("name")]!=""){
-                        result[$(thisObj).attr("name")] = $(thisObj).textarea("getValue");
-                    }else if(isArray(result[$(thisObj).attr("name")])!='array'){
-                        var value1 = result[$(thisObj).attr("name")];
-                        result[$(thisObj).attr("name")] = [];
-                        result[$(thisObj).attr("name")].push(value1);
-                        result[$(thisObj).attr("name")].push($(thisObj).textarea("getValue"));
-                    }else if(isArray(result[$(thisObj).attr("name")])=='array'){
-                        result[$(thisObj).attr("name")].push($(thisObj).textarea("getValue"));
-                    }
-                }else{
-                    if(checkResult.required == 'fail'){
-                        requiredFailArr.push($(thisObj).find('.eb_title').html());
-                    }
-                }
-            }
-        });
-        this.$element.find("input[type='text'],select,textarea,input[type='hidden'],input[type='password']").not(".eb_input,.eb_selectBox,.eb_timeInput,.eb_textarea,.eb_selectBox_hide").each(function(){
-            var thisObj = this;
-            if(!result[$(thisObj).attr("name")] && result[$(thisObj).attr("name")]!=""){
-                result[$(thisObj).attr("name")] = $(thisObj).val();
-            }else if(isArray(result[$(thisObj).attr("name")])!='array'){
-                var value1 = result[$(thisObj).attr("name")];
-                result[$(thisObj).attr("name")] = [];
-                result[$(thisObj).attr("name")].push(value1);
-                result[$(thisObj).attr("name")].push($(thisObj).val());
-            }else if(isArray(result[$(thisObj).attr("name")])=='array'){
-                result[$(thisObj).attr("name")].push($(thisObj).val());
-            }
-        });
-        if(requiredFailArr.length > 0){
-            var msg = '"';
-            for(var i=0;i<requiredFailArr.length;i++){
-                if(i<requiredFailArr.length-1){
-                    msg = msg + requiredFailArr[i] + ",";
-                }else{
-                    msg = msg + requiredFailArr[i] + '"为必填项，请完成填写！';
-                }
-            }
-            alert(msg);
-            return false;
-        }else{
-            return result;
-        }
-    };
-
-    Form.prototype.setValue = function(param){
-        var thisObject = this;
-        for(var i in param){
-            thisObject.$element.find("div[name='"+i+"']").each(function(){
-                var thisObj = this;
-                if($(this).attr("class") == "eb_inputGroup"){
-                    $(thisObj).input("setValue",param[i]);
-                }else if($(this).attr("class") == "eb_selectBoxGroup"){
-                    if(param[i]==""){
-                        $(thisObj).selectBox("clearValue");
-                    }else{
-                        $(thisObj).selectBox("setValue",param[i]);
-                    }
-                }else if($(this).attr("class") == "eb_textareaGroup"){
-                    $(thisObj).textarea("setValue",param[i]);
-                }else if($(this).attr("class") == "eb_timeInputGroup"){
-                    $(thisObj).timeInput("setValue",param[i]);
-                }
-            });
-            thisObject.$element.find("input[name='"+i+"'],select[name='"+i+"'],textarea[name='"+i+"']").each(function(){
-                $(this).val(param[i]);
-            });
-        }
-    };
-
-    Form.prototype.clearValue = function(){
-        var thisObject = this;
-        var param = {};
-        this.$element.find('[name]').each(function(){
-            var thisObj = this;
-            param[$(thisObj).attr("name")] = "";
-        });
-        this.setValue(param);
-    };
-
-    $.fn.form = function (option,param) {
-        var result = null;
-        var thisObj = this.each(function () {
-            var $this = $(this)
-                , thisObject = $this.data('form')
-                , dataOptions = typeof option == 'object' && option;
-            if(typeof option == 'string' ){
-                result = thisObject[option](param);
-            }else{
-                $this.data('form', (thisObject = new Form(this, dataOptions)));
-            }
-        });
-        if(typeof option == 'string' )return result;
-        return thisObj;
-    };
-
-    $.fn.form.defaults = {
-        method:'post',
-        action:'',
-        ajax:false
-    };
-
-    $(window).on('load', function(){
-        $(".eb_form").each(function () {
-            var thisObj = $(this)
-                , dataOptionsStr = thisObj.data('options');
-            if(!dataOptionsStr)
-                thisObj.form($.fn.form.defaults);
-            else
-                thisObj.form((new Function("return {" + dataOptionsStr + "}"))());
-        });
-    });
-}(window.jQuery);
-
-/*=====================================================================================
- * easy-bootstrap-input v2.0
- *
- * @author:niyq
- * @date:2013/08/19
- * @dependce:jquery
- *=====================================================================================*/
-!function($){
-
-    "use strict";
-
-    var Input = function(element,dataOptions){
-        var thisObject = this;
-        this.$element = $(element);
-        this.style = this.$element.attr("style");
-        this.dataOptions = $.extend({}, $.fn.input.defaults, dataOptions);
-        this.value = "";
-        if(this.dataOptions.defaultVal)
-            this.value = this.dataOptions.defaultVal;
-        this.title = "";
-        if(this.$element.attr("title"))
-            this.title = this.$element.attr("title");
-        if(this.dataOptions.title)
-            this.title = this.dataOptions.title;
-        this.id = this.$element.attr("id");
-        this.name = this.$element.attr("name");
-        if(this.$element.attr("placeholder"))
-            this.placeholder = this.$element.attr("placeholder");
-        else
-            this.placeholder = "";
-        this.init();     //初始化inputGroup组件
-        this.setStyle();
-        this.$element.change(function(){
-            thisObject.check();
-        });
-    };
-
-    Input.prototype.hide = function(){
-        this.parentObj.hide();
-    };
-
-    Input.prototype.show = function(){
-        this.parentObj.show();
-    };
-
-    Input.prototype.lengthLimit = function(lengthParam){
-        var thisObject = this;
-        var obj = this.inputObj.get(0);
-        var value;
-        this.inputObj.keypress(function(e){
-            var str = $(this).val();
-            var key = e.which;
-            if(str.length >= lengthParam && key != 8 && key != 0){
-                return false;
-            }else{
-                value = $(this).val();
-            }
-        }).get(0).onpaste=function(e){
-            var str = $(this).val();
-            var key = e.which;
-            if(str.length >= lengthParam && key != 8 && key != 0){
-                return false;
-            }else{
-                value = $(this).val();
-            }
-        };
-        if(typeof obj.oninput != 'undefined'){
-            obj.oninput = function(e){
-                var str = $(this).val();
-                var key = e.which;
-                //alert(str.length);
-                if(str.length > lengthParam){
-                    $(this).val(value);
-                }else{
-                    value = $(this).val();
-                }
-            };
-        }
-        if(typeof obj.onpropertychange != 'undefined'){
-            obj.oninput = function(e){
-                var str = $(this).val();
-                var key = e.which;
-                //alert(str.length);
-                if(str.length > lengthParam){
-                    $(this).val(value);
-                }else{
-                    value = $(this).val();
-                }
-            };
-        }
-    };
-
-    Input.prototype.check = function(){
-        var thisObject = this;
-        var result = {length:0,result:true};
-        var val;
-        if(this.inputObj.is('input'))
-            val = this.inputObj.val();
-        else if(this.inputObj.is('span'))
-            val = this.inputObj.attr("value");
-        if(this.dataOptions.required == true){
-            if(!val){
-                result['required'] = 'fail';
-                result.result = false;
-                result.length++;
-            }
-        }
-        if(this.dataOptions.validtype == 'numOnly'){
-            if(!this.setNumOnly()){
-                result['numOnly'] = 'fail';
-                result.result = false;
-                result.length++;
-                thisObject.setValue(thisObject.value);
-            }else{
-                thisObject.value = thisObject.getValue();
-            }
-        }
-        return result;
-    };
-
-    Input.prototype.setNumOnly = function(){
-        var thisObject = this;
-        if(this.inputObj.is('input')){
-            var reg = new RegExp("^[0-9]*$");
-            if(!reg.test(thisObject.inputObj.val()))
-                return false;
-            else
-                return true;
-        }
-        return true;
-    };
-
-    Input.prototype.getValue = function(){
-        var value = "";
-        if(this.inputObj.is('input')){
-            value = this.inputObj.val();
-        }else if(this.inputObj.is('span')){
-            value = this.inputObj.attr("value");
-        }
-        return value;
-    };
-
-    Input.prototype.setValue = function(value){
-        if(this.inputObj.is("input"))
-            this.inputObj.val(value);
-        else
-            this.inputObj.attr("value",value).html(value);
-        this.parentObj.attr("value",value);
-        if(this.check())
-            this.value = value;
-    };
-
-    Input.prototype.clearValue = function(){
-        this.setValue("");
-    };
-
-    Input.prototype.setStyle = function(){
-        var thisObject = this;
-        this.inputObj.focus(function(){
-            $(this).addClass("focus");
-            if(thisObject.dataOptions.button){
-                thisObject.buttonObj.addClass("focus");
-            }
-        }).blur(function(){
-            $(this).removeClass("focus");
-            if(thisObject.dataOptions.button){
-                thisObject.buttonObj.removeClass("focus");
-            }
-        });
-        if(this.dataOptions.button){
-            this.buttonObj.mouseover(function(){
-                $(this).addClass("mouseover");
-            }).mouseout(function(){
-                $(this).removeClass("mouseover");
-            }).mousedown(function(){
-                $(this).addClass("mousedown");
-            }).mouseup(function(){
-                $(this).removeClass("mousedown");
-            });
-        }
-    };
-
-    Input.prototype.init = function(){
-        var thisObject = this;
-        //this.$element.attr("id","");
-        this.$element.wrap($('<div class="eb_inputGroup" id="'+this.id+'_subgroup" name="'+thisObject.name+'" value="'+thisObject.value+'" data-options="'+thisObject.$element.data("options")+'"></div>'));
-        this.$element.before('<span class="eb_title">'+this.title+'</span>');
-        this.parentObj = this.$element.parent();               //parentObj
-        this.inputObj = this.$element;                //inputObj
-        this.inputObj.val(thisObject.value);
-        if(this.dataOptions.readonly == true){
-            this.inputObj.after($('<span class="eb_input eb_readonly" id="'+thisObject.id+'" name="'+thisObject.name+'" value="'+thisObject.value+'" data-options="'+thisObject.$element.data("options")+'">'+thisObject.value+'</span>'));
-            this.inputObj.remove();
-            this.$element = this.parentObj.children(".eb_input");
-            this.inputObj = this.parentObj.children(".eb_input");           //inputObj
-            this.inputObj.data("input",thisObject);
-        }
-        this.parentObj.data("input",thisObject);
-        this.inputObj.attr("style",thisObject.style);
-        this.titleObj = this.parentObj.find(".eb_title");           //titleObj
-        if(this.dataOptions.required == true){ //如果设定为必填，则显示相应样式
-            this.inputObj.attr("placeholder",thisObject.placeholder+"(必填)");
-            this.parentObj.append('<span class="redStar" style="color:red;">*</span>');
-        }
-        if(this.dataOptions.button){
-            this.button = this.dataOptions.button;
-            if(typeof this.button == "string")
-                this.button = window[thisObject.button];
-            if(typeof thisObject.button.handler == "string")
-                thisObject.button.handler = window[thisObject.button.handler];
-            this.inputObj.before($('<span class="eb_button">'+thisObject.button.text+'</span>').click(thisObject.button.handler));
-            this.buttonObj = this.parentObj.children(".eb_button");        //buttonObj
-            this.buttonObj.mousedown(function(){
-                setTimeout(function(){thisObject.inputObj.get(0).focus();},1);
-            }).click(function(){
-                thisObject.inputObj.get(0).focus();
-            });
-            this.inputObj.css({position:'relative',right:'-1px'});
-        }
-        if(this.dataOptions.lengthLimit){
-            this.lengthLimit(thisObject.dataOptions.lengthLimit);
-        }
-        this.setWidth();
-        this.setHeight();
-        this.setEvent();
-    };
-
-    Input.prototype.setEvent = function(){          //处理绑定事件的方法，包括：onclick,onmousedown,onmouseup,ondblclick,onfocus,onblur,onkeypress,onkeydown,onkeyup,onchange
-        var TIMEOUT = 250;
-        if(this.dataOptions.dblclickTimeSpan)
-            TIMEOUT = this.dataOptions.dblclickTimeSpan;
-        var thisObject = this;
-        var clickTimeoutId = null,mousedownTimeoutId = null,mouseupTimeoutId = null;
-        var clickLock = false,mousedownLock = false,mouseupLock = false;
-        if(this.dataOptions.onclickHandler){             //onclick
-            if(this.dataOptions.ondblclickHandler){
-                if(typeof this.dataOptions.onclickHandler == "string"){
-                    this.inputObj.get(0).onclick = function(){
-                        if(!clickLock){
-                            clickTimeoutId = setTimeout(window[this.dataOptions.onclickHandler],TIMEOUT);
-                            clickLock = true;
-                            setTimeout(function(){clickLock=false;},TIMEOUT);
-                        }
-                    };
-                }else{
-                    this.inputObj.get(0).onclick = function(){
-                        if(!clickLock){
-                            clickTimeoutId = setTimeout(thisObject.dataOptions.onclickHandler,TIMEOUT);
-                            clickLock = true;
-                            setTimeout(function(){clickLock=false;},TIMEOUT);
-                        }
-                    };
-                }
-            }else{
-                if(typeof this.dataOptions.onclickHandler == "string"){
-                    this.inputObj.get(0).onclick = window[this.dataOptions.onclickHandler];
-                }else{
-                    this.inputObj.get(0).onclick = thisObject.dataOptions.onclickHandler;
-                }
-            }
-        }
-        if(this.dataOptions.onmousedownHandler){             //onmousedown
-            if(this.dataOptions.ondblclickHandler){
-                if(typeof this.dataOptions.onmousedownHandler == "string"){
-                    this.inputObj.get(0).onmousedown = function(){
-                        if(!mousedownLock){
-                            mousedownTimeoutId = setTimeout(window[this.dataOptions.onmousedownHandler],TIMEOUT);
-                            mousedownLock = true;
-                            setTimeout(function(){mousedownLock=false;},TIMEOUT);
-                        }
-                    };
-                }else{
-                    this.inputObj.get(0).onmousedown = function(){
-                        if(!mousedownLock){
-                            mousedownTimeoutId = setTimeout(thisObject.dataOptions.onmousedownHandler,TIMEOUT);
-                            mousedownLock = true;
-                            setTimeout(function(){mousedownLock=false;},TIMEOUT);
-                        }
-                    };
-                }
-            }else{
-                if(typeof this.dataOptions.onmousedownHandler == "string"){
-                    this.inputObj.get(0).onmousedown = window[this.dataOptions.onmousedownHandler];
-                }else{
-                    this.inputObj.get(0).onmousedown = thisObject.dataOptions.onmousedownHandler;
-                }
-            }
-        }
-        if(this.dataOptions.onmouseupHandler){             //onmouseup
-            if(this.dataOptions.ondblclickHandler){
-                if(typeof this.dataOptions.onmouseupHandler == "string"){
-                    this.inputObj.get(0).onmouseup = function(){
-                        if(!mouseupLock){
-                            mouseupTimeoutId = setTimeout(window[this.dataOptions.onmouseupHandler],TIMEOUT);
-                            mouseupLock = true;
-                            setTimeout(function(){mouseupLock=false;},TIMEOUT);
-                        }
-                    };
-                }else{
-                    this.inputObj.get(0).onmouseup = function(){
-                        if(!mouseupLock){
-                            mouseupTimeoutId = setTimeout(thisObject.dataOptions.onmouseupHandler,TIMEOUT);
-                            mouseupLock = true;
-                            setTimeout(function(){mouseupLock=false;},TIMEOUT);
-                        }
-                    };
-                }
-            }else{
-                if(typeof this.dataOptions.onmouseupHandler == "string"){
-                    this.inputObj.get(0).onmouseup = window[this.dataOptions.onmouseupHandler];
-                }else{
-                    this.inputObj.get(0).onmouseup = thisObject.dataOptions.onmouseupHandler;
-                }
-            }
-        }
-        if(this.dataOptions.ondblclickHandler){             //ondblclick
-            if(typeof this.dataOptions.ondblclickHandler == "string"){
-                this.inputObj.get(0).ondblclick = function(){
-                    if(clickTimeoutId){
-                        clearTimeout(clickTimeoutId);
-                        clickTimeoutId = null;
-                    }
-                    if(mousedownTimeoutId){
-                        clearTimeout(mousedownTimeoutId);
-                        mousedownTimeoutId = null;
-                    }
-                    if(mouseupTimeoutId){
-                        clearTimeout(mouseupTimeoutId);
-                        mouseupTimeoutId = null;
-                    }
-                    window[thisObject.dataOptions.ondblclickHandler]();
-                };
-            }else{
-                this.inputObj.get(0).ondblclick = function(){
-                    if(clickTimeoutId){
-                        clearTimeout(clickTimeoutId);
-                        clickTimeoutId = null;
-                    }
-                    if(mousedownTimeoutId){
-                        clearTimeout(mousedownTimeoutId);
-                        mousedownTimeoutId = null;
-                    }
-                    if(mouseupTimeoutId){
-                        clearTimeout(mouseupTimeoutId);
-                        mouseupTimeoutId = null;
-                    }
-                    thisObject.dataOptions.ondblclickHandler();
-                };
-            }
-        }
-        if(this.dataOptions.onfocusHandler){                //onfocus
-            if(typeof this.dataOptions.onfocusHandler == "string"){
-                this.inputObj.get(0).onfocus = window[this.dataOptions.onfocusHandler];
-            }else{
-                this.inputObj.get(0).onfocus = this.dataOptions.onfocusHandler;
-            }
-        }
-        if(this.dataOptions.onblurHandler){                //onblur
-            if(typeof this.dataOptions.onblurHandler == "string"){
-                this.inputObj.get(0).onblur = window[this.dataOptions.onblurHandler];
-            }else{
-                this.inputObj.get(0).onblur = this.dataOptions.onblurHandler;
-            }
-        }
-        if(this.dataOptions.onkeypressHandler){                //onkeypress
-            if(typeof this.dataOptions.onkeypressHandler == "string"){
-                this.inputObj.get(0).onkeypress = window[this.dataOptions.onkeypressHandler];
-            }else{
-                this.inputObj.get(0).onkeypress = this.dataOptions.onkeypressHandler;
-            }
-        }
-        if(this.dataOptions.onkeydownHandler){                //onkeydown
-            if(typeof this.dataOptions.onkeydownHandler == "string"){
-                this.inputObj.get(0).onkeydown = window[this.dataOptions.onkeydownHandler];
-            }else{
-                this.inputObj.get(0).onkeydown = this.dataOptions.onkeydownHandler;
-            }
-        }
-        if(this.dataOptions.onkeyupHandler){                //onkeyup
-            if(typeof this.dataOptions.onkeyupHandler == "string"){
-                this.inputObj.get(0).onkeyup = window[this.dataOptions.onkeyupHandler];
-            }else{
-                this.inputObj.get(0).onkeyup = this.dataOptions.onkeyupHandler;
-            }
-        }
-        if(this.dataOptions.onchangeHandler){                //onchange
-            if(typeof this.dataOptions.onchangeHandler == "string"){
-                this.inputObj.get(0).onchange = window[this.dataOptions.onchangeHandler];
-            }else{
-                this.inputObj.get(0).onchange = this.dataOptions.onchangeHandler;
-            }
-        }
-    };
-
-    Input.prototype.setWidth = function(){
-        if(this.dataOptions.width){ //宽度
-            var width = null;
-            if(isNaN(this.dataOptions.width))
-                width = this.dataOptions.width.split("px")[0];
-            else
-                width = this.dataOptions.width;
-            this.parentObj.css("width",width);
-            if(this.dataOptions.button)
-                this.inputObj.width(width-140);
-            else
-                this.inputObj.width(width-80);
-        }
-        if(this.dataOptions.titleWidth || this.dataOptions.titleWidt == 0){
-            var titleWidth = this.dataOptions.titleWidth;
-            if(typeof titleWidth == "string")
-                titleWidth = titleWidth.split("px")[0];
-            var width = this.parentObj.width();
-            var inputWidth = width - titleWidth - 7;
-            if(this.dataOptions.button)
-                inputWidth = inputWidth - 60;
-            this.titleObj.width(titleWidth);
-            this.inputObj.width(inputWidth);
-        }
-    };
-
-    Input.prototype.setHeight = function(){
-        if(this.dataOptions.height){ //高度
-            var height = null;
-            if(isNaN(this.dataOptions.height))
-                height = this.dataOptions.height.split("px")[0];
-            else
-                height = this.dataOptions.height;
-            this.parentObj.css("height",height);
-            this.inputObj.css("height",height-2);
-            this.titleObj.height(height+2).css("line-height",(height+2)+"px");
-            if(this.inputObj.is('span')){
-                this.inputObj.height(height).css("line-height",(height)+"px");
-            }
-            if(this.buttonObj)
-                this.buttonObj.height(height).css("line-height",(height)+"px");
-        }
-    };
-
-    $.fn.input = function (option,param) {
-        var result = null;
-        var thisObj = this.each(function () {
-            var $this = $(this)
-                , thisObject = $this.data('input')
-                , dataOptions = typeof option == 'object' && option;
-            if(typeof option == 'string' ){
-                result = thisObject[option](param);
-            }else{
-                $this.data('input', (thisObject = new Input(this, dataOptions)));
-            }
-        });
-        if(typeof option == 'string' )return result;
-        return thisObj;
-    };
-
-    $.fn.input.defaults = {
-        required:false,
-        dblclickTimeSpan:250,
-        width:250,
-        height:20,
-        titleWidth:73,
-        readonly:false
-    };
-
-    $(window).on('load', function(){
-        $(".eb_input").each(function () {
-            var thisObj = $(this)
-                , dataOptionsStr = thisObj.data('options');
-            if(!dataOptionsStr)
-                thisObj.input($.fn.input.defaults);
-            else
-                thisObj.input((new Function("return {" + dataOptionsStr + "}"))());
-        });
-    });
-}(window.jQuery);
-
-
 /**
  * Author zhouzy
  * Date   2014/9/18
@@ -1827,7 +1036,11 @@
     var _defaultOptions = {
         label:null,
         button:null,//button={iconCls:"",handler:""}
-        value:null
+        value:null,
+        readonly:false,
+        onFocus:null,
+        onBlur:null,
+        onClick:null
     };
 
     var INPUT_GROUP = "input-group",
@@ -1850,30 +1063,101 @@
         },
 
         _createInputGroup:function(){
-            var op = this.options,
-                label = op.label || "",
-                $label = $('<label></label>').text(label),
+            var $element = this.$element;
+            $element.wrap('<div class="'+ INPUT_GROUP + '"></div>');
+            this.$inputGroup = $element.parent();
+            this._wrapInput();
+            this.$input.before(this._label());
+        },
+
+        _wrapInput:function(){
+            var that = this,
+                op   = that.options,
                 $input = this.$element;
 
-            $input.wrap('<div class="'+ INPUT_GROUP + '"></div>');
-            if(op.value != null){
-                $input.val(op.value);
+            if(op.readonly){
+                $input = this._readonlyInput($input);
             }
-            var $inputGroup = $input.parent();
-            this.$inputGroup = $inputGroup;
+            else{
+                $input.on("focus",function(){
+                    that.options.onFocus && that.options.onFocus.call(that);
+                }).blur(function(){
+                    that.options.onBlur && that.options.onBlur.call(that);
+                });
+            }
+
+            op.button && $input.after(this._button()) && $input.addClass(WITH_BTN);
+
+            this.$input = $input;
+
+            if(op.value != null){
+                this._setValue(op.value)
+            }
+        },
+
+        /**
+         * 返回包装 readonly input
+         * @param $element
+         * @private
+         */
+        _readonlyInput:function($element){
+            var that = this,
+                $input = $('<span class="readonly" role="readonly">'+this.$element.val()+'</span>');
+            $input.on("click",function(){
+                that.options.onFocus && that.options.onFocus.call(that);
+            }).blur(function(){
+                that.options.onBlur && that.options.onBlur.call(that);
+            });
+            this.$element.attr("readonly",true).hide().after($input);
+            return $input;
+        },
+
+        _button:function(){
+            var op    = this.options,
+                $icon = null;
             if(op.button){
-                var $icon = $('<i class="' + INPUT_BTN + " " + op.button.iconCls + '"></i>').on("click",function(){
+                $icon = $('<i class="' + INPUT_BTN + " " + op.button.iconCls + '"></i>').on("click",function(){
                     op.button.handler.call();
                 });
-                $inputGroup.append($icon);
-                $input.addClass(WITH_BTN);
             }
-            $inputGroup.prepend($label);
+            return $icon;
+        },
+
+        _label:function(){
+            var label = this.options.label ||
+                this.$element.data("label") ||
+                this.$element.attr("title") ||
+                this.$element.attr("name") ||
+                "";
+            return $('<label></label>').text(label);
         },
 
         _destory:function(){
             var $input = this.$element;
             this.$inputGroup.replaceWith($input);
+        },
+
+        _setValue:function(value){
+            if(this.$input.is("input")){
+                this.$input.val(value);
+            }else{
+                this.$element.val(value);
+                this.$input.text(value);
+                this.$element.trigger("change");
+            }
+        },
+
+        _getValue:function(){
+            return this.$element.val();
+        },
+
+        value:function(value){
+            if(arguments.length>0){
+                this._setValue(value)
+            }
+            else{
+                return this._getValue();
+            }
         }
     });
     cri.Input = Input;
@@ -2005,269 +1289,70 @@
 
 }(window.jQuery);
 
-
-/*=====================================================================================
- * easy-bootstrap-messager v1.0
+/**
+ * Author zhouzy
+ * Date   2014/10/14
+ * notification 组件
  *
- * @author:zhouzy
- * @date:2013/10/18
- * @dependce:jquery
- *=====================================================================================*/
-!function($){
-    var Messager = function(){
-        this.messagerQueue = [];
-        var that = this;
-        window.MessagerOkBtn = function(){
-            $("#EASYBOOTSTARPMSGWND").popoutWindow("hide");
-            $("#EASYBOOTSTARPMSGWND").html("");
-            var msg = that.messagerQueue.pop();
-            if(msg.length == 3){
-                msg[2](true);
-            }
-        };
-        window.MessagerCancelBtn = function(){
-            $("#EASYBOOTSTARPMSGWND").popoutWindow("hide");
-            $("#EASYBOOTSTARPMSGWND").html("");
-            var msg = that.messagerQueue.pop();
-            if(msg.length == 3){
-                msg[2](false);
-            }
-        };
-        window.MessagerCloseBtn = function(){
-            $("#EASYBOOTSTARPMSGWND").popoutWindow("hide");
-            $("#EASYBOOTSTARPMSGWND").html("");
-            var msg = that.messagerQueue.pop();
-            if(msg.length == 3){
-                msg[2](false);
-            }
-        };
+ */
+!function(window){
+
+    var cri = window.cri,
+        $   = window.jQuery;
+
+    var Notification = function(){
+
     };
-    Messager.prototype = {
-        alert:function(title,content,iconSty){
-            this.messagerQueue.push(arguments);
-            var id = "EASYBOOTSTARPMSGWND";
-            $("#EASYBOOTSTARPMSGWND").length > 0 || $("body").append("<div class=\"eb_popoutWindow\" id=\"" + id + "\"></div>");
-            var $wnd = $("#EASYBOOTSTARPMSGWND");
-            $wnd.html(content);
-            $wnd.popoutWindow({
-                title:title,
-                buttons:[
-                    {text:'确定',icon:'eb_iconOK',handler:'MessagerOkBtn'}
-                ],
-                width:500,
-                height:300,
-                left:440,
-                top:100
-            });
-            $wnd.popoutWindow("show");
+
+    Notification.prototype={
+        _notiBody:function(type,message){
+            var that = this;
+            var icons = {success:"fa-exclamation",error:"fa-exclamation",warming:"fa-exclamation"};
+            if(this.$notification && this.$notification.length){
+                this._hide(this.$notification);
+            }
+            var $notification = this.$notification = $('<div class="notification ' + type + '"></div>'),
+                $icon = $('<i class="icon fa ' + icons[type]+ '"></i>'),
+                $message = $('<span class="message">' + message + '</span>'),
+                $btn = $('<i class="btn fa fa-close"></i>').on("click",function(){
+                    that._hide($notification);
+                });
+            $notification.append($icon,$message,$btn);
+            $('body').append($notification);
+            that._show();
+            window.setTimeout(function(){
+                that._hide($notification);
+            },1000*5);
         },
-        confirm:function(title,content,callBack){
-            this.messagerQueue.push(arguments);
-            var id = "EASYBOOTSTARPMSGWND";
-            $("#EASYBOOTSTARPMSGWND").length > 0 || $("body").append("<div class=\"eb_popoutWindow\" id=\"" + id + "\"></div>");
-            var $wnd = $("#EASYBOOTSTARPMSGWND");
-            $wnd.html(content);
-            $wnd.popoutWindow({
-                title:title,
-                buttons:[
-                    {text:'确定',icon:'eb_iconOK',handler:'MessagerOkBtn'},
-                    {text:'取消',icon:'eb_iconCancel',handler:'MessagerCancelBtn'}
-                ],
-                width:500,
-                height:300,
-                left:440,
-                top:100
+
+        _hide:function($notification){
+            $notification.animate({
+                height:"hide"
+            },function(){
+                $notification.remove();
             });
-            $wnd.popoutWindow("show");
-        }
-    };
-    $.messager = new Messager();
-}(jQuery);
+        },
 
+        _show:function(){
+            this.$notification.animate({
+                height:"show"
+            });
+        },
 
-
-/*=====================================================================================
- * easy-bootstrap-msgWindow v2.0
- *
- * @author:niyq
- * @date:2013/09/05
- * @dependce:jquery
- *=====================================================================================*/
-!function($){
-
-    "use strict";
-
-    var MsgWindow = function(element,dataOptions){
-        var thisObject = this;
-        this.$element = $(element);
-        this.dataOptions = $.extend({}, $.fn.msgWindow.defaults, dataOptions);
-        this.title = "系统消息";
-        if(this.$element.attr("title"))
-            this.title = this.$element.attr("title");
-        if(this.dataOptions.title)
-            this.title = this.dataOptions.title;
-        this.id = this.$element.attr("id");
-        if(!this.$element.attr("class") || this.$element.attr("class").indexOf("inited")<0){
-            this.init();
-        }
-    };
-
-    MsgWindow.prototype.refreshInit = function(param){
-        var thisObject = this;
-        this.dataOptions = $.extend(thisObject.dataOptions,param);
-        if(param && param.html){
-            this.html(param.html);
-        }
-        if(param && param.width){
-            this.setWidth(param.width);
-        }
-        if(param && param.height){
-            this.setHeight(param.height);
+        error:function(message){
+            this._notiBody("error",message);
+        },
+        warming:function(message){
+            this._notiBody("warming",message);
+        },
+        success:function(message){
+            this._notiBody("success",message);
         }
     }
 
-    MsgWindow.prototype.init = function(){
-        var thisObject = this;
-        this.windowObj = this.$element;                                 //windowObj
-        if(!this.windowObj.attr("class") || this.windowObj.attr("class").indexOf("eb_msgWindow")<0){
-            this.windowObj.addClass("eb_msgWindow");
-        }
-        this.windowObj.addClass('inited');
-        this.windowObj.wrap($('<div class="eb_msgWindowGroup"></div>'));
-        this.parent = this.windowObj.parent();                            //parent
-        this.parent.prepend($('<span class="eb_title">'+thisObject.title+'</span><span class="eb_closeMsgWindowBtn">x</span>'));
-        this.titleObj = this.parent.children(".eb_title");              //titleObj
-        this.closeBtnObj = this.parent.children(".eb_closeMsgWindowBtn");     //closeBtnObj
-        this.closeBtnObj.mouseover(function(){
-            $(this).addClass("mouseover");
-        }).mouseout(function(){
-            $(this).removeClass("mouseover");
-        }).click(function(){
-            thisObject.hide();
-        });
-        if(this.dataOptions && this.dataOptions.html){
-            this.windowObj.html(thisObject.dataOptions.html);
-        }
-        this.setWidth();
-        this.setHeight();
-    };
+    cri.notification = new Notification();
 
-    MsgWindow.prototype.html = function(html){
-        this.$element.html(html);
-    }
-
-    MsgWindow.prototype.show = function(){
-        var thisObject = this;
-        clearTimeout(thisObject.autoHideTimeoutId);
-        this.parent.fadeIn(300);
-        if(this.dataOptions.autoHide == true){
-            var time = this.dataOptions.autoHideTime;
-            this.autoHideTimeoutId = setTimeout(function(){thisObject.parent.fadeOut(300)},time);
-        }
-    }
-
-    MsgWindow.prototype.hide = function(){
-        this.parent.hide();
-    }
-
-    MsgWindow.prototype.remove = function(){
-        this.parent.remove();
-    }
-
-    MsgWindow.prototype.setWidth = function(widthParam){
-        var width = this.dataOptions.width;
-        if(widthParam)
-            width = widthParam;
-        if(typeof width == "string")
-            width = width.split("px")[0];
-        this.parent.width(width);
-        this.windowObj.width(width-22);
-        this.titleObj.width(width-1);
-    }
-
-    MsgWindow.prototype.setHeight = function(heightParam){
-        var height = this.dataOptions.height;
-        if(heightParam)
-            height = heightParam;
-        if(typeof height == "string")
-            height = height.split("px")[0];
-        this.parent.height(height);
-        this.windowObj.height(height-46);
-    }
-
-    $.msgWindow = function(msg,title,url,param){
-        var obj;
-        var result;
-        if(!title)
-            title = "系统消息";
-        if(url)
-            $('body').prepend(obj = $('<div class="eb_msgWindow" data-options="title:\''+title+'\'"><a href="'+url+'">'+msg+'</a></div>'));
-        else
-            $('body').prepend(obj = $('<div class="eb_msgWindow" data-options="title:\''+title+'\'">'+msg+'</div>'));
-        var str = "title:'"+title+"',";
-        var strArr = [];
-        for(var i in param){
-            strArr.push(i);
-        }
-        for(var i=0;i<strArr.length;i++){
-            if(i<strArr.length-1){
-                str = str + strArr[i] + ":" + param[strArr[i]] + ",";
-            }else{
-                str = str + strArr[i] + ":" + param[strArr[i]];
-            }
-        }
-        obj.data("options",str);
-        obj.each(function(){
-            var thisObj = $(this)
-                , dataOptionsStr = thisObj.data('options');
-            if(!dataOptionsStr)
-                result = thisObj.msgWindow($.fn.msgWindow.defaults);
-            else
-                result = thisObj.msgWindow((new Function("return {" + dataOptionsStr + "}"))());
-        });
-        obj.msgWindow('show');
-        return result;
-    };
-
-    $.fn.msgWindow = function (option,param) {
-        var result = null;
-        var thisObj = this.each(function () {
-            var $this = $(this)
-                , thisObject = $this.data('msgWindow')
-                , dataOptions = typeof option == 'object' && option;
-            if(typeof option == 'string' ){
-                result = thisObject[option](param);
-            }else{
-                if(!thisObject){
-                    $this.data('msgWindow', (thisObject = new MsgWindow(this, dataOptions)));
-                }else{
-                    thisObject.refreshInit(option);
-                }
-            }
-        });
-        if(typeof option == 'string' )return result;
-        return thisObj;
-    };
-
-    $.fn.msgWindow.defaults = {
-        width:220,
-        height:150,
-        autoHide:false,
-        autoHideTime:5000
-    };
-
-    $(window).on('load', function(){
-        $(".eb_msgWindow").not(".inited").each(function () {
-            var thisObj = $(this)
-                , dataOptionsStr = thisObj.data('options');
-            if(!dataOptionsStr)
-                thisObj.msgWindow($.fn.msgWindow.defaults);
-            else
-                thisObj.msgWindow((new Function("return {" + dataOptionsStr + "}"))());
-        });
-    });
-}(window.jQuery);
-
+}(window);
 /**
  * Author zhouzy
  * Date   2014/9/18
@@ -2450,349 +1535,6 @@
     });
     cri.Pager = Pager;
 }(window);
-
-/*=====================================================================================
- * easy-bootstrap-panel v2.0
- *
- * @author:niyq
- * @date:2013/08/22
- * @dependce:jquery
- *=====================================================================================*/
-!function($){
-
-    "use strict";
-
-    var Panel = function(element,dataOptions){
-        var thisObject = this;
-        this.$element = $(element);
-        this.dataOptions = $.extend({}, $.fn.panel.defaults, dataOptions);
-        this.title = '';
-        if(this.$element.attr('title'))
-            this.title = this.$element.attr("title");
-        if(this.dataOptions.title)
-            this.title = this.dataOptions.title;
-        this.id = this.$element.attr("id");
-        this.init();
-    };
-
-    Panel.prototype.init = function(){
-        var thisObject = this;
-        this.$element.wrap($('<div class="eb_panelGroup"></div>'));
-        this.parent = this.$element.parent();                                                    //parent
-        this.parent.data('panel',thisObject.$element.data('panel'));
-        this.parent.data('options',thisObject.$element.data('options'));
-        this.parent.prepend($('<div class="eb_panelTitleBar">'+thisObject.title+'</div>'));
-        this.titleBarObj = this.parent.children('.eb_panelTitleBar');                             //titleBarObj
-        this.setWidth();
-        this.setHeight();
-    };
-
-    Panel.prototype.setWidth = function(widthParam){
-        var width = 600;
-        if(this.$element.css('width'))
-            width = this.$element.css('width');
-        if(this.dataOptions.width)
-            width = this.dataOptions.width;
-        if(widthParam)
-            width = widthParam;
-        if(typeof width == 'string')
-            width = width.split('px')[0];
-        this.parent.width(width);
-        this.$element.width(width-2);
-        this.titleBarObj.width(width-2);
-    }
-
-    Panel.prototype.setHeight = function(heightParam){
-        var height = 80;
-        if(this.$element.css('height'))
-            height = this.$element.css('height');
-        if(this.dataOptions.height)
-            height = this.dataOptions.height;
-        if(heightParam)
-            height = heightParam;
-        if(typeof height == 'string')
-            height = height.split('px')[0];
-        this.parent.height(height);
-        this.$element.height(height-26);
-    }
-
-    $.fn.panel = function (option,param) {
-        var result = null;
-        var thisObj = this.each(function () {
-            var $this = $(this)
-                , thisObject = $this.data('panel')
-                , dataOptions = typeof option == 'object' && option;
-            if(typeof option == 'string' ){
-                result = thisObject[option](param);
-            }else{
-                $this.data('panel', (thisObject = new Panel(this, dataOptions)));
-            }
-        });
-        if(typeof option == 'string' )return result;
-        return thisObj;
-    };
-
-    $.fn.panel.defaults = {
-        width:600,
-        height:80
-    };
-
-    $(window).on('load', function(){
-        $(".eb_panel").each(function () {
-            var thisObj = $(this)
-                , dataOptionsStr = thisObj.data('options');
-            if(!dataOptionsStr)
-                thisObj.panel($.fn.panel.defaults);
-            else
-                thisObj.panel((new Function("return {" + dataOptionsStr + "}"))());
-        });
-    });
-}(window.jQuery);
-/*=====================================================================================
- * easy-bootstrap-popoutWindow v2.0
- *
- * @author:niyq
- * @date:2013/08/22
- * @dependce:jquery
- *=====================================================================================*/
-!function($){
-
-    "use strict";
-
-    var PopoutWindow = function(element,dataOptions){
-        var thisObject = this;
-        this.$element = $(element);
-        this.dataOptions = $.extend({}, $.fn.popoutWindow.defaults, dataOptions);
-        this.title = this.dataOptions.title || this.$element.attr("title") || "";
-        this.id = this.$element.attr("id");
-        this.funcArr = {};
-        this.init();     //初始化popoutWindowGroup组件
-    };
-
-    PopoutWindow.prototype.init = function(){
-        var thisObject = this;
-        this.$element.wrap('<div class="eb_popoutWindowGroup" id="'+thisObject.id+'_subgroup"></div>');
-        this.parent = this.$element.parent();      //parent
-        this.parent.data("popoutWindow",thisObject);
-        if(thisObject.$element.data("form"))
-            this.parent.data("form",thisObject.$element.data("form"));
-        this.popoutWindowObj = this.$element;     //popoutWindowObj
-        this.parent.prepend('<div class="eb_title">'+thisObject.title+'<span class="eb_closeWindowButton">x</span></div>');
-        this.titleObj = this.parent.children('.eb_title');    //titleObj
-        if(this.dataOptions.closeHandler){
-            var func = this.dataOptions.closeHandler;
-            if(typeof func == "string")
-                func = window[func];
-            thisObject.titleObj.find('.eb_closeWindowButton').click(function(){
-                func();
-            });
-        }
-        this.parent.append('<div class="eb_buttonsBar"></div>');
-        this.buttonsBar = this.parent.children('.eb_buttonsBar');       //buttonsBar
-        this.buttonsArr = this.dataOptions.buttons;
-        if(typeof this.buttonsArr == "string"){
-            this.buttonsArr = window[thisObject.buttonsArr];
-        }                                                   //buttonsArr
-        if(thisObject.buttonsArr){
-            for(var i=0;i<thisObject.buttonsArr.length;i++){
-                var button = thisObject.buttonsArr[i];
-                var func = button.handler;
-                typeof func == "string" && (func = window[func]);
-                thisObject.funcArr[i] = func;
-                var $button = $('<span class="eb_buttons" funcIndex="'+i+'"></span>');
-                button.icon && $button.append('<i class="eb_icon '+button.icon+'"></i>');
-                $button.append(button.text);
-                $button.on("click",function(){
-                    var thisObj = this;
-                    thisObject.funcArr[$(thisObj).attr("funcIndex")]();
-                });
-                this.buttonsBar.prepend($button);
-            }
-        }
-        this.buttonsObj = this.buttonsBar.children('.eb_buttons');     //buttonsObj
-        if(this.dataOptions.fullScreen){
-            this.setFullScreen();
-        }else{
-            this.setWidth();
-            this.setHeight();
-        }
-        this.setPosition();
-        this.setStyle();
-    };
-
-    PopoutWindow.prototype.show = function(url){
-        var thisObject = this;
-        if(this.parent.css("display") == 'none'){
-            if(this.popoutWindowObj.children("iframe.eb_iframe").length<=0 && (url || this.dataOptions.url || this.popoutWindowObj.attr("url") || this.popoutWindowObj.children("div.eb_iframe").length>0)){
-                this.src = "";
-                if(this.popoutWindowObj.children("div.eb_iframe").length>0)
-                    this.src = this.popoutWindowObj.children("div.eb_iframe").attr("src");
-                if(this.popoutWindowObj.attr("url"))
-                    this.src = this.popoutWindowObj.attr("url");
-                if(this.dataOptions.url)
-                    this.src = this.dataOptions.url;
-                if(url)
-                    this.src = url;
-                var html = '<iframe id="eb_iframe_'+this.id+'" class="eb_iframe" src="'+this.src+'" style="margin:auto" ></iframe>';
-                this.popoutWindowObj.html(html);
-                this.iframeObj = this.popoutWindowObj.children("iframe.eb_iframe");      //iframeObj
-                this.iframeObj.width(thisObject.popoutWindowObj.width()-5).height(thisObject.popoutWindowObj.height()-5);
-            }else if(this.popoutWindowObj.children("iframe.eb_iframe").length>0){
-                if(url)
-                    this.src = url;
-                var html = '<iframe id="eb_iframe_'+this.id+'" class="eb_iframe" src="'+this.src+'" style="margin:auto" ></iframe>';
-                this.popoutWindowObj.html(html);
-                this.iframeObj = this.popoutWindowObj.children("iframe.eb_iframe");      //iframeObj
-                this.iframeObj.width(thisObject.popoutWindowObj.width()-5).height(thisObject.popoutWindowObj.height()-5);
-            }
-            this.parent.parent().prepend('<div id="maskX" style="display: none"></div>');
-            $("#maskX").css({"opacity":"0.3", "display":"block", "position":"absolute", "background-color":"#fff", "z-index":11})
-                .width(document.body.clientWidth)
-                .height(document.body.clientHeight);
-            this.setPosition();
-            this.parent.show();
-        }
-    };
-
-    PopoutWindow.prototype.hide = function(){
-        this.parent.hide();
-        $("#maskX").remove();
-    };
-
-    PopoutWindow.prototype.setPosition = function(param){
-        if(this.dataOptions.fullScreen != true){
-            var top = $.fn.popoutWindow.defaults.top;
-            var left = $.fn.popoutWindow.defaults.left;
-            if(this.dataOptions.top)
-                top = this.dataOptions.top;
-            if(typeof top == "string")
-                top = top.split("px")[0];
-            top = top + $(window).scrollTop();
-            if(this.dataOptions.left)
-                left = this.dataOptions.left;
-            if(typeof left == "string")
-                left = left.split("px")[0];
-            if(param){
-                if(param.top){
-                    if(typeof param.top == "string")
-                        top = param.top.split("px")[0];
-                    else
-                        top = param.top;
-                }
-                if(param.left){
-                    if(typeof param.left == "string")
-                        left = param.left.split("px")[0];
-                    else
-                        left = param.left;
-                }
-            }
-            this.parent.css("top",top+"px").css("left",left+"px");
-        }
-    };
-
-    PopoutWindow.prototype.setFullScreen = function(){
-        var width = $(window).width();
-        if(typeof width == "string")
-            width = width.split("px")[0];
-        var height = $(window).height();
-        if(typeof height == "string")
-            height = height.split("px")[0];
-        this.parent.css("top",0).css("left",0);
-        this.setWidth(width);
-        this.setHeight(height);
-        this.parent.css("border-radius","0");
-    };
-
-    PopoutWindow.prototype.setWidth = function(widthParam){
-        if(this.dataOptions.width){
-            var width = this.dataOptions.width;
-            if(widthParam)
-                width = widthParam;
-            if(typeof width == "string")
-                width = width.split("px")[0];
-            this.parent.width(width);
-            this.titleObj.width(width);
-            this.popoutWindowObj.width(width);
-            this.buttonsBar.width(width);
-        }
-    };
-
-    PopoutWindow.prototype.setHeight = function(heightParam){
-        if(this.dataOptions.height){
-            var height = this.dataOptions.height;
-            if(heightParam)
-                height = heightParam;
-            if(typeof height == "string")
-                height = height.split("px")[0];
-            this.parent.height(height);
-            this.popoutWindowObj.height(height-61);
-            this.buttonsBar.css("top",height-30+"px");
-        }
-    };
-
-    PopoutWindow.prototype.setStyle = function(){
-        var thisObject = this;
-        this.buttonsObj.each(function(){
-            $(this).mouseover(function(){
-                $(this).addClass("mouseover");
-            }).mouseout(function(){
-                $(this).removeClass("mouseover");
-            }).mousedown(function(){
-                $(this).addClass("mousedown");
-            }).mouseup(function(){
-                $(this).removeClass("mousedown");
-            });
-        });
-        this.titleObj.find(".eb_closeWindowButton").mouseover(function(){
-            $(this).addClass("mouseover");
-        }).mouseout(function(){
-            $(this).removeClass("mouseover");
-        }).click(function(){
-            thisObject.parent.hide();
-            $("#maskX").remove();
-        });
-    };
-
-    $.fn.popoutWindow = function (option,param) {
-        var result = null;
-        var thisObj = this.each(function () {
-            var $this = $(this)
-                , thisObject = $this.data('popoutWindow')
-                , dataOptions = typeof option == 'object' && option;
-            if(typeof option == 'string' ){
-                result = thisObject[option](param);
-            }else{
-                if(thisObject){
-
-                }else{
-                    $this.data('popoutWindow', (thisObject = new PopoutWindow(this, dataOptions)));
-                }
-            }
-        });
-        if(typeof option == 'string' )return result;
-        return thisObj;
-    };
-
-    $.fn.popoutWindow.defaults = {
-        required:false,
-        dblclickTimeSpan:250,
-        top:30,
-        left:60
-    };
-
-    $(window).on('load', function(){
-        $(".eb_popoutWindow").each(function () {
-            var thisObj = $(this)
-                , dataOptionsStr = thisObj.data('options');
-            if(!dataOptionsStr)
-                thisObj.popoutWindow($.fn.popoutWindow.defaults);
-            else
-                thisObj.popoutWindow((new Function("return {" + dataOptionsStr + "}"))());
-        });
-    });
-}(window.jQuery);
-
-
 /**
  * Author zhouzy
  * Date   2014/9/18
@@ -2806,6 +1548,13 @@
     var cri = window.cri,
         $   = window.jQuery;
 
+    var SELECTBOX_GROUP = "selectBox-group",
+        SELECTBOX_BODY  = "selectBox-body",
+        SELECTBOX_INPUT = "selectBox-input",
+        SELECTBOX_BTN   = "fa fa-caret-down",
+        OPTIONS  = "options",
+        SELECTED = "selected";
+
     var _defaultOptions = {
         label:''
         ,data:null//Array [{value:"",text:""},{value:"",text:""}]
@@ -2815,16 +1564,6 @@
         ,change:null//Function: call back after select option
     };
 
-    var SELECTBOX_GROUP = "selectBox-group",
-        SELECTBOX_BODY  = "selectBox-body",
-        SELECTBOX_INPUT = "selectBox-input",
-        SELECTBOX_BTN   = "selectBox-btn",
-        OPTIONS  = "options",
-        SELECTED = "selected";
-
-    /**
-     * TODO:1.增加级联下拉框特性
-     */
     var SelectBox = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
         this.$selectBoxGroup = null;
@@ -2846,86 +1585,35 @@
         _create:function(){
             this.$element.hide();
             this.$element.wrap('<span class="' + SELECTBOX_GROUP + '"></span>');
-            var $selectBoxGroup = this.$selectBoxGroup = this.$element.parent();
-            $selectBoxGroup.append('<label>' + this.options.label + '</label>');
-            $selectBoxGroup.append(this._createBody(),this._createOptions())
+            this.$selectBoxGroup = this.$element.parent();
+            this._createInput();
+            this._createListView();
         },
 
-        _createBody:function(){
-            var $selectBody = $('<span class="' + SELECTBOX_BODY + '"></span>'),
-                $selectInput = this.$selectBoxInput = $('<span class="' + SELECTBOX_INPUT + '"></span>'),
-                $btn = $('<i class="' + SELECTBOX_BTN +' fa fa-caret-down"></i>');
-            $selectBody.append($selectInput,$btn);
-            $selectBody.on("click",this._toggleOptions());
-            return $selectBody;
-        },
+        _createInput:function(){
+            var that = this,
+                button = {iconCls:SELECTBOX_BTN,handler:function(){
+                    that.listView.toggle();
+                }};
 
-        /**
-         * 初始化下拉选择框
-         * @returns {*|HTMLElement}
-         * @private
-         */
-        _createOptions:function(){
-            var data = this._data();
-            var $options = this.$selectBoxOptions = $('<ul class="' + OPTIONS + '"></ul>').hide();
-            if(data){
-                for(var i = 0,len = data.length; i<len; i++){
-                    $options.append(this._createOption(data[i]));
+            this.input = new cri.Input(this.$element,{
+                readonly:true,
+                value:this.$element.find("option:selected").text(),
+                button:button,
+                onFocus:function(){
+                    that.listView.toggle();
                 }
-            }
-            return $options;
+            });
         },
 
-        /**
-         * 构造单个option
-         * @param option
-         * @private
-         */
-        _createOption:function(option){
-            var $li = $('<li></li>').text(option.text),
-                that = this;
-            $li.on("click",function(e){
-                if(!$li.is("." + SELECTED)){
-                    $("li."+SELECTED,that.$selectBoxOptions).removeClass(SELECTED);
-                    $li.addClass(SELECTED);
-                    that._select(option.text,option.value);
-                    that.options.change && that.options.change.call(that);
-                }
-            })
-            .on("click",that._toggleOptions());
-            return $li;
-        },
-
-        /**
-         * 显示隐藏切换options选择框
-         * @private
-         */
-        _toggleOptions:function(){
+        _createListView:function(){
             var that = this;
-            return function(){
-                that.$selectBoxOptions.animate({
-                    height:'toggle'
-                },200,function(){
-                    if(!that.$selectBoxOptions.is(":hidden")){
-                        that._clickBlank();
-                    }
-                });
-                return false;
-            };
-        },
-
-        /**
-         * 当在非本元素范围内点击，收缩下拉框
-         * @private
-         */
-        _clickBlank:function(){
-            var that = this;
-            $(document).mouseup(function(e) {
-                var _con = that.$selectBoxGroup;
-                if (!_con.is(e.target) && _con.has(e.target).length === 0) {
-                    that.$selectBoxOptions.animate({
-                        height:'hide'
-                    },200);
+            this.listView = new ListView(this.$selectBoxGroup,{
+                data:that._data(),
+                value:that.$element.val(),
+                onChange:function(value,text){
+                    that.$element.val(value);
+                    that.input.value(text);
                 }
             });
         },
@@ -2949,22 +1637,6 @@
             }
             this.options.data = data;
             return data;
-        },
-
-        /**
-         * 单击option触发
-         * @param e
-         * @private
-         */
-        _select:function(text,value){
-            //TODO:原来元素必须为select
-            var $select = this.$element;
-            if($select.is("select")){
-                $select.val(value);
-            }
-            this.$selectBoxInput.text(text);
-            this._text = text;
-            this._value = value;
         },
 
         /**
@@ -3006,6 +1678,119 @@
         }
     });
 
+    var ListView = function($parent,options){
+        this.options = $.extend({
+            data:[],
+            onChange:null
+        },options);
+        this.$options = null;
+        this.$parent = $parent;
+        this.value = options.value;//下拉框初始值
+        this._init();
+        this.text = null;
+    };
+
+    ListView.prototype = {
+        /**
+         * 初始化下拉选择框
+         * @returns {*|HTMLElement}
+         * @private
+         */
+        _init:function(){
+            var data = this.options.data;
+            var $options = this.$options = $('<ul class="' + OPTIONS + '"></ul>').hide();
+            if(data){
+                for(var i = 0,len = data.length; i<len; i++){
+                    $options.append(this._createOption(data[i]));
+                }
+            }
+            this.$parent.append($options);
+        },
+
+        /**
+         * 构造单个option
+         * @param option
+         * @private
+         */
+        _createOption:function(option){
+            var $li = $('<li></li>').text(option.text),
+                that = this;
+            $li.on("click",function(){
+                if(!$li.is("." + SELECTED)){
+                    $("li."+SELECTED,that.$options).removeClass(SELECTED);
+                    $li.addClass(SELECTED);
+                    that.text = option.text;
+                    that.value = option.value;
+                    that._change();
+                }
+                that.toggle();
+            });
+            that.value == option.value && $li.addClass(SELECTED);
+            return $li;
+        },
+
+        /**
+         * 显示隐藏切换options选择框
+         * @private
+         */
+        toggle:function(){
+            var that = this;
+            this.$options.animate({
+                    height:'toggle'
+                },200,function(){
+                    if(!that.$options.is(":hidden")){
+                        that._clickBlank();
+                    }
+                });
+        },
+
+        /**
+         * 当在非本元素范围内点击，收缩下拉框
+         * @private
+         */
+        _clickBlank:function(){
+            var that = this;
+            $(document).mouseup(function(e) {
+                var _con = that.$parent;
+                if (!_con.is(e.target) && _con.has(e.target).length === 0) {
+                    that.$options.animate({
+                        height:'hide'
+                    },200);
+                }
+            });
+        },
+
+        /**
+         * 获取options定义
+         * 1.初始化时定义
+         * 2.原始select元素options获取
+         * @private
+         */
+        _data:function(){
+            var data = this.options.data;
+            if(!data){
+                data = [];
+                $("option",this.$element).each(function(){
+                        var text = $(this).text();
+                        var value = this.value;
+                        data.push({text:text,value:value});
+                    }
+                );
+            }
+            this.options.data = data;
+            return data;
+        },
+
+        /**
+         * 单击option触发
+         * @param e
+         * @private
+         */
+        _change:function(){
+            this.options.onChange && this.options.onChange.call(this,this.value,this.text);
+        }
+    };
+
     cri.SelectBox = SelectBox;
 
     $.fn.selectBox = function(option) {
@@ -3014,7 +1799,9 @@
             var $this = $(this),
                 options = typeof option == 'object' && option;
             o = $this.data('selectBox');
-            if(o != null){}
+            if(o != null){
+                o._destory();
+            }
             $this.data('selectBox', (o = new SelectBox(this, options)));
         });
         return o;
@@ -3816,444 +2603,352 @@
  * @date:2013/09/05
  * @dependce:jquery
  *=====================================================================================*/
-!function($){
+!function(window){
 
     "use strict";
 
-    var TimeInput = function(element,dataOptions){
-        this.$element = $(element);
-        this.$element.keypress(function(){
-            return false;
-        }).val("");
-        this.dataOptions = $.extend({}, $.fn.timeInput.defaults, dataOptions);
-        this.name = this.$element.attr("name");
-        this.id = this.$element.attr("id");
-        this.thisYear = new Date().getFullYear();
-        this.thisMonth = new Date().getMonth()+1;
-        if(this.thisMonth<10)
-            this.thisMonth = "0"+this.thisMonth;
-        this.today = new Date().getDate();
-        this.year = new Date().getFullYear();
-        this.month = new Date().getMonth()+1;
-        if(this.month<10)
-            this.month = "0"+this.month;
-        this.monthArr = new Array();
-        this.ifEnable = true;
-        this.value = "";
-        this.id = this.$element.attr("id");
-        this.timeBoxId = "timeBox_"+this.id;
-        this.title = "时间";
-        if(this.$element.attr("title"))
-            this.title = this.$element.attr("title");
-        if(this.dataOptions.title)
-            this.title = this.dataOptions.title;
-        this.init();
+    var cri = window.cri,
+        $   = window.jQuery;
 
-    };//Timeinput
+    var TIME_INPUT_GROUP = "eb_timeInputGroup",
+        TIME_BOX         = "eb_timeBox",
+        TIME_INPUT_ICON  = "fa fa-table";
 
-    TimeInput.prototype.enabled = function(){
-        this.ifEnable = true;
+    function getDate(yyyy,MM,dd,HH,mm,ss){
+        var date = new Date();
+        date.setFullYear(yyyy);
+        date.setMonth(MM);
+        date.setDate(dd);
+        date.setHours(HH);
+        date.setMinutes(mm);
+        date.setSeconds(ss);
+        return date;
+    }
+
+    /**
+     * 获取某年的月份数组
+     * @param year
+     * @returns {number[]}
+     */
+    function getMonthArr (year){
+        if(cri.isLeapYear(year))
+            return [31,29,31,30,31,30,31,31,30,31,30,31];
+        else
+            return [31,28,31,30,31,30,31,31,30,31,30,31];
+    }
+
+
+    var _defaultOptions = {
+        value:null,
+        format:"yyyy/MM/dd",
+        HMS:false
     };
 
-    TimeInput.prototype.disabled = function(){
-        this.ifEnable = false;
+    var TimeInput = cri.Widgets.extend(function(element,options){
+        if(!options.HMS && options.format){
+            options.format = options.format.replace(/\s*[Hh].*$/,"");
+        }
+        this.options = _defaultOptions;
+        this.date  = null;
+        this.input = null;
+        this.selectView = null;
+        cri.Widgets.apply(this,arguments);
+    });
+
+    TimeInput.prototype._init = function(){
+        var $element = this.$element.attr("role","timeInput");
+        $element.wrap('<div class="'+TIME_INPUT_GROUP+'"></div>');
+        this.$timeInputGroup = $element.parent();
+        this.date = this.options.value || new Date();
+        this._wrapInput();
+        this._timeSelectView();
     };
 
-    TimeInput.prototype.setWidth = function(widthParam){
-        var width = this.dataOptions.width;
-        if(widthParam)
-            width = widthParam;
-        if(typeof width == "string")
-            width = width.split("px")[0];
-        this.parent.width(width);
-        this.inputObj.width(width-85);
-        if(this.dataOptions.titleWidth || this.dataOptions.titleWidth == 0){
-            var titleWidth = this.dataOptions.titleWidth;
-            if(typeof titleWidth == "string")
-                titleWidth = titleWidth.split("px")[0];
-            titleWidth = titleWidth - 1;
-            var inputWidth = width - titleWidth - 13;
-            this.inputObj.width(inputWidth);
-            this.titleObj.width(titleWidth);
+    /**
+     * 生成Input
+     * @private
+     */
+    TimeInput.prototype._wrapInput = function(){
+        var that = this,
+            value = this.date,
+            button = {iconCls:TIME_INPUT_ICON,handler:function(){
+                that.selectView.toggle();
+            }};
+
+        this.input = new cri.Input(this.$element,{readonly:true,value:cri.formatDate(value,this.options.format),button:button,onFocus:function(){
+            that.selectView.toggle();
+        }});
+    };
+
+    /**
+     * 日期选择下拉面板
+     * @private
+     */
+    TimeInput.prototype._timeSelectView = function(){
+        var that = this,
+            date = this.date;
+        this.selectView = new TimeSelectView(this.$timeInputGroup,{
+            value:date,
+            HMS:this.options.HMS,
+            onChange:function(){
+                that.date = this.getDate();
+                that.input.value(cri.formatDate(that.date,that.options.format));
+            }
+        });
+    };
+
+    /**
+     * 设置值
+     * @private
+     */
+    TimeInput.prototype._setValue = function(value){
+        this.date = value;
+        this.input.value(cri.formatDate(value,this.options.format));
+        this.selectView.setDate(value);
+    };
+
+    TimeInput.prototype.value = function(value){
+        if(value == undefined){
+            return this.date;
+        }
+        else{
+            this._setValue(value);
         }
     };
 
-    TimeInput.prototype.setHeight = function(heightParam){
-        var height = this.dataOptions.height;
-        if(heightParam)
-            height = heightParam;
-        if(typeof height == "string")
-            height = height.split("px")[0];
-        this.parent.height(height);
-        this.parent.css("line-height",height+"px");
-        this.inputObj.height(height-2);
-        this.inputObj.css("line-height",(height-2)+"px");
-        this.titleObj.height(height);
-        this.titleObj.css("line-height",height+"px");
+    var TimeSelectView = function($parent,options){
+        this.$parent = $parent;
+        this.$timeBox = null;
+        this.$daySelect = null;
+        var date = new Date();
+        this.options = $.extend({
+            HMS:false,
+            onChange:null,
+            date:{
+                yyyy:date.getFullYear(),
+                MM:date.getMonth(),
+                dd:date.getDate(),
+                HH:date.getHours(),
+                mm:date.getMinutes(),
+                ss:date.getSeconds(),
+                ww:date.getDay()
+            }
+        },options);
+        this._create($parent);
     };
 
-    TimeInput.prototype.init = function(){
-        var thisObject = this;
-        if(this.dataOptions.required == true){
-            this.$element.attr("placeholder",thisObject.$element.attr("placeholder")+" (必填)");
-        }
-        this.inputObj = this.$element;                 //inputObj
+    TimeSelectView.prototype = {
+        /**
+         * 生成时间选择下拉面板
+         * @returns {*|HTMLElement}
+         * @private
+         */
+        _create:function($parent){
+            var $timeBox = this.$timeBox = $('<div class="' + TIME_BOX + '"></div>');
+            var $titleBar = $('<div class="eb_titleBar"></div>');
+            $titleBar.append(this._yearSelect(),this._monthSelect(),'<span style="position:absolute;top:5px;right:23px;">月</span>');
+            $timeBox.append($titleBar,this._daySelect());
+            if(this.options.HMS == true){
+                $timeBox.append(this._hmsSelect());
+            }
+            $parent.append($timeBox);
+        },
 
-        this.inputObj.wrap($("<div class=\"eb_timeInputGroup\"></div>"));
-        this.parent = this.inputObj.parent();                       //parent
-        this.parent.data("timeInput",thisObject);
-        this.parent.attr("name",thisObject.name).attr("id",thisObject.id + "_subgroup");
-        this.parent.data("options",thisObject.$element.data("options"));
-        if(this.dataOptions && this.dataOptions.defaultVal){
-            this.inputObj.val(thisObject.dataOptions.defaultVal);
-            this.parent.attr("value",thisObject.dataOptions.defaultVal);
-        }
-        this.parent.prepend($('<span class="eb_title">'+thisObject.title+'</span>'));
-        this.titleObj = this.parent.children(".eb_title");        //titleObj
-        if(this.dataOptions && this.dataOptions.required == true){
-            this.parent.append('<span class="redStar" style="color:red;">*</span>');
-        }
-        this.setWidth();
-        this.setHeight();
-        var html = "";
-        html = html + '<div class="eb_timeBox" id="'+this.timeBoxId+'"></div>';
-        var timeBoxArea = $(".eb_timeBoxArea");               //timeBoxArea
-        if(timeBoxArea.length <= 0){
-            $("body").prepend('<div class="eb_timeBoxArea"></div>');
-            timeBoxArea = $(".eb_timeBoxArea");
-        }
-        timeBoxArea.append(html);
-        this.timeBoxObj = $("#" + thisObject.timeBoxId);
-        $("#"+this.timeBoxId).append('<div class="eb_titleBar"></div>');
-        this.titleBarObj = this.timeBoxObj.find(".eb_titleBar");
-        html = "";
-        html = html + '<div class="eb_yearSelecter"><span class="eb_toLastYear eb_yearButton">－</span><span class="eb_year">'+this.year+'</span>&nbsp;年<span class="eb_toNextYear eb_yearButton">＋</span></div>';
-        $("#"+this.timeBoxId).find(".eb_titleBar").append(html); //写入年份选择组件
-        $("#"+this.timeBoxId).find(".eb_yearButton").each(function(){ //年份增减按钮样式控制
-            var thisObj = this;
-            $(thisObj).mouseover(function(){
-                $(thisObj).addClass("mouseover");
-            }).mouseout(function(){
-                $(thisObj).removeClass("mouseover");
-            }).mousedown(function(){
-                $(thisObj).addClass("mousedown");
-            }).mouseup(function(){
-                $(thisObj).removeClass("mousedown");
+        _yearSelect : function(){
+            var that = this;
+            var date = this.options.date;
+            var $yearSelect = $('<div class="eb_yearSelecter"></div>');
+            var $minusBtn   = $('<i class="eb_toLastYear eb_yearButton fa fa-minus"></i>');
+            var $plusBtn    = $('<i class="eb_toNextYear eb_yearButton fa fa-plus"></i>');
+            var $year       = $('<span class="eb_year">' + date.yyyy + '</span>');
+
+            $minusBtn.on("click",function(){
+                $year.html(--that.options.date.yyyy);
+                that._change();
             });
-        });
-        $("#"+this.timeBoxId).find(".eb_toLastYear").click(function(){ //年份向前翻页
-            thisObject.year--;
-            $("#"+thisObject.timeBoxId).find(".eb_year").html(thisObject.year);
-            thisObject.refreshDate();
-        });
-        $("#"+this.timeBoxId).find(".eb_toNextYear").click(function(){ //年份向后翻页
-            thisObject.year++;
-            $("#"+thisObject.timeBoxId).find(".eb_year").html(thisObject.year);
-            thisObject.refreshDate();
-        });
-        html = '';
-        html = html + '<select name="month" class="eb_monthSelect">';
-        html = html + '<option value="01">01</option>';
-        html = html + '<option value="02">02</option>';
-        html = html + '<option value="03">03</option>';
-        html = html + '<option value="04">04</option>';
-        html = html + '<option value="05">05</option>';
-        html = html + '<option value="06">06</option>';
-        html = html + '<option value="07">07</option>';
-        html = html + '<option value="08">08</option>';
-        html = html + '<option value="09">09</option>';
-        html = html + '<option value="10">10</option>';
-        html = html + '<option value="11">11</option>';
-        html = html + '<option value="12">12</option>';
-        html = html + '</select>';
-        this.titleBarObj.append($(html));
-        this.titleBarObj.append('<span style="position:absolute;top:5px;right:23px;">月</span>');
-        this.monthSelectObj = this.titleBarObj.find(".eb_monthSelect");                      //monthSelectObj
-        this.monthSelectObj.val(thisObject.thisMonth);
-        this.monthSelectObj.change(function(){
-            thisObject.refreshDate();
-        });
-        html = "";
-        html = html + '<table>';
-        html = html + '<tr>';
-        html = html + '<th class="eb_Sunday eb_red">日</th>';
-        html = html + '<th class="eb_Monday">一</th>';
-        html = html + '<th class="eb_Tuesday">二</th>';
-        html = html + '<th class="eb_Wednesday">三</th>';
-        html = html + '<th class="eb_Thursday">四</th>';
-        html = html + '<th class="eb_Friday">五</th>';
-        html = html + '<th class="eb_Saturday red">六</th>';
-        html = html + '</tr>';
-        html = html + '<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
-        html = html + '<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
-        html = html + '<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
-        html = html + '<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
-        html = html + '<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
-        html = html + '<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
-        html = html + '</table>';
-        $("#"+this.timeBoxId).append(html);
-        $("#"+this.timeBoxId).find("table td").each(function(){
-            var thisObj = this;
-            $(thisObj).mouseover(function(){
-                $(thisObj).addClass("eb_dateMouseover");
-            }).mouseout(function(){
-                $(thisObj).removeClass("eb_dateMouseover");
+            $plusBtn.on("click",function(){
+                $year.html(++that.options.date.yyyy);
+                that._change();
             });
-        });
-        this.$element.click(function(){
-            $(".eb_dropdownMenu.eb_show").hide().removeClass("eb_show");
-            $(".eb_timeInput.focus").not(thisObject.$element).removeClass('focus');
-            thisObject.toggleBox();
-        });
-        this.$element.focus(function(){
-            thisObject.$element.addClass("focus");
-        });
-        this.refreshDate();
-        if(this.dataOptions.HMS == true){                      //HMS == true
-            this.timeBoxObj.height(thisObject.timeBoxObj.height()+30);
-            var html = "";
-            html = html + '<div class="eb_HMSBar">';
-            html = html + '<input class="eb_HMSInput eb_Hour" value="00" />&nbsp;时&nbsp;';
-            html = html + '<input class="eb_HMSInput eb_minute"  value="00" />&nbsp;分&nbsp;';
-            html = html + '<input class="eb_HMSInput eb_second"  value="00" />&nbsp;秒';
-            html = html + '</div>';
-            this.timeBoxObj.append(html);
-            this.timeBoxObj.find(".eb_HMSInput").focus(function(){
-                $(this).addClass("focus");
-            }).blur(function(){
-                $(this).removeClass("focus");
-            }).focus(function(){
-                $(this).select();
+            $yearSelect.append($minusBtn,$year,'年',$plusBtn);
+            return $yearSelect;
+        },
+
+        _monthSelect : function(){
+            var that = this,
+                date = this.options.date,
+                $select = $('<select class="eb_monthSelect">');
+
+            $.each([1,2,3,4,5,6,7,8,9,10,11,12],function(index,value){
+                value < 10 && (value = "0" + value);
+                $select.append('<option value="' + index + '">' + value + '</option>');
             });
-            this.timeBoxObj.find(".eb_HMSInput").keydown(function(e){
+            $select.val(date.MM);
+
+            $select.on("change",function(){
+                date.MM = $select.val();
+                that._refreshDaySelect();
+                that._change();
+            });
+
+            return $select;
+        },
+
+        _daySelect:function(){
+            var $daySelect = this.$daySelect = $('<table></table>'),
+                $week = $('<tr class="week"></tr>'),
+                week = {"Sunday":"日","Monday":"一","Tuesday":"二","Wednesday":"三",Thursday:"四","Friday":"五","Saturday":"六"},
+                that = this;
+            for(var day in week){
+                var $day = $('<th>' + week[day] + '</th>');
+                day == "Sunday" && $day.addClass("eb_red");
+                day == "Saturday" && $day.addClass("red");
+                $week.append($day);
+            }
+            $daySelect.append($week);
+            for(var i=0; i<6; i++){
+                var $tr = $('<tr class="days"></tr>');
+                for(var j=0; j<7;j++){
+                    var $td = $("<td></td>").on("click",function(){
+                        var day = $(this).text();
+                        if(day && day!=that.options.date.dd){
+                            $('td.choosed',$daySelect).removeClass("choosed");
+                            that.options.date.dd = +day;
+                            $(this).addClass("choosed");
+                            that._change();
+                        }
+                    });
+                    $tr.append($td);
+                }
+                $daySelect.append($tr);
+            }
+            this._refreshDaySelect();
+            return $daySelect;
+        },
+
+        /**
+         * 当日期改变后，刷新daySelect
+         * @private
+         */
+        _refreshDaySelect:function(){
+            var date   = this.options.date,
+                maxDay = getMonthArr(date.yyyy)[date.MM],
+                shift  = new Date(date.yyyy,date.MM,1).getDay();
+            $('td.choosed',this.$daySelect).removeClass("choosed");
+            $('tr.days td',this.$daySelect).html("");
+            for(var i=shift;i<maxDay+shift;i++){
+                var rows = i%7,
+                    cols = Math.floor(i/7),
+                    $td = $('tr.days:eq("'+cols+'") td:eq("' + rows + '")',this.$daySelect),
+                    day = i- shift + 1;
+                $td.text(day);
+                day == date.dd && $td.addClass("choosed");
+            }
+        },
+
+        _hmsSelect:function(){
+            var $hmsBar      = $('<div class="eb_HMSBar">'),
+                $hourInput   = $('<input class="eb_HMSInput eb_Hour" value="00" />'),
+                $minuteInput = $('<input class="eb_HMSInput eb_minute"  value="00" />'),
+                $secondInput = $('<input class="eb_HMSInput eb_second"  value="00" />'),
+                date         = this.options.date,
+                that         = this;
+
+            $hourInput.on("change",_handleNumF(0,23));
+            $minuteInput.on("change",_handleNumF(0,59));
+            $secondInput.on("change",_handleNumF(0,59));
+            function _handleNumF(min,max){
+                return function(){
+                    var value = +$(this).val();
+                    if(value>max){
+                        $(this).val(max);
+                    }
+                    else if(value<min){
+                        $(this).val(min);
+                    }
+                    date.HH = +$hourInput.val();
+                    date.mm = +$minuteInput.val();
+                    date.ss = +$secondInput.val();
+                    that._change();
+                };
+            }
+
+            $hmsBar.append($hourInput,":",$minuteInput,":",$secondInput);
+            $(".eb_HMSInput",$hmsBar).on("keydown",function(e){
                 var keycode=e.keyCode||e.which||e.charCode;
-                var thisObj = this;
-                var value = $(this).val();
                 if((keycode>=48 && keycode<=57) || keycode == 8){
                     return true;
                 }else{
                     return false;
                 }
             });
-            this.timeBoxObj.find(".eb_Hour").change(function(){
-                var value = $(this).val();
-                if(value>23){
-                    $(this).val("23");
-                }else if(value<0){
-                    $(this).val("00");
+            return $hmsBar;
+        },
+
+        _change:function(){
+            this.options.onChange && this.options.onChange.call(this);
+        },
+
+        /**
+         * 当在非本元素范围内点击，收缩下拉框
+         * @private
+         */
+        _clickBlank:function(){
+            var that = this;
+            $(document).mouseup(function(e) {
+                var _con = that.$parent;
+                if (!_con.is(e.target) && _con.has(e.target).length === 0) {
+                    that.$timeBox.animate({
+                        height:'hide'
+                    },200);
                 }
             });
-            this.timeBoxObj.find(".eb_minute,.eb_second").change(function(){
-                var value = $(this).val();
-                if(value>59){
-                    $(this).val("59");
-                }else if(value<0){
-                    $(this).val("00");
+        },
+
+        toggle:function(){
+            var that = this;
+            this.$timeBox.animate({
+                height:"toggle"
+            },200,function(){
+                if(!that.$timeBox.is(":hidden")){
+                    that._clickBlank();
                 }
             });
-            this.timeBoxObj.append($('<div class="timeInputOK">确定</div>').mouseover(function(){
-                $(this).addClass("mouseover");
-            }).mouseout(function(){
-                $(this).removeClass("mouseover");
-            }).click(function(){
-                var date = thisObject.timeBoxObj.find(".choosed").html();
-                if(!date)
-                    date = "1";
-                if(date<10 && date.length == 1)
-                    date = "0"+date;
-                var YMD = thisObject.year + "-" + thisObject.month + "-" + date;
-                var hour = thisObject.timeBoxObj.find(".eb_Hour").val();
-                if(hour<10 && hour.length == 1)
-                    hour = "0" + hour;
-                var min = thisObject.timeBoxObj.find(".eb_minute").val();
-                if(min<10 && min.length == 1)
-                    min = "0" + min;
-                var second = thisObject.timeBoxObj.find(".eb_second").val();
-                if(second<10 && second.length == 1)
-                    second = "0" + second;
-                var HMS = hour + ":" + min + ":" + second;
-                var result = YMD + "  " + HMS;
-                thisObject.setValue(result);
-                thisObject.timeBoxObj.hide().removeClass("show");
-                thisObject.$element.change();
-            })).append($('<div class="timeInputCancel">取消</div>').mouseover(function(){
-                $(this).addClass("mouseover");
-            }).mouseout(function(){
-                $(this).removeClass("mouseover");
-            }).click(function(){
-                thisObject.timeBoxObj.hide().removeClass("show");
-            }));
-        }
-        $(window).click(function(){
-            //thisObject.check();
-            thisObject.$element.removeClass("focus");
-            $("#"+thisObject.timeBoxId).removeClass("show").hide();
-        });
-        this.$element.each(function(){
-            $(this).click(function(event){
-                event.stopPropagation();
-            });
-        });
-        $("#"+this.timeBoxId).each(function(){
-            $(this).click(function(event){
-                event.stopPropagation();
-            });
-        });
-    };
+        },
 
-    TimeInput.prototype.refreshDate = function(){
-        var thisObject = this;
-        this.timeBoxObj.find(".choosed").removeClass("choosed");
-        $("#"+this.timeBoxId).find("table td").html("").unbind("click");
-        this.month = this.monthSelectObj.val();
-        var maxDay = this.getMonthArr(this.year)[this.month-1];
-        var firstDay = new Date(this.year,this.month-1,1).getDay();
-        var index = firstDay%7;
-        for(var i=0;i<maxDay;i++){
-            $("#"+this.timeBoxId).find("table td").eq(index).html(i+1);
-            if(this.dataOptions.defaultVal){
-                var value = this.dataOptions.defaultVal;
-                if(this.inputObj.val())
-                    value = this.inputObj.val();
-                var YMD = value.split(" ")[0];
-                var Y = YMD.split("-")[0];
-                var M = YMD.split("-")[1];
-                var D = YMD.split("-")[2];
-                if(D.indexOf("0") == 0)
-                    D = D.split("0")[1];
-                if(this.year == Y && this.month == M && i+1 == D){
-                    $("#"+this.timeBoxId).find(".choosed").removeClass("choosed");
-                    $("#"+this.timeBoxId).find("table td").eq(index).addClass('choosed');
-                }
-            }else if(this.year == this.thisYear && this.month == this.thisMonth && i+1 == thisObject.today){
-                $("#"+this.timeBoxId).find(".choosed").removeClass("choosed");
-                $("#"+this.timeBoxId).find("table td").eq(index).addClass('choosed');
-            }
-            if(thisObject.dataOptions.HMS != true){
-                $("#"+this.timeBoxId).find("table td").eq(index).click(function(){
-                    $("#"+thisObject.timeBoxId).find(".choosed").removeClass("choosed");
-                    $(this).addClass("choosed");
-                    thisObject.date = $(this).html();
-                    if(thisObject.date<10)
-                        thisObject.date = "0" + thisObject.date;
-                    var data = thisObject.year + "-" + thisObject.month + "-" + thisObject.date;
-                    thisObject.setValue(data);
-                    thisObject.timeBoxObj.hide().removeClass("show");
-                    thisObject.$element.change();
-                });
-            }else{
-                $("#"+this.timeBoxId).find("table td").eq(index).click(function(){
-                    thisObject.date = $(this).html();
-                    if(thisObject.date<10)
-                        thisObject.date = "0" + thisObject.date;
-                    var data = thisObject.year + "-" + thisObject.month + "-" + thisObject.date;
-                    //thisObject.inputObj.val(data);
-                    //thisObject.timeBoxObj.hide();
-                    thisObject.timeBoxObj.find(".choosed").removeClass("choosed");
-                    $(this).addClass("choosed");
-                });
-            }
-            index++;
-        }
-    };
-    TimeInput.prototype.isLeapYear = function(year){
-        if(year%4==0 && (year%100!= 0 || year%400 == 0))
-            return true;
-        else
-            return false;
-    };
+        getDate:function(){
+            var date = this.options.date;
+            return getDate(date.yyyy,date.MM,date.dd,date.HH,date.mm,date.ss);
+        },
 
-    TimeInput.prototype.getMonthArr = function(year){
-        if(this.isLeapYear(year))
-            return [31,29,31,30,31,30,31,31,30,31,30,31];
-        else
-            return [31,28,31,30,31,30,31,31,30,31,30,31];
-    };
-
-    TimeInput.prototype.toggleBox = function(){
-        this.locatBox();
-        var display = $("#"+this.timeBoxId).attr("class");
-        if(display.indexOf("show")>=0){
-            $("#"+this.timeBoxId).removeClass("show").hide();
-        }else{
-            $(".eb_timeBoxArea .show").hide().removeClass("show");
-            if(this.ifEnable == true){
-                $("#"+this.timeBoxId).slideDown('fast').addClass("show");
+        setDate:function(date){
+            this.options.date = {
+                yyyy:date.getFullYear(),
+                MM:date.getMonth(),
+                dd:date.getDate(),
+                HH:date.getHours(),
+                mm:date.getMinutes(),
+                ss:date.getSeconds(),
+                ww:date.getDay()
             }
         }
     };
 
-    TimeInput.prototype.getValue = function(){
-        return this.inputObj.val();
-    };
-
-    TimeInput.prototype.setValue = function(value){
-        this.inputObj.val(value);
-        this.parent.attr("value",value);
-    };
-
-    TimeInput.prototype.clearValue = function(){
-        this.setValue("");
-    };
-
-    TimeInput.prototype.check = function(){
-        var thisObject = this;
-        var result = {length:0,result:true};
-        var val = this.$element.val();
-        if(this.dataOptions.required == true){
-            if(!val){
-                result['required'] = 'fail';
-                result.result = false;
-                result.length++;
+    $.fn.timeInput = function (option) {
+        var o = null;
+        this.each(function () {
+            var $this = $(this),
+                options = typeof option == 'object' && option;
+            o = $this.data('timeInput');
+            if(o != null){
+                o._destory();
             }
-        }
-        return result;
-    };
-
-    TimeInput.prototype.locatBox = function(){
-        var top = this.$element.offset().top;
-        var left = this.$element.offset().left;
-        var scrollTop = $(window).scrollTop();
-        var scrollLeft = $(window).scrollLeft();
-        top = top;
-        left = left;
-        $("#"+this.timeBoxId).css("left",left).css("top",top+this.$element.height()+3);
-    }
-
-    $.fn.timeInput = function (option,param) {
-        var result = null;
-        var thisObj = this.each(function () {
-            var $this = $(this)
-                , thisObject = $this.data('timeInput')
-                , dataOptions = typeof option == 'object' && option;
-            if(typeof option == 'string' ){
-                result = thisObject[option](param);
-            }else{
-                $this.data('timeInput', (thisObject = new TimeInput(this, dataOptions)));
-            }
+            $this.data('timeInput', (o = new TimeInput(this, options)));
         });
-        if(typeof option == 'string' )return result;
-        return thisObj;
+        return o;
     };
 
-    $.fn.timeInput.defaults = {
-        required:false,
-        width:250,
-        height:20,
-        titleWidth:73
-    };
-
-    $(window).on('load', function(){
-        $(".eb_timeInput").each(function () {
-            var thisObj = $(this)
-                , dataOptionsStr = thisObj.data('options');
-            if(!dataOptionsStr)
-                thisObj.timeInput($.fn.timeInput.defaults);
-            else
-                thisObj.timeInput((new Function("return {" + dataOptionsStr + "}"))());
-        });
-    });
-}(window.jQuery);
+}(window);
 
 /**
  * Author zhouzy
@@ -4317,14 +3012,12 @@
  * Date   2014/9/23
  *
  * Tree
- *
- * 依赖 Class
+ * 继承 Widgets
  */
 
 !function(window){
 
     "use strict";
-
 
     var $   = window.jQuery,
         cri = window.cri;
@@ -4335,6 +3028,20 @@
     var _titleH    = 31, //标题高度
         _toolbarH  = 31, //工具栏高度
         _iconWidth = 16; //
+
+    var fileIcons = {"file":"icon fa fa-file","folderOpen":"icon fa fa-folder-open","folderClose":"icon fa fa-folder"};
+
+    var _defaultOptions = {
+        url:"",
+        title:null,
+        param:null,
+        rows:[],
+        selectedRow:null,
+        onDblClick:null,
+        page:true,
+        async:false,
+        asyncUrl:null
+    };
 
     /**
      * 计算原始元素高度
@@ -4387,19 +3094,17 @@
         return parseInt(calWidth);
     }
 
-    var Tree = cri.Tree = function (element, options) {
-        this.options = $.extend({}, $.fn.tree.defaults, options);
-        this.$element = $(element);
+    var Tree = cri.Tree = cri.Widgets.extend(function (element,options) {
+        this.options = _defaultOptions;
         this.$tree = null;
         this.$treebody = null;
         this.selectedRow = null;
         this.toolbar = null;
         this._className = "tree";
-        this._init();
-        this._eventListen();
-    };
+        cri.Widgets.apply(this,arguments);
+    });
 
-    Tree.prototype = {
+    $.extend(Tree.prototype,{
         _init:function () {
             this._getData();
             this._createTree();
@@ -4495,6 +3200,7 @@
 
                 $treeview = this.$treeview = $("<div></div>").addClass("tree-view"),
                 $treebody = this.$treebody = $("<ul></ul>").addClass("tree-body");
+
             $tree.attr("style",this.$element.attr("style")).show().height(height);
             $treeview.append($treebody);
             if(height){
@@ -4511,36 +3217,81 @@
             this.$tree.append($treeview);
         },
 
+        /**
+         * 递归生成节点
+         * 节点默认显示打开
+         * @param $li
+         * @param children
+         * @private
+         */
         _appendChildren:function($li,children){
-            var $ul = $("<ul></ul>");
-            var indent = $(i,$li).attr("marginLeft");
+            var $ul    = $("<ul></ul>"),
+                indent = $(i,$li).attr("marginLeft");
             this._eachNode($ul,children,"show",0,indent);
             $li.append($ul);
         },
 
+        /**
+         * 生成每个节点
+         * 同步树(当点击fold节点，不查询后台数据)
+         * 异步树(当点击fold检点，实时查询后台后代节点)
+         * 当为同步树，检查children进行递归生成节点
+         * 当为异步树，检查hasChildren,children字段，hasChildren==true && (!children || children.length==0)时，访问后台
+         *
+         * @param $ul
+         * @param data
+         * @param isShow
+         * @param id
+         * @param indent
+         * @private
+         */
         _eachNode:function($ul,data,isShow,id,indent){
-            var fileIcons = {"file":"icon fa fa-file","folderOpen":"icon fa fa-folder-open","folderClose":"icon fa fa-folder"};
             for(var i = 0,len=data.length; i<len; i++){
                 var row      = data[i],
-                    $li      = $("<li></li>"),
-                    $text    = $("<span></span>").addClass("li-text").text(row.text),
-                    $icon    = $("<i></i>").attr("class",fileIcons.file).css("marginLeft",indent),
-                    $content = $("<div></div>").addClass("li-content").data("uid",++id);
-
-                $ul.append($li.append($content.append($icon).append($text)));
+                    $li      = $('<li></li>'),
+                    $text    = $('<span class="li-text">' + row.text + '</span>'),
+                    $icon    = $('<i class="' + fileIcons.file + '"></i>').css("marginLeft",indent),
+                    $content = $('<div class="li-content"></div>').data("uid",++id);
+                this._dealNodeData(row);
+                $icon.attr("class",fileIcons[row.iconType]);
+                $ul.append($li.append($content.append($icon,$text)));
                 isShow == "hide" && $li.hide();
-
-                if(row.children && row.children.length > 0){
+                if(row.hasChildren){
                     var $parent = $("<ul></ul>");
-                    if(row.hasChildren || (row.children && row.children.length)){
-                        row.state == "open" ? $icon.attr("class",fileIcons.folderOpen):$icon.attr("class",fileIcons.folderClose);
-                    }
                     $li.append($parent);
                     indent += _iconWidth;
-                    row.state && row.state == "closed"
+                    row.state && row.state == "close"
                         ? this._eachNode($parent,row.children,"hide",id*1000,indent)
                         : this._eachNode($parent,row.children,isShow,id*1000,indent);
                     indent -= _iconWidth;
+                }
+            }
+        },
+
+        /**
+         * 处理node数据的默认值
+         * state：默认值open
+         * 获取节点图标类型
+         * 如果节点指定 hasChildren 则图标显示为文件夹，
+         * 如果 children 不存在，则显示为关闭文件夹
+         * 如果未指定 state ，则默认为 close
+         * @param node
+         * @private
+         */
+        _dealNodeData:function(node){
+            node.iconType = "file";
+            if(node.children && node.children.length>0){
+                node.hasChildren = true;
+            }
+            if(node.hasChildren){
+                if(node["state"] == undefined || node["state"] == null){
+                    node["state"] = "open";
+                }
+                if(node.state && node.state=="open" && node.children && node.children.length>0){
+                    node.iconType = "folderOpen";
+                }
+                else{
+                    node.iconType = "folderClose";
                 }
             }
         },
@@ -4615,7 +3366,7 @@
             param && (this.options.param = param);
             this._init();
         }
-    };
+    });
 
     $.fn.tree = function (option,param) {
         var tree = null;
@@ -4627,17 +3378,7 @@
         return tree;
     };
 
-    $.fn.tree.defaults = {
-        url:"",
-        title:null,
-        param:null,
-        rows:[],
-        selectedRow:null,
-        onDblClick:null,
-        page:true,
-        async:false,
-        asyncUrl:null
-    };
+
 
 }(window);
 /**
@@ -4837,9 +3578,9 @@
 /**
  * Author zhouzy
  * Date   2014/10/14
- * window 组件
  *
- * 依赖Widgets
+ * jQuery 插件基类
+ * 继承自Class
  *
  */
 !function(window){
@@ -4848,6 +3589,224 @@
 
     var cri = window.cri,
         $   = window.jQuery;
+
+    var INPUTSELECTOR = ":input:not(:button,[type=submit],[type=reset],[disabled])",
+        CHECKBOXSELECTOR = ":checkbox:not([disabled],[readonly])",
+        NUMBERINPUTSELECTOR = "[type=number],[type=range]";
+
+    var emailRegExp = /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))$/i,
+        urlRegExp = /^(https?|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i;
+    function patternMatcher(value, pattern) {
+        if (typeof pattern === "string") {
+            pattern = new RegExp('^(?:' + pattern + ')$');
+        }
+        return pattern.test(value);
+    }
+
+    function matcher(input, selector, pattern) {
+        var value = input.val();
+        if (input.filter(selector).length && value !== "") {
+            return patternMatcher(value, pattern);
+        }
+        return true;
+    }
+
+    function hasAttribute(input, name) {
+        if (input.length)  {
+            return input[0].attributes[name] != null;
+        }
+        return false;
+    }
+
+    var Rules = {
+        required: function(input) {
+            var checkbox = input.filter("[type=checkbox]").length && !input.is(":checked"),
+                value = input.val();
+
+            return !(hasAttribute(input, "required") && (value === "" || !value  || checkbox));
+        },
+        pattern: function(input) {
+            if (input.filter("[role=text],[role=email],[role=url],[role=tel],[role=search],[role=password]").filter("[pattern]").length && input.val() !== "") {
+                return patternMatcher(input.val(), input.attr("pattern"));
+            }
+            return true;
+        },
+        min: function(input){
+            if (input.filter(NUMBERINPUTSELECTOR + ",[role=number]").filter("[min]").length && input.val() !== "") {
+                var min = parseFloat(input.attr("min")) || 0,
+                    val = parseFloat(input.val());
+                return min <= val;
+            }
+            return true;
+        },
+        max: function(input){
+            if (input.filter(NUMBERINPUTSELECTOR + ",[role=number]").filter("[max]").length && input.val() !== "") {
+                var max = parseFloat(input.attr("max")) || 0,
+                    val = parseFloat(input.val());
+                return max >= val;
+            }
+            return true;
+        },
+
+        email: function(input) {
+            return matcher(input, "[role=email]", emailRegExp);
+        },
+        url: function(input) {
+            return matcher(input, "[role=url]", urlRegExp);
+        },
+        date: function(input) {
+            if (input.filter("[role^=date]").length && input.val() !== ""){
+                return parseDate(input.val(), input.attr("format")) !== null;
+            }
+            return true;
+        }
+    };
+
+    var Messages = {
+        required:"请输入",
+        min:"请输入大于的数字",
+        max:"请输入小于的数字",
+        email:"请输入合法的邮箱地址",
+        url:"请输入合法的URL地址",
+        date:"请输入合法的日期"
+    };
+
+    var _defaultOptions = {
+        rules : Rules,
+        messages:Messages,
+        validateOnBlur:false
+    };
+
+    var Validator = cri.Widgets.extend(function(element,options){
+        this.options = _defaultOptions;
+        cri.Widgets.apply(this,arguments);
+    });
+
+    $.extend(Validator.prototype,{
+        _init: function(element, options){},
+        _eventListen:function(){
+            /**
+             * 如果是表单,在提交时验证
+             * 如果设置validateOnBlur,则在input blur事件中验证
+             */
+            var that = this,
+                $element = this.$element;
+            if(this.$element.is("form")){
+                this.$element.on("submit",function(){
+                    that.validate();
+                });
+            }
+            if(that.options.validateOnBlur){
+                if(!$element.is(INPUTSELECTOR)){
+                    $element.find(INPUTSELECTOR).each(function(){
+                        if($(this).is('[role=timeInput]')){
+                            $(this).on("change",function(){
+                                that._validateInput($(this));
+                            });
+                        }else{
+                            $(this).on("blur",function(){
+                                that._validateInput($(this));
+                            });
+                        }
+                    });
+                }else{
+                    $element.on("blur",function(){
+                        that._validateInput($element);
+                    });
+                }
+            }
+        },
+
+        /**
+         * 检查 input 合法性
+         * @param $input
+         * @private
+         */
+        _checkValidity:function($input){
+            var rules = this.options.rules,
+                rule;
+            for (rule in rules) {
+                if (!rules[rule].call(this, $input)) {
+                    return { valid: false, key: rule };
+                }
+            }
+            return { valid: true };
+        },
+
+        /**
+         * 验证表单或者输入框
+         */
+        validate:function(){
+            var that = this,
+                $element = this.$element,
+                result = true;
+            if(!$element.is(INPUTSELECTOR)){
+                $element.find(INPUTSELECTOR).each(function(){
+                    var isValidity = that._validateInput($(this));
+                    result = result && isValidity;
+                });
+            }else{
+                result = result && that._validateInput($element)
+            }
+            return result;
+        },
+
+        /**
+         * 验证每个Input
+         * @param $input
+         * @returns {boolean|Validator._checkValidity.valid|exports.valid|valid}
+         * @private
+         */
+        _validateInput:function($input){
+            var result = this._checkValidity($input),
+                valid = result.valid;
+            if(!valid){
+                var $errormsg = $input.next(".input-warm");
+                if($errormsg.length == 0){
+                    $input.after($('<span class="input-warm">' + this.options.messages[result.key] + '</span>'));
+                }
+                else{
+                    $errormsg.text(this.options.messages[result.key]);
+                }
+            }else{
+                $input.next(".input-warm").remove();
+            }
+            return valid;
+        }
+    });
+
+    cri.Validator = Validator;
+
+    $.fn.validator = function(option) {
+        var validator = null;
+        this.each(function () {
+            var $this   = $(this),
+                options = typeof option == 'object' && option;
+            validator = $this.data('validator');
+            if(validator != null){
+            }
+            $this.data('validator', (validator = new Validator(this, options)));
+        });
+        return validator;
+    };
+
+}(window);
+/**
+ * Author zhouzy
+ * Date   2014/10/14
+ * window 组件
+ *
+ * 继承 Widgets
+ *
+ */
+!function(window){
+
+    "use strict";
+
+    var cri = window.cri,
+        $   = window.jQuery;
+
+    var WINDOW_HEAD = "window-head";
 
     var icons = {Minimize:"fa fa-minus",Maximize:"fa fa-expand","Close":"fa fa-close","Resume":"fa fa-compress"},
         MINI_WINDOW_WIDTH = 140+10,
@@ -4862,7 +3821,8 @@
         height:400,
         position:{top:0,left:0},
         center:true,//初始时是否居中
-        resizable:true
+        resizable:true,
+        onReady:null//当窗口初始化完成时触发
     };
 
     var Window = cri.Widgets.extend(function(element,options){
@@ -4872,396 +3832,414 @@
         Window.prototype.windowStack.push(this);
     });
 
-    Window.prototype.windowStack = [];
+    $.extend(Window.prototype,{
 
-    /**
-     * 初始化组件DOM结构
-     * @private
-     */
-    Window.prototype._init = function(){
-        var op = this.options;
-        var viewWidth = $(window).width();
-        var viewHeight = $(window).height();
+        windowStack : [],
 
-        this._createBody();
-        if(op.center){
-            op.position.left = (viewWidth - op.width) / 2;
-            op.position.top  = (viewHeight - op.height) / 2;
-        }
-        this.$window.css($.extend({zIndex:this._zIndex()},op.position)).width(op.width).height(op.height);
-        this._overlay();
-        this._createHead();
-        op.resizable && this._createResizeHandler();
-        $("body").append(this.$window);
-    };
+        /**
+         * 初始化组件DOM结构
+         * @private
+         */
+        _init : function(){
+            var op = this.options,
+                viewWidth = $(window).width(),
+                viewHeight = $(window).height();
 
-    /**
-     * 初始化组件监听事件
-     * @private
-     */
-    Window.prototype._eventListen = function(){
-        var that = this;
-        this.$window
-            .on("click",".action",function(){
-                var action = that._actionForButton($(this));
-                action && typeof that[action] === "function" && that[action]();
-            })
-            .on("click",".window-head",function(){
-                that.toFront();
-            })
-            .on("mousedown",".window-head",function(e){
-                var left     = +that.$window.css("left").split("px")[0],
-                    top      = +that.$window.css("top").split("px")[0],
-                    width    = +that.$window.width(),
-                    height   = +that.$window.height(),
-                    startX   = e.pageX,
-                    startY   = e.pageY;
-                $(document).on("mousemove",function(e){
-                    var pageX  = e.pageX,
-                        pageY  = e.pageY,
-                        shiftX = pageX - startX,
-                        shiftY = pageY - startY;
-                    left += shiftX;
-                    top  += shiftY;
-                    startX = pageX;
-                    startY = pageY;
-                    that._setPosition({top:top,left:left,width:width,height:height});
+            this._createBody();
+            if(op.center){
+                op.position.left = (viewWidth - op.width) / 2;
+                op.position.top  = (viewHeight - op.height) / 2;
+            }
+            this.$window.css($.extend({zIndex:this._zIndex()},op.position)).width(op.width).height(op.height);
+            this._overlay();
+            this._createHead();
+            op.resizable && this._createResizeHandler();
+            $("body").append(this.$window);
+            if(op.visible){
+                this.$window.show();
+            }else{
+                this.$window.hide();
+            }
+        },
+
+        /**
+         * 初始化组件监听事件
+         * @private
+         */
+        _eventListen : function(){
+            var that = this;
+            this.$window
+                .on("click",".action",function(){
+                    var action = that._actionForButton($(this));
+                    action && typeof that[action] === "function" && that[action]();
+                })
+                .on("click",".window-head",function(){
+                    that.toFront();
+                })
+                .on("mousedown",".window-head",function(e){
+                    var left     = +that.$window.css("left").split("px")[0],
+                        top      = +that.$window.css("top").split("px")[0],
+                        width    = +that.$window.width(),
+                        height   = +that.$window.height(),
+                        startX   = e.pageX,
+                        startY   = e.pageY;
+                    $(document).on("mousemove",function(e){
+                        var pageX  = e.pageX,
+                            pageY  = e.pageY,
+                            shiftX = pageX - startX,
+                            shiftY = pageY - startY;
+                        left += shiftX;
+                        top  += shiftY;
+                        startX = pageX;
+                        startY = pageY;
+                        that._setPosition({top:top,left:left,width:width,height:height});
+                    });
+                })
+                .on("mousedown",".window-resizer",function(e){
+                    var left     = +that.$window.css("left").split("px")[0],
+                        top      = +that.$window.css("top").split("px")[0],
+                        width    = +that.$window.width(),
+                        height   = +that.$window.height(),
+                        startX   = e.pageX,
+                        startY   = e.pageY,
+                        resizer  = /[ewsn]+$/.exec(this.className)[0];
+
+                    $(document).on("mousemove",function(e){
+                        var pageX  = e.pageX,
+                            pageY  = e.pageY,
+                            shiftX = pageX - startX,
+                            shiftY = pageY - startY;
+                        startX = pageX;
+                        startY = pageY;
+                        if(resizer.indexOf("e") >= 0){
+                            width += shiftX;
+                        }
+                        if(resizer.indexOf("w") >= 0){
+                            left = pageX;
+                            width -= shiftX;
+                        }
+                        if(resizer.indexOf("n") >= 0){
+                            top = pageY;
+                            height -= shiftY;
+                        }
+                        if(resizer.indexOf("s") >= 0){
+                            height += shiftY;
+                        }
+                        that._setPosition({top:top,left:left,width:width,height:height});
+                    });
                 });
-            })
-            .on("mousedown",".window-resizer",function(e){
-                var left     = +that.$window.css("left").split("px")[0],
-                    top      = +that.$window.css("top").split("px")[0],
-                    width    = +that.$window.width(),
-                    height   = +that.$window.height(),
-                    startX   = e.pageX,
-                    startY   = e.pageY,
-                    resizer  = /[ewsn]+$/.exec(this.className)[0];
-
-                $(document).on("mousemove",function(e){
-                    var pageX  = e.pageX,
-                        pageY  = e.pageY,
-                        shiftX = pageX - startX,
-                        shiftY = pageY - startY;
-                    startX = pageX;
-                    startY = pageY;
-                    if(resizer.indexOf("e") >= 0){
-                        width += shiftX;
-                    }
-                    if(resizer.indexOf("w") >= 0){
-                        left = pageX;
-                        width -= shiftX;
-                    }
-                    if(resizer.indexOf("n") >= 0){
-                        top = pageY;
-                        height -= shiftY;
-                    }
-                    if(resizer.indexOf("s") >= 0){
-                        height += shiftY;
-                    }
-                    that._setPosition({top:top,left:left,width:width,height:height});
-                });
+            $(document).on("mouseup",function(){
+                $(document).off("mousemove");
             });
-        $(document).on("mouseup",function(){
-            $(document).off("mousemove");
-        });
-    };
+        },
 
-    /**
-     * 生成window 头部
-     * @private
-     */
-    Window.prototype._createHead = function(){
-        var $windowHead = $("<div></div>").addClass("window-head");
-        $windowHead.append(this._createTitle()).append(this._createActions());
-        this.$window.prepend($windowHead);
-        this.$windowHead = $windowHead;
-    };
+        /**
+         * 生成window 头部
+         * @private
+         */
+        _createHead : function(){
+            var $windowHead = $('<div class="' + WINDOW_HEAD + '"></div>');
+            $windowHead.append(this._createTitle()).append(this._createActions());
+            this.$window.prepend($windowHead);
+            this.$windowHead = $windowHead;
+        },
 
-    /**
-     * 包装window 内容部分
-     * @private
-     */
-    Window.prototype._createBody = function(){
-        var $element = this.$element;
-        $element.detach();
-        var $window = $('<div class="window"></div>');
-        var $windowBody = $('<div class="window-content"></div>');
-        $window.append($windowBody);
-        $windowBody.append($element);
-        this.$window = $window;
-        if(this.options.content){
-            $windowBody.load(this.options.content);
-        }
-        $("body").append(this.$window);
+        /**
+         * 包装window 内容部分
+         * @private
+         */
+        _createBody : function(){
+            var that     = this,
+                op       = this.options,
+                $element = this.$element,
+                $window  = $('<div class="window"></div>'),
+                $windowBody = $('<div class="window-content"></div>');
 
-    };
+            $element.detach();
+            $window.append($windowBody);
+            this.$window = $window;
+            $windowBody.append($element);
+            if(this.options.content){
+                $element.load(this.options.content,function(){
+                    op.onReady && op.onReady.call(that,that.$window);
+                });
+            }else{
+                op.onReady && op.onReady.call(that,that.$window);
+            }
+            $("body").append(this.$window);
+        },
 
-    /**
-     * 生成标题栏
-     * @returns {*}
-     * @private
-     */
-    Window.prototype._createTitle = function(){
-        var title = this.options.title || "";
-        var $title = $("<span></span>").addClass("title").text(title);
-        return $title;
-    };
+        /**
+         * 生成标题栏
+         * @returns {*}
+         * @private
+         */
+        _createTitle : function(){
+            var title = this.options.title || "";
+            var $title = $("<span></span>").addClass("title").text(title);
+            return $title;
+        },
 
-    /**
-     * 根据actions 按照（最小化，放大，关闭）顺序生成按钮
-     * 模态窗口不生成最小化按钮
-     * @returns {*}
-     * @private
-     */
-    Window.prototype._createActions = function(){
-        var options = this.options;
-        var $buttons = $("<div></div>").addClass("actions");
-        var defaultButtons = options.modal ? ["Maximize","Close"]:["Minimize","Maximize","Close"];
+        /**
+         * 根据actions 按照（最小化，放大，关闭）顺序生成按钮
+         * 模态窗口不生成最小化按钮
+         * @returns {*}
+         * @private
+         */
+        _createActions : function(){
+            var options = this.options,
+                $buttons = $("<div></div>").addClass("actions"),
+                defaultButtons = options.modal ? ["Maximize","Close"]:["Minimize","Maximize","Close"];
 
-        for(var i = 0, len = defaultButtons.length; i<len; i++){
-            var defBtn = defaultButtons[i];
-            for(var j = 0,l = options.actions.length; j < l; j++){
-                var action = options.actions[j];
-                if(action == defBtn){
-                    var $button = $("<span></span>").addClass("action").addClass(action.toLowerCase());
-                    var $icon = $("<i></i>").attr("class",icons[action]);
-                    $button.append($icon);
-                    $buttons.append($button);
+            for(var i = 0, len = defaultButtons.length; i<len; i++){
+                var defBtn = defaultButtons[i];
+                for(var j = 0,l = options.actions.length; j < l; j++){
+                    var action = options.actions[j];
+                    if(action == defBtn){
+                        var $button = $('<span class="action"></span>').addClass(action.toLowerCase()),
+                            $icon   = $('<i class="' + icons[action] + '"></i>');
+                        $buttons.append($button);
+                        $button.append($icon);
+                    }
                 }
             }
-        }
-        return $buttons;
-    };
+            return $buttons;
+        },
 
-    /**
-     * 生成 8个方位的 resizeHandler
-     * @private
-     */
-    Window.prototype._createResizeHandler = function(){
-        var resizerHandler = [],
-            resizer = "n e s w nw ne se sw";
-        $.each(resizer.split(" "),function(index,value){
-            resizerHandler.push('<div class="window-resizer window-resizer-' + value + '" style="display: block;"></div>');
-        });
-        this.$window.append(resizerHandler.join(""));
-    };
+        /**
+         * 生成 8个方位的 resizeHandler
+         * @private
+         */
+        _createResizeHandler : function(){
+            var resizerHandler = [],
+                resizer = "n e s w nw ne se sw";
+            $.each(resizer.split(" "),function(index,value){
+                resizerHandler.push('<div class="window-resizer window-resizer-' + value + '" style="display: block;"></div>');
+            });
+            this.$window.append(resizerHandler.join(""));
+        },
 
-    /**
-     * 生成模态窗口背景遮罩
-     * @private
-     */
-    Window.prototype._overlay = function(){
-        if(this.options.modal){
-            var zIndex = +this.$window.css("zIndex");
-            this.$window.css("zIndex",(zIndex+1));
-            var $overlay = $(".overlay");
-            if($overlay.length == 0){
-                $overlay = $("<div></div>").addClass("overlay");
-                $("body").append($overlay);
+        /**
+         * 生成模态窗口背景遮罩
+         * @private
+         */
+        _overlay : function(){
+            if(this.options.modal){
+                var zIndex = +this.$window.css("zIndex");
+                this.$window.css("zIndex",(zIndex+1));
+                var $overlay = $(".overlay");
+                if($overlay.length == 0){
+                    $overlay = $("<div></div>").addClass("overlay");
+                    $("body").append($overlay);
+                }
+                $overlay.css("zIndex",zIndex).show();
             }
-            $overlay.css("zIndex",zIndex).show();
-        }
-    };
+        },
 
-    /**
-     * 设置窗口位置
-     * @param position {top:number,left:number,height:number,width:number}
-     * @private
-     */
-    Window.prototype._setPosition = function(position){
-        var $window = this.$window;
-        $window.css(position);
-        this.options.position = position;
-    };
+        /**
+         * 设置窗口位置
+         * @param position {top:number,left:number,height:number,width:number}
+         * @private
+         */
+        _setPosition : function(position){
+            var $window = this.$window;
+            $window.css(position);
+            this.options.position = position;
+        },
 
-    /**
-     * 根据icon类名返回对应的处理函数
-     * @param icon
-     * @returns {*}
-     * @private
-     */
-    Window.prototype._actionForButton = function(button) {
-        var iconClass = /\baction \w+\b/.exec(button[0].className)[0];
-        return {
-            "action minimize": "minimize",
-            "action maximize": "maximize",
-            "action resume": "resume",
-            "action close": "close"
-        }[iconClass];
-    };
+        /**
+         * 根据icon类名返回对应的处理函数
+         * @param icon
+         * @returns {*}
+         * @private
+         */
+        _actionForButton : function(button) {
+            var iconClass = /\baction \w+\b/.exec(button[0].className)[0];
+            return {
+                "action minimize": "minimize",
+                "action maximize": "maximize",
+                "action resume": "resume",
+                "action close": "close"
+            }[iconClass];
+        },
 
-    Window.prototype._loadContent = function(){
-        $.load();
-    };
-
-    /**
-     * 由最小化打开窗口
-     */
-    Window.prototype.open = function(){
-        this._setStyleByStatus("normal");
-        this.windowStatus = "normal";
-    };
-
-    /**
-     * 关闭当前窗口
-     *
-     * 隐藏并且放置到最底层
-     */
-    Window.prototype.close = function(){
-        var max = ZINDEX;
-        var frontWnd = null;
-        this.$window.css("zIndex",ZINDEX).hide();
-        $(".window").each(function(){
-            var z = +this.style.zIndex + 1;
-            this.style.zIndex = z;
-            if(z >= max){
-                max = z;
-                frontWnd = this;
-            }
-        });
-        frontWnd.style.zIndex = max+1;
-        $(".window").is(":visible") ?
-            $(".overlay").css("zIndex",max):
-            $(".overlay").hide();
-
-        this.$window.removeClass("mini-window");
-        this.windowStatus = "close";
-    };
-
-    /**
-     * 最大化窗口
-     * 最大化后 复原、关闭
-     */
-    Window.prototype.maximize = function(){
-        this._setStyleByStatus("maximize");
-        this._setButtons("maximize");
-        this.windowStatus = "maximize";
-    };
-
-    /**
-     * 最小化窗口
-     * 依次排放到左下侧
-     * 模态窗口没有最小化按钮
-     */
-    Window.prototype.minimize = function(){
-        this._setButtons("minimize");
-        $(".window-content",this.$window).hide();
-        var left = $(".mini-window").size() * MINI_WINDOW_WIDTH;
-        this._setStyleByStatus("minimize");
-        this.$window.css("left",left);
-        this.windowStatus = "minimize";
-    };
-
-    /**
-     * 复原窗口到初始(缩放、移动窗口会改变初始位置尺寸信息)尺寸、位置
-     */
-    Window.prototype.resume = function(){
-        this._setButtons("normal");
-        this._setStyleByStatus("normal");
-        if(this.windowStatus == "minimize"){
+        /**
+         * 由最小化打开窗口
+         */
+        open : function(){
+            this._setStyleByStatus("normal");
             this.windowStatus = "normal";
-            var i = 0;
-            $.each(Window.prototype.windowStack,function(index,wnd){
-                if(wnd.windowStatus == "minimize"){
-                    wnd._moveLeft(i++);
+        },
+
+        /**
+         * 关闭当前窗口
+         *
+         * 隐藏并且放置到最底层
+         */
+        close : function(){
+            var max      = ZINDEX,
+                frontWnd = null,
+                $windows = $(".window"),
+                $overlay = $(".overlay");
+
+            this.$window.css("zIndex",ZINDEX).hide();
+            $windows.each(function(){
+                var z = +this.style.zIndex + 1;
+                this.style.zIndex = z;
+                if(z >= max){
+                    max = z;
+                    frontWnd = this;
                 }
             });
-        }
-        this.windowStatus = "normal";
-    };
+            frontWnd.style.zIndex = max+1;
+            $windows.is(":visible") ? $overlay.css("zIndex",max) : $overlay.hide();
 
-    /**
-     * 根据窗口的状态设置窗口样式
-     * @private
-     */
-    Window.prototype._setStyleByStatus = function(status){
-        var op    = this.options,
-            pos   = op.position,
-            KLASS = {minimize:"window mini-window",maximize:"window maxi-window",closed:"window",normal:"window"},
-            style = {width:op.width,height:op.height,left:pos.left,top:pos.top,bottom:"auto",right:"auto"};
-        this.$window.prop("class",KLASS[status]).css(style);
-    };
+            this.$window.removeClass("mini-window");
+            this.windowStatus = "close";
+        },
 
-    /**
-     * 根据当前窗口状态设置窗口按钮组
-     * @param buttons
-     * @private
-     */
-    Window.prototype._setButtons = function(status){
-        var BUTTONS = {minimize:["resume","close"],maximize:["resume","close"],normal:["minimize","maximize","close"]};
-        var $buttons = $(".buttons",this.$window);
-        $(".button",$buttons).hide();
+        /**
+         * 最大化窗口
+         * 最大化后 复原、关闭
+         */
+        maximize : function(){
+            this._setStyleByStatus("maximize");
+            this._setButtons("maximize");
+            this.windowStatus = "maximize";
+        },
 
-        if(status == "minimize"){
-            var $btn = $(".maximize",$buttons).removeClass("maximize").addClass("resume");
-            $("i",$btn).prop("class",icons["Maximize"]);
-        }
+        /**
+         * 最小化窗口
+         * 依次排放到左下侧
+         * 模态窗口没有最小化按钮
+         */
+        minimize : function(){
+            this._setButtons("minimize");
+            $(".window-content",this.$window).hide();
+            var left = $(".mini-window").size() * MINI_WINDOW_WIDTH;
+            this._setStyleByStatus("minimize");
+            this.$window.css("left",left);
+            this.windowStatus = "minimize";
+        },
 
-        if(status == "maximize"){
-            var $btn = $(".maximize",$buttons).removeClass("maximize").addClass("resume");
-            $("i",$btn).prop("class",icons["Resume"]);
-        }
-        if(status == "normal"){
-            var $btn = $(".resume",$buttons).removeClass("resume").addClass("maximize");
-            $("i",$btn).prop("class",icons["Maximize"]);
-        }
-        $.each(BUTTONS[status],function(index,value){
-            $("." + value,$buttons).show();
-        });
-    };
-
-    /**
-     * 当左侧最小化窗口复原后，右侧最小化窗口依次左移一个窗口位置
-     * @param index
-     * @private
-     */
-    Window.prototype._moveLeft = function(index){
-        this.$window.css("left",MINI_WINDOW_WIDTH * index);
-    };
-
-    /**
-     * 把当前窗口顶至最前,与之前最上层窗口替换
-     */
-    Window.prototype.toFront = function(){
-        //TODO:轮询窗口，取最大zindex,替换zindex
-        var frontWnd = this._getFrontWindow();
-        if(this.$window != frontWnd){
-            var zIndex = +this.$window.css("zIndex");
-            this.$window.css("zIndex",frontWnd.css("zIndex"));
-            frontWnd.css("zIndex",zIndex);
-        }
-    };
-
-    /**
-     * 获取最上层窗口
-     * @private
-     */
-    Window.prototype._getFrontWindow = function(){
-        var zIndex = +this.$window.css("zIndex"),
-            wnd = this.$window;
-        $(".window").each(function(){
-            var tempZIndex = +this.style.zIndex;
-            if(tempZIndex  > zIndex){
-                wnd = $(this);
-                zIndex = tempZIndex;
+        /**
+         * 复原窗口到初始(缩放、移动窗口会改变初始位置尺寸信息)尺寸、位置
+         */
+        resume : function(){
+            this._setButtons("normal");
+            this._setStyleByStatus("normal");
+            if(this.windowStatus == "minimize"){
+                this.windowStatus = "normal";
+                var i = 0;
+                $.each(Window.prototype.windowStack,function(index,wnd){
+                    if(wnd.windowStatus == "minimize"){
+                        wnd._moveLeft(i++);
+                    }
+                });
             }
-        });
-        return wnd;
-    };
+            this.windowStatus = "normal";
+        },
 
-    /**
-     * 获取最大zIndex
-     * @returns {number}
-     * @private
-     */
-    Window.prototype._zIndex = function(){
-        var zindex = ZINDEX;
-        $(".window").each(function(i,element){
-            zindex = Math.max(+this.style.zIndex,zindex);
-        });
-        return ++zindex;
-    };
+        /**
+         * 根据窗口的状态设置窗口样式
+         * @private
+         */
+        _setStyleByStatus : function(status){
+            var op    = this.options,
+                pos   = op.position,
+                KLASS = {minimize:"window mini-window",maximize:"window maxi-window",closed:"window",normal:"window"},
+                style = {width:op.width,height:op.height,left:pos.left,top:pos.top,bottom:"auto",right:"auto"};
+            this.$window.prop("class",KLASS[status]).css(style);
+        },
 
+        /**
+         * 根据当前窗口状态设置窗口按钮组
+         * @param buttons
+         * @private
+         */
+        _setButtons : function(status){
+            var BUTTONS = {minimize:["resume","close"],maximize:["resume","close"],normal:["minimize","maximize","close"]};
+            var $actions = $(".actions",this.$window);
+            $(".action",$actions).hide();
+
+            if(status == "minimize"){
+                var $btn = $(".maximize",$actions).removeClass("maximize").addClass("resume");
+                $("i",$btn).prop("class",icons["Maximize"]);
+            }
+
+            if(status == "maximize"){
+                var $btn = $(".maximize",$actions).removeClass("maximize").addClass("resume");
+                $("i",$btn).prop("class",icons["Resume"]);
+            }
+            if(status == "normal"){
+                var $btn = $(".resume",$actions).removeClass("resume").addClass("maximize");
+                $("i",$btn).prop("class",icons["Maximize"]);
+            }
+            $.each(BUTTONS[status],function(index,value){
+                $("." + value,$actions).show();
+            });
+        },
+
+        /**
+         * 当左侧最小化窗口复原后，右侧最小化窗口依次左移一个窗口位置
+         * @param index
+         * @private
+         */
+        _moveLeft : function(index){
+            this.$window.css("left",MINI_WINDOW_WIDTH * index);
+        },
+
+        /**
+         * 把当前窗口顶至最前,与之前最上层窗口替换
+         */
+        toFront : function(){
+            /**
+             * 轮询窗口，取最大zindex,替换zindex
+             */
+            var frontWnd = this._getFrontWindow();
+            if(this.$window != frontWnd){
+                var zIndex = +this.$window.css("zIndex");
+                this.$window.css("zIndex",frontWnd.css("zIndex"));
+                frontWnd.css("zIndex",zIndex);
+            }
+        },
+
+        /**
+         * 获取最上层窗口
+         * @private
+         */
+        _getFrontWindow : function(){
+            var zIndex = +this.$window.css("zIndex"),
+                wnd = this.$window;
+            $(".window").each(function(){
+                var tempZIndex = +this.style.zIndex;
+                if(tempZIndex  > zIndex){
+                    wnd = $(this);
+                    zIndex = tempZIndex;
+                }
+            });
+            return wnd;
+        },
+
+        /**
+         * 获取最大zIndex
+         * @returns {number}
+         * @private
+         */
+        _zIndex : function(){
+            var zindex = ZINDEX;
+            $(".window").each(function(i,element){
+                zindex = Math.max(+this.style.zIndex,zindex);
+            });
+            return ++zindex;
+        },
+
+        _destory : function(){
+            var $element = this.$element,
+                $warpper = $element.parents(".window");
+            $warpper.after($element).remove();
+        }
+    });
     cri.Window = Window;
 
     $.fn.window = function(option) {
@@ -5271,7 +4249,7 @@
                 wnd     = $this.data('window'),
                 options = typeof option == 'object' && option;
             if(wnd != null){
-                wnd.$window.before($this).remove();
+                wnd._destory();
             }
             $this.data('window', (wnd = new Window(this, options)));
         });
