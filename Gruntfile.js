@@ -6,6 +6,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');  // 动态执行任务
     grunt.loadNpmTasks('grunt-contrib-qunit');  //js 单元测试
     grunt.loadNpmTasks('grunt-tomcat-deploy');  //发布
+    grunt.loadNpmTasks('grunt-zip');  //发布
 
     // 配置
     grunt.initConfig({
@@ -109,6 +110,12 @@ module.exports = function (grunt) {
             redeploy:{
                 files: 'api/**',
                 tasks: "tomcat_redeploy"
+            }
+        },
+        zip: {
+            cri:{
+                dest:'api/html/zip/cri.zip',
+                src:['script/func/cri/final/**']
             }
         }
     });
