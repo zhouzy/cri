@@ -27,7 +27,7 @@
         title:null,
         param:null,
         rows:[],
-        selectedRow:null,
+        onSelected:null,
         onDblClick:null,
         page:true,
         async:false,
@@ -168,6 +168,11 @@
             }
         },
 
+        /**
+         * 同步数据
+         * @returns {boolean}
+         * @private
+         */
         _getData:function(){
             var tree = this;
             $.ajax({
@@ -183,6 +188,10 @@
             return true;
         },
 
+        /**
+         * 生成tree视图
+         * @private
+         */
         _createTree:function(){
             var op      = this.options,
                 height  = _getElementHeight(this.$element,op.height),
@@ -307,8 +316,8 @@
                 ,id = item.data('uid')
                 ,op = this.options;
             this._getDataById(id);
-            if(op.onClick){
-                op.onClick(op.selectedRow);
+            if(op.onSelected){
+                op.onSelected(op.selectedRow);
             }
         },
 

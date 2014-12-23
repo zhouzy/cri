@@ -26,6 +26,22 @@
         box-shadow: inset 0px 1px 1px @color-toolbar-button-active, 0px 1px 0px @color-toolbar-button-active;
         border-color:darken(@color-toolbar-button-active,20%);
     }
+    &.disabled{
+        cursor:inherit;
+        background:#f2f2f2;
+        color: #a5a5a5;
+        &:hover{
+            border-color:@color-button-border;
+        }
+        &:active{
+            background:#f2f2f2;
+            color: #a5a5a5;
+            -webkit-box-shadow:none;
+            -moz-box-shadow:none;
+            box-shadow:none;
+            border-color:@color-button-border;
+        }
+    }
     i{
         font-size:1.2em;
         margin-right:5px;

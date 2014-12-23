@@ -14,22 +14,22 @@
     var _defaultOptions = {
         text:"",
         iconCls:null,
-        onClick:null,//button={iconCls:"",handler:""}
+        handler:null,
         enable:true
     };
 
     var BUTTON = "button";
 
+    //TODO:添加enable，disable方法
+
     var Button = cri.Widgets.extend(function(element,options){
-        this.options = _defaultOptions;
+        this.options     = _defaultOptions;
         this.$inputGroup = null;
+        this.$button     = null;
         cri.Widgets.apply(this,arguments);
     });
 
     $.extend(Button.prototype,{
-        _eventListen:function(){
-
-        },
 
         _init:function(){
             this._create();
@@ -40,14 +40,29 @@
                 $e = this.$element.hide();
 
             $e.wrap('<div class="'+ BUTTON + '"></div>');
-
-            var $button = this.$button = $e.parent();
-            var $icon = $('<i class="' + op.iconCls + '"></i>');
-            var text = op.text || $e.text() || $e.val();
+            var $button = this.$button = $e.parent(),
+                $icon = $('<i class="' + op.iconCls + '"></i>'),
+                text = op.text || $e.text() || $e.val();
             $button.append($icon, text);
             $button.on("click",function(){
-                op.onClick && op.onClick.call();
+                op.handler && op.handler.call();
             });
+            if(!op.enable){
+                this.disable();
+            }
+        },
+
+        enable:function(){
+            var that = this;
+            this.$button.removeClass("disabled");
+            this.$button.on("click",function(){
+                that.options.handler && that.options.handler.call();
+            });
+        },
+
+        disable:function(){
+            this.$button.addClass("disabled");
+            this.$button.off("click");
         }
     });
 
@@ -57,10 +72,10 @@
         var o = null;
         this.each(function () {
             var $this   = $(this),
-                o   = $this.data('button'),
+                button  = $this.data('button'),
                 options = typeof option == 'object' && option;
-            if(o != null){
-                o._destory();
+            if(button != null){
+                button._destory();
             }
             $this.data('button', (o = new Button(this, options)));
         });

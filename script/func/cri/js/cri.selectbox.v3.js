@@ -12,19 +12,14 @@
         $   = window.jQuery;
 
     var SELECTBOX_GROUP = "selectBox-group",
-        SELECTBOX_BODY  = "selectBox-body",
-        SELECTBOX_INPUT = "selectBox-input",
         SELECTBOX_BTN   = "fa fa-caret-down",
         OPTIONS  = "options",
         SELECTED = "selected";
 
     var _defaultOptions = {
-        label:''
-        ,data:null//Array [{value:"",text:""},{value:"",text:""}]
-        ,optionLabel:''
-        ,value:null//Function: get or set selectBox value
-        ,text:null//Function: get or set selectBox text
-        ,change:null//Function: call back after select option
+        label:'',
+        data:null,  //Array [{value:"",text:""},{value:"",text:""}]
+        change:null //Function: call back after select option
     };
 
     var SelectBox = cri.Widgets.extend(function(element,options){
@@ -58,8 +53,8 @@
                 button = {iconCls:SELECTBOX_BTN,handler:function(){
                     that.listView.toggle();
                 }};
-
             this.input = new cri.Input(this.$element,{
+                label:that.label,
                 readonly:true,
                 value:this.$element.find("option:selected").text(),
                 button:button,

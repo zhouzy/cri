@@ -92,24 +92,25 @@
      * @private
      */
     var _defaultOptions = {
+        title:null,
+        height:null,
+        width:null,
+        toolbar:null,
         url:null,
         param:{},
-        title:null,
-        toolbar:null,
-        columns:null,
-        rows:null,
-        rowNum:true,
         checkBox:false,
+        rowNum:true,
+        columns:null,
         pagination:true,
         page:1,
         pageSize:10,
 
-        ajaxDone:null,
-        ajaxError:null,
-        onChange:null,    //行点击时触发
+        onChange:null,   //行点击时触发
         onDblClick:null, //双击行时触发
         onSelected:null, //当选择一行或者多行时触发
-        onLoad:null      //构造表格结束时触发
+        onLoad:null,     //构造表格结束时触发
+        ajaxDone:null,   //当AJAX请求成功后触发
+        ajaxError:null   //当AJAX请求失败后触发
     };
 
     var Grid = cri.Widgets.extend(function(element,options){
@@ -118,11 +119,12 @@
         this.$grid       = null;
         this.$gridhead   = null;
         this.$gridbody   = null;
-        this.$toolbar    = null;
+        this.toolbar     = null;
         this.pager       = null;
         this.$title      = null;
+        this._rows       = null;
         this._columns    = [];
-        this.selectedId  = [];
+        this._selectedId = [];
         this._gridClassName = this._gridClassName || "datagrid";
         cri.Widgets.apply(this,arguments);
     });
@@ -176,15 +178,15 @@
                 .on('click',"input[type=checkbox]",function(e){
                     var isChecked = $(e.target).prop("checked");
                     if(isChecked){
-                        that.selectedId = [];
+                        that._selectedId = [];
                         $("tr",that.$gridbody).each(function(){
                             var $tr = $(this);
-                            that.selectedId.push($tr.data("rowid"));
+                            that._selectedId.push($tr.data("rowid"));
                             $tr.addClass("selected");
                             $('input[type=checkbox]',$tr).prop("checked",isChecked);
                         });
                     }else{
-                        that.selectedId = [];
+                        that._selectedId = [];
                         $("tr",that.$gridbody).removeClass("selected");
                     }
                     $("input[type=checkbox]",that.$gridbody).each(function(){
@@ -296,13 +298,14 @@
                 op       = this.options,
                 id       = 0,
                 lineNum  = 1 + op.pageSize * (op.page - 1),
-                columns  = this._columns;
+                columns  = this._columns,
+                rows     = this._rows;
 
             $table.append($("colgroup",this.$gridhead).clone());
 
-            for(var i = 0,len = op.rows.length; i<len; i++){
-                var row = op.rows[i];
-                var $tr  = $('<tr></tr>').data("rowid",id);
+            for(var i = 0,len = rows.length; i<len; i++){
+                var row = rows[i],
+                    $tr = $('<tr></tr>').data("rowid",id);
 
                 if(op.checkBox){
                     $tr.append($("<td></td>").addClass("line-checkbox").append('<input type="checkbox"/>'));
@@ -400,15 +403,15 @@
                     if(op.ajaxDone){
                         op.ajaxDone(data);
                     }
-                    op.rows = data.rows || [];
+                    that._rows = data.rows || [];
                     op.total = data.total || 0;
-                    that.pager && that.pager.update(op.page,op.pageSize,op.total,op.rows.length);
+                    that.pager && that.pager.update(op.page,op.pageSize,op.total,that._rows.length);
                     that._refreshBody(that.$gridbody);
                 },
                 error: function(XMLHttpRequest, textStatus, errorThrown){
-                    op.rows = [];
+                    that._rows = [];
                     op.total = 0;
-                    that.pager && that.pager.update(op.page,op.pageSize,op.total,op.rows.length);
+                    that.pager && that.pager.update(op.page,op.pageSize,op.total,that._rows.length);
                     that._refreshBody(that.$gridbody);
                 },
                 data:op.param,
@@ -430,31 +433,31 @@
 
             if(!this.options.checkBox){
                 if(item.hasClass("selected")){
-                    this.selectedId = [];
+                    this._selectedId = [];
                     item.removeClass("selected");
                 }else{
-                    this.selectedId = this.selectedId || [];
+                    this._selectedId = this._selectedId || [];
                     $("tr.selected",this.$gridbody).removeClass("selected");
                     item.addClass("selected");
-                    this.selectedId = [rowId];
+                    this._selectedId = [rowId];
                 }
             }
             else{
                 if(item.hasClass("selected")){
-                    var index = $.inArray(rowId,this.selectedId);
-                    index >= 0 && this.selectedId.splice(index,1);
+                    var index = $.inArray(rowId,this._selectedId);
+                    index >= 0 && this._selectedId.splice(index,1);
                     item.removeClass("selected");
                     $("input[type=checkbox]",item).prop("checked",false);
                 }else{
-                    this.selectedId = this.selectedId || [];
+                    this._selectedId = this._selectedId || [];
                     item.addClass("selected");
-                    this.selectedId.push(rowId);
+                    this._selectedId.push(rowId);
                     if(this.options.checkBox){
                         $("input[type=checkbox]",item).prop("checked",true);
                     }
                 }
             }
-            if(this.selectedId && this.selectedId.length){
+            if(this._selectedId && this._selectedId.length){
                 this.options.onSelected && this.options.onSelected.call(this);
             }
         },
@@ -472,7 +475,7 @@
         },
 
         _getRowDataById:function(rowid){
-            return this.options.rows[parseInt(rowid)];
+            return this._rows[parseInt(rowid)];
         },
 
         _onDblClickRow:function(e){
@@ -480,7 +483,7 @@
                 ,item = $(e.target).closest("tr")
                 ,rowid = item.data('rowid')
                 ,that = this;
-            this.selectedId = [rowid];
+            this._selectedId = [rowid];
             if(op.onDblClick){
                 op.onDblClick();
             }
@@ -488,21 +491,22 @@
 
         reload:function(param){
             param && (this.options.param = param);
-            this.selectedId = [];
+            this._selectedId = [];
             this._getData();
         },
 
         loadData:function(param){
             if(param.push){
-                this.options.rows = param;
+                this._rows = param;
                 this._refreshBody();
             }
         },
 
         getSelected:function(){
-            var selected = [];
-            for(var i=0; i<this.selectedId.length;i++){
-                selected.push(this._getRowDataById(this.selectedId[i]));
+            var selected = [],
+                selectedId = this._selectedId;
+            for(var i=0; i<selectedId.length;i++){
+                selected.push(this._getRowDataById(selectedId[i]));
             }
             return selected;
         }

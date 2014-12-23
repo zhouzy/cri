@@ -31,7 +31,7 @@
         url:"./html/data/menu-data.json",
         onClick:function(row){
             getRefreshF(row)();
-            open(row.url);
+            row.url && openRight(row.url);
         }
     });
 
@@ -52,8 +52,12 @@
             $breadcrumbs.append($firstNav,$split,$currentNav);
         }
     }
-    function open(url){
-        $("#right iframe").prop("src",url);
+    function openRight(url){
+        if(url.indexOf("/template/")>-1){
+            window.open(url);
+        }else{
+            $("#right iframe").prop("src",url);
+        }
     }
 </script>
 </body>

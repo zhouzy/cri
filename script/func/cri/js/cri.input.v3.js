@@ -13,8 +13,8 @@
 
     var _defaultOptions = {
         label:null,
-        button:null,//button={iconCls:"",handler:""}
         value:null,
+        button:null,//button={iconCls:"",handler:""}
         readonly:false,
         onFocus:null,
         onBlur:null,

@@ -1,0 +1,32 @@
+@header-height:100px;
+#header{
+    position:fixed;
+    height:@header-height;
+	.logo{
+		padding:16px 0 16px 5px;
+		height:40px;
+	}
+}
+#wrapper{
+    #left{
+        position:fixed;
+        top:@header-height;
+        bottom:0px;
+        width:200px;
+    }
+    #right{
+        position:absolute;
+        left:205px;
+		top:@header-height;
+        bottom:3px;/*chrome bug*/
+        right:0;
+    }
+}
+#footer{
+	position:fixed;
+	bottom:0;
+	width:100%;
+	height:40px;
+	//background:#444;
+	//background:rgba(0,0,0,0.6);
+}

@@ -1,0 +1,28 @@
+#header {
+  position: fixed;
+  height: 100px;
+}
+#header .logo {
+  padding: 16px 0 16px 5px;
+  height: 40px;
+}
+#wrapper #left {
+  position: fixed;
+  top: 100px;
+  bottom: 0px;
+  width: 200px;
+}
+#wrapper #right {
+  position: absolute;
+  left: 205px;
+  top: 100px;
+  bottom: 3px;
+  /*chrome bug*/
+  right: 0;
+}
+#footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 40px;
+}

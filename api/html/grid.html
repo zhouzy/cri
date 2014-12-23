@@ -17,7 +17,7 @@
 <div class="header">
     <div class="name">cri.Grid</div>
     <div class="type">Grid</div>
-    <div class="des">表格类组件基类，继承自 <a href="./widgets">Widgets</a></div>
+    <div class="des">表格类组件基类，继承自 <a href="./widget.html">Widgets</a></div>
 </div>
 
 <h2>属性</h2>
@@ -45,17 +45,16 @@
 </h3>
 <p class="item-body">
     定义树形菜单工具栏
-    <pre><code>
-    text:按钮文本
-    iconCls:按钮图标,根据项目使用的字体库,cri默认依赖Font-Awesome字体库,请到Font-Awesome挑选图标
-    handler:回调函数
+    <pre class="code"><code>
+        text:按钮文本
+        iconCls:按钮图标,根据项目使用的字体库,cri默认依赖Font-Awesome字体库,请到Font-Awesome挑选图标
+        handler:回调函数
 
-    toolbar:[{text:'添加',iconCls:'fa fa-plus',handler:addFun},
-             {text:'删除',iconCls:'fa fa-times',handler:deleteFun},
-             {text:'修改',iconCls:'fa fa-pencil',handler:updateFun}
-    ]
+        toolbar:[{text:'添加',iconCls:'fa fa-plus',handler:addFun},
+                 {text:'删除',iconCls:'fa fa-times',handler:deleteFun},
+                 {text:'修改',iconCls:'fa fa-pencil',handler:updateFun}
+        ]
     </code></pre>
-
 </p>
 
 <h3 class="item-head">
@@ -65,7 +64,7 @@
 <p class="item-body">数据请求地址</p>
 
 <h3 class="item-head">
-    <div class="name">Param</div>
+    <div class="name">param</div>
     <div class="type">Object</div>
 </h3>
 <p class="item-body">请求数据参数</p>
@@ -88,7 +87,7 @@
 </h3>
 <p class="item-body">
     列定义
-    <pre><code>
+    <pre class="code"><code>
         field :显示PO中的指定的字段
         width :列宽度
         columns:[
@@ -136,7 +135,7 @@
 </h3>
 <p class="item-body">
     根据参数中的数据构造Grid
-    <pre><code>
+    <pre class="code"><code>
         var grid = $("#tt").datagrid();
         grid.loadData([
             {fieldA:'A',fieldB:'B',fieldC:'C'},

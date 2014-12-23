@@ -139,3 +139,9 @@ ul.item-body li{
     color: #0000ef;
     cursor:pointer;
 }
+.code{
+    display:block;
+    padding:10px;
+    margin:5px;
+    background: #e5e5e5;
+}
