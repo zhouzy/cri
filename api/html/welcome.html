@@ -33,7 +33,7 @@
     <h3 class="item-head">依赖</h3>
     <ul class="item-body">
         <li>jQuery</li>
-        <li><a href="javascript:window.open('http://fortawesome.github.io/Font-Awesome/')">Font Awesome</a></li>
+        <li><a id="fontAwesomeLink" href="javascript:void(0);">Font Awesome</a></li>
     </ul>
     <h3 class="item-head">1.初始化方式</h3>
     <p class="item-body">
@@ -76,7 +76,10 @@
 
             return str;
         }
-
+        $("#fontAwesomeLink").on("click",openFontAs);
+        function openFontAs(){
+            window.open('http://fortawesome.github.io/Font-Awesome/');
+        }
     </script>
 </body>
 </html>

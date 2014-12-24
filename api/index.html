@@ -30,8 +30,10 @@
         title:"cri widget",
         url:"./html/data/menu-data.json",
         onClick:function(row){
-            getRefreshF(row)();
-            row.url && openRight(row.url);
+            if(row.url){
+                getRefreshF(row)();
+                openRight(row.url);
+            }
         }
     });
 
