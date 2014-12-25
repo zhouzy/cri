@@ -140,6 +140,8 @@ ul.item-body li{
     cursor:pointer;
 }
 .code{
+    font-family:"Times New Roman","Microsoft YaHei","微软雅黑",STXihei,"华文细黑",serif;
+    line-height:1.5;
     display:block;
     padding:10px;
     margin:5px;

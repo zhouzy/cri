@@ -25,7 +25,6 @@
     var SelectBox = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
         this.$selectBoxGroup = null;
-        this.$selectBoxOptions = null;
         this.input = null;
         this._value = null;
         this._text = null;
@@ -70,8 +69,8 @@
                 data:that._data(),
                 value:that.$element.val(),
                 onChange:function(value,text){
-                    that.$element.val(value);
                     that.input.value(text);
+                    that.$element.val(value);
                 }
             });
         },

@@ -3,6 +3,7 @@
         "text":"widgets",
         "hasChildren":true,
         "state":"close",
+        "url":"./html/widget.html",
         "children":[
             {
                 "text":"framework",

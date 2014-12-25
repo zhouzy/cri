@@ -32,18 +32,8 @@
 
     cri.Class = Class;
 
-    cri.isArray = function(value){
-        if(value instanceof Array ||
-            (!(value instanceof Object) &&
-                (Object.prototype.toString.call((value)) == '[object Array]') ||
-                typeof value.length == 'number' &&
-                typeof value.splice != 'undefined' &&
-                typeof value.propertyIsEnumerable != 'undefined' &&
-                !value.propertyIsEnumerable('splice'))) {
-            return true;
-        }else{
-            return false;
-        }
+    cri.isArray = function(o){
+        return Object.prototype.toString.call(o) === '[object Array]';
     };
 
     /**
@@ -62,7 +52,12 @@
                     return true;
                 }
             }
-            o[this.name] = this.value;
+            if($(this).is("select")){
+                o[this.name] = $(this).val();
+            }
+            else{
+                o[this.name] = this.value;
+            }
         });
         return o;
     };
@@ -1602,7 +1597,6 @@
     var SelectBox = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
         this.$selectBoxGroup = null;
-        this.$selectBoxOptions = null;
         this.input = null;
         this._value = null;
         this._text = null;
@@ -1647,8 +1641,8 @@
                 data:that._data(),
                 value:that.$element.val(),
                 onChange:function(value,text){
-                    that.$element.val(value);
                     that.input.value(text);
+                    that.$element.val(value);
                 }
             });
         },

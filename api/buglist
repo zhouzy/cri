@@ -40,3 +40,6 @@ TimeInput
 Validator
 1.错误提示 'undefined' (fixed)
 2.timeInput 未触发validator(validateOnBlur=true) validate方法(fixed)
+
+FromValue
+1.SelectBox 不能取到值 (fixed)
