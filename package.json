@@ -1,6 +1,6 @@
 {
-  "name": "ThereAreFishes",
-  "version": "0.0.1",
+  "name": "easy-bootstrap",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "start": "node app.js"
@@ -9,9 +9,8 @@
     "grunt": "*",
     "grunt-contrib-concat": "~0.4.0",
     "grunt-contrib-jshint": "~0.6.0",
-    "grunt-contrib-less": "~0.11.0",
+    "grunt-contrib-less": "~1.0.0",
     "grunt-contrib-nodeunit": "~0.2.0",
-    "grunt-contrib-qunit": "^0.5.2",
     "grunt-contrib-uglify": "~0.2.2",
     "grunt-contrib-watch": "~0.6.1",
     "grunt-tomcat-deploy": "*",

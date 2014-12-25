@@ -4,6 +4,7 @@
     height:40px;
     background:#444;
     background:rgba(0,0,0,0.6);
+    z-index:10000;
 }
 .info{
     color: #ffffff;
@@ -28,7 +29,7 @@
     bottom:3px;/*chrome bug*/
     right:0;
 }
-#right iframe{
-    width:100%;
+#iframe{
     height:90%;
+    margin:0 40px;
 }
