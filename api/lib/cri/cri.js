@@ -32,18 +32,8 @@
 
     cri.Class = Class;
 
-    cri.isArray = function(value){
-        if(value instanceof Array ||
-            (!(value instanceof Object) &&
-                (Object.prototype.toString.call((value)) == '[object Array]') ||
-                typeof value.length == 'number' &&
-                typeof value.splice != 'undefined' &&
-                typeof value.propertyIsEnumerable != 'undefined' &&
-                !value.propertyIsEnumerable('splice'))) {
-            return true;
-        }else{
-            return false;
-        }
+    cri.isArray = function(o){
+        return Object.prototype.toString.call(o) === '[object Array]';
     };
 
     /**
@@ -62,7 +52,12 @@
                     return true;
                 }
             }
-            o[this.name] = this.value;
+            if($(this).is("select")){
+                o[this.name] = $(this).val();
+            }
+            else{
+                o[this.name] = this.value;
+            }
         });
         return o;
     };
@@ -145,14 +140,14 @@
      *把日期分割成数组
      */
     cri.date2Array = function(myDate){
-        var myArray = Array();
-        myArray[0] = myDate.getFullYear();
-        myArray[1] = myDate.getMonth();
-        myArray[2] = myDate.getDate();
-        myArray[3] = myDate.getHours();
-        myArray[4] = myDate.getMinutes();
-        myArray[5] = myDate.getSeconds();
-        return myArray;
+        return [
+            myDate.getFullYear(),
+            myDate.getMonth(),
+            myDate.getDate(),
+            myDate.getHours(),
+            myDate.getMinutes(),
+            myDate.getSeconds()
+        ];
     };
 
     /**
@@ -177,7 +172,7 @@
      */
     cri.string2Date  = function(DateStr){
         var converted = Date.parse(DateStr);
-        var myDate = new Date(converted);
+        var myDate    = new Date(converted);
         if (isNaN(myDate))
         {
             var arys= DateStr.split('-');
@@ -1602,7 +1597,6 @@
     var SelectBox = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
         this.$selectBoxGroup = null;
-        this.$selectBoxOptions = null;
         this.input = null;
         this._value = null;
         this._text = null;
@@ -1647,8 +1641,8 @@
                 data:that._data(),
                 value:that.$element.val(),
                 onChange:function(value,text){
-                    that.$element.val(value);
                     that.input.value(text);
+                    that.$element.val(value);
                 }
             });
         },
