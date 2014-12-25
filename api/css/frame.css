@@ -26,8 +26,9 @@
     position:absolute;
     left:200px;
     top:40px;
-    bottom:3px;/*chrome bug*/
+    bottom:0px;/*chrome bug*/
     right:0;
+    overflow-x:auto;
 }
 #iframe{
     height:90%;
