@@ -1,0 +1,49 @@
+@import "lib.less";
+@import "theme-default.less";
+.button{
+    background:#FFF;
+    color:@color-font;
+    text-align: center;
+    display:inline-block;
+    height:24px;
+    line-height:24px;
+    border: 1px solid @color-button-border;
+    cursor: pointer;
+    list-style: none outside none;
+    min-width: 60px;
+    margin:5px 5px 0 0;
+    padding:0 5px;
+    .user-not-select;
+    .rounded-corners(4px);
+    &:hover{
+        border-color:@color-button-hover-border;
+    }
+    &:active{
+        color:@color-button-active-icon;
+        background:@color-toolbar-button-active;
+        -webkit-box-shadow: inset 0px 1px 1px @color-toolbar-button-active, 0px 1px 0px @color-toolbar-button-active;
+        -moz-box-shadow: inset 0px 1px 1px @color-toolbar-button-active, 0px 1px 0px @color-toolbar-button-active;
+        box-shadow: inset 0px 1px 1px @color-toolbar-button-active, 0px 1px 0px @color-toolbar-button-active;
+        border-color:darken(@color-toolbar-button-active,20%);
+    }
+    &.disabled{
+        cursor:inherit;
+        background:#f2f2f2;
+        color: #a5a5a5;
+        &:hover{
+            border-color:@color-button-border;
+        }
+        &:active{
+            background:#f2f2f2;
+            color: #a5a5a5;
+            -webkit-box-shadow:none;
+            -moz-box-shadow:none;
+            box-shadow:none;
+            border-color:@color-button-border;
+        }
+    }
+    i{
+        font-size:1.2em;
+        margin-right:5px;
+    }
+}

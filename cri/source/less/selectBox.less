@@ -1,0 +1,42 @@
+@import "lib.less";
+@import "theme-default.less";
+
+@selectBox-width:180px;
+.selectBox-group{
+    display:inline-block;
+    word-spacing:-1px;
+    font-size: 0;
+    -webkit-text-size-adjust:none;
+    position:relative;
+    vertical-align:top;
+    .options{
+        font-size:14px;
+        width:@selectBox-width;
+        display:block;
+        margin-top: -5px;
+        position:absolute;
+        left:80px;
+        width:@selectBox-width - 2px;
+        border:1px solid @color-input-border;
+        background:#F2F2F2;
+        .rounded-corners(3px);
+        .box-shadow(0,2px,2px,0,#CCC);
+        padding:4px 0;
+        li{
+            display:inline-block;
+            width:96%;
+            margin:0 2%;
+            .rounded-corners(3px);
+            height:26px;
+            line-height:26px;
+            text-align:center;
+            &:hover{
+                background:@color-selectBox-option-hover;
+            }
+        }
+        li.selected{
+            background:@color-selectBox-option-selected;
+            color:#fff;
+        }
+    }
+}

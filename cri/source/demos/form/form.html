@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <script src="../../cri/jquery/jquery-1.9.1.js" type="text/javascript"></script>
+    <script src="../../cri/cri/cri/cri.js" type="text/javascript"></script>
+    <title></title>
+</head>
+<body>
+<form>
+    <input name="inputA" value="helloA"/>
+
+    <input type="checkbox" name="checkBoxA" value="checkBoxA"checked/>
+    <input type="checkbox" name="checkBoxB" value="checkBoxB"/>
+
+    <input type="radio" name="radio" value="radioA"/>
+    <input type="radio" name="radio" value="radioB" checked/>
+    <input type="radio" name="radio" value="radioC"/>
+
+    <select name="select">
+        <option value="1">selectA</option>
+        <option value="2">selectB</option>
+        <option value="3">selectC</option>
+    </select>
+</form>
+<script>
+    $("select").val("2");
+    console.log($('form').formValue());
+    $('form').formValue({inputA: "helloB", checkBoxA: "checkBoxA", radio: "radioB", select: "3"})
+</script>
+</body>
+</html>
