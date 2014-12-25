@@ -25,8 +25,8 @@
     var SelectBox = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
         this.$selectBoxGroup = null;
-        this.$selectBoxInput = null;
         this.$selectBoxOptions = null;
+        this.input = null;
         this._value = null;
         this._text = null;
         cri.Widgets.apply(this,arguments);
@@ -98,6 +98,20 @@
         },
 
         /**
+         * 根据value值获取对应的text值
+         * @param value
+         * @private
+         */
+        _getTextByValue:function(value){
+            var data = this.options.data;
+            for(var i= 0,len=data.length; i<len; i++){
+                if(data[i].value === value){
+                    return data[i].text;
+                }
+            }
+        },
+
+        /**
          * get or set selectBox value
          * @param value
          * @returns {*}
@@ -106,7 +120,7 @@
             if(arguments.length>0){
                 this._value = value;
                 this.$element.val(value);
-                this.$selectBoxInput.text(this.options.data[value]);
+                this.input.value(this._getTextByValue(value));
             }
             else{
                 return this._value;
@@ -128,7 +142,7 @@
                 }
                 this._value = value;
                 this.$element.val(value);
-                this.$selectBoxInput.text(text);
+                this.input.value(text);
             }
             else{
                 return this._text;

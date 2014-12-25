@@ -35,5 +35,55 @@
         $("form").formValue(nameValues);
     </code></pre>
 </p>
+<h3 class="item-head">
+    <div class="name">isLeapYear</div>
+    <div class="type">Boolean</div>
+</h3>
+<p class="item-body">
+    判断闰年
+    <pre class="code"><code>
+        var isLeapYear = cri.isLeapYear(new Date());
+    </code></pre>
+</p>
+<h3 class="item-head">
+    <div class="name">formatDate</div>
+    <div class="type">String</div>
+</h3>
+<p class="item-body">
+    转换日期成字符串
+    <pre class="code"><code>
+        var dateStr = cri.formatDate(new Date());
+    </code></pre>
+</p>
+<h3 class="item-head">
+    <div class="name">string2Date</div>
+    <div class="type">Date</div>
+</h3>
+<p class="item-body">
+    字符串转换成Date
+    <pre class="code"><code>
+        var date = cri.string2Date('2014/06/07');
+    </code></pre>
+</p>
+<h3 class="item-head">
+    <div class="name">date2Json</div>
+    <div class="type">Object</div>
+</h3>
+<p class="item-body">
+    Date转换成对象{yyyy:'2015',MM:'01',dd:'01',mm:'00',HH:'00',ss:'00',ww:'4'}
+    <pre class="code"><code>
+        var date = cri.date2Json('2015/01/01');
+    </code></pre>
+</p>
+<h3 class="item-head">
+    <div class="name">date2Array</div>
+    <div class="type">Array</div>
+</h3>
+<p class="item-body">
+    Date保存到数组[年,月,日,时,分,秒]
+    <pre class="code"><code>
+        var arr = cri.date2Array(new Date());
+    </code></pre>
+</p>
 </body>
 </html>

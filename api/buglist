@@ -31,9 +31,11 @@ Input
 
 SelectBox
 1.失去焦点，未触发validator(validateOnBlur=true) validate方法(fixed)
+2.value方法报错(fixed)
 
 TimeInput
 1.未选择HMS时，输入框显示了小时分钟秒信息(fixed)
+2.初始化时，日期显示不正确(fixed)
 
 Validator
 1.错误提示 'undefined' (fixed)

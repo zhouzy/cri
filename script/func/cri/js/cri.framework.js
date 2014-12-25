@@ -93,9 +93,14 @@
         }
     };
 
+    /**
+     * 判断是否为闰年
+     * @param year
+     * @returns {boolean}
+     */
     cri.isLeapYear = function(year){
         return (0==year%4&&((year%100!=0)||(year%400==0)));
-    }
+    };
 
     /**
      * 日期格式化
@@ -134,29 +139,45 @@
         str=str.replace(/ss|SS/,second>9?second.toString():'0' + second);
         str=str.replace(/s|S/g,second);
         return str;
-    }
+    };
 
     /**
      *把日期分割成数组
      */
     cri.date2Array = function(myDate){
-        var myArray = Array();
-        myArray[0] = myDate.getFullYear();
-        myArray[1] = myDate.getMonth();
-        myArray[2] = myDate.getDate();
-        myArray[3] = myDate.getHours();
-        myArray[4] = myDate.getMinutes();
-        myArray[5] = myDate.getSeconds();
-        return myArray;
+        return [
+            myDate.getFullYear(),
+            myDate.getMonth(),
+            myDate.getDate(),
+            myDate.getHours(),
+            myDate.getMinutes(),
+            myDate.getSeconds()
+        ];
     };
 
+    /**
+     * 日期保存为JSON
+     * @param myDate
+     * @returns {{yyyy: number, MM: number, dd: (*|number), HH: number, mm: number, ss: number, ww: number}}
+     */
+    cri.date2Json = function(myDate){
+        return {
+            yyyy:myDate.getFullYear(),
+            MM:myDate.getMonth(),
+            dd:myDate.getDate(),
+            HH:myDate.getHours(),
+            mm:myDate.getMinutes(),
+            ss:myDate.getSeconds(),
+            ww:myDate.getDay()
+        };
+    };
     /**
      * 字符串转成日期类型
      * 格式 MM/dd/YYYY MM-dd-YYYY YYYY/MM/dd YYYY-MM-dd
      */
-    cri.StringToDate  = function(DateStr){
+    cri.string2Date  = function(DateStr){
         var converted = Date.parse(DateStr);
-        var myDate = new Date(converted);
+        var myDate    = new Date(converted);
         if (isNaN(myDate))
         {
             var arys= DateStr.split('-');

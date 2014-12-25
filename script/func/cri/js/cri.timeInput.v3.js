@@ -16,17 +16,6 @@
         TIME_BOX         = "eb_timeBox",
         TIME_INPUT_ICON  = "fa fa-table";
 
-    function getDate(yyyy,MM,dd,HH,mm,ss){
-        var date = new Date();
-        date.setFullYear(yyyy);
-        date.setMonth(MM);
-        date.setDate(dd);
-        date.setHours(HH);
-        date.setMinutes(mm);
-        date.setSeconds(ss);
-        return date;
-    }
-
     /**
      * 获取某年的月份数组
      * @param year
@@ -122,20 +111,12 @@
         this.$parent = $parent;
         this.$timeBox = null;
         this.$daySelect = null;
-        var date = new Date();
         this.options = $.extend({
+            value:new Date(),
             HMS:false,
-            onChange:null,
-            date:{
-                yyyy:date.getFullYear(),
-                MM:date.getMonth(),
-                dd:date.getDate(),
-                HH:date.getHours(),
-                mm:date.getMinutes(),
-                ss:date.getSeconds(),
-                ww:date.getDay()
-            }
+            onChange:null
         },options);
+        this.date = cri.date2Json(this.options.value);
         this._create($parent);
     };
 
@@ -148,7 +129,10 @@
         _create:function($parent){
             var $timeBox = this.$timeBox = $('<div class="' + TIME_BOX + '"></div>');
             var $titleBar = $('<div class="eb_titleBar"></div>');
-            $titleBar.append(this._yearSelect(),this._monthSelect(),'<span style="position:absolute;top:5px;right:23px;">月</span>');
+            $titleBar.append(
+                this._yearSelect(),
+                this._monthSelect(),
+                '<span style="position:absolute;top:5px;right:23px;">月</span>');
             $timeBox.append($titleBar,this._daySelect());
             if(this.options.HMS == true){
                 $timeBox.append(this._hmsSelect());
@@ -158,27 +142,27 @@
 
         _yearSelect : function(){
             var that = this;
-            var date = this.options.date;
+            var date = this.date;
             var $yearSelect = $('<div class="eb_yearSelecter"></div>');
             var $minusBtn   = $('<i class="eb_toLastYear eb_yearButton fa fa-minus"></i>');
             var $plusBtn    = $('<i class="eb_toNextYear eb_yearButton fa fa-plus"></i>');
             var $year       = $('<span class="eb_year">' + date.yyyy + '</span>');
 
             $minusBtn.on("click",function(){
-                $year.html(--that.options.date.yyyy);
+                $year.html(--that.date.yyyy);
                 that._change();
             });
             $plusBtn.on("click",function(){
-                $year.html(++that.options.date.yyyy);
+                $year.html(++that.date.yyyy);
                 that._change();
             });
             $yearSelect.append($minusBtn,$year,'年',$plusBtn);
             return $yearSelect;
         },
 
-        _monthSelect : function(){
+        _monthSelect:function(){
             var that = this,
-                date = this.options.date,
+                date = this.date,
                 $select = $('<select class="eb_monthSelect">');
 
             $.each([1,2,3,4,5,6,7,8,9,10,11,12],function(index,value){
@@ -213,9 +197,9 @@
                 for(var j=0; j<7;j++){
                     var $td = $("<td></td>").on("click",function(){
                         var day = $(this).text();
-                        if(day && day!=that.options.date.dd){
+                        if(day && day!=that.date.dd){
                             $('td.choosed',$daySelect).removeClass("choosed");
-                            that.options.date.dd = +day;
+                            that.date.dd = +day;
                             $(this).addClass("choosed");
                             that._change();
                         }
@@ -233,7 +217,7 @@
          * @private
          */
         _refreshDaySelect:function(){
-            var date   = this.options.date,
+            var date   = this.date,
                 maxDay = getMonthArr(date.yyyy)[date.MM],
                 shift  = new Date(date.yyyy,date.MM,1).getDay();
             $('td.choosed',this.$daySelect).removeClass("choosed");
@@ -244,7 +228,7 @@
                     $td = $('tr.days:eq("'+cols+'") td:eq("' + rows + '")',this.$daySelect),
                     day = i- shift + 1;
                 $td.text(day);
-                day == date.dd && $td.addClass("choosed");
+                day == this.date.dd && $td.addClass("choosed");
             }
         },
 
@@ -253,7 +237,6 @@
                 $hourInput   = $('<input class="eb_HMSInput eb_Hour" value="00" />'),
                 $minuteInput = $('<input class="eb_HMSInput eb_minute"  value="00" />'),
                 $secondInput = $('<input class="eb_HMSInput eb_second"  value="00" />'),
-                date         = this.options.date,
                 that         = this;
 
             $hourInput.on("change",_handleNumF(0,23));
@@ -268,16 +251,15 @@
                     else if(value<min){
                         $(this).val(min);
                     }
-                    date.HH = +$hourInput.val();
-                    date.mm = +$minuteInput.val();
-                    date.ss = +$secondInput.val();
+                    that.date.HH = +$hourInput.val();
+                    that.date.mm = +$minuteInput.val();
+                    that.date.ss = +$secondInput.val();
                     that._change();
                 };
             }
-
             $hmsBar.append($hourInput,":",$minuteInput,":",$secondInput);
             $(".eb_HMSInput",$hmsBar).on("keydown",function(e){
-                var keycode=e.keyCode||e.which||e.charCode;
+                var keycode = e.keyCode || e.which || e.charCode;
                 if((keycode>=48 && keycode<=57) || keycode == 8){
                     return true;
                 }else{
@@ -319,20 +301,12 @@
         },
 
         getDate:function(){
-            var date = this.options.date;
-            return getDate(date.yyyy,date.MM,date.dd,date.HH,date.mm,date.ss);
+            var date = this.date;
+            return new Date(date.yyyy,date.MM,date.dd,date.HH,date.mm,date.ss);
         },
 
         setDate:function(date){
-            this.options.date = {
-                yyyy:date.getFullYear(),
-                MM:date.getMonth(),
-                dd:date.getDate(),
-                HH:date.getHours(),
-                mm:date.getMinutes(),
-                ss:date.getSeconds(),
-                ww:date.getDay()
-            }
+            this.date = cri.date2Json(date);
         }
     };
 
