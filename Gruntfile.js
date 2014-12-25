@@ -15,24 +15,26 @@ module.exports = function (grunt) {
         less: {
             development: {
                 options: {
-                    yuicompress: false
+                    yuicompress:false
                 },
-                files: {
-                    src:["script/func/cri/less/*.less","!script/func/cri/less/lib.less","!script/func/cri/less/theme-default.less"],
-                    dest:"script/func/cri/final/cri.css"
+                files:{
+                    src:[
+                        "cri/source/less/*.less",
+                        "!cri/source/less/lib.less",
+                        "!cri/source/less/heme-default.less"],
+                    dest:"cri/source/less/cri.css"
                 }
             },
             production: {
-                options: {
-                    yuicompress: true
+                options:{
+                    yuicompress:true
                 },
                 files:[{
                     src:[
-                        "script/func/cri/less/*.less",
-                        "!script/func/cri/less/easybootstrap.less",
-                        "!script/func/cri/less/lib.less",
-                        "!script/func/cri/less/theme-default.less"],
-                    dest:"script/func/cri/final/cri.css"
+                        "cri/source/less/*.less",
+                        "!cri/source/less/lib.less",
+                        "!cri/source/less/heme-default.less"],
+                    dest:"cri/source/less/cri.css"
                 }]
             }
         },
@@ -41,21 +43,20 @@ module.exports = function (grunt) {
             js:{
                 files:[{
                     src: [
-                        'script/func/cri/js/cri.framework.js',
-                        'script/func/cri/js/cri.widgets.js',
-                        'script/func/cri/js/cri.grid.js',
-                        'script/func/cri/js/*.js',
-                        '!script/func/cri/js/cri.selectBox.js',
-                        '!script/func/cri/js/cri.timeInput.js',
-                        '!script/func/cri/js/cri.button.js'
+                        'cri/source/js/cri.framework.js',
+                        'cri/source/js/cri.widgets.js',
+                        'cri/source/js/cri.grid.js',
+                        'cri/source/js/*.js'
                     ],
-                    dest:'script/func/cri/final/cri.js'
+                    dest:'cri/source/cri/cri.js'
                 }]
             },
             css:{
                 files:[{
-                    src:["script/func/cri/css/*.css","!script/func/cri/css/easy-*.css","!script/func/cri/css/reset.css"],
-                    dest:"script/func/cri/css/cri.css"
+                    src:[
+                        "cri/source/css/*.css",
+                        "!cri/source/css/easy-*.css"],
+                    dest:"cri/source/css/cri.css"
                 }]
             }
         },
@@ -64,21 +65,10 @@ module.exports = function (grunt) {
             build: {
                 files:[
                     {
-                        src:['script/func/cri/final/cri.js'],
-                        dest:'script/func/cri/final/cri.min.js'
+                        src:['cri/source/cri/cri.js'],
+                        dest:'cri/source/cri/cri.min.js'
                     }
                 ]
-            }
-        },
-
-        //单元测试
-        qunit:{
-            all: {
-                options: {
-                    urls: [
-                        'http://localhost:63342/easy-bootstrap/script/func/cri/test/datagrid/datagrid-test.html'
-                    ]
-                }
             }
         },
 
@@ -92,32 +82,36 @@ module.exports = function (grunt) {
             deploy: '/manager/deploy',
             undeploy: '/manager/undeploy'
         },
-
+        zip: {
+            cri:{
+                dest:'api/download/cri.zip',
+                src:['cri/source/cri/**']
+            }
+        },
         //监控文件变化并动态执行任务(https://github.com/gruntjs/grunt-contrib-watch)
         watch: {
             scripts: {
-                files: ['script/func/cri/js/*.js'],
+                files: ['cri/source/js/*.js'],
                 tasks: ['concat:js']
             },
             css: {
-                files: ['script/func/cri/css/*.css'],
+                files: ['cri/source/css/*.css'],
                 tasks: ['concat:css']
             },
             less: {
-                files: 'script/func/cri/less/*.less',
+                files: 'cri/source/less/*.less',
                 tasks: ['less:production']
             },
             redeploy:{
                 files: 'api/**',
                 tasks: "tomcat_redeploy"
-            }
-        },
-        zip: {
-            cri:{
-                dest:'api/html/zip/cri.zip',
-                src:['script/func/cri/final/**']
+            },
+            zip:{
+                files: 'cri/source/cri/*.*',
+                tasks: "zip:cri"
             }
         }
+
     });
 
     // 开发环境不压缩 可调用 `grunt dev`
