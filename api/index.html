@@ -32,7 +32,7 @@
     $("#menu").tree({
         title:"cri widget",
         url:"./html/data/menu-data.json",
-        onClick:function(row){
+        onSelected:function(row){
             if(row.url){
                 getRefreshF(row)();
                 openRight(row.url);
@@ -48,7 +48,7 @@
             var $currentNav = $('<span class="nav">'+row.text+'</span>');
             $breadcrumbs.empty();
             $firstNav.click(function(){
-                $("#right iframe").prop("src","./html/welcome.html");
+                $("#iframe").load("./html/welcome.html");
                 $split.remove();
                 $currentNav.remove();
                 $firstNav.removeClass("active");
