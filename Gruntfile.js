@@ -17,7 +17,7 @@ module.exports = function (grunt) {
                     yuicompress:false
                 },
                 files:{
-                    "cri/source/cri/cri.css":["cri/source/less/*.less", "!cri/source/less/lib.less", "!cri/source/less/heme-default.less"]
+                    "cri/source/cri/cri.css":["cri/source/less/reset.less","cri/source/less/*.less", "!cri/source/less/lib.less", "!cri/source/less/heme-default.less","!cri/source/less/easybootstrap.less"]
                 }
             },
             production:{
@@ -26,7 +26,7 @@ module.exports = function (grunt) {
                     yuicompress:true
                 },
                 files:{
-                    "cri/source/cri/cri.css":["cri/source/less/*.less", "!cri/source/less/lib.less", "!cri/source/less/heme-default.less"]
+                    "cri/source/cri/cri.css":["cri/source/less/reset.less","cri/source/less/*.less", "!cri/source/less/lib.less", "!cri/source/less/heme-default.less","!cri/source/less/easybootstrap.less"]
                 }
             }
         },
@@ -41,14 +41,6 @@ module.exports = function (grunt) {
                         'cri/source/js/*.js'
                     ],
                     dest:'cri/source/cri/cri.js'
-                }]
-            },
-            css:{
-                files:[{
-                    src:[
-                        "cri/source/css/*.css",
-                        "!cri/source/css/easy-*.css"],
-                    dest:"cri/source/css/cri.css"
                 }]
             }
         },
@@ -85,10 +77,6 @@ module.exports = function (grunt) {
             scripts: {
                 files: ['cri/source/js/*.js'],
                 tasks: ['concat:js']
-            },
-            css: {
-                files: ['cri/source/css/*.css'],
-                tasks: ['concat:css']
             },
             less: {
                 files: 'cri/source/less/*.less',

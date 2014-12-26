@@ -11,7 +11,6 @@
     "use strict";
 
     var TabPage = function(element,dataOptions){
-        var thisObject = this;
         this.$element = $(element);
         this.dataOptions = $.extend({}, $.fn.tabPage.defaults, dataOptions);
         this.title = this.$element.attr("title");
@@ -20,17 +19,15 @@
     };
 
     TabPage.prototype.setHeadBarView = function(myObj){
-        var thisObject = this;
-        var obj = this.headBarObj.children('.eb_tabPageHead.on');
-        if(myObj)
-            obj = myObj;
-        var objLeft = obj.offset().left;
-        var objRight = obj.offset().left + obj.width() + 61;
-        var headBarPanelLeft = this.headBarPanelObj.offset().left;
-        var headBarPanelRight = this.headBarPanelObj.offset().left + this.headBarPanelObj.width();
+        var obj = myObj || this.headBarObj.children('.eb_tabPageHead.on'),
+            objLeft = obj.offset().left,
+            objRight = obj.offset().left + obj.width() + 61,
+            headBarPanelLeft = this.headBarPanelObj.offset().left,
+            headBarPanelRight = this.headBarPanelObj.offset().left + this.headBarPanelObj.width();
         if(objLeft < headBarPanelLeft){
             this.headMoveLeft(obj);
-        }else if(objRight > headBarPanelRight){
+        }
+        else if(objRight > headBarPanelRight){
             this.headMoveRight(obj);
         }
     };
@@ -107,7 +104,7 @@
                 thisObject.rightBtnObj.children('.eb_arrow02R').show();
             }
         });
-    }
+    };
 
     TabPage.prototype.toggleHeadBtn = function(){
         var thisObject = this;
@@ -124,7 +121,7 @@
             this.rightBtnObj.hide();
             this.headBarObj.css("left","0");
         }
-    }
+    };
 
     TabPage.prototype.countWidth = function(){
         var thisObject = this;
@@ -134,10 +131,9 @@
             pageHeadTotalWidth = pageHeadTotalWidth + $(this).width() + 61;
         });
         return pageHeadTotalWidth;
-    }
+    };
 
     TabPage.prototype.setWidth = function(widthNum){
-        var thisObject = this;
         var width;
         if(this.dataOptions.width)
             width = this.dataOptions.width;
@@ -146,7 +142,6 @@
         if(typeof width == "string")
             width = width.split("px")[0];
         this.parent.width(width);
-        //this.headBarObj.width(width-2);
         this.headBarPanelObj.width(width-2);
         this.headBarBGObj.width(width-2);
         this.parent.children('.eb_tabPageBody').each(function(){
@@ -159,7 +154,6 @@
     };
 
     TabPage.prototype.setHeight = function(heightNum){
-        var thisObject = this;
         var height;
         if(this.dataOptions.height)
             height = this.dataOptions.height;
@@ -369,16 +363,6 @@
         });
         this.headBarObj.children(".eb_tabPageHead").first().addClass("on");    //将第一项设置为显示状态
         this.getBody(thisObject.headBarObj.children(".eb_tabPageHead").first()).show();           //将第一项设置为显示状态
-        /*this.parent.children('.eb_tabPageBody').each(function(){
-         var thisObj = this;
-         if($(this).children('.eb_iframe').length>0){
-         var src = '';
-         var html = '';
-         src = $(this).children('.eb_iframe').attr('src');
-         html = html + '<iframe src="'+src+'" class="eb_iframe"></iframe>';
-         $(this).html(html);
-         }
-         });*/
         this.setWidth();
         this.setHeight();
         this.toggleHeadBtn();
