@@ -35,6 +35,8 @@ module.exports = function (grunt) {
             js:{
                 files:[{
                     src: [
+                        'cri/source/js/velocity.js',
+                        'cri/source/js/velocity.ui.js',
                         'cri/source/js/cri.framework.js',
                         'cri/source/js/cri.widgets.js',
                         'cri/source/js/cri.grid.js',
