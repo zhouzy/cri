@@ -16,44 +16,21 @@
     </style>
 </head>
 <body>
-    <div class="tabPage-group">
-        <div class="tabPage-header">
-            <i class="tabPage-header-leftBtn fa fa-angle-double-left"></i>
-            <i class="tabPage-header-rightBtn fa fa-angle-double-right"></i>
-            <div class="tabPage-header-tabs-wrap">
-            <ul class="tabPage-header-tabs" style="width:1600px;">
-                <li class="tabPage-header-tab selected">tab1</li>
-                <li class="tabPage-header-tab">tab2</li>
-                <li class="tabPage-header-tab">tab3</li>
-                <li class="tabPage-header-tab">tab4</li>
-                <li class="tabPage-header-tab">tab5</li>
-                <li class="tabPage-header-tab">tab6</li>
-                <li class="tabPage-header-tab">tab6</li>
-                <li class="tabPage-header-tab">tab6</li>
-                <li class="tabPage-header-tab">tab6</li>
-                <li class="tabPage-header-tab">tab6</li>
-                <li class="tabPage-header-tab">tab6</li>
-                <li class="tabPage-header-tab">tab6</li>
-                <li class="tabPage-header-tab">tab6</li>
-                <li class="tabPage-header-tab">tab6</li>
-                <li class="tabPage-header-tab">tab6</li>
-                <li class="tabPage-header-tab">tab6</li>
-                <li class="tabPage-header-tab">tab6</li>
-                <li class="tabPage-header-tab">tab6</li>
-                <li class="tabPage-header-tab">tab6</li>
-                <li class="tabPage-header-tab">tab6</li>
-            </ul>
-            </div>
-        </div>
-        <div class="tabPage-body"></div>
-        <div class="tabPage-body"></div>
-        <div class="tabPage-body"></div>
-        <div class="tabPage-body"></div>
-        <div class="tabPage-body"></div>
-        <div class="tabPage-body"></div>
-    </div>
+<div style="width:900px;height:500px;margin:0 auto;">
+    <div id="tabPage"></div>
+</div>
 <script type="text/javascript">
-    var grid = $("#tabpage").tabPage();
+    var tabPage = $("#tabPage").tabPage();
+    var i = 0;
+    !function(){
+        var time = window.setInterval(function(){
+            tabPage.addTab("../datagrid/datagrid-v3.html","window"+i);
+            if(i++ > 10){
+                window.clearInterval(time);
+            }
+        },2000);
+    }();
+
 </script>
 </body>
 </html>
