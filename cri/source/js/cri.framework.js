@@ -179,6 +179,11 @@
             myDate = new Date(arys[0],--arys[1],arys[2]);
         }
         return myDate;
-    }
+    };
+
+    cri.parseJSON = function(json){
+        return json ? (new Function("return " + json))(): {};
+    };
+
 }(window);
 

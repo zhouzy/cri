@@ -43,6 +43,8 @@
             this.$element.hide();
             this.$element.wrap('<span class="' + SELECTBOX_GROUP + '"></span>');
             this.$selectBoxGroup = this.$element.parent();
+            this._value = this.$element.val();
+            this._text  = this.$element.find("option:selected").text();
             this._createInput();
             this._createListView();
         },
@@ -55,7 +57,7 @@
             this.input = new cri.Input(this.$element,{
                 label:that.label,
                 readonly:true,
-                value:this.$element.find("option:selected").text(),
+                value:that._text,
                 button:button,
                 onFocus:function(){
                     that.listView.toggle();
@@ -67,10 +69,12 @@
             var that = this;
             this.listView = new ListView(this.$selectBoxGroup,{
                 data:that._data(),
-                value:that.$element.val(),
+                value:that._value,
                 onChange:function(value,text){
                     that.input.value(text);
                     that.$element.val(value);
+                    that._value = value;
+                    that._text = text;
                 }
             });
         },

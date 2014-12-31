@@ -10,11 +10,11 @@
     position:relative;
     vertical-align:top;
     .options{
+        position:absolute;
         font-size:14px;
         width:@selectBox-width;
         display:block;
         margin-top: -5px;
-        position:absolute;
         left:80px;
         width:@selectBox-width - 2px;
         border:1px solid @color-input-border;
@@ -22,6 +22,7 @@
         .rounded-corners(3px);
         .box-shadow(0,2px,2px,0,#CCC);
         padding:4px 0;
+        z-index:10009;
         li{
             display:inline-block;
             width:96%;

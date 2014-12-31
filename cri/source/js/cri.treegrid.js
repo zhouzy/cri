@@ -66,7 +66,7 @@
                     paddingLeft -= iconWidth;
                 }
             }
-        }(op.rows,"show",0);
+        }(this._rows,"show",0);
 
         /**
          * 拼装列HTML
@@ -86,7 +86,7 @@
                 if(this.field == "text"){
                     var $icon = $("<i></i>").attr("class",fileIcons.file);
                     if(colData.hasChildren || (colData.children && colData.children.length)){
-                        colData.state == "open" ? $icon.attr("class",fileIcons.folderOpen):$icon.attr("class",fileIcons.folderClose);
+                        colData.state == "closed" ? $icon.attr("class",fileIcons.folderClose):$icon.attr("class",fileIcons.folderOpen);
                     }
                     $td.css("text-indent",textIndent).addClass("line-file-icon").append($icon).append(text);
                 }
@@ -102,18 +102,16 @@
         //根据gird-body 纵向滚动条决定headWrap rightPadding
         var scrollBarW = $parent.width()-$parent.prop("clientWidth");
         this.$gridhead.css("paddingRight",scrollBarW);
-    }
+    };
 
     TreeGrid.prototype._fold = function(e){
-        var op = this.options,
-            item = $(e.target).closest("tr"),
+        var op    = this.options,
+            item  = $(e.target).closest("tr"),
             rowid = item.data('rowid'),
-            that = this;
+            that  = this;
         this.selectedRow = this._getRowDataById(rowid);
-        if(this.selectedRow.state == "open") {
-            this.selectedRow.state = "closed";
-        }
-        else if(this.selectedRow.state == "closed"){
+
+        if(this.selectedRow.state == "closed") {
             this.selectedRow.state = "open";
             if(op.async && !this.selectedRow.children){
                 var pa = {};
@@ -129,6 +127,9 @@
                     async:false
                 });
             }
+        }
+        else{
+            this.selectedRow.state = "closed";
         }
         this._refreshBody();
     };
@@ -175,7 +176,7 @@
                 var k = arr[i] - 1;
                 data[k]&&(rowdata = data[k])&&(data = data[k].children);
             }
-        }(op.rows);
+        }(this._rows);
         return rowdata;
     };
 
