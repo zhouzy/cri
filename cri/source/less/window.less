@@ -22,7 +22,7 @@
         line-height:24px;
         padding:5px 0;
         font-size:1.2em;
-        .gradient-background(lighten(@color-window-head-bg,5%),@color-window-head-bg);
+        background:@color-window-head-bg;
         border-bottom: solid 1px @color-window-border;
         .user-not-select;
         .title{
@@ -135,6 +135,22 @@
         width: 6px;
         height: 6px;
         cursor: nw-resize;
+    }
+    .loading{
+        height:100%;
+        background-color:darken(@color-grid-bg,30%);
+        .loadingIcon{
+            color:@color-font;
+            font-size:40px;
+            width:40px;
+            height:40px;
+            line-height: 40px;
+            margin-left:-20px;
+            margin-top:-20px;
+            position:absolute;
+            top:50%;
+            left:50%;
+        }
     }
 }
 

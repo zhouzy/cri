@@ -17,18 +17,30 @@
 </head>
 <body>
 <div style="width:900px;height:500px;margin:0 auto;">
-    <div id="tabPage"></div>
+    <input type="button" id="button" value="addTab" style="margin:15px;">
+    <div id="tabPage">
+        <div data-title="hello">no somthing</div>
+        <div data-title="hello">no somthing</div>
+        <div data-title="hello">no somthing</div>
+        <div data-title="hello">no somthing</div>
+        <div data-title="hello">no somthing</div>
+    </div>
 </div>
 <script type="text/javascript">
     var tabPage = $("#tabPage").tabPage();
     var i = 0;
+    $("#button").click(function(){
+        tabPage.addTab("../datagrid/datagrid-v3.html","window");
+    });
     !function(){
+        /*
         var time = window.setInterval(function(){
             tabPage.addTab("../datagrid/datagrid-v3.html","window"+i);
             if(i++ > 10){
                 window.clearInterval(time);
             }
         },2000);
+        */
     }();
 
 </script>

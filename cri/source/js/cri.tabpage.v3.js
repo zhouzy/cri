@@ -47,14 +47,23 @@
 
         _create:function(){
             this.$tabPageGroup = this.$element.addClass(TABPAGE_GROUP);
+            var bodys = [];
+            this.$element.children().each(function(){
+                bodys.push($(this).detach());
+            });
             this._createHeader();
+            if(bodys.length>0){
+                for(var i=0; i<bodys.length; i++){
+                    this.addTab(bodys[i],(bodys[i].data("title")|| ""));
+                }
+            }
         },
 
         _createHeader:function(){
             var that = this,
-                $pageHeader = $('<div class="' + TABPAGE_HEADER + '"></div>'),
-                $leftBtn    = $('<i class="fa fa-angle-double-left ' + TABPAGE_HEADER_LB + '"></i>'),
-                $rightBtn   = $('<i class="fa fa-angle-double-right ' + TABPAGE_HEADER_RB + '"></i>'),
+                $pageHeader = this.$pageHeader = $('<div class="' + TABPAGE_HEADER + '"></div>'),
+                $leftBtn    = this.$leftBtn = $('<i class="fa fa-angle-double-left ' + TABPAGE_HEADER_LB + '"></i>').hide(),
+                $rightBtn   = this.$rightBtn = $('<i class="fa fa-angle-double-right ' + TABPAGE_HEADER_RB + '"></i>').hide(),
                 $tabsWrap   = this.$tabsWrap = $('<div class="' + TABPAGE_TABS_WRAP + '"></div>');
             $leftBtn.click(function(){
                 that._offsetL();
@@ -62,7 +71,8 @@
             $rightBtn.click(function(){
                 that._offsetR();
             });
-            $pageHeader.append($leftBtn,$rightBtn,$tabsWrap);
+            $pageHeader.append($leftBtn,$rightBtn);
+            $pageHeader.append($tabsWrap);
             $tabsWrap.append(this._createTabs());
             this.$tabPageGroup.append($pageHeader);
         },
@@ -113,7 +123,22 @@
             }
 
         },
+        _leftrightBtn:function(){
+            var $tabs = this.$tabs;
+            var tabsW = $tabs.width();
+            var tabpageHeaderW = this.$pageHeader.width();
 
+            if(tabsW > tabpageHeaderW){
+                this.$leftBtn.show();
+                this.$rightBtn.show();
+                this.$pageHeader.addClass("shift");
+            }
+            else{
+                this.$leftBtn.hide();
+                this.$rightBtn.hide();
+                this.$pageHeader.removeClass("shift");
+            }
+        },
         _getTab:function(index){
             return $('li:eq('+index+')',this.$tabs);
         },
@@ -136,7 +161,7 @@
             $tab.click(function(){
                 that._fouceTab($(this));
             });
-            $tabs.width(this._pageBodyQueue.length*TAB_WIDTH);
+
             $tabs.append($tab);
             var tabPageBody = new TabPageBody(this.$tabPageGroup,{
                 content:content
@@ -145,6 +170,7 @@
             this._fouceTab($tab);
             $tabs.width(this._pageBodyQueue.length*TAB_WIDTH);
             this._offsetL();
+            this._leftrightBtn();
         },
 
         closeTab:function($tab){
@@ -171,8 +197,22 @@
             this._load();
         },
         _load:function(){
-            var $iframe = $('<iframe src="'+this.options.content+'"></iframe>');
-            this.$body.append($iframe);
+            var iframe = true;
+            //jQuery
+            if(this.options.content instanceof jQuery){
+                iframe = false;
+            }
+            //HTML
+            else if(/^<\w+>.*/g.test(this.options.content)){
+                iframe = false;
+            }
+            if(iframe){
+                var $iframe = $('<iframe src="'+this.options.content+'"></iframe>');
+                this.$body.append($iframe);
+            }
+            else{
+                this.$body.append(this.options.content);
+            }
         },
         _destory:function(){
             this.$body.remove();

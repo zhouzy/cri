@@ -20,6 +20,7 @@
         ZINDEX = 10000;
 
     var _defaultOptions = {
+        title:"",
         actions:["Close","Minimize","Maximize"],//Colse:关闭,Minimize:最下化,Maximize:最大化
         content:null,
         visible:true,
@@ -43,29 +44,10 @@
 
         windowStack : [],
 
-        /**
-         * 初始化组件DOM结构
-         * @private
-         */
-        _init : function(){
-            var op = this.options,
-                viewWidth = $(window).width(),
-                viewHeight = $(window).height();
-
-            this._createBody();
-            if(op.center){
-                op.position.left = (viewWidth - op.width) / 2;
-                op.position.top  = (viewHeight - op.height) / 2;
-            }
-            this.$window.css($.extend({zIndex:this._zIndex()},op.position)).width(op.width).height(op.height);
-            this._overlay();
-            this._createHead();
-            op.resizable && this._createResizeHandler();
-            $("body").append(this.$window);
-            if(op.visible){
-                this.$window.show();
-            }else{
-                this.$window.hide();
+        _initOptions:function(options) {
+            this.options = $.extend(true,{}, this.options, options);
+            if(options.actions && options.actions.length){
+                this.options.actions = options.actions;
             }
         },
 
@@ -79,6 +61,7 @@
                 .on("click",".action",function(){
                     var action = that._actionForButton($(this));
                     action && typeof that[action] === "function" && that[action]();
+                    return false;
                 })
                 .on("click",".window-head",function(){
                     that.toFront();
@@ -141,6 +124,24 @@
         },
 
         /**
+         * 初始化组件DOM结构
+         * @private
+         */
+        _init : function(){
+            var op = this.options;
+            this._createBody();
+            this._overlay();
+            this._createHead();
+            op.resizable && this._createResizeHandler();
+            $("body").append(this.$window);
+            if(op.visible){
+                this.$window.show();
+            }else{
+                this.$window.hide();
+            }
+        },
+
+        /**
          * 生成window 头部
          * @private
          */
@@ -158,16 +159,31 @@
         _createBody : function(){
             var that     = this,
                 op       = this.options,
+                viewWidth = $(window).width(),
+                viewHeight = $(window).height(),
                 $element = this.$element,
                 $window  = $('<div class="window"></div>'),
-                $windowBody = $('<div class="window-content"></div>');
-
+                $windowBody = $('<div class="window-content"></div>'),
+                $loadingIcon = $('<i class="fa fa-spinner fa-spin"></i>').addClass("loadingIcon");
             $element.detach();
-            $window.append($windowBody);
             this.$window = $window;
+            if(op.center){
+                op.position.left = (viewWidth - op.width) / 2;
+                op.position.top  = (viewHeight - op.height) / 2;
+            }
+            $window.css({zIndex:this._zIndex()});
+
+            this._setPosition({top:op.position.top,left:op.position.left,width:op.width,height:op.height});
+
+            $window.append($windowBody);
+
             $windowBody.append($element);
+
             if(this.options.content){
-                $element.load(this.options.content,function(){
+                $element.addClass("loading").html($loadingIcon);
+                $element.load(this.options.content,function(response,status){
+                    $element.removeClass("loading");
+                    $loadingIcon.remove();
                     op.onReady && op.onReady.call(that,that.$window);
                 });
             }else{
@@ -275,6 +291,7 @@
          */
         open : function(){
             this._setStyleByStatus("normal");
+            $(".window-content",this.$window).show();
             this.windowStatus = "normal";
         },
 
@@ -335,9 +352,10 @@
         resume : function(){
             this._setButtons("normal");
             this._setStyleByStatus("normal");
+            $(".window-content",this.$window).show();
             if(this.windowStatus == "minimize"){
-                this.windowStatus = "normal";
                 var i = 0;
+                this.windowStatus = "normal";
                 $.each(Window.prototype.windowStack,function(index,wnd){
                     if(wnd.windowStatus == "minimize"){
                         wnd._moveLeft(i++);
