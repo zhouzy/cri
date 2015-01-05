@@ -38,11 +38,19 @@
             url:"./datagrid-data.json",
             rowNum:true,
             title:"hello grid",
-            //checkBox:true,
-            toolbar:[{text:"button",handle:function(){console.log('hello hutton')},iconCls:"fa fa-circle-o"},{text:"按钮"}],
+            checkBox:true,
+            toolbar:[{
+                text:"button",
+                handler:function(){
+                        var rows = grid.getSelected();
+                        console.dir(rows);
+                    },
+                iconCls:"fa fa-circle-o"
+            },{text:"按钮"}],
             pageSize:4,
             onClick:function(data){
-                console.log(data.propA);
+                var rows = grid.getSelected();
+                console.dir(rows);
             },
             onDblClick:function(data){
                 console.log(data.propB);
