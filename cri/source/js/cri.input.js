@@ -92,10 +92,11 @@
 
         _button:function(){
             var op    = this.options,
-                $icon = null;
+                $icon = null,
+                that  = this;
             if(op.button){
                 $icon = $('<i class="' + INPUT_BTN + " " + op.button.iconCls + '"></i>').on("click",function(){
-                    op.button.handler.call();
+                    op.button.handler.call(that);
                 });
             }
             return $icon;

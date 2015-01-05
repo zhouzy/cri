@@ -80,15 +80,30 @@
         _offsetL:function(){
             var left = this.$tabs.position().left,
                 width = this.$tabs.width(),
-                containerWidth = this.$tabsWrap.width();
-            if(left+width > containerWidth){
-                this.$tabs.velocity({left:"-=100px"});
+                containerWidth = this.$tabsWrap.width(),
+                viewWidth = width + left - 25;
+            if(viewWidth > containerWidth){
+                if(viewWidth%100>0){
+                    this.$tabs.velocity({left:"-="+(viewWidth%100)+"px"});
+                }else{
+                    this.$tabs.velocity({left:"-=100px"});
+                }
             }
         },
         _offsetR:function(){
-            var left = this.$tabs.position().left;
-            if(left < 0){
-                this.$tabs.velocity({left:"+=100px"});
+            var left  = this.$tabs.position().left,
+                width = this.$tabs.width(),
+                containerWidth = this.$tabsWrap.width();
+
+            if(left <= 0){
+                var viewWidth = width + left - 25;
+                var right = containerWidth-viewWidth;
+                if(right > 0){
+                    this.$tabs.velocity({left:"+="+(right%100)+"px"});
+                }
+                else{
+                    this.$tabs.velocity({left:"+=100px"});
+                }
             }
         },
         _createTabs:function(){
