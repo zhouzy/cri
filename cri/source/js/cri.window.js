@@ -163,8 +163,7 @@
                 viewHeight = $(window).height(),
                 $element = this.$element,
                 $window  = $('<div class="window"></div>'),
-                $windowBody = $('<div class="window-content"></div>'),
-                $loadingIcon = $('<i class="fa fa-spinner fa-spin"></i>').addClass("loadingIcon");
+                $windowBody = $('<div class="window-content"></div>');
             $element.detach();
             this.$window = $window;
             if(op.center){
@@ -179,16 +178,8 @@
 
             $windowBody.append($element);
 
-            if(this.options.content){
-                $element.addClass("loading").html($loadingIcon);
-                $element.load(this.options.content,function(response,status){
-                    $element.removeClass("loading");
-                    $loadingIcon.remove();
-                    op.onReady && op.onReady.call(that,that.$window);
-                });
-            }else{
-                op.onReady && op.onReady.call(that,that.$window);
-            }
+            this.load(this.options.content);
+
             $("body").append(this.$window);
         },
 
@@ -444,6 +435,23 @@
                 }
             });
             return wnd;
+        },
+
+        load:function(content){
+            var $element = this.$element,
+                that = this,
+                op = this.options,
+                $loadingIcon = $('<i class="fa fa-spinner fa-spin"></i>').addClass("loadingIcon");
+            if(content){
+                $element.addClass("loading").html($loadingIcon);
+                $element.load(content,function(response,status){
+                    $element.removeClass("loading");
+                    $loadingIcon.remove();
+                    op.onReady && op.onReady.call(that,that.$window);
+                });
+            }else{
+                op.onReady && op.onReady.call(that,that.$window);
+            }
         },
 
         /**

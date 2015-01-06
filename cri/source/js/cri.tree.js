@@ -378,6 +378,4 @@
         return tree;
     };
 
-
-
 }(window);
