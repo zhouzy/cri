@@ -75,6 +75,7 @@
                     that.$element.val(value);
                     that._value = value;
                     that._text = text;
+                    that.options.change && that.options.change.call(that);
                 }
             });
         },

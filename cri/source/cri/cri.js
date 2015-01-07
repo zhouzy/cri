@@ -6238,6 +6238,7 @@ return function (global, window, document, undefined) {
                     that.$element.val(value);
                     that._value = value;
                     that._text = text;
+                    that.options.change && that.options.change.call(that);
                 }
             });
         },
@@ -6528,7 +6529,7 @@ return function (global, window, document, undefined) {
             var left = this.$tabs.position().left,
                 width = this.$tabs.width(),
                 containerWidth = this.$tabsWrap.width(),
-                viewWidth = width + left - 25;
+                viewWidth = width + left - this.$tabs.css("marginLeft").split("px")[0];
             if(viewWidth > containerWidth){
                 if(viewWidth%100>0){
                     this.$tabs.velocity({left:"-="+(viewWidth%100)+"px"});
@@ -6541,9 +6542,8 @@ return function (global, window, document, undefined) {
             var left  = this.$tabs.position().left,
                 width = this.$tabs.width(),
                 containerWidth = this.$tabsWrap.width();
-
             if(left <= 0){
-                var viewWidth = width + left - 25;
+                var viewWidth = width + left - this.$tabs.css("marginLeft").split("px")[0];
                 var right = containerWidth-viewWidth;
                 if(right > 0){
                     this.$tabs.velocity({left:"+="+(right%100)+"px"});
@@ -6570,7 +6570,7 @@ return function (global, window, document, undefined) {
             var index = $tab.data('for');
             if(index != undefined && index != null){
                 this._pageBodyQueue[index]._destory();
-                this._pageBodyQueue = this._pageBodyQueue.splice(index-1,1);
+                this._pageBodyQueue.splice(index,1);
                 $('li:gt('+ index +')',this.$tabs).each(function(){
                     var index = +$(this).data("for");
                     $(this).data("for",index-1);
@@ -6580,7 +6580,7 @@ return function (global, window, document, undefined) {
                     if(index >= this._pageBodyQueue.length){
                         index -= 1;
                     }
-                    this._fouceTab(this._getTab(index));
+                    index >= 0 && this._fouceTab(this._getTab(index));
                 }
             }
 
@@ -6614,29 +6614,27 @@ return function (global, window, document, undefined) {
             title = title || 'New Tab';
             var that = this,
                 $tabs = this.$tabs,
-                $tab = $('<li class="' + TABPAGE_TAB + '">' + title + '</li>').data("for",this._pageBodyQueue.length),
-                $closeBtn = $('<i class="fa fa-close ' + TABPAGE_TAB_CLOSE + '"></i>');
-            $closeBtn.click(function(){
-                that._closeTab($tab);
-            });
-            $tab.append($closeBtn);
-            $tab.click(function(){
-                that._fouceTab($(this));
-            });
+                $tab = $('<li class="' + TABPAGE_TAB + '">' + title + '</li>').data("for",this._pageBodyQueue.length).click(function(){
+                    that._fouceTab($(this));
+                }),
+                $closeBtn = $('<i class="fa fa-close ' + TABPAGE_TAB_CLOSE + '"></i>').click(function(){
+                    that._closeTab($tab);
+                });
+            $tabs.append($tab.append($closeBtn));
 
-            $tabs.append($tab);
             var tabPageBody = new TabPageBody(this.$tabPageGroup,{
                 content:content
             });
+
             this._pageBodyQueue.push(tabPageBody);
-            this._fouceTab($tab);
             $tabs.width(this._pageBodyQueue.length*TAB_WIDTH);
             this._offsetL();
+            this._fouceTab($tab);
             this._leftrightBtn();
         },
 
-        closeTab:function($tab){
-            this._closeTab($('li:eq('+index+')',this.$tabs));
+        closeTab:function(index){
+            this._closeTab(this._getTab(index));
         }
     });
 
