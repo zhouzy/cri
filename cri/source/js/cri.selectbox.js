@@ -123,8 +123,9 @@
         value:function(value){
             if(arguments.length>0){
                 this._value = value;
+                this._text  = this._getTextByValue(value);
                 this.$element.val(value);
-                this.input.value(this._getTextByValue(value));
+                this.input.value(this._text);
             }
             else{
                 return this._value;
@@ -145,6 +146,7 @@
                     }
                 }
                 this._value = value;
+                this._text = text;
                 this.$element.val(value);
                 this.input.value(text);
             }

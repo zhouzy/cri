@@ -17,7 +17,39 @@
 
     var icons = {Minimize:"fa fa-minus",Maximize:"fa fa-expand","Close":"fa fa-close","Resume":"fa fa-compress"},
         MINI_WINDOW_WIDTH = 140+10,
+        WINDOW_PADDING = 35,
+        WINDOW_BORDER  = 1,
         ZINDEX = 10000;
+
+    function parseWidth(width,parentWidth){
+        width = "" + width;
+        //百分比
+        if(/^-?\d+%$/g.test(width)){
+            return Math.floor(parentWidth * width.split("%")[0] / 100);
+        }
+        //像素值
+        if(/^\d+px$/g.test(width)){
+            return parseInt(width.split("px")[0]);
+        }
+
+        //整数
+        return parseInt(width) || 0;
+    }
+
+    function parseHeight(height,parentHeight){
+        height = "" + height;
+        //百分比
+        if(/^-?\d+%$/g.test(height)){
+            return Math.floor(parentHeight * height.split("%")[0] / 100);
+        }
+        //像素值
+        if(/^\d+px$/g.test(height)){
+            return parseInt(height.split("px")[0]);
+        }
+
+        //整数
+        return parseInt(height) || 0;
+    }
 
     var _defaultOptions = {
         title:"",
@@ -129,6 +161,8 @@
          */
         _init : function(){
             var op = this.options;
+            op.width = parseWidth(op.width,$(window).width()) - WINDOW_BORDER*2;
+            op.height = parseHeight(op.height,$(window).height()) - WINDOW_PADDING - WINDOW_BORDER*2;
             this._createBody();
             this._overlay();
             this._createHead();
@@ -157,18 +191,18 @@
          * @private
          */
         _createBody : function(){
-            var that     = this,
-                op       = this.options,
-                viewWidth = $(window).width(),
+            var that       = this,
+                op         = this.options,
+                viewWidth  = $(window).width(),
                 viewHeight = $(window).height(),
-                $element = this.$element,
-                $window  = $('<div class="window"></div>'),
+                $element   = this.$element,
+                $window    = $('<div class="window"></div>'),
                 $windowBody = $('<div class="window-content"></div>');
             $element.detach();
             this.$window = $window;
             if(op.center){
-                op.position.left = (viewWidth - op.width) / 2;
-                op.position.top  = (viewHeight - op.height) / 2;
+                op.position.left = (viewWidth - op.width - 2*WINDOW_BORDER) / 2;
+                op.position.top  = (viewHeight - op.height - WINDOW_PADDING - 2*WINDOW_BORDER) / 2;
             }
             $window.css({zIndex:this._zIndex()});
 

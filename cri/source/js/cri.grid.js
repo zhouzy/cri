@@ -134,17 +134,24 @@
             var that = this;
             var op = this.options;
             var dragStartX = 0;
+            var clickTimer = null;
 
             this.$gridbody
                 .on("scroll",function(e){
                     $(".grid-head-wrap",that.$gridhead).scrollLeft($(this).scrollLeft());
                 })
                 .on('click', "tr", function(e){
-                    $("input[type=checkbox]",that.$gridhead).prop("checked",false);
-                    that._setSelected(e);
-                    that.options.onChange && that.options.onChange.call(that);
+                    if(clickTimer != null){
+                        clearTimeout(clickTimer);
+                    }
+                    clickTimer = window.setTimeout(function(){
+                        $("input[type=checkbox]",that.$gridhead).prop("checked",false);
+                        that._setSelected(e);
+                        that.options.onChange && that.options.onChange.call(that);
+                    },300);
                 })
                 .on('dblclick', "tr", function(e){
+                    clearTimeout(clickTimer);
                     that._onDblClickRow(e);
                 });
             $(document).on("mouseup",function(e){
@@ -479,14 +486,17 @@
         },
 
         _onDblClickRow:function(e){
-            var op = this.options
-                ,item = $(e.target).closest("tr")
-                ,rowid = item.data('rowid')
-                ,that = this;
+            var that  = this,
+                op    = this.options,
+                item  = $(e.target).closest("tr"),
+                rowid = item.data('rowid');
             this._selectedId = [rowid];
-            if(op.onDblClick){
-                op.onDblClick();
+            $("tr.selected",this.$gridbody).removeClass("selected");
+            item.addClass("selected");
+            if(this.options.checkBox){
+                $("input[type=checkbox]",item).prop("checked",false);
             }
+            op.onDblClick && op.onDblClick.call(that,that._getRowDataById(rowid));
         },
 
         reload:function(param){

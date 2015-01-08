@@ -4964,17 +4964,24 @@ return function (global, window, document, undefined) {
             var that = this;
             var op = this.options;
             var dragStartX = 0;
+            var clickTimer = null;
 
             this.$gridbody
                 .on("scroll",function(e){
                     $(".grid-head-wrap",that.$gridhead).scrollLeft($(this).scrollLeft());
                 })
                 .on('click', "tr", function(e){
-                    $("input[type=checkbox]",that.$gridhead).prop("checked",false);
-                    that._setSelected(e);
-                    that.options.onChange && that.options.onChange.call(that);
+                    if(clickTimer != null){
+                        clearTimeout(clickTimer);
+                    }
+                    clickTimer = window.setTimeout(function(){
+                        $("input[type=checkbox]",that.$gridhead).prop("checked",false);
+                        that._setSelected(e);
+                        that.options.onChange && that.options.onChange.call(that);
+                    },300);
                 })
                 .on('dblclick', "tr", function(e){
+                    clearTimeout(clickTimer);
                     that._onDblClickRow(e);
                 });
             $(document).on("mouseup",function(e){
@@ -5309,14 +5316,17 @@ return function (global, window, document, undefined) {
         },
 
         _onDblClickRow:function(e){
-            var op = this.options
-                ,item = $(e.target).closest("tr")
-                ,rowid = item.data('rowid')
-                ,that = this;
+            var that  = this,
+                op    = this.options,
+                item  = $(e.target).closest("tr"),
+                rowid = item.data('rowid');
             this._selectedId = [rowid];
-            if(op.onDblClick){
-                op.onDblClick();
+            $("tr.selected",this.$gridbody).removeClass("selected");
+            item.addClass("selected");
+            if(this.options.checkBox){
+                $("input[type=checkbox]",item).prop("checked",false);
             }
+            op.onDblClick && op.onDblClick.call(that,that._getRowDataById(rowid));
         },
 
         reload:function(param){
@@ -6286,8 +6296,9 @@ return function (global, window, document, undefined) {
         value:function(value){
             if(arguments.length>0){
                 this._value = value;
+                this._text  = this._getTextByValue(value);
                 this.$element.val(value);
-                this.input.value(this._getTextByValue(value));
+                this.input.value(this._text);
             }
             else{
                 return this._value;
@@ -6308,6 +6319,7 @@ return function (global, window, document, undefined) {
                     }
                 }
                 this._value = value;
+                this._text = text;
                 this.$element.val(value);
                 this.input.value(text);
             }
@@ -8246,7 +8258,39 @@ return function (global, window, document, undefined) {
 
     var icons = {Minimize:"fa fa-minus",Maximize:"fa fa-expand","Close":"fa fa-close","Resume":"fa fa-compress"},
         MINI_WINDOW_WIDTH = 140+10,
+        WINDOW_PADDING = 35,
+        WINDOW_BORDER  = 1,
         ZINDEX = 10000;
+
+    function parseWidth(width,parentWidth){
+        width = "" + width;
+        //百分比
+        if(/^-?\d+%$/g.test(width)){
+            return Math.floor(parentWidth * width.split("%")[0] / 100);
+        }
+        //像素值
+        if(/^\d+px$/g.test(width)){
+            return parseInt(width.split("px")[0]);
+        }
+
+        //整数
+        return parseInt(width) || 0;
+    }
+
+    function parseHeight(height,parentHeight){
+        height = "" + height;
+        //百分比
+        if(/^-?\d+%$/g.test(height)){
+            return Math.floor(parentHeight * height.split("%")[0] / 100);
+        }
+        //像素值
+        if(/^\d+px$/g.test(height)){
+            return parseInt(height.split("px")[0]);
+        }
+
+        //整数
+        return parseInt(height) || 0;
+    }
 
     var _defaultOptions = {
         title:"",
@@ -8358,6 +8402,8 @@ return function (global, window, document, undefined) {
          */
         _init : function(){
             var op = this.options;
+            op.width = parseWidth(op.width,$(window).width()) - WINDOW_BORDER*2;
+            op.height = parseHeight(op.height,$(window).height()) - WINDOW_PADDING - WINDOW_BORDER*2;
             this._createBody();
             this._overlay();
             this._createHead();
@@ -8386,18 +8432,18 @@ return function (global, window, document, undefined) {
          * @private
          */
         _createBody : function(){
-            var that     = this,
-                op       = this.options,
-                viewWidth = $(window).width(),
+            var that       = this,
+                op         = this.options,
+                viewWidth  = $(window).width(),
                 viewHeight = $(window).height(),
-                $element = this.$element,
-                $window  = $('<div class="window"></div>'),
+                $element   = this.$element,
+                $window    = $('<div class="window"></div>'),
                 $windowBody = $('<div class="window-content"></div>');
             $element.detach();
             this.$window = $window;
             if(op.center){
-                op.position.left = (viewWidth - op.width) / 2;
-                op.position.top  = (viewHeight - op.height) / 2;
+                op.position.left = (viewWidth - op.width - 2*WINDOW_BORDER) / 2;
+                op.position.top  = (viewHeight - op.height - WINDOW_PADDING - 2*WINDOW_BORDER) / 2;
             }
             $window.css({zIndex:this._zIndex()});
 

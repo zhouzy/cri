@@ -15,7 +15,7 @@ Grid
 10.表格头拖动未考虑到(col width:auto)情况(fixed)
 11.表头拖动后，再翻页，grid-body变成原来尺寸(fixed)
 12.当checkBox=true，单击行checkBox未勾选(fixed)
-13.双击后，选择数据getSelected异常
+13.双击后，选择数据getSelected异常(fixed)
 
 Window
 1.模态窗口关闭，遮罩未关闭(fixed)
@@ -33,8 +33,9 @@ Input
 SelectBox
 1.失去焦点，未触发validator(validateOnBlur=true) validate方法(fixed)
 2.value方法报错(fixed)
-3.change事件未触发
+3.change事件未触发(fixed)
 4.在窗口中，下拉选择项过多，展示不友好
+5.setText方法后，获取text异常
 
 TimeInput
 1.未选择HMS时，输入框显示了小时分钟秒信息(fixed)
