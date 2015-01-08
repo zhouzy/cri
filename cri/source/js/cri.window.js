@@ -21,6 +21,12 @@
         WINDOW_BORDER  = 1,
         ZINDEX = 10000;
 
+    /**
+     * 格式化宽度，接受百分比、像素值、整数参数
+     * @param width
+     * @param parentWidth
+     * @returns {格式化后的宽度，如果为百分比，则返回百分比父节点宽度的整数}
+     */
     function parseWidth(width,parentWidth){
         width = "" + width;
         //百分比
@@ -35,7 +41,12 @@
         //整数
         return parseInt(width) || 0;
     }
-
+    /**
+     * 格式化高度，接受百分比、像素值、整数参数
+     * @param width
+     * @param parentWidth
+     * @returns {格式化后的高度，如果为百分比，则返回百分比父节点高度的整数}
+     */
     function parseHeight(height,parentHeight){
         height = "" + height;
         //百分比
@@ -62,6 +73,7 @@
         position:{top:0,left:0},
         center:true,//初始时是否居中
         resizable:true,
+        dragable:true,
         onReady:null//当窗口初始化完成时触发
     };
 
@@ -89,16 +101,8 @@
          */
         _eventListen : function(){
             var that = this;
-            this.$window
-                .on("click",".action",function(){
-                    var action = that._actionForButton($(this));
-                    action && typeof that[action] === "function" && that[action]();
-                    return false;
-                })
-                .on("click",".window-head",function(){
-                    that.toFront();
-                })
-                .on("mousedown",".window-head",function(e){
+            if(this.options.dragable){
+                this.$window.on("mousedown",".window-head",function(e){
                     var left     = +that.$window.css("left").split("px")[0],
                         top      = +that.$window.css("top").split("px")[0],
                         width    = +that.$window.width(),
@@ -116,6 +120,16 @@
                         startY = pageY;
                         that._setPosition({top:top,left:left,width:width,height:height});
                     });
+                })
+            }
+            this.$window
+                .on("click",".action",function(){
+                    var action = that._actionForButton($(this));
+                    action && typeof that[action] === "function" && that[action]();
+                    return false;
+                })
+                .on("click",".window-head",function(){
+                    that.toFront();
                 })
                 .on("mousedown",".window-resizer",function(e){
                     var left     = +that.$window.css("left").split("px")[0],
