@@ -122,10 +122,14 @@
          */
         value:function(value){
             if(arguments.length>0){
+                if(value == this._value){
+                    return ;
+                }
                 this._value = value;
                 this._text  = this._getTextByValue(value);
                 this.$element.val(value);
                 this.input.value(this._text);
+                this.options.change && this.options.change.call(this);
             }
             else{
                 return this._value;
@@ -165,6 +169,7 @@
         this.$parent = $parent;
         this.value = options.value;//下拉框初始值
         this._init();
+        this.isOpen = false;
         this.text = null;
     };
 
@@ -176,13 +181,18 @@
          */
         _init:function(){
             var data = this.options.data;
-            var $options = this.$options = $('<ul class="' + OPTIONS + '"></ul>').hide();
+            var $options = this.$options = $('<ul class="' + OPTIONS + '"></ul>');
+            var left = this.$parent.offset().left + 80;
+            var top = this.$parent.offset().top + 28;
             if(data){
                 for(var i = 0,len = data.length; i<len; i++){
                     $options.append(this._createOption(data[i]));
                 }
             }
-            this.$parent.append($options);
+            this.optionsHeight = $options.height();
+            $('body').append($options.css({top:top,left:left}));
+            this.optionsHeight = $options.height();
+            $options.hide();
         },
 
         /**
@@ -208,18 +218,40 @@
         },
 
         /**
+         * 设置position显示时在屏幕中的位置
+         * @private
+         */
+        _setPosition:function(){
+            var left = this.$parent.offset().left + 80;
+            var top = this.$parent.offset().top + 28;
+            this.$options.css({top:top,left:left});
+        },
+
+        /**
          * 显示隐藏切换options选择框
          * @private
          */
         toggle:function(){
-            var that = this;
-            this.$options.animate({
-                    height:'toggle'
-                },200,function(){
-                    if(!that.$options.is(":hidden")){
+            var that = this,
+                $options = this.$options;
+            this._setPosition();
+            this.isOpen = !this.isOpen;
+            var height = this.isOpen ? this.optionsHeight:0;
+            if(this.isOpen){
+                $options.height(0);
+                $options.show();
+            }
+            this.$options.velocity({
+                    height:height
+                },200,
+                function(){
+                    if(that.isOpen){
                         that._clickBlank();
+                    }else{
+                        $options.hide();
                     }
-                });
+                }
+            );
         },
 
         /**

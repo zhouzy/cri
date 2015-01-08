@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>input</title>
+    <title>timeInput</title>
     <meta charset="utf-8" content="text/html"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link href="../../../libs/font-awesome/css/font-awesome.css" type="text/css" rel="stylesheet"/>
@@ -16,14 +16,34 @@
     </style>
 </head>
 <body style="padding:50px;">
-    <div style="height:35px;line-height:35px;">
-    <input id="timeinput"/>
-        </div>
+    <div id="window">
+        <input id="timeinput"/>
+        <select class="" id="selectInWnd">
+            <option value="red">f00</option>
+            <option value="green">0f0</option>
+            <option value="blue">00f</option>
+            <option value="blue">00f</option>
+            <option value="blue">00f</option>
+            <option value="blue">00f</option>
+            <option value="blue">00f</option>
+            <option value="blue">00f</option>
+            <option value="blue">00f</option>
+            <option value="blue">00f</option>
+            <option value="blue">00f</option>
+            <option value="blue">00f</option>
+            <option value="blue">00f</option>
+        </select>
+    </div>
 <script>
+    $("#window").window({
+        width:600,
+        height:200
+    });
     $("#timeinput").timeInput({
         format:"yyyy/MM/dd HH:mm:ss",
         value:cri.string2Date("2014/07/05")
     });
+    $("#selectInWnd").selectBox();
     </script>
 </body>
 </html>

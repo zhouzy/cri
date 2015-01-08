@@ -182,16 +182,18 @@ table {
   min-width: 60px;
   margin: 2px 0;
   padding: 0 5px;
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-  -khtml-user-select: none;
-  user-select: none;
+  font-size: 14px;
+  vertical-align: middle;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   -ms-border-radius: 4px;
   -o-border-radius: 4px;
   border-radius: 4px;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -khtml-user-select: none;
+  user-select: none;
 }
 .button:hover {
   border-color: #494949;
@@ -488,9 +490,11 @@ table {
   font-size: 0;
   -webkit-text-size-adjust: none;
   width: 260px;
-  margin: 5px 0;
-  vertical-align: top;
+  margin: 2px 0;
+  vertical-align: middle;
   position: relative;
+  height: 26px;
+  line-height: 26px;
 }
 .input-group input,
 .input-group .input-btn,
@@ -572,6 +576,11 @@ table {
   border-bottom-right-radius: 3px;
   border-top-right-radius: 3px;
   cursor: pointer;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -khtml-user-select: none;
+  user-select: none;
 }
 .input-group .input-btn:hover {
   color: #fff;
@@ -896,18 +905,19 @@ table {
   font-size: 0;
   -webkit-text-size-adjust: none;
   position: relative;
-  vertical-align: top;
+  vertical-align: middle;
+  height: 30px;
+  line-height: 30px;
 }
-.selectBox-group .options {
+.options {
+  background: #F2F2F2;
   position: absolute;
   font-size: 14px;
-  width: 180px;
-  display: block;
-  margin-top: -5px;
-  left: 80px;
   width: 178px;
   border: 1px solid #c8c8c8;
-  background: #F2F2F2;
+  z-index: 10009;
+  max-height: 200px;
+  overflow: auto;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   -ms-border-radius: 3px;
@@ -916,13 +926,16 @@ table {
   box-shadow: 0 2px 2px 0 #cccccc;
   -moz-box-shadow: 0 2px 2px 0 #cccccc;
   -webkit-box-shadow: 0 2px 2px 0 #cccccc;
-  padding: 4px 0;
-  z-index: 10009;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -khtml-user-select: none;
+  user-select: none;
 }
-.selectBox-group .options li {
+.options li {
   display: inline-block;
-  width: 96%;
-  margin: 0 2%;
+  margin: 3px 4px 0 4px;
+  width: 170px;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   -ms-border-radius: 3px;
@@ -932,182 +945,12 @@ table {
   line-height: 26px;
   text-align: center;
 }
-.selectBox-group .options li:hover {
+.options li:hover {
   background: #97b7fc;
 }
-.selectBox-group .options li.selected {
+.options li.selected {
   background: #4f7fe8;
   color: #fff;
-}
-
-/**
- * zhouzy
- *
- * 2014/12/26
- *
- */
-.eb_tabPage {
-  height: 350px;
-  width: 700px;
-  border: 1px solid #d4d4d4;
-  position: relative;
-  background-color: white;
-}
-.eb_tabPage > .eb_headBarBG {
-  height: 34px;
-  width: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  background: -webkit-linear-gradient(top, #fbfbfb, #eeeeee);
-  background: -moz-linear-gradient(top, #fbfbfb, #eeeeee);
-  background: -o-linear-gradient(top, #fbfbfb, #eeeeee);
-  filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, EndColorStr='#eeeeee', StartColorStr='#fbfbfb');
-  margin: 1px;
-  border-bottom: 1px solid #c3c3c3;
-}
-.eb_tabPage > .eb_headBarBG > .eb_headBarLeftBtn {
-  width: 6px;
-  height: 34px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 110;
-  border-right: 1px solid #ccc;
-  box-shadow: -1px 0 1px 1px rgba(255, 255, 255, 0.7) inset;
-  cursor: pointer;
-  line-height: 34px;
-  text-align: center;
-  background: -webkit-linear-gradient(top, #f6f6f6, #eaeaea);
-  background: -moz-linear-gradient(top, #f6f6f6, #eaeaea);
-  background: -o-linear-gradient(top, #f6f6f6, #eaeaea);
-  filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#f6f6f6', EndColorStr='#eaeaea');
-  display: none;
-}
-.eb_tabPage > .eb_headBarBG > .eb_headBarLeftBtn > .eb_arrow02L {
-  width: 3px;
-  height: 5px;
-  background: url(cri/source/img/arrow02.png) no-repeat bottom left;
-  position: absolute;
-  top: 14px;
-  left: 1px;
-}
-.eb_tabPage > .eb_headBarBG > .eb_headBarLeftBtn.mouseover > .eb_arrow02L {
-  background: url(cri/source/img/arrow02.png) no-repeat top left;
-}
-.eb_tabPage > .eb_headBarBG > .eb_headBarLeftBtn.mousedown {
-  background: -webkit-linear-gradient(top, #e8e8e8, #e8e8e8);
-  background: -moz-linear-gradient(top, #e8e8e8, #e8e8e8);
-  background: -o-linear-gradient(top, #e8e8e8, #e8e8e8);
-  filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#e8e8e8', EndColorStr='#e8e8e8');
-  box-shadow: -1px 0 1px 1px rgba(255, 255, 255, 0) inset;
-}
-.eb_tabPage > .eb_headBarBG > .eb_headBarRightBtn {
-  width: 6px;
-  height: 34px;
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 110;
-  border-left: 1px solid #ccc;
-  box-shadow: 1px 0 1px 1px rgba(255, 255, 255, 0.7) inset;
-  cursor: pointer;
-  line-height: 34px;
-  text-align: center;
-  display: none;
-}
-.eb_tabPage > .eb_headBarBG > .eb_headBarRightBtn > .eb_arrow02R {
-  width: 3px;
-  height: 5px;
-  background: url(cri/source/img/arrow02.png) no-repeat bottom right;
-  position: absolute;
-  top: 14px;
-  right: 1px;
-}
-.eb_tabPage > .eb_headBarBG > .eb_headBarRightBtn.mouseover > .eb_arrow02R {
-  background: url(cri/source/img/arrow02.png) no-repeat top right;
-}
-.eb_tabPage > .eb_headBarBG > .eb_headBarRightBtn.mousedown {
-  background: -webkit-linear-gradient(top, #e8e8e8, #e8e8e8);
-  background: -moz-linear-gradient(top, #e8e8e8, #e8e8e8);
-  background: -o-linear-gradient(top, #e8e8e8, #e8e8e8);
-  filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#e8e8e8', EndColorStr='#e8e8e8');
-  box-shadow: -1px 0 1px 1px rgba(255, 255, 255, 0) inset;
-}
-.eb_tabPage > .eb_headBarBG > .eb_headBarPanel {
-  height: 35px;
-  width: 698px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  overflow: hidden;
-}
-.eb_tabPage > .eb_headBarBG > .eb_headBarPanel > .eb_headBar {
-  height: 35px;
-  width: 100000px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  line-height: 34px;
-  font-size: 13px;
-  font-family: arial, '宋体';
-  font-weight: 400;
-}
-.eb_tabPage > .eb_headBarBG > .eb_headBarPanel > .eb_headBar > .eb_tabPageHead {
-  display: inline-block;
-  height: 35px;
-  padding: 0 30px;
-  border-right: 1px solid #c3c3c3;
-  float: left;
-  cursor: pointer;
-  position: relative;
-  z-index: 100;
-  text-shadow: 1px 1px 1px #ffffff;
-}
-.eb_tabPage > .eb_headBarBG > .eb_headBarPanel > .eb_headBar > .eb_tabPageHead > .eb_tabPageCloseBtn {
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  top: 10px;
-  right: 3px;
-  background: transparent;
-  color: #aaa;
-  border-radius: 3px;
-  line-height: 10px;
-  text-align: center;
-  text-shadow: 0 0 0 rgba(0, 0, 0, 0);
-  display: none;
-  font-weight: 600;
-  border: 1px solid rgba(0, 0, 0, 0);
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  user-select: none;
-}
-.eb_tabPage > .eb_headBarBG > .eb_headBarPanel > .eb_headBar > .eb_tabPageHead > .eb_tabPageCloseBtn.mouseover {
-  background: #be0000;
-  border: 1px solid #a80000;
-  color: white;
-}
-.eb_tabPage > .eb_headBarBG > .eb_headBarPanel > .eb_headBar > .eb_tabPageHead.on {
-  background: url("cri/source/img/container_1_tab_ul_li.png") no-repeat scroll center 28px transparent;
-  color: #159ce0;
-  font-weight: 600;
-}
-.eb_tabPage > .eb_tabPageBody {
-  width: 698px;
-  height: 313px;
-  position: absolute;
-  top: 35px;
-  margin: 1px;
-  clear: both;
-  overflow: hidden;
-  display: none;
-}
-.eb_tabPage > .eb_tabPageBody > .eb_iframe {
-  border-style: none;
-  width: 698px;
-  height: 313px;
-  overflow: auto;
 }
 
 /**
@@ -1305,10 +1148,18 @@ table {
 .eb_timeInputGroup {
   position: relative;
   display: inline-block;
-  vertical-align: top;
-  line-height: 1;
+  line-height: 30px;
+  height: 30px;
+  vertical-align: middle;
+  font-size: 0;
 }
-.eb_timeInputGroup .eb_timeBox {
+.eb_timeInputGroup .eb_focus {
+  border: 1px solid #383eab !important;
+}
+.eb_timeInputGroup .eb_red {
+  color: red !important;
+}
+.eb_timeBox {
   background: #ffffff;
   border: 1px solid #c8c8c8;
   border-radius: 0 0 5px 5px;
@@ -1317,13 +1168,12 @@ table {
   -webkit-box-shadow: 0 2px 2px 0 #cccccc;
   position: absolute;
   left: 80px;
-  margin-top: -5px;
-  z-index: 200;
+  z-index: 10004;
   width: 240px;
   height: 190px;
   display: none;
 }
-.eb_timeInputGroup .eb_timeBox .eb_titleBar {
+.eb_timeBox .eb_titleBar {
   top: 0;
   left: 0;
   height: 25px;
@@ -1333,7 +1183,7 @@ table {
   font-weight: 600;
   background: #f5f7fa;
 }
-.eb_timeInputGroup .eb_timeBox .eb_yearSelecter {
+.eb_timeBox .eb_yearSelecter {
   height: 16px;
   width: 120px;
   line-height: 14px;
@@ -1342,7 +1192,7 @@ table {
   left: 0;
   top: 5px;
 }
-.eb_timeInputGroup .eb_timeBox .eb_yearButton {
+.eb_timeBox .eb_yearButton {
   font-size: 12px;
   width: 12px;
   height: 12px;
@@ -1356,15 +1206,15 @@ table {
   color: #555555;
   cursor: pointer;
 }
-.eb_timeInputGroup .eb_timeBox .eb_yearButton:hover {
+.eb_timeBox .eb_yearButton:hover {
   color: #FFF;
   background: #4f7fe8;
 }
-.eb_timeInputGroup .eb_timeBox .eb_monthSelect {
+.eb_timeBox .eb_monthSelect {
   position: absolute;
   top: 3px;
   right: 40px;
-  width: 40px;
+  width: 50px;
   height: 20px;
   border: 1px solid #c8c8c8;
   -webkit-border-radius: 2px;
@@ -1375,7 +1225,7 @@ table {
   line-height: 20px;
   cursor: pointer;
 }
-.eb_timeInputGroup .eb_timeBox .eb_dateMouseover {
+.eb_timeBox .eb_dateMouseover {
   background: -webkit-linear-gradient(top, #eeeeee, #ffffff 70%) !important;
   background: -moz-linear-gradient(top, #eeeeee, #ffffff 70%) !important;
   background: -o-linear-gradient(top, #eeeeee, #ffffff 70%) !important;
@@ -1387,11 +1237,11 @@ table {
   font-weight: 400;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0) !important;
 }
-.eb_timeInputGroup .eb_timeBox .eb_year {
+.eb_timeBox .eb_year {
   display: inline-block;
   width: 30px;
 }
-.eb_timeInputGroup .eb_timeBox > table {
+.eb_timeBox > table {
   width: 210px;
   margin: auto 15px;
   font-size: 12px;
@@ -1399,39 +1249,33 @@ table {
   -moz-user-select: none;
   user-select: none;
 }
-.eb_timeInputGroup .eb_timeBox > table tr {
+.eb_timeBox > table tr {
   height: 20px;
 }
-.eb_timeInputGroup .eb_timeBox > table tr > td:hover {
+.eb_timeBox > table tr > td:hover {
   background: #97b7fc;
 }
-.eb_timeInputGroup .eb_timeBox > table th {
+.eb_timeBox > table th {
   font-family: Microsoft YaHei;
   cursor: default;
 }
-.eb_timeInputGroup .eb_timeBox > table td {
+.eb_timeBox > table td {
   cursor: pointer;
   text-align: center;
   vertical-align: middle;
 }
-.eb_timeInputGroup .eb_timeBox > table td.choosed {
+.eb_timeBox > table td.choosed {
   background-color: #4f7fe8;
   color: #fff;
 }
-.eb_timeInputGroup .eb_focus {
-  border: 1px solid #383eab !important;
-}
-.eb_timeInputGroup .eb_red {
-  color: red !important;
-}
-.eb_timeInputGroup .eb_HMSBar {
+.eb_timeBox .eb_HMSBar {
   height: 20px;
   width: 100%;
   text-align: right;
   font-size: 12px;
   line-height: 20px;
 }
-.eb_timeInputGroup .eb_HMSInput {
+.eb_timeBox .eb_HMSInput {
   position: relative;
   right: 15px;
   width: 22px;
@@ -1441,10 +1285,10 @@ table {
   color: #666;
   font-size: 12px;
 }
-.eb_timeInputGroup .eb_HMSInput.focus {
+.eb_timeBox .eb_HMSInput.focus {
   border: 1px solid #626dbb;
 }
-.eb_timeInputGroup .eb_timeBox .timeInputOK {
+.eb_timeBox .timeInputOK {
   width: 40px;
   height: 22px;
   line-height: 20px;
@@ -1461,13 +1305,13 @@ table {
   text-align: center;
   cursor: pointer;
 }
-.eb_timeInputGroup .eb_timeBox .timeInputOK.mouseover {
+.eb_timeBox .timeInputOK.mouseover {
   background: -webkit-linear-gradient(top, #3edc5f, #1e8934);
   background: -moz-linear-gradient(top, #3edc5f, #1e8934);
   background: -o-linear-gradient(top, #3edc5f, #1e8934);
   filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#3edc5f', EndColorStr='#1e8934');
 }
-.eb_timeInputGroup .eb_timeBox .timeInputCancel {
+.eb_timeBox .timeInputCancel {
   width: 40px;
   height: 22px;
   line-height: 20px;
@@ -1485,7 +1329,7 @@ table {
   cursor: pointer;
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
 }
-.eb_timeInputGroup .eb_timeBox .timeInputCancel.mouseover {
+.eb_timeBox .timeInputCancel.mouseover {
   background: -webkit-linear-gradient(top, #f72323, #941717);
   background: -moz-linear-gradient(top, #f72323, #941717);
   background: -o-linear-gradient(top, #f72323, #941717);

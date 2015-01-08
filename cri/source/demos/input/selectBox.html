@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>input</title>
+    <title>selectBox</title>
     <meta charset="utf-8" content="text/html"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link href="../../cri/font-awesome/css/font-awesome.css" type="text/css" rel="stylesheet"/>
-    <link href="../../script/func/easy-bootstrap/css/reset.css" type="text/css" rel="stylesheet"/>
-    <link href="../../cri/cri/cri/cri.css" type="text/css" rel="stylesheet"/>
-    <script src="../../cri/jquery/jquery-1.9.1.js" type="text/javascript"></script>
-    <script src="../../cri/cri/cri/cri.js" type="text/javascript"></script>
+    <link href="../../../libs/font-awesome/css/font-awesome.css" type="text/css" rel="stylesheet"/>
+    <link href="../../cri/cri.css" type="text/css" rel="stylesheet"/>
+    <script src="../../../libs/jquery/jquery-1.9.1.js" type="text/javascript"></script>
+    <script src="../../cri/cri.js" type="text/javascript"></script>
     <style>
         html{
             font-family:Georgia,"Times New Roman","Microsoft YaHei","微软雅黑",STXihei,"华文细黑",serif;
@@ -16,7 +15,8 @@
         }
     </style>
 </head>
-<body style="padding:50px;">
+<body style="padding:50px;height:1000px;">
+<!--
     <select id="select">
         <option value="red">f00</option>
         <option value="green">0f0</option>
@@ -32,11 +32,34 @@
         <option value="green">0f0</option>
         <option value="blue">00f</option>
     </select>
-<script>
+    -->
+    <div id="window">
+        <select class="" id="selectInWnd">
+            <option value="red">f00</option>
+            <option value="green">0f0</option>
+            <option value="blue">00f</option>
+            <option value="blue">00f</option>
+            <option value="blue">00f</option>
+            <option value="blue">00f</option>
+            <option value="blue">00f</option>
+            <option value="blue">00f</option>
+            <option value="blue">00f</option>
+            <option value="blue">00f</option>
+            <option value="blue">00f</option>
+            <option value="blue">00f</option>
+            <option value="blue">00f</option>
+        </select>
+    </div>
+<script type="text/javascript">
+    $("#window").window({
+        width:800,
+        height:200
+    });
+    $("#selectInWnd").selectBox();
+    /*
    $(".select").selectBox({
         label:"hello"
    });
-
    var s = $("#select").selectBox({
        label:"hello",
        change:function(){
@@ -46,6 +69,7 @@
    });
 
    s.value("green");
+   */
 </script>
 </body>
 </html>

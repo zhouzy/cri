@@ -4,118 +4,120 @@
 .eb_timeInputGroup {
     position: relative;
     display: inline-block;
-    vertical-align: top;
-    line-height: 1;
-    .eb_timeBox {
-        background:@color-timeinput-timebox-bg;
-        border: 1px solid @color-timeinput-timebox-border;
-        border-radius: 0 0 5px 5px;
-        .box-shadow(0,2px,2px,0,#CCC);
-        position: absolute;
-        left: 80px;
-        margin-top: -5px;
-        z-index: 200;
-        width: 240px;
-        height: 190px;
-        display: none;
-        .eb_titleBar {
-            top:0;
-            left:0;
-            height:25px;
-            width:100%;
-            font-size: 13px;
-            text-align: center;
-            font-weight: 600;
-            background:@color-timeinput-timebox-title-bg;
-        }
-
-        .eb_yearSelecter {
-            height: 16px;
-            width: 120px;
-            line-height: 14px;
-            font-size: 12px;
-            position: relative;
-            left: 0;
-            top: 5px;
-        }
-        .eb_yearButton{
-            font-size:12px;
-            width:12px;
-            height:12px;
-            padding:2px;
-            margin:0 5px;
-            .rounded-corners(8px);
-            color:@color-timeinput-timebox-icon;
-            cursor:pointer;
-            &:hover{
-                color:#FFF;
-                background:@color-timeinput-timebox-icon-hover;
-            }
-        }
-
-        .eb_monthSelect {
-            position: absolute;
-            top: 3px;
-            right: 40px;
-            width: 40px;
-            height: 20px;
-            border: 1px solid @color-timeinput-timebox-border;
-            .rounded-corners(2px);
-            line-height: 20px;
-            cursor: pointer;
-        }
-
-        .eb_dateMouseover {
-            background: -webkit-linear-gradient(top, #eee, #fff 70%) !important;
-            background: -moz-linear-gradient(top, #eee, #fff 70%) !important;
-            background: -o-linear-gradient(top, #eee, #fff 70%) !important;
-            filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#eeeeee', EndColorStr='#ffffff', starty=0, finishy=70%);
-            border-top: 1px solid rgba(255, 255, 255, 0.8);
-            padding-top: 0 !important;
-            box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.3);
-            color: red !important;
-            font-weight: 400;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0) !important;
-        }
-        .eb_year {
-            display:inline-block;
-            width:30px;
-        }
-        & > table {
-            width: 210px;
-            margin: auto 15px;
-            font-size: 12px;
-            margin-top: 3px;
-            -moz-user-select: none;
-            user-select: none;
-            tr{
-                height: 20px;
-                &>td:hover{
-                    background:@color-timeinput-timebox-day-hover;
-                }
-            }
-            th{
-                font-family: Microsoft YaHei;
-                cursor: default;
-            }
-            td{
-                cursor: pointer;
-                text-align: center;
-                vertical-align: middle;
-            }
-        }
-
-        & > table td.choosed {
-            background-color:@color-timeinput-timebox-day-selected;
-            color:#fff;
-        }
-    }
+    line-height: 30px;
+    height: 30px;
+    vertical-align: middle;
+    font-size:0;
     .eb_focus {
         border: 1px solid #383eab !important;
     }
 
     .eb_red {
         color: red !important;
+    }
+
+}
+.eb_timeBox {
+    background:@color-timeinput-timebox-bg;
+    border: 1px solid @color-timeinput-timebox-border;
+    border-radius: 0 0 5px 5px;
+    .box-shadow(0,2px,2px,0,#CCC);
+    position: absolute;
+    left: 80px;
+    z-index: 10004;
+    width: 240px;
+    height: 190px;
+    display: none;
+    .eb_titleBar {
+        top:0;
+        left:0;
+        height:25px;
+        width:100%;
+        font-size: 13px;
+        text-align: center;
+        font-weight: 600;
+        background:@color-timeinput-timebox-title-bg;
+    }
+
+    .eb_yearSelecter {
+        height: 16px;
+        width: 120px;
+        line-height: 14px;
+        font-size: 12px;
+        position: relative;
+        left: 0;
+        top: 5px;
+    }
+    .eb_yearButton{
+        font-size:12px;
+        width:12px;
+        height:12px;
+        padding:2px;
+        margin:0 5px;
+        .rounded-corners(8px);
+        color:@color-timeinput-timebox-icon;
+        cursor:pointer;
+        &:hover{
+            color:#FFF;
+            background:@color-timeinput-timebox-icon-hover;
+        }
+    }
+
+    .eb_monthSelect {
+        position: absolute;
+        top: 3px;
+        right: 40px;
+        width: 50px;
+        height: 20px;
+        border: 1px solid @color-timeinput-timebox-border;
+        .rounded-corners(2px);
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    .eb_dateMouseover {
+        background: -webkit-linear-gradient(top, #eee, #fff 70%) !important;
+        background: -moz-linear-gradient(top, #eee, #fff 70%) !important;
+        background: -o-linear-gradient(top, #eee, #fff 70%) !important;
+        filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#eeeeee', EndColorStr='#ffffff', starty=0, finishy=70%);
+        border-top: 1px solid rgba(255, 255, 255, 0.8);
+        padding-top: 0 !important;
+        box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.3);
+        color: red !important;
+        font-weight: 400;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0) !important;
+    }
+    .eb_year {
+        display:inline-block;
+        width:30px;
+    }
+    & > table {
+        width: 210px;
+        margin: auto 15px;
+        font-size: 12px;
+        margin-top: 3px;
+        -moz-user-select: none;
+        user-select: none;
+        tr{
+            height: 20px;
+            &>td:hover{
+                background:@color-timeinput-timebox-day-hover;
+            }
+        }
+        th{
+            font-family: Microsoft YaHei;
+            cursor: default;
+        }
+        td{
+            cursor: pointer;
+            text-align: center;
+            vertical-align: middle;
+        }
+    }
+
+    & > table td.choosed {
+        background-color:@color-timeinput-timebox-day-selected;
+        color:#fff;
     }
     .eb_HMSBar {
         height: 20px;
@@ -133,11 +135,11 @@
         text-indent: 3px;
         color: #666;
         font-size: 12px;
+        &.focus{
+            border: 1px solid #626dbb;
+        }
     }
-    .eb_HMSInput.focus {
-        border: 1px solid #626dbb;
-    }
-    .eb_timeBox .timeInputOK {
+    .timeInputOK {
         width: 40px;
         height: 22px;
         line-height: 20px;
@@ -153,14 +155,15 @@
         border-radius: 10px 0 0 10px;
         text-align: center;
         cursor: pointer;
+        &.mouseover{
+            background: -webkit-linear-gradient(top, #3edc5f, #1e8934);
+            background: -moz-linear-gradient(top, #3edc5f, #1e8934);
+            background: -o-linear-gradient(top, #3edc5f, #1e8934);
+            filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#3edc5f', EndColorStr='#1e8934');
+        }
     }
-    .eb_timeBox .timeInputOK.mouseover {
-        background: -webkit-linear-gradient(top, #3edc5f, #1e8934);
-        background: -moz-linear-gradient(top, #3edc5f, #1e8934);
-        background: -o-linear-gradient(top, #3edc5f, #1e8934);
-        filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#3edc5f', EndColorStr='#1e8934');
-    }
-    .eb_timeBox .timeInputCancel {
+
+    .timeInputCancel {
         width: 40px;
         height: 22px;
         line-height: 20px;
@@ -177,11 +180,11 @@
         text-align: center;
         cursor: pointer;
         text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
-    }
-    .eb_timeBox .timeInputCancel.mouseover {
-        background: -webkit-linear-gradient(top, #f72323, #941717);
-        background: -moz-linear-gradient(top, #f72323, #941717);
-        background: -o-linear-gradient(top, #f72323, #941717);
-        filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#f72323', EndColorStr='#941717');
+        &.mouseover{
+            background: -webkit-linear-gradient(top, #f72323, #941717);
+            background: -moz-linear-gradient(top, #f72323, #941717);
+            background: -o-linear-gradient(top, #f72323, #941717);
+            filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#f72323', EndColorStr='#941717');
+        }
     }
 }

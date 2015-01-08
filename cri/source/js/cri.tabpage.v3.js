@@ -24,7 +24,6 @@
         TAB_WIDTH         = 100;
 
     var _defaultOptions = {
-        label:'',
         data:null,  //Array [{value:"",text:""},{value:"",text:""}]
         change:null //Function: call back after select option
     };
@@ -38,8 +37,6 @@
     });
 
     $.extend(TabPage.prototype,{
-        _eventListen:function(){
-        },
 
         _init:function(){
             this._create();
@@ -54,7 +51,7 @@
             this._createHeader();
             if(bodys.length>0){
                 for(var i=0; i<bodys.length; i++){
-                    this.addTab(bodys[i],(bodys[i].data("title")|| ""));
+                    this.addTab(bodys[i],(bodys[i].data("title")|| ""),bodys[i].data("close"));
                 }
             }
         },
@@ -161,9 +158,15 @@
          * 增加Tab
          * @param content : html字符串、url、jquery对象
          * @param title : tab name
+         * @param closeAble: 是否在该tab上提供关闭按钮
          */
-        addTab:function(content,title){
+        addTab:function(content,title,closeAble){
             title = title || 'New Tab';
+
+            if(closeAble == undefined || closeAble == null || closeAble == "null"){
+                closeAble = true;
+            }
+
             var that = this,
                 $tabs = this.$tabs,
                 $tab = $('<li class="' + TABPAGE_TAB + '">' + title + '</li>').data("for",this._pageBodyQueue.length).click(function(){
@@ -172,7 +175,8 @@
                 $closeBtn = $('<i class="fa fa-close ' + TABPAGE_TAB_CLOSE + '"></i>').click(function(){
                     that._closeTab($tab);
                 });
-            $tabs.append($tab.append($closeBtn));
+            closeAble && $tab.append($closeBtn);
+            $tabs.append($tab);
 
             var tabPageBody = new TabPageBody(this.$tabPageGroup,{
                 content:content
@@ -187,6 +191,13 @@
 
         closeTab:function(index){
             this._closeTab(this._getTab(index));
+        },
+
+        /**
+         * 选择tab并给与焦点
+         */
+        select:function(index){
+            this._fouceTab(this._getTab(index))
         }
     });
 

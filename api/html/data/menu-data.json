@@ -21,6 +21,9 @@
                 "text":"window",
                 "url":"./html/window.html"
             },{
+                "text":"tabPage",
+                "url":"./html/tabpage.html"
+            },{
                 "text":"input",
                 "url":"./html/input.html"
             },{

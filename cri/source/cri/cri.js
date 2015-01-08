@@ -6295,10 +6295,14 @@ return function (global, window, document, undefined) {
          */
         value:function(value){
             if(arguments.length>0){
+                if(value == this._value){
+                    return ;
+                }
                 this._value = value;
                 this._text  = this._getTextByValue(value);
                 this.$element.val(value);
                 this.input.value(this._text);
+                this.options.change && this.options.change.call(this);
             }
             else{
                 return this._value;
@@ -6338,6 +6342,7 @@ return function (global, window, document, undefined) {
         this.$parent = $parent;
         this.value = options.value;//下拉框初始值
         this._init();
+        this.isOpen = false;
         this.text = null;
     };
 
@@ -6349,13 +6354,18 @@ return function (global, window, document, undefined) {
          */
         _init:function(){
             var data = this.options.data;
-            var $options = this.$options = $('<ul class="' + OPTIONS + '"></ul>').hide();
+            var $options = this.$options = $('<ul class="' + OPTIONS + '"></ul>');
+            var left = this.$parent.offset().left + 80;
+            var top = this.$parent.offset().top + 28;
             if(data){
                 for(var i = 0,len = data.length; i<len; i++){
                     $options.append(this._createOption(data[i]));
                 }
             }
-            this.$parent.append($options);
+            this.optionsHeight = $options.height();
+            $('body').append($options.css({top:top,left:left}));
+            this.optionsHeight = $options.height();
+            $options.hide();
         },
 
         /**
@@ -6381,18 +6391,40 @@ return function (global, window, document, undefined) {
         },
 
         /**
+         * 设置position显示时在屏幕中的位置
+         * @private
+         */
+        _setPosition:function(){
+            var left = this.$parent.offset().left + 80;
+            var top = this.$parent.offset().top + 28;
+            this.$options.css({top:top,left:left});
+        },
+
+        /**
          * 显示隐藏切换options选择框
          * @private
          */
         toggle:function(){
-            var that = this;
-            this.$options.animate({
-                    height:'toggle'
-                },200,function(){
-                    if(!that.$options.is(":hidden")){
+            var that = this,
+                $options = this.$options;
+            this._setPosition();
+            this.isOpen = !this.isOpen;
+            var height = this.isOpen ? this.optionsHeight:0;
+            if(this.isOpen){
+                $options.height(0);
+                $options.show();
+            }
+            this.$options.velocity({
+                    height:height
+                },200,
+                function(){
+                    if(that.isOpen){
                         that._clickBlank();
+                    }else{
+                        $options.hide();
                     }
-                });
+                }
+            );
         },
 
         /**
@@ -6484,7 +6516,6 @@ return function (global, window, document, undefined) {
         TAB_WIDTH         = 100;
 
     var _defaultOptions = {
-        label:'',
         data:null,  //Array [{value:"",text:""},{value:"",text:""}]
         change:null //Function: call back after select option
     };
@@ -6498,8 +6529,6 @@ return function (global, window, document, undefined) {
     });
 
     $.extend(TabPage.prototype,{
-        _eventListen:function(){
-        },
 
         _init:function(){
             this._create();
@@ -6514,7 +6543,7 @@ return function (global, window, document, undefined) {
             this._createHeader();
             if(bodys.length>0){
                 for(var i=0; i<bodys.length; i++){
-                    this.addTab(bodys[i],(bodys[i].data("title")|| ""));
+                    this.addTab(bodys[i],(bodys[i].data("title")|| ""),bodys[i].data("close"));
                 }
             }
         },
@@ -6621,9 +6650,15 @@ return function (global, window, document, undefined) {
          * 增加Tab
          * @param content : html字符串、url、jquery对象
          * @param title : tab name
+         * @param closeAble: 是否在该tab上提供关闭按钮
          */
-        addTab:function(content,title){
+        addTab:function(content,title,closeAble){
             title = title || 'New Tab';
+
+            if(closeAble == undefined || closeAble == null || closeAble == "null"){
+                closeAble = true;
+            }
+
             var that = this,
                 $tabs = this.$tabs,
                 $tab = $('<li class="' + TABPAGE_TAB + '">' + title + '</li>').data("for",this._pageBodyQueue.length).click(function(){
@@ -6632,7 +6667,8 @@ return function (global, window, document, undefined) {
                 $closeBtn = $('<i class="fa fa-close ' + TABPAGE_TAB_CLOSE + '"></i>').click(function(){
                     that._closeTab($tab);
                 });
-            $tabs.append($tab.append($closeBtn));
+            closeAble && $tab.append($closeBtn);
+            $tabs.append($tab);
 
             var tabPageBody = new TabPageBody(this.$tabPageGroup,{
                 content:content
@@ -6647,6 +6683,13 @@ return function (global, window, document, undefined) {
 
         closeTab:function(index){
             this._closeTab(this._getTab(index));
+        },
+
+        /**
+         * 选择tab并给与焦点
+         */
+        select:function(index){
+            this._fouceTab(this._getTab(index))
         }
     });
 
@@ -7062,13 +7105,12 @@ return function (global, window, document, undefined) {
     });
 }(window.jQuery);
 
-/*=====================================================================================
- * easy-bootstrap-timeInput v2.0
+/**
+ * Author zhouzy
+ * Date   2014/9/18
+ * TimeInput 组件
  *
- * @author:niyq
- * @date:2013/09/05
- * @dependce:jquery
- *=====================================================================================*/
+ */
 !function(window){
 
     "use strict";
@@ -7201,7 +7243,11 @@ return function (global, window, document, undefined) {
             if(this.options.HMS == true){
                 $timeBox.append(this._hmsSelect());
             }
-            $parent.append($timeBox);
+
+            var left = $parent.offset().left + 80;
+            var top = $parent.offset().top + 28;
+
+            $("body").append($timeBox.css({top:top,left:left}));
         },
 
         _yearSelect : function(){
@@ -7344,7 +7390,7 @@ return function (global, window, document, undefined) {
         _clickBlank:function(){
             var that = this;
             $(document).mouseup(function(e) {
-                var _con = that.$parent;
+                var _con = that.$timeBox;
                 if (!_con.is(e.target) && _con.has(e.target).length === 0) {
                     that.$timeBox.animate({
                         height:'hide'
@@ -7352,9 +7398,19 @@ return function (global, window, document, undefined) {
                 }
             });
         },
+        /**
+         * 设置position显示时在屏幕中的位置
+         * @private
+         */
+        _setPosition:function(){
+            var left = this.$parent.offset().left + 80;
+            var top = this.$parent.offset().top + 28;
+            this.$timeBox.css({top:top,left:left});
+        },
 
         toggle:function(){
             var that = this;
+            this._setPosition();
             this.$timeBox.animate({
                 height:"toggle"
             },200,function(){

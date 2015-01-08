@@ -1,0 +1,58 @@
+
+<div class="header">
+    <div class="name">cri.TabPage</div>
+    <div class="des">TabPage分页组件</div>
+</div>
+<h2>说明</h2>
+<p class="item-body">
+    该组件初始化时，读取直接子节点生成tab页，在每个子节点上获取data-title,data-close属性设置tab页标题和确定是否显示关闭按钮,当未设置data-close默认提供关闭按钮
+    <pre class="code"><code>
+        &lt;div id="tabpage"&gt;
+            &lt;div data-title="tab1" data-close="false"&gt;
+                |this is tab1
+            &lt;/div&gt;
+            &lt;div data-title="tab2"&gt;
+                |this is tab2
+            &lt;/div&gt;
+        &lt;/div&gt;
+    </code></pre>
+</p>
+<h2>方法</h2>
+<h3 class="item-head">
+    <div class="name">addTab</div>
+    <div class="type">void</div>
+</h3>
+<p class="item-body">
+    增加Tab
+    <pre class="code"><code>
+        tabPage.addTab(
+            content,  //tabPage 内容，可以传入 URL、jQuery、HTML字符串
+            title,    //标题
+            closeAble //在tabPage 标签头上是否提供关闭按钮
+        );
+    </code></pre>
+</p>
+
+<h3 class="item-head">
+    <div class="name">closeTab</div>
+    <div class="type">void</div>
+</h3>
+<p class="item-body">
+    关闭第几个标签页
+    <pre class="code"><code>
+        //参数为tab标签的索引值，索引值从0开始从左到右依次递增
+        tabPage.closeTab(index);
+    </code></pre>
+</p>
+<h3 class="item-head">
+    <div class="name">select</div>
+    <div class="type">void</div>
+</h3>
+<p class="item-body">
+    选择第几个标签页
+    <pre class="code"><code>
+        //参数为tab标签的索引值，索引值从0开始从左到右依次递增
+        tabPage.select(index);
+    </code></pre>
+</p>
+

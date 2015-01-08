@@ -1,10 +1,9 @@
-/*=====================================================================================
- * easy-bootstrap-timeInput v2.0
+/**
+ * Author zhouzy
+ * Date   2014/9/18
+ * TimeInput 组件
  *
- * @author:niyq
- * @date:2013/09/05
- * @dependce:jquery
- *=====================================================================================*/
+ */
 !function(window){
 
     "use strict";
@@ -137,7 +136,11 @@
             if(this.options.HMS == true){
                 $timeBox.append(this._hmsSelect());
             }
-            $parent.append($timeBox);
+
+            var left = $parent.offset().left + 80;
+            var top = $parent.offset().top + 28;
+
+            $("body").append($timeBox.css({top:top,left:left}));
         },
 
         _yearSelect : function(){
@@ -280,7 +283,7 @@
         _clickBlank:function(){
             var that = this;
             $(document).mouseup(function(e) {
-                var _con = that.$parent;
+                var _con = that.$timeBox;
                 if (!_con.is(e.target) && _con.has(e.target).length === 0) {
                     that.$timeBox.animate({
                         height:'hide'
@@ -288,9 +291,19 @@
                 }
             });
         },
+        /**
+         * 设置position显示时在屏幕中的位置
+         * @private
+         */
+        _setPosition:function(){
+            var left = this.$parent.offset().left + 80;
+            var top = this.$parent.offset().top + 28;
+            this.$timeBox.css({top:top,left:left});
+        },
 
         toggle:function(){
             var that = this;
+            this._setPosition();
             this.$timeBox.animate({
                 height:"toggle"
             },200,function(){
