@@ -169,7 +169,6 @@
         this.$parent = $parent;
         this.value = options.value;//下拉框初始值
         this._init();
-        this.isOpen = false;
         this.text = null;
     };
 
@@ -189,10 +188,7 @@
                     $options.append(this._createOption(data[i]));
                 }
             }
-            this.optionsHeight = $options.height();
-            $('body').append($options.css({top:top,left:left}));
-            this.optionsHeight = $options.height();
-            $options.hide();
+            $('body').append($options.css({top:top,left:left}).hide());
         },
 
         /**
@@ -232,26 +228,16 @@
          * @private
          */
         toggle:function(){
-            var that = this,
-                $options = this.$options;
+            var that = this;
             this._setPosition();
-            this.isOpen = !this.isOpen;
-            var height = this.isOpen ? this.optionsHeight:0;
-            if(this.isOpen){
-                $options.height(0);
-                $options.show();
+            if(this.$options.is(":hidden")){
+                this.$options.slideDown(200, function(){
+                    that._clickBlank();
+                });
             }
-            this.$options.velocity({
-                    height:height
-                },200,
-                function(){
-                    if(that.isOpen){
-                        that._clickBlank();
-                    }else{
-                        $options.hide();
-                    }
-                }
-            );
+            else{
+                this.$options.slideUp(200);
+            }
         },
 
         /**
@@ -261,11 +247,9 @@
         _clickBlank:function(){
             var that = this;
             $(document).mouseup(function(e) {
-                var _con = that.$parent;
+                var _con = that.$options;
                 if (!_con.is(e.target) && _con.has(e.target).length === 0) {
-                    that.$options.animate({
-                        height:'hide'
-                    },200);
+                    that.$options.slideUp(200);
                 }
             });
         },

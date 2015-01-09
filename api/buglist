@@ -24,6 +24,7 @@ Window
 4.窗口最大化后，按钮状态错误(fixed)
 5.窗口初始化再次构造异常(fixed)
 6.窗口构造成功后需要暴露事件(fixed)
+7.不能设置窗口是否能拖动（fixed）
 
 Input
 1.重复初始化(fixed)
@@ -34,8 +35,8 @@ SelectBox
 1.失去焦点，未触发validator(validateOnBlur=true) validate方法(fixed)
 2.value方法报错(fixed)
 3.change事件未触发(fixed)
-4.在窗口中，下拉选择项过多，展示不友好
-5.setText方法后，获取text异常
+4.在窗口中，下拉选择项过多，展示不友好(fixed)
+5.setText方法后，获取text异常(fixed)
 
 TimeInput
 1.未选择HMS时，输入框显示了小时分钟秒信息(fixed)

@@ -285,9 +285,7 @@
             $(document).mouseup(function(e) {
                 var _con = that.$timeBox;
                 if (!_con.is(e.target) && _con.has(e.target).length === 0) {
-                    that.$timeBox.animate({
-                        height:'hide'
-                    },200);
+                    that.$timeBox.slideUp(200);
                 }
             });
         },
@@ -304,13 +302,14 @@
         toggle:function(){
             var that = this;
             this._setPosition();
-            this.$timeBox.animate({
-                height:"toggle"
-            },200,function(){
-                if(!that.$timeBox.is(":hidden")){
+            if(this.$timeBox.is(":hidden")){
+                this.$timeBox.slideDown(200,function(){
                     that._clickBlank();
-                }
-            });
+                });
+            }
+            else{
+                this.$timeBox.slideUp(200);
+            }
         },
 
         getDate:function(){
