@@ -1,6 +1,6 @@
-easy-bootstrap
+cri
 ==============
-easy-bootstrap 是一整套运用于CMS类WEB项目，JQuery 插件集合。包含了datagrid、tree、treegrid、window、tabpage、input等常用插件。
+cri 类似于easyUI的一种前端框架，封装了各种jquery插件，例如：datagrid、tree、treegrid、window、tabpage、input。
 
 ###1.版本：
 
