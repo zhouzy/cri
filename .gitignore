@@ -3,4 +3,4 @@ node_modules
 .gitignore
 .idea
 api.war
-easy-bootstrap.iml
+*.iml
