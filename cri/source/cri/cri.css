@@ -182,7 +182,7 @@ table {
   min-width: 60px;
   margin: 2px 0;
   padding: 0 5px;
-  font-size: 14px;
+  font-size: 12px;
   vertical-align: middle;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
@@ -500,7 +500,7 @@ table {
 .input-group .input-btn,
 .input-group label {
   display: inline-block;
-  font-size: 14px;
+  font-size: 12px;
   vertical-align: middle;
 }
 .input-group label {
@@ -522,7 +522,7 @@ table {
   height: 14px;
   border-radius: 3px;
   border: 1px solid #c8c8c8;
-  font-size: 14px;
+  font-size: 12px;
 }
 .input-group input {
   display: inline-block;
@@ -534,7 +534,7 @@ table {
   height: 14px;
   border-radius: 3px;
   border: 1px solid #c8c8c8;
-  font-size: 14px;
+  font-size: 12px;
 }
 .input-group input:focus {
   border: 1px solid #97b7fc;
@@ -553,7 +553,7 @@ table {
   height: 14px;
   border-radius: 3px;
   border: 1px solid #c8c8c8;
-  font-size: 14px;
+  font-size: 12px;
   vertical-align: middle;
   cursor: pointer;
 }
@@ -912,12 +912,13 @@ table {
 .options {
   background: #F2F2F2;
   position: absolute;
-  font-size: 14px;
+  font-size: 12px;
   width: 178px;
   border: 1px solid #c8c8c8;
   z-index: 10009;
   max-height: 200px;
   overflow: auto;
+  overflow-x: hidden;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   -ms-border-radius: 3px;
@@ -1280,10 +1281,10 @@ table {
   right: 15px;
   width: 22px;
   height: 14px;
+  font-size: 12px;
   border: 1px solid #aaa;
   text-indent: 3px;
   color: #666;
-  font-size: 12px;
 }
 .eb_timeBox .eb_HMSInput.focus {
   border: 1px solid #626dbb;

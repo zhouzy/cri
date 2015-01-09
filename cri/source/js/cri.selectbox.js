@@ -19,7 +19,8 @@
     var _defaultOptions = {
         label:'',
         data:null,  //Array [{value:"",text:""},{value:"",text:""}]
-        change:null //Function: call back after select option
+        change:null, //Function: call back after select option
+        value:null
     };
 
     var SelectBox = cri.Widgets.extend(function(element,options){
@@ -32,19 +33,17 @@
     });
 
     $.extend(SelectBox.prototype,{
-        _eventListen:function(){
-        },
 
         _init:function(){
             this._create();
+            var value = this.options.value || this.$element.val();
+            this.value(value);
         },
 
         _create:function(){
             this.$element.hide();
             this.$element.wrap('<span class="' + SELECTBOX_GROUP + '"></span>');
             this.$selectBoxGroup = this.$element.parent();
-            this._value = this.$element.val();
-            this._text  = this.$element.find("option:selected").text();
             this._createInput();
             this._createListView();
         },
@@ -57,7 +56,6 @@
             this.input = new cri.Input(this.$element,{
                 label:that.label,
                 readonly:true,
-                value:that._text,
                 button:button,
                 onFocus:function(){
                     that.listView.toggle();
@@ -69,13 +67,8 @@
             var that = this;
             this.listView = new ListView(this.$selectBoxGroup,{
                 data:that._data(),
-                value:that._value,
-                onChange:function(value,text){
-                    that.input.value(text);
-                    that.$element.val(value);
-                    that._value = value;
-                    that._text = text;
-                    that.options.change && that.options.change.call(that);
+                onChange:function(value){
+                    that.value(value);
                 }
             });
         },
@@ -99,6 +92,22 @@
             }
             this.options.data = data;
             return data;
+        },
+
+        /**
+         * 设置原生元素select option
+         * @param optionsArr [{value:value,text:text}]
+         * @private
+         */
+        _setSelectOptions:function(optionsArr){
+            var $select = this.$element;
+            if($select.is("select")){
+                $select.empty();
+                for(var i = 0,len=optionsArr.length;i<len;i++){
+                    var option = optionsArr[i];
+                    $select.append('<option value="' + option.value + '">' + option.text + '</option>');
+                }
+            }
         },
 
         /**
@@ -129,6 +138,7 @@
                 this._text  = this._getTextByValue(value);
                 this.$element.val(value);
                 this.input.value(this._text);
+                this.listView.select(this._value);
                 this.options.change && this.options.change.call(this);
             }
             else{
@@ -142,22 +152,32 @@
          * @returns {*}
          */
         text:function(text){
+            var data = this.options.data;
             if(arguments.length>0){
-                var value = null;
-                for(var p in this.options.data){
-                    if(p.text === text){
-                        value = p.value || "";
+                for(var i= 0,len = data.length;i<len;i++){
+                    if(data[i].text === text){
+                        this.value(data[i].value);
                     }
                 }
-                this._value = value;
-                this._text = text;
-                this.$element.val(value);
-                this.input.value(text);
             }
             else{
                 return this._text;
             }
+        },
+
+        /**
+         * 动态改变selectBox的options
+         * @param options
+         */
+        setOptions:function(options){
+            this.options.data = options;
+            this._data();
+            this._setSelectOptions(options);
+            this.value(options[0].value);
+            this.listView.destory();
+            this._createListView();
         }
+
     });
 
     var ListView = function($parent,options){
@@ -165,9 +185,9 @@
             data:[],
             onChange:null
         },options);
+        this.value = options.value || null;//下拉框初始值
         this.$options = null;
         this.$parent = $parent;
-        this.value = options.value;//下拉框初始值
         this._init();
         this.text = null;
     };
@@ -181,14 +201,12 @@
         _init:function(){
             var data = this.options.data;
             var $options = this.$options = $('<ul class="' + OPTIONS + '"></ul>');
-            var left = this.$parent.offset().left + 80;
-            var top = this.$parent.offset().top + 28;
             if(data){
                 for(var i = 0,len = data.length; i<len; i++){
                     $options.append(this._createOption(data[i]));
                 }
             }
-            $('body').append($options.css({top:top,left:left}).hide());
+            $('body').append($options.hide());
         },
 
         /**
@@ -224,8 +242,45 @@
         },
 
         /**
-         * 显示隐藏切换options选择框
+         * 当在非本元素范围内点击，收缩下拉框
          * @private
+         */
+        _clickBlank:function(){
+            var that = this;
+            $(document).mouseup(function(e) {
+                var _con = that.$options;
+                if (!_con.is(e.target) && _con.has(e.target).length === 0) {
+                    that.$options.slideUp(200);
+                }
+            });
+        },
+
+        /**
+         * 单击option触发
+         * @param e
+         * @private
+         */
+        _change:function(){
+            this.options.onChange && this.options.onChange.call(this,this.value,this.text);
+        },
+
+        select:function(value){
+            var data = this.options.data;
+            var $options = this.$options;
+            if(data){
+                for(var i = 0,len = data.length; i<len; i++){
+                    if(value == data[i].value){
+                        this.value = value;
+                        $options.children().removeClass(SELECTED);
+                        $options.children().eq(i).addClass(SELECTED);
+                        return ;
+                    }
+                }
+            }
+        },
+
+        /**
+         * 显示隐藏切换options选择框
          */
         toggle:function(){
             var that = this;
@@ -241,47 +296,10 @@
         },
 
         /**
-         * 当在非本元素范围内点击，收缩下拉框
-         * @private
+         * 销毁ListView
          */
-        _clickBlank:function(){
-            var that = this;
-            $(document).mouseup(function(e) {
-                var _con = that.$options;
-                if (!_con.is(e.target) && _con.has(e.target).length === 0) {
-                    that.$options.slideUp(200);
-                }
-            });
-        },
-
-        /**
-         * 获取options定义
-         * 1.初始化时定义
-         * 2.原始select元素options获取
-         * @private
-         */
-        _data:function(){
-            var data = this.options.data;
-            if(!data){
-                data = [];
-                $("option",this.$element).each(function(){
-                        var text = $(this).text();
-                        var value = this.value;
-                        data.push({text:text,value:value});
-                    }
-                );
-            }
-            this.options.data = data;
-            return data;
-        },
-
-        /**
-         * 单击option触发
-         * @param e
-         * @private
-         */
-        _change:function(){
-            this.options.onChange && this.options.onChange.call(this,this.value,this.text);
+        destory:function(){
+            this.$options.remove();
         }
     };
 

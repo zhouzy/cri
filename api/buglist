@@ -37,6 +37,7 @@ SelectBox
 3.change事件未触发(fixed)
 4.在窗口中，下拉选择项过多，展示不友好(fixed)
 5.setText方法后，获取text异常(fixed)
+6.当setOptions后，formValue取值异常
 
 TimeInput
 1.未选择HMS时，输入框显示了小时分钟秒信息(fixed)
