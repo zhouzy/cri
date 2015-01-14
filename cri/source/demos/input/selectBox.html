@@ -16,23 +16,18 @@
     </style>
 </head>
 <body style="padding:50px;height:1000px;">
-<select class="" id="selectInWnd">
-    <option value="red">f00</option>
-    <option value="green">0f0</option>
-    <option value="blue">00f</option>
-    <option value="blue">00f</option>
-    <option value="blue">00f</option>
-    <option value="blue">00f</option>
-    <option value="blue">00f</option>
-    <option value="blue">00f</option>
-    <option value="blue">00f</option>
-    <option value="blue">00f</option>
-    <option value="blue">00f</option>
-    <option value="blue">00f</option>
-    <option value="blue">00f</option>
+<select id="selectInWnd" name="select">
+    <option value="1">f00</option>
+    <option value="2">0f0</option>
+    <option value="3">00f</option>
+    <option value="4">00f</option>
 </select>
 <script type="text/javascript">
-    $("#selectInWnd").selectBox();
+    $("#selectInWnd").selectBox({
+        change:function(){
+            console.log($('body').formValue().select);
+        }
+    });
 </script>
 </body>
 </html>

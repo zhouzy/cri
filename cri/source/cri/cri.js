@@ -185,6 +185,15 @@
         return json ? (new Function("return " + json))(): {};
     };
 
+    cri.isNum  = function(s)
+    {
+        if (s!=null && s!="")
+        {
+            return !isNaN(s);
+        }
+        return false;
+    }
+
 }(window);
 
 
@@ -1192,8 +1201,14 @@
             if(this.$input.is("input")){
                 this.$input.val(value);
             }else{
-                this.$element.val(value);
-                this.$input.text(value);
+                if(this.$element.is("select")){
+                    this.$element.val(value);
+                    this.$input.text(this.$element.find("option:selected").text());
+                }
+                else{
+                    this.$element.val(value);
+                    this.$input.text(value);
+                }
                 this.$element.trigger("change");
             }
         },
@@ -1724,8 +1739,7 @@
                 }
                 this._value = value;
                 this._text  = this._getTextByValue(value);
-                this.$element.val(value);
-                this.input.value(this._text);
+                this.input.value(this._value);
                 this.listView.select(this._value);
                 this.options.change && this.options.change.call(this);
             }

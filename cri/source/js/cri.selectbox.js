@@ -136,8 +136,7 @@
                 }
                 this._value = value;
                 this._text  = this._getTextByValue(value);
-                this.$element.val(value);
-                this.input.value(this._text);
+                this.input.value(this._value);
                 this.listView.select(this._value);
                 this.options.change && this.options.change.call(this);
             }

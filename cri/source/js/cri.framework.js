@@ -185,5 +185,14 @@
         return json ? (new Function("return " + json))(): {};
     };
 
+    cri.isNum  = function(s)
+    {
+        if (s!=null && s!="")
+        {
+            return !isNaN(s);
+        }
+        return false;
+    }
+
 }(window);
 
