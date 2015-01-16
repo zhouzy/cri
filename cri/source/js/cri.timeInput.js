@@ -31,7 +31,8 @@
     var _defaultOptions = {
         value:null,
         format:"yyyy/MM/dd",
-        HMS:false
+        HMS:false,
+        enable:true
     };
 
     var TimeInput = cri.Widgets.extend(function(element,options){
@@ -65,9 +66,14 @@
                 that.selectView.toggle();
             }};
 
-        this.input = new cri.Input(this.$element,{readonly:true,value:cri.formatDate(value,this.options.format),button:button,onFocus:function(){
-            that.selectView.toggle();
-        }});
+        this.input = new cri.Input(this.$element,{
+            readonly:true,
+            value:cri.formatDate(value,this.options.format),
+            button:button,
+            enable:this.options.enable,
+            onFocus:function(){
+                that.selectView.toggle();
+            }});
     };
 
     /**
@@ -95,6 +101,19 @@
         this.date = value;
         this.input.value(cri.formatDate(value,this.options.format));
         this.selectView.setDate(value);
+    };
+    /**
+     * 使输入框不能用
+     */
+    TimeInput.prototype.disable=function(){
+        this.input.disable();
+    };
+
+    /**
+     * 使输入框可用
+     */
+    TimeInput.prototype.enable=function(){
+        this.input.enable();
     };
 
     TimeInput.prototype.value = function(value){
@@ -298,6 +317,7 @@
             var top = this.$parent.offset().top + 28;
             this.$timeBox.css({top:top,left:left});
         },
+
 
         toggle:function(){
             var that = this;

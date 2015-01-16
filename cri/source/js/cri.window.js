@@ -41,6 +41,7 @@
         //整数
         return parseInt(width) || 0;
     }
+
     /**
      * 格式化高度，接受百分比、像素值、整数参数
      * @param width
@@ -74,7 +75,12 @@
         center:true,//初始时是否居中
         resizable:true,
         dragable:true,
-        onReady:null//当窗口初始化完成时触发
+        onReady:null,//当窗口初始化完成时触发
+        onOpen:null,//窗口打开时触发
+        onClose:null,//窗口关闭时触发
+        onMaxmize:null,//窗口最大化时触发
+        onMinimize:null,//窗口最小化时触发
+        onResume:null//窗口复原时触发
     };
 
     var Window = cri.Widgets.extend(function(element,options){
@@ -332,6 +338,7 @@
             this._setStyleByStatus("normal");
             $(".window-content",this.$window).show();
             this.windowStatus = "normal";
+            this.options.onOpen && this.options.onOpen.call(this);
         },
 
         /**
@@ -354,11 +361,19 @@
                     frontWnd = this;
                 }
             });
-            frontWnd.style.zIndex = max+1;
-            $windows.is(":visible") ? $overlay.css("zIndex",max) : $overlay.hide();
-
+            //TODO:当所有显示的窗口没有模态窗口时，隐藏overlay,也就是找到一个显示的模态窗口就显示overlay
+            $overlay.hide();
+            for(var i=this.windowStack.length - 1; i>=0; i--){
+                if(this.windowStack[i].windowStatus != "close" && this.windowStack.options.modal){
+                    frontWnd.style.zIndex = max+1;
+                    $overlay.css("zIndex",max);
+                    $overlay.show();
+                    return ;
+                }
+            }
             this.$window.removeClass("mini-window");
             this.windowStatus = "close";
+            this.options.onClose && this.options.onClose.call(this);
         },
 
         /**
@@ -369,6 +384,7 @@
             this._setStyleByStatus("maximize");
             this._setButtons("maximize");
             this.windowStatus = "maximize";
+            this.options.onMaxmize && this.options.onMaxmize.call(this);
         },
 
         /**
@@ -383,6 +399,7 @@
             this._setStyleByStatus("minimize");
             this.$window.css("left",left);
             this.windowStatus = "minimize";
+            this.options.onMinimize && this.options.onMinimize.call(this);
         },
 
         /**
@@ -402,6 +419,7 @@
                 });
             }
             this.windowStatus = "normal";
+            this.options.onResume && this.options.onResume.call(this);
         },
 
         /**
@@ -521,6 +539,7 @@
             $warpper.after($element).remove();
         }
     });
+
     cri.Window = Window;
 
     $.fn.window = function(option) {

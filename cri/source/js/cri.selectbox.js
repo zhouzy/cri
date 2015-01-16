@@ -20,7 +20,8 @@
         label:'',
         data:null,  //Array [{value:"",text:""},{value:"",text:""}]
         change:null, //Function: call back after select option
-        value:null
+        value:null,
+        enable:true
     };
 
     var SelectBox = cri.Widgets.extend(function(element,options){
@@ -57,6 +58,7 @@
                 label:that.label,
                 readonly:true,
                 button:button,
+                enable:this.options.enable,
                 onFocus:function(){
                     that.listView.toggle();
                 }
@@ -122,6 +124,19 @@
                     return data[i].text;
                 }
             }
+        },
+        /**
+         * 使输入框不能用
+         */
+        disable:function(){
+            this.input.disable();
+        },
+
+        /**
+         * 使输入框可用
+         */
+        enable:function(){
+            this.input.enable();
         },
 
         /**

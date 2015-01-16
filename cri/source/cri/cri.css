@@ -621,6 +621,16 @@ table {
   border-right: 5px solid transparent;
   border-top: 10px solid rgba(255, 70, 60, 0.9);
 }
+.input-group .input-layout {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: #d7d7d7;
+  filter: alpha(opacity=50);
+  opacity: .5;
+}
 
 .user-not-select {
   -moz-user-select: none;
@@ -666,7 +676,7 @@ table {
 }
 .notification {
   position: fixed;
-  z-index: 10003;
+  z-index: 20000;
   bottom: 0;
   left: 0;
   right: 0;

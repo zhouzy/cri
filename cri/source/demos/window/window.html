@@ -4,11 +4,10 @@
     <title>window</title>
     <meta charset="utf-8" content="text/html"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link href="/easy-bootstrap/script/lib/font-awesome/css/font-awesome.css" type="text/css" rel="stylesheet"/>
-    <link href="/easy-bootstrap/script/func/cri/css/reset.css" type="text/css" rel="stylesheet"/>
-    <link href="../../cri/cri/cri/cri.css" type="text/css" rel="stylesheet"/>
-    <script src="../../cri/jquery/jquery-1.9.1.js" type="text/javascript"></script>
-    <script src="../../cri/cri/cri/cri.js" type="text/javascript"></script>
+    <link href="../../../libs/font-awesome/css/font-awesome.css" type="text/css" rel="stylesheet"/>
+    <link href="../../cri/cri.css" type="text/css" rel="stylesheet"/>
+    <script src="../../../libs/jquery/jquery-1.9.1.js" type="text/javascript"></script>
+    <script src="../../cri/cri.js" type="text/javascript"></script>
     <style>
         html{
             font-family:Georgia,"Times New Roman","Microsoft YaHei","微软雅黑",STXihei,"华文细黑",serif;
@@ -21,7 +20,10 @@
     </style>
 </head>
 <body>
-<div id="adddiv">
+<div id="window1">
+    <button onclick="openWindow2()">kai</button>
+</div>
+<div id="window2" style="display:none;">
     <select id="select_color" name="color" title="颜色" class="eb_selectBox" data-options="required:true,defaultVal:'0'">
         <option value="0">黑色</option>
         <option value="1">白色</option>
@@ -34,13 +36,19 @@
     <textarea name="description" class="eb_textarea" title="描述" data-options="width:510"></textarea>
 </div>
 <script>
-    $("#adddiv").window({
+    $("#window1").window({
         title:"window1",
         actions:["Maximize","Close","Minimize"],
-        position:{left:10,top:10},
-        modal:true,
-        content:"./windowContent.html"
+        position:{left:10,top:10}
     });
+    function openWindow2(){
+        $("#window2").window({
+            title:"window2",
+            actions:["Maximize","Close","Minimize"],
+            modal:true,
+            position:{left:10,top:10}
+        });
+    }
     function buttonAdd(){}
 </script>
 </body>

@@ -408,7 +408,8 @@
                 url: this.options.url,
                 success: function(data){
                     if(op.ajaxDone){
-                        op.ajaxDone(data);
+                        var re = op.ajaxDone.call(that,data);
+                        re && (data = re);
                     }
                     that._rows = data.rows || [];
                     op.total = data.total || 0;

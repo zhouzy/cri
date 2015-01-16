@@ -662,7 +662,8 @@
                 url: this.options.url,
                 success: function(data){
                     if(op.ajaxDone){
-                        op.ajaxDone(data);
+                        var re = op.ajaxDone.call(that,data);
+                        re && (data = re);
                     }
                     that._rows = data.rows || [];
                     op.total = data.total || 0;
@@ -1099,7 +1100,8 @@
         readonly:false,
         onFocus:null,
         onBlur:null,
-        onClick:null
+        onClick:null,
+        enable:true
     };
 
     var INPUT_GROUP = "input-group",
@@ -1127,6 +1129,7 @@
             this.$inputGroup = $element.parent();
             this._wrapInput();
             this.$input.before(this._label());
+            this.options.enable || this.disable();
         },
 
         _wrapInput:function(){
@@ -1217,6 +1220,21 @@
             return this.$element.val();
         },
 
+        /**
+         * 使输入框不能用
+         */
+        disable:function(){
+            var $layout = $('<div class="input-layout"></div>');
+            this.$inputGroup.append($layout);
+        },
+
+        /**
+         * 使输入框可用
+         */
+        enable:function(){
+            this.$inputGroup.children(".input-layout").remove();
+        },
+
         value:function(value){
             if(arguments.length>0){
                 this._setValue(value)
@@ -1229,7 +1247,7 @@
     cri.Input = Input;
 
     $.fn.input = function(option) {
-        var input = null;
+        var o = null;
         this.each(function () {
             var $this   = $(this),
                 input   = $this.data('input'),
@@ -1237,9 +1255,9 @@
             if(input != null){
                 input._destory();
             }
-            $this.data('input', (input = new Input(this, options)));
+            $this.data('input', (o = new Input(this, options)));
         });
-        return input;
+        return o;
     };
 }(window);
 /*=====================================================================================
@@ -1623,7 +1641,8 @@
         label:'',
         data:null,  //Array [{value:"",text:""},{value:"",text:""}]
         change:null, //Function: call back after select option
-        value:null
+        value:null,
+        enable:true
     };
 
     var SelectBox = cri.Widgets.extend(function(element,options){
@@ -1660,6 +1679,7 @@
                 label:that.label,
                 readonly:true,
                 button:button,
+                enable:this.options.enable,
                 onFocus:function(){
                     that.listView.toggle();
                 }
@@ -1725,6 +1745,19 @@
                     return data[i].text;
                 }
             }
+        },
+        /**
+         * 使输入框不能用
+         */
+        disable:function(){
+            this.input.disable();
+        },
+
+        /**
+         * 使输入框可用
+         */
+        enable:function(){
+            this.input.enable();
         },
 
         /**
@@ -2569,7 +2602,8 @@
     var _defaultOptions = {
         value:null,
         format:"yyyy/MM/dd",
-        HMS:false
+        HMS:false,
+        enable:true
     };
 
     var TimeInput = cri.Widgets.extend(function(element,options){
@@ -2603,9 +2637,14 @@
                 that.selectView.toggle();
             }};
 
-        this.input = new cri.Input(this.$element,{readonly:true,value:cri.formatDate(value,this.options.format),button:button,onFocus:function(){
-            that.selectView.toggle();
-        }});
+        this.input = new cri.Input(this.$element,{
+            readonly:true,
+            value:cri.formatDate(value,this.options.format),
+            button:button,
+            enable:this.options.enable,
+            onFocus:function(){
+                that.selectView.toggle();
+            }});
     };
 
     /**
@@ -2633,6 +2672,19 @@
         this.date = value;
         this.input.value(cri.formatDate(value,this.options.format));
         this.selectView.setDate(value);
+    };
+    /**
+     * 使输入框不能用
+     */
+    TimeInput.prototype.disable=function(){
+        this.input.disable();
+    };
+
+    /**
+     * 使输入框可用
+     */
+    TimeInput.prototype.enable=function(){
+        this.input.enable();
     };
 
     TimeInput.prototype.value = function(value){
@@ -2836,6 +2888,7 @@
             var top = this.$parent.offset().top + 28;
             this.$timeBox.css({top:top,left:left});
         },
+
 
         toggle:function(){
             var that = this;
@@ -3768,6 +3821,7 @@
         //整数
         return parseInt(width) || 0;
     }
+
     /**
      * 格式化高度，接受百分比、像素值、整数参数
      * @param width
@@ -3801,7 +3855,12 @@
         center:true,//初始时是否居中
         resizable:true,
         dragable:true,
-        onReady:null//当窗口初始化完成时触发
+        onReady:null,//当窗口初始化完成时触发
+        onOpen:null,//窗口打开时触发
+        onClose:null,//窗口关闭时触发
+        onMaxmize:null,//窗口最大化时触发
+        onMinimize:null,//窗口最小化时触发
+        onResume:null//窗口复原时触发
     };
 
     var Window = cri.Widgets.extend(function(element,options){
@@ -4059,6 +4118,7 @@
             this._setStyleByStatus("normal");
             $(".window-content",this.$window).show();
             this.windowStatus = "normal";
+            this.options.onOpen && this.options.onOpen.call(this);
         },
 
         /**
@@ -4081,11 +4141,19 @@
                     frontWnd = this;
                 }
             });
-            frontWnd.style.zIndex = max+1;
-            $windows.is(":visible") ? $overlay.css("zIndex",max) : $overlay.hide();
-
+            //TODO:当所有显示的窗口没有模态窗口时，隐藏overlay,也就是找到一个显示的模态窗口就显示overlay
+            $overlay.hide();
+            for(var i=this.windowStack.length - 1; i>=0; i--){
+                if(this.windowStack[i].windowStatus != "close" && this.windowStack.options.modal){
+                    frontWnd.style.zIndex = max+1;
+                    $overlay.css("zIndex",max);
+                    $overlay.show();
+                    return ;
+                }
+            }
             this.$window.removeClass("mini-window");
             this.windowStatus = "close";
+            this.options.onClose && this.options.onClose.call(this);
         },
 
         /**
@@ -4096,6 +4164,7 @@
             this._setStyleByStatus("maximize");
             this._setButtons("maximize");
             this.windowStatus = "maximize";
+            this.options.onMaxmize && this.options.onMaxmize.call(this);
         },
 
         /**
@@ -4110,6 +4179,7 @@
             this._setStyleByStatus("minimize");
             this.$window.css("left",left);
             this.windowStatus = "minimize";
+            this.options.onMinimize && this.options.onMinimize.call(this);
         },
 
         /**
@@ -4129,6 +4199,7 @@
                 });
             }
             this.windowStatus = "normal";
+            this.options.onResume && this.options.onResume.call(this);
         },
 
         /**
@@ -4248,6 +4319,7 @@
             $warpper.after($element).remove();
         }
     });
+
     cri.Window = Window;
 
     $.fn.window = function(option) {

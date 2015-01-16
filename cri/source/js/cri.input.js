@@ -18,7 +18,8 @@
         readonly:false,
         onFocus:null,
         onBlur:null,
-        onClick:null
+        onClick:null,
+        enable:true
     };
 
     var INPUT_GROUP = "input-group",
@@ -46,6 +47,7 @@
             this.$inputGroup = $element.parent();
             this._wrapInput();
             this.$input.before(this._label());
+            this.options.enable || this.disable();
         },
 
         _wrapInput:function(){
@@ -136,6 +138,21 @@
             return this.$element.val();
         },
 
+        /**
+         * 使输入框不能用
+         */
+        disable:function(){
+            var $layout = $('<div class="input-layout"></div>');
+            this.$inputGroup.append($layout);
+        },
+
+        /**
+         * 使输入框可用
+         */
+        enable:function(){
+            this.$inputGroup.children(".input-layout").remove();
+        },
+
         value:function(value){
             if(arguments.length>0){
                 this._setValue(value)
@@ -148,7 +165,7 @@
     cri.Input = Input;
 
     $.fn.input = function(option) {
-        var input = null;
+        var o = null;
         this.each(function () {
             var $this   = $(this),
                 input   = $this.data('input'),
@@ -156,8 +173,8 @@
             if(input != null){
                 input._destory();
             }
-            $this.data('input', (input = new Input(this, options)));
+            $this.data('input', (o = new Input(this, options)));
         });
-        return input;
+        return o;
     };
 }(window);

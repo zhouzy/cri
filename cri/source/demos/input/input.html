@@ -38,10 +38,16 @@
     <input type="button" value="submit" id="btn"/>
 </form>
 <script>
-    $("#timeinput").timeInput({HMS:true});
+    $("#timeinput").timeInput();
+    $("#timeinput").timeInput();
     $("#input").input();
+    var input = $("#input").input();
+    input.disable();
+    $("#readonlyinput").input({readonly:true});
     $("#readonlyinput").input({readonly:true});
     $("#select").selectBox();
+    $("#select").selectBox();
+    $("#btn").button();
     $("#btn").button();
 </script>
 </body>
