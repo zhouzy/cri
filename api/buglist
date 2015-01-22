@@ -16,6 +16,7 @@ Grid
 11.表头拖动后，再翻页，grid-body变成原来尺寸(fixed)
 12.当checkBox=true，单击行checkBox未勾选(fixed)
 13.双击后，选择数据getSelected异常(fixed)
+14.分页初始化是最多显示三页，默认显示五页(fixed)
 
 Window
 1.模态窗口关闭，遮罩未关闭(fixed)

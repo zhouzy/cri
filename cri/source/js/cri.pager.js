@@ -123,12 +123,14 @@
         },
 
         _numberPage:function($numberPage,page,lastPage){
-            for(var i=-2; i<3; i++){
-                var shiftPage = i + page;
-                if(shiftPage>0 && shiftPage <= lastPage){
+            var start = page > 2 ? page-2:1,
+                end   = start + 5;
+
+            for(var i=start; i<end; i++){
+                if(i>0 && i<= lastPage){
                     var $li = $("<li></li>"),
-                        $a  = $("<a></a>").data("page",shiftPage).text(shiftPage);
-                    shiftPage != page ?
+                        $a  = $("<a></a>").data("page",i).text(i);
+                    i != page ?
                         $a.addClass("pager-num"):
                         $a.addClass(STATEDSTATE);
                     $numberPage.append($li.append($a));
