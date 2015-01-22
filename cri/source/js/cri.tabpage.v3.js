@@ -24,8 +24,7 @@
         TAB_WIDTH         = 100;
 
     var _defaultOptions = {
-        data:null,  //Array [{value:"",text:""},{value:"",text:""}]
-        change:null //Function: call back after select option
+        onFouce:null
     };
 
     var TabPage = cri.Widgets.extend(function(element,options){
@@ -87,6 +86,7 @@
                 }
             }
         },
+
         _offsetR:function(){
             var left  = this.$tabs.position().left,
                 width = this.$tabs.width(),
@@ -102,6 +102,7 @@
                 }
             }
         },
+
         _createTabs:function(){
             var $tabs = this.$tabs = $('<ul class="' + TABPAGE_TABS + '"></ul>');
             return $tabs;
@@ -113,6 +114,7 @@
             index != null && this._pageBodyQueue[index].hide();
             $tab.addClass("selected");
             this._pageBodyQueue[$tab.data("for")].show();
+            this.options.onFouce && this.options.onFouce.call(this,$tab.data("for"));
         },
 
         _closeTab:function($tab){
@@ -132,8 +134,8 @@
                     index >= 0 && this._fouceTab(this._getTab(index));
                 }
             }
-
         },
+
         _leftrightBtn:function(){
             var $tabs = this.$tabs;
             var tabsW = $tabs.width();
@@ -150,6 +152,7 @@
                 this.$pageHeader.removeClass("shift");
             }
         },
+
         _getTab:function(index){
             return $('li:eq('+index+')',this.$tabs);
         },
@@ -198,6 +201,13 @@
          */
         select:function(index){
             this._fouceTab(this._getTab(index))
+        },
+
+        /**
+         * 根据索引获取tabBody
+         */
+        getTabBody:function(index){
+            return this._pageBodyQueue[index];
         }
     });
 
@@ -240,6 +250,11 @@
         _destory:function(){
             this.$body.remove();
         },
+
+        getContent:function(){
+            return this.$body;
+        },
+
         show:function(){
             this.$body.show();
         },

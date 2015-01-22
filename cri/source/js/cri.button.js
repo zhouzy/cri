@@ -20,8 +20,6 @@
 
     var BUTTON = "button";
 
-    //TODO:添加enable，disable方法
-
     var Button = cri.Widgets.extend(function(element,options){
         this.options     = _defaultOptions;
         this.$inputGroup = null;

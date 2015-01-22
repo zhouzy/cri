@@ -17,6 +17,25 @@
         &lt;/div&gt;
     </code></pre>
 </p>
+<h2>事件</h2>
+<h3 class="item-head">
+    <div class="name">onFouce</div>
+    <div class="type">void</div>
+</h3>
+<p class="item-body">
+    当用户切换tab时触发
+    <pre class="code"><code>
+        tabPage.addTab(
+            content,  //tabPage 内容，可以传入 URL、jQuery、HTML字符串
+            title,    //标题
+            closeAble, //在tabPage 标签头上是否提供关闭按钮
+            onFouce:function(index){//参数为当前tab索引
+                var $tabBody = this.getTabBody(index);
+            }
+        );
+    </code></pre>
+</p>
+
 <h2>方法</h2>
 <h3 class="item-head">
     <div class="name">addTab</div>
@@ -53,6 +72,18 @@
     <pre class="code"><code>
         //参数为tab标签的索引值，索引值从0开始从左到右依次递增
         tabPage.select(index);
+    </code></pre>
+</p>
+
+<h3 class="item-head">
+    <div class="name">getTabBody</div>
+    <div class="type">void</div>
+</h3>
+<p class="item-body">
+    根据索引获取TabBody
+    <pre class="code"><code>
+        //参数为tab标签的索引值，索引值从0开始从左到右依次递增
+        tabPage.getTabBody(index);
     </code></pre>
 </p>
 

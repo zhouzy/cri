@@ -353,6 +353,8 @@
                 $overlay = $(".overlay");
 
             this.$window.css("zIndex",ZINDEX).hide();
+            this.windowStatus = "close";
+            this.$window.removeClass("mini-window");
             $windows.each(function(){
                 var z = +this.style.zIndex + 1;
                 this.style.zIndex = z;
@@ -361,18 +363,16 @@
                     frontWnd = this;
                 }
             });
-            //TODO:当所有显示的窗口没有模态窗口时，隐藏overlay,也就是找到一个显示的模态窗口就显示overlay
+            //当所有显示的窗口没有模态窗口时，隐藏overlay,也就是找到一个显示的模态窗口就显示overlay
             $overlay.hide();
             for(var i=this.windowStack.length - 1; i>=0; i--){
-                if(this.windowStack[i].windowStatus != "close" && this.windowStack.options.modal){
+                if(this.windowStack[i].windowStatus != "close" && this.windowStack[i].options.modal){
                     frontWnd.style.zIndex = max+1;
                     $overlay.css("zIndex",max);
                     $overlay.show();
                     return ;
                 }
             }
-            this.$window.removeClass("mini-window");
-            this.windowStatus = "close";
             this.options.onClose && this.options.onClose.call(this);
         },
 
@@ -543,7 +543,7 @@
     cri.Window = Window;
 
     $.fn.window = function(option) {
-        var wnd = null;
+        var o = null;
         this.each(function () {
             var $this   = $(this),
                 wnd     = $this.data('window'),
@@ -551,8 +551,8 @@
             if(wnd != null){
                 wnd._destory();
             }
-            $this.data('window', (wnd = new Window(this, options)));
+            $this.data('window', (o = new Window(this, options)));
         });
-        return wnd;
+        return o;
     };
 }(window);

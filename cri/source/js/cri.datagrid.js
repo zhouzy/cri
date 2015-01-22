@@ -16,17 +16,17 @@
     });
 
     $.fn.datagrid = function(option) {
-        var datagrid = null;
+        var o = null;
         this.each(function () {
             var $this = $(this),
-                dg    = $this.data('datagrid'),
+                dg    = $this.data('datagrid');
             options = typeof option == 'object' && option;
             if(dg != null){
-                dg._distory();
+                dg._destory();
             }
-            $this.data('datagrid', (datagrid = new DataGrid(this, options)));
+            $this.data('datagrid', (o = new DataGrid(this, options)));
         });
-        return datagrid;
+        return o;
     };
 
 }(window);

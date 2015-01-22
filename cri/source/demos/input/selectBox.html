@@ -17,13 +17,10 @@
 </head>
 <body style="padding:50px;height:1000px;">
 <select id="selectInWnd" name="select">
-    <option value="1">f00</option>
-    <option value="2">0f0</option>
-    <option value="3">00f</option>
-    <option value="4">00f</option>
 </select>
 <script type="text/javascript">
     $("#selectInWnd").selectBox({
+        data:[{value:1,text:"text01"},{value:2,text:"text02"},{value:3,text:"text04"},{value:5,text:"text05"}],
         change:function(){
             console.log($('body').formValue().select);
         }

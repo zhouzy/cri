@@ -802,8 +802,6 @@
 
     var BUTTON = "button";
 
-    //TODO:添加enable，disable方法
-
     var Button = cri.Widgets.extend(function(element,options){
         this.options     = _defaultOptions;
         this.$inputGroup = null;
@@ -882,17 +880,17 @@
     });
 
     $.fn.datagrid = function(option) {
-        var datagrid = null;
+        var o = null;
         this.each(function () {
             var $this = $(this),
-                dg    = $this.data('datagrid'),
+                dg    = $this.data('datagrid');
             options = typeof option == 'object' && option;
             if(dg != null){
-                dg._distory();
+                dg._destory();
             }
-            $this.data('datagrid', (datagrid = new DataGrid(this, options)));
+            $this.data('datagrid', (o = new DataGrid(this, options)));
         });
-        return datagrid;
+        return o;
     };
 
 }(window);
@@ -1120,7 +1118,15 @@
         },
 
         _init:function(){
+            var op = this.options,
+                value = this.$element.val();
+            if(op.value == null && value != null){
+                op.value = value;
+            }
             this._createInputGroup();
+            if(op.value != null){
+                this._setValue(op.value)
+            }
         },
 
         _createInputGroup:function(){
@@ -1152,9 +1158,6 @@
 
             this.$input = $input;
 
-            if(op.value != null){
-                this._setValue(op.value)
-            }
         },
 
         /**
@@ -1164,7 +1167,7 @@
          */
         _readonlyInput:function($element){
             var that = this,
-                $input = $('<span class="readonly" role="readonly">'+this.$element.val()+'</span>');
+                $input = $('<span class="readonly" role="readonly"></span>');
             $input.on("click",function(){
                 that.options.onFocus && that.options.onFocus.call(that);
             }).blur(function(){
@@ -1201,6 +1204,9 @@
         },
 
         _setValue:function(value){
+            if(value == null){
+                return ;
+            }
             if(this.$input.is("input")){
                 this.$input.val(value);
             }else{
@@ -1659,7 +1665,9 @@
         _init:function(){
             this._create();
             var value = this.options.value || this.$element.val();
-            this.value(value);
+            if(value != null){
+                this.value(value);
+            }
         },
 
         _create:function(){
@@ -1712,6 +1720,13 @@
                         data.push({text:text,value:value});
                     }
                 );
+            }
+            else{
+                var option = [];
+                for(var i= 0,len=data.length;i<len;i++){
+                    option.push('<option value="' + data[i].value + '">' + data[i].text + '</option>');
+                }
+                this.$element.html(option.join(""));
             }
             this.options.data = data;
             return data;
@@ -1808,7 +1823,7 @@
             this.options.data = options;
             this._data();
             this._setSelectOptions(options);
-            this.value(options[0].value);
+            options.length && this.value(options[0].value);
             this.listView.destory();
             this._createListView();
         }
@@ -1980,8 +1995,7 @@
         TAB_WIDTH         = 100;
 
     var _defaultOptions = {
-        data:null,  //Array [{value:"",text:""},{value:"",text:""}]
-        change:null //Function: call back after select option
+        onFouce:null
     };
 
     var TabPage = cri.Widgets.extend(function(element,options){
@@ -2043,6 +2057,7 @@
                 }
             }
         },
+
         _offsetR:function(){
             var left  = this.$tabs.position().left,
                 width = this.$tabs.width(),
@@ -2058,6 +2073,7 @@
                 }
             }
         },
+
         _createTabs:function(){
             var $tabs = this.$tabs = $('<ul class="' + TABPAGE_TABS + '"></ul>');
             return $tabs;
@@ -2069,6 +2085,7 @@
             index != null && this._pageBodyQueue[index].hide();
             $tab.addClass("selected");
             this._pageBodyQueue[$tab.data("for")].show();
+            this.options.onFouce && this.options.onFouce.call(this,$tab.data("for"));
         },
 
         _closeTab:function($tab){
@@ -2088,8 +2105,8 @@
                     index >= 0 && this._fouceTab(this._getTab(index));
                 }
             }
-
         },
+
         _leftrightBtn:function(){
             var $tabs = this.$tabs;
             var tabsW = $tabs.width();
@@ -2106,6 +2123,7 @@
                 this.$pageHeader.removeClass("shift");
             }
         },
+
         _getTab:function(index){
             return $('li:eq('+index+')',this.$tabs);
         },
@@ -2154,6 +2172,13 @@
          */
         select:function(index){
             this._fouceTab(this._getTab(index))
+        },
+
+        /**
+         * 根据索引获取tabBody
+         */
+        getTabBody:function(index){
+            return this._pageBodyQueue[index];
         }
     });
 
@@ -2196,6 +2221,11 @@
         _destory:function(){
             this.$body.remove();
         },
+
+        getContent:function(){
+            return this.$body;
+        },
+
         show:function(){
             this.$body.show();
         },
@@ -3579,10 +3609,11 @@
 
     var INPUTSELECTOR = ":input:not(:button,[type=submit],[type=reset],[disabled])",
         CHECKBOXSELECTOR = ":checkbox:not([disabled],[readonly])",
-        NUMBERINPUTSELECTOR = "[type=number],[type=range]";
+        NUMBERINPUTSELECTOR = "[type=num],[type=range]";
 
     var emailRegExp = /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))$/i,
         urlRegExp = /^(https?|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i;
+
     function patternMatcher(value, pattern) {
         if (typeof pattern === "string") {
             pattern = new RegExp('^(?:' + pattern + ')$');
@@ -3619,7 +3650,7 @@
             return true;
         },
         min: function(input){
-            if (input.filter(NUMBERINPUTSELECTOR + ",[role=number]").filter("[min]").length && input.val() !== "") {
+            if (input.filter(NUMBERINPUTSELECTOR).filter("[min]").length && input.val() !== "") {
                 var min = parseFloat(input.attr("min")) || 0,
                     val = parseFloat(input.val());
                 return min <= val;
@@ -3627,7 +3658,7 @@
             return true;
         },
         max: function(input){
-            if (input.filter(NUMBERINPUTSELECTOR + ",[role=number]").filter("[max]").length && input.val() !== "") {
+            if (input.filter(NUMBERINPUTSELECTOR).filter("[max]").length && input.val() !== "") {
                 var max = parseFloat(input.attr("max")) || 0,
                     val = parseFloat(input.val());
                 return max >= val;
@@ -3646,6 +3677,12 @@
                 return parseDate(input.val(), input.attr("format")) !== null;
             }
             return true;
+        },
+        number: function(input) {
+            if(input.filter(NUMBERINPUTSELECTOR).length && input.val()){
+                return cri.isNum(input.val());
+            }
+            return true;
         }
     };
 
@@ -3655,7 +3692,8 @@
         max:"请输入小于的数字",
         email:"请输入合法的邮箱地址",
         url:"请输入合法的URL地址",
-        date:"请输入合法的日期"
+        date:"请输入合法的日期",
+        number:"请输入数字"
     };
 
     var _defaultOptions = {
@@ -4133,6 +4171,8 @@
                 $overlay = $(".overlay");
 
             this.$window.css("zIndex",ZINDEX).hide();
+            this.windowStatus = "close";
+            this.$window.removeClass("mini-window");
             $windows.each(function(){
                 var z = +this.style.zIndex + 1;
                 this.style.zIndex = z;
@@ -4141,18 +4181,16 @@
                     frontWnd = this;
                 }
             });
-            //TODO:当所有显示的窗口没有模态窗口时，隐藏overlay,也就是找到一个显示的模态窗口就显示overlay
+            //当所有显示的窗口没有模态窗口时，隐藏overlay,也就是找到一个显示的模态窗口就显示overlay
             $overlay.hide();
             for(var i=this.windowStack.length - 1; i>=0; i--){
-                if(this.windowStack[i].windowStatus != "close" && this.windowStack.options.modal){
+                if(this.windowStack[i].windowStatus != "close" && this.windowStack[i].options.modal){
                     frontWnd.style.zIndex = max+1;
                     $overlay.css("zIndex",max);
                     $overlay.show();
                     return ;
                 }
             }
-            this.$window.removeClass("mini-window");
-            this.windowStatus = "close";
             this.options.onClose && this.options.onClose.call(this);
         },
 
@@ -4323,7 +4361,7 @@
     cri.Window = Window;
 
     $.fn.window = function(option) {
-        var wnd = null;
+        var o = null;
         this.each(function () {
             var $this   = $(this),
                 wnd     = $this.data('window'),
@@ -4331,8 +4369,8 @@
             if(wnd != null){
                 wnd._destory();
             }
-            $this.data('window', (wnd = new Window(this, options)));
+            $this.data('window', (o = new Window(this, options)));
         });
-        return wnd;
+        return o;
     };
 }(window);

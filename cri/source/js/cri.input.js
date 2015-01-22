@@ -38,7 +38,15 @@
         },
 
         _init:function(){
+            var op = this.options,
+                value = this.$element.val();
+            if(op.value == null && value != null){
+                op.value = value;
+            }
             this._createInputGroup();
+            if(op.value != null){
+                this._setValue(op.value)
+            }
         },
 
         _createInputGroup:function(){
@@ -70,9 +78,6 @@
 
             this.$input = $input;
 
-            if(op.value != null){
-                this._setValue(op.value)
-            }
         },
 
         /**
@@ -82,7 +87,7 @@
          */
         _readonlyInput:function($element){
             var that = this,
-                $input = $('<span class="readonly" role="readonly">'+this.$element.val()+'</span>');
+                $input = $('<span class="readonly" role="readonly"></span>');
             $input.on("click",function(){
                 that.options.onFocus && that.options.onFocus.call(that);
             }).blur(function(){
@@ -119,6 +124,9 @@
         },
 
         _setValue:function(value){
+            if(value == null){
+                return ;
+            }
             if(this.$input.is("input")){
                 this.$input.val(value);
             }else{

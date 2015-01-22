@@ -38,7 +38,9 @@
         _init:function(){
             this._create();
             var value = this.options.value || this.$element.val();
-            this.value(value);
+            if(value != null){
+                this.value(value);
+            }
         },
 
         _create:function(){
@@ -91,6 +93,13 @@
                         data.push({text:text,value:value});
                     }
                 );
+            }
+            else{
+                var option = [];
+                for(var i= 0,len=data.length;i<len;i++){
+                    option.push('<option value="' + data[i].value + '">' + data[i].text + '</option>');
+                }
+                this.$element.html(option.join(""));
             }
             this.options.data = data;
             return data;
@@ -187,7 +196,7 @@
             this.options.data = options;
             this._data();
             this._setSelectOptions(options);
-            this.value(options[0].value);
+            options.length && this.value(options[0].value);
             this.listView.destory();
             this._createListView();
         }
