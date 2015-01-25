@@ -315,7 +315,7 @@ table {
 .grid {
   color: #666666;
   border: 1px solid #c8c8c8;
-  background: rgba(255, 255, 255, 0.9);
+  background: #f0f0f0;
 }
 .grid .title {
   padding-left: 4px;
@@ -427,7 +427,7 @@ table {
 }
 .grid .loading {
   height: 310px;
-  background-color: rgba(179, 179, 179, 0.9);
+  background-color: #a3a3a3;
 }
 .grid .loading .loadingIcon {
   color: #666666;
@@ -599,7 +599,7 @@ table {
   line-height: 24px;
   padding: 0 10px;
   border: #c8c8c8;
-  background: rgba(255, 70, 60, 0.9);
+  background: #ff463c;
   color: #fff;
   font-size: 12px;
   z-index: 10002;
@@ -619,7 +619,7 @@ table {
   height: 0;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
-  border-top: 10px solid rgba(255, 70, 60, 0.9);
+  border-top: 10px solid #ff463c;
 }
 .input-group .input-layout {
   position: absolute;
@@ -683,7 +683,7 @@ table {
   height: 50px;
   line-height: 50px;
   display: none;
-  background: rgba(77, 77, 77, 0.9);
+  background: #3e3e3e;
 }
 .notification .icon {
   font-size: 20px;
@@ -693,7 +693,7 @@ table {
   top: 15px;
 }
 .notification .message {
-  color: rgba(255, 255, 255, 0.9);
+  color: #f0f0f0;
   font-weight: bolder;
   display: inline-block;
   position: absolute;
@@ -709,7 +709,7 @@ table {
   -ms-border-radius: 10px;
   -o-border-radius: 10px;
   border-radius: 10px;
-  background: rgba(230, 230, 230, 0.9);
+  background: #d7d7d7;
   font-size: 16px;
   display: inline-block;
   height: 16px;
@@ -1393,7 +1393,7 @@ ul.toolbar {
   border-bottom: 1px solid #c8c8c8;
   height: 30px;
   line-height: 30px;
-  background: rgba(255, 255, 255, 0.9);
+  background: #f0f0f0;
 }
 ul.toolbar li {
   color: #666666;
@@ -1405,6 +1405,7 @@ ul.toolbar li {
   list-style: none outside none;
   min-width: 60px;
   margin-right: 10px;
+  padding: 0 5px;
   -moz-user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
@@ -1489,7 +1490,7 @@ ul.toolbar li i {
 .tree {
   color: #666666;
   border: 1px solid #c8c8c8;
-  background: rgba(255, 255, 255, 0.9);
+  background: #f0f0f0;
 }
 .tree .title {
   background: #f5f7fa;
@@ -1668,7 +1669,7 @@ ul.toolbar li i {
   }
 }
 .window {
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: #f0f0f0;
   color: #666666;
   display: inline-block;
   position: absolute;
@@ -1683,9 +1684,9 @@ ul.toolbar li i {
   -ms-border-radius: 4px;
   -o-border-radius: 4px;
   border-radius: 4px;
-  box-shadow: 1px 1px 7px 1px rgba(153, 153, 153, 0.9);
-  -moz-box-shadow: 1px 1px 7px 1px rgba(153, 153, 153, 0.9);
-  -webkit-box-shadow: 1px 1px 7px 1px rgba(153, 153, 153, 0.9);
+  box-shadow: 1px 1px 7px 1px #8a8a8a;
+  -moz-box-shadow: 1px 1px 7px 1px #8a8a8a;
+  -webkit-box-shadow: 1px 1px 7px 1px #8a8a8a;
 }
 .window .window-head {
   margin-top: -35px;
@@ -1743,7 +1744,7 @@ ul.toolbar li i {
   color: #555555;
 }
 .window .window-content {
-  background: rgba(255, 255, 255, 0.9);
+  background: #f0f0f0;
   height: 100%;
   overflow: auto;
 }
@@ -1815,7 +1816,7 @@ ul.toolbar li i {
 }
 .window .loading {
   height: 100%;
-  background-color: rgba(179, 179, 179, 0.9);
+  background-color: #a3a3a3;
 }
 .window .loading .loadingIcon {
   color: #666666;
@@ -1844,7 +1845,7 @@ ul.toolbar li i {
   height: auto !important;
 }
 .overlay {
-  background-color: rgba(51, 51, 51, 0.9);
+  background-color: #242424;
   position: absolute;
   z-index: 10000;
   left: 0;

@@ -17,6 +17,7 @@ Grid
 12.当checkBox=true，单击行checkBox未勾选(fixed)
 13.双击后，选择数据getSelected异常(fixed)
 14.分页初始化是最多显示三页，默认显示五页(fixed)
+15.checkbox=true,双击时,未勾选checkbox(fixed)
 
 Window
 1.模态窗口关闭，遮罩未关闭(fixed)
@@ -27,6 +28,7 @@ Window
 6.窗口构造成功后需要暴露事件(fixed)
 7.不能设置窗口是否能拖动（fixed）
 8.第一个窗口为非模态窗口，再生成一个模态窗口，关闭模态窗口，遮罩不消失
+9.IE下背景透明
 
 Input
 1.重复初始化(fixed)
@@ -44,6 +46,7 @@ SelectBox
 TimeInput
 1.未选择HMS时，输入框显示了小时分钟秒信息(fixed)
 2.初始化时，日期显示不正确(fixed)
+3.当设置HMS参数时，未显示时间输入HMS输入框(fixed)
 
 Validator
 1.错误提示 'undefined' (fixed)

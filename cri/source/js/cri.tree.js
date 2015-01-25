@@ -104,8 +104,8 @@
         _eventListen:function(){
             var that = this;
             this.$treebody
-                .on('click',"div.li-content",function(e){that._setSelected(e);})
-                .on('click', "li i.icon", function(e){
+                .on('click',"div.li-content",function(e){
+                    that._setSelected(e);
                     that._fold(e);
                     return false;
                 })

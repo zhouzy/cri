@@ -562,6 +562,8 @@
                 columns  = this._columns,
                 rows     = this._rows;
 
+            this._selectedId = [];
+
             $table.append($("colgroup",this.$gridhead).clone());
 
             for(var i = 0,len = rows.length; i<len; i++){
@@ -599,6 +601,7 @@
              */
             var scrollBarW = this.$gridbody.width()-this.$gridbody.prop("clientWidth");
             this.$gridhead.css("paddingRight",scrollBarW);
+
         },
 
         _createColGroup:function(parentWidth){
@@ -695,10 +698,9 @@
 
             if(!this.options.checkBox){
                 if(item.hasClass("selected")){
-                    this._selectedId = [];
                     item.removeClass("selected");
+                    this._selectedId = [];
                 }else{
-                    this._selectedId = this._selectedId || [];
                     $("tr.selected",this.$gridbody).removeClass("selected");
                     item.addClass("selected");
                     this._selectedId = [rowId];
@@ -749,7 +751,8 @@
             $("tr.selected",this.$gridbody).removeClass("selected");
             item.addClass("selected");
             if(this.options.checkBox){
-                $("input[type=checkbox]",item).prop("checked",false);
+                $("input[type=checkbox]",this.$gridbody).prop("checked",false);
+                $("input[type=checkbox]",item).prop("checked",true);
             }
             op.onDblClick && op.onDblClick.call(that,that._getRowDataById(rowid));
         },
@@ -810,6 +813,13 @@
     });
 
     $.extend(Button.prototype,{
+        _eventListen:function(){
+            var that = this,
+                enable = this.options.enable;
+            this.$button.on("click",function(){
+                enable && that.options.handler && that.options.handler.call();
+            });
+        },
 
         _init:function(){
             this._create();
@@ -833,16 +843,13 @@
         },
 
         enable:function(){
-            var that = this;
             this.$button.removeClass("disabled");
-            this.$button.on("click",function(){
-                that.options.handler && that.options.handler.call();
-            });
+            this.options.enable = false;
         },
 
         disable:function(){
             this.$button.addClass("disabled");
-            this.$button.off("click");
+            this.options.enable = true;
         }
     });
 
@@ -2633,15 +2640,12 @@
 
     var _defaultOptions = {
         value:null,
-        format:"yyyy/MM/dd",
+        format:"yyyy/MM/dd hh:mm:ss",
         HMS:false,
         enable:true
     };
 
     var TimeInput = cri.Widgets.extend(function(element,options){
-        if(!options.HMS && options.format){
-            options.format = options.format.replace(/\s*[Hh].*$/,"");
-        }
         this.options = _defaultOptions;
         this.date  = null;
         this.input = null;
@@ -2650,6 +2654,9 @@
     });
 
     TimeInput.prototype._init = function(){
+        if(!this.options.HMS && this.options.format){
+            this.options.format = this.options.format.replace(/\s*[Hh].*$/,"");
+        }
         var $element = this.$element.attr("role","timeInput");
         $element.wrap('<div class="'+TIME_INPUT_GROUP+'"></div>');
         this.$timeInputGroup = $element.parent();
@@ -2859,9 +2866,9 @@
 
         _hmsSelect:function(){
             var $hmsBar      = $('<div class="eb_HMSBar">'),
-                $hourInput   = $('<input class="eb_HMSInput eb_Hour" value="00" />'),
-                $minuteInput = $('<input class="eb_HMSInput eb_minute"  value="00" />'),
-                $secondInput = $('<input class="eb_HMSInput eb_second"  value="00" />'),
+                $hourInput   = $('<input class="eb_HMSInput eb_Hour"/>').val(this.date.HH),
+                $minuteInput = $('<input class="eb_HMSInput eb_minute"/>').val(this.date.mm),
+                $secondInput = $('<input class="eb_HMSInput eb_second"/>').val(this.date.ss),
                 that         = this;
 
             $hourInput.on("change",_handleNumF(0,23));
@@ -3124,8 +3131,8 @@
         _eventListen:function(){
             var that = this;
             this.$treebody
-                .on('click',"div.li-content",function(e){that._setSelected(e);})
-                .on('click', "li i.icon", function(e){
+                .on('click',"div.li-content",function(e){
+                    that._setSelected(e);
                     that._fold(e);
                     return false;
                 })

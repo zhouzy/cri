@@ -30,15 +30,12 @@
 
     var _defaultOptions = {
         value:null,
-        format:"yyyy/MM/dd",
+        format:"yyyy/MM/dd hh:mm:ss",
         HMS:false,
         enable:true
     };
 
     var TimeInput = cri.Widgets.extend(function(element,options){
-        if(!options.HMS && options.format){
-            options.format = options.format.replace(/\s*[Hh].*$/,"");
-        }
         this.options = _defaultOptions;
         this.date  = null;
         this.input = null;
@@ -47,6 +44,9 @@
     });
 
     TimeInput.prototype._init = function(){
+        if(!this.options.HMS && this.options.format){
+            this.options.format = this.options.format.replace(/\s*[Hh].*$/,"");
+        }
         var $element = this.$element.attr("role","timeInput");
         $element.wrap('<div class="'+TIME_INPUT_GROUP+'"></div>');
         this.$timeInputGroup = $element.parent();
@@ -256,9 +256,9 @@
 
         _hmsSelect:function(){
             var $hmsBar      = $('<div class="eb_HMSBar">'),
-                $hourInput   = $('<input class="eb_HMSInput eb_Hour" value="00" />'),
-                $minuteInput = $('<input class="eb_HMSInput eb_minute"  value="00" />'),
-                $secondInput = $('<input class="eb_HMSInput eb_second"  value="00" />'),
+                $hourInput   = $('<input class="eb_HMSInput eb_Hour"/>').val(this.date.HH),
+                $minuteInput = $('<input class="eb_HMSInput eb_minute"/>').val(this.date.mm),
+                $secondInput = $('<input class="eb_HMSInput eb_second"/>').val(this.date.ss),
                 that         = this;
 
             $hourInput.on("change",_handleNumF(0,23));

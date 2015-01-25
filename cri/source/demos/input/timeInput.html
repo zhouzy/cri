@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>selectBox</title>
+    <title>timeInput</title>
     <meta charset="utf-8" content="text/html"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link href="../../../libs/font-awesome/css/font-awesome.css" type="text/css" rel="stylesheet"/>
@@ -16,61 +16,11 @@
     </style>
 </head>
 <body style="padding:50px;">
-    <div id="window">
-        <button id="btn"></button>
-        <select class="" name="select" id="selectInWnd">
-            <option value="1">001</option>
-            <option value="2">002</option>
-            <option value="3">003</option>
-            <option value="4">004</option>
-            <option value="5">005</option>
-            <option value="6">006</option>
-            <option value="7">007</option>
-            <option value="8">008</option>
-            <option value="9">009</option>
-            <option value="10">010</option>
-        </select>
-    </div>
+<input id="timeinput"  name="time" data-label="timeInput"/>
 <script>
-    $("#window").window({
-        width:600,
-        height:200
+    $("#timeinput").timeInput({
+        HMS:true
     });
-
-    $("#btn").button({
-        text:'动态设置options',
-        handler:function(){
-            $("#selectInWnd").data('selectBox').setOptions([
-                {value:"1",text:"text01"},
-                {value:"2",text:"text02"},
-                {value:"3",text:"text03"},
-                {value:"4",text:"text04"},
-                {value:"5",text:"text05"},
-                {value:"6",text:"text06"},
-                {value:"7",text:"text07"},
-                {value:"8",text:"text08"},
-                {value:"9",text:"text09"}
-            ]);
-
-            console.dir($("#window").formValue());
-        }
-    });
-    var select = $("#selectInWnd").selectBox({
-        change:function(){
-            console.log('change');
-        }
-    });
-
-    console.log("select->value:" + select.value());
-    console.log("select->text:" + select.text());
-
-    console.log("select setValueStart");
-    select.value("5");
-    console.log("select setValueResult:" + select.value());
-
-    console.log("select setTextStart:text=001");
-    select.text("001");
-    console.log("select setTextResult:" + select.text());
     </script>
 </body>
 </html>

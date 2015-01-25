@@ -308,6 +308,8 @@
                 columns  = this._columns,
                 rows     = this._rows;
 
+            this._selectedId = [];
+
             $table.append($("colgroup",this.$gridhead).clone());
 
             for(var i = 0,len = rows.length; i<len; i++){
@@ -345,6 +347,7 @@
              */
             var scrollBarW = this.$gridbody.width()-this.$gridbody.prop("clientWidth");
             this.$gridhead.css("paddingRight",scrollBarW);
+
         },
 
         _createColGroup:function(parentWidth){
@@ -441,10 +444,9 @@
 
             if(!this.options.checkBox){
                 if(item.hasClass("selected")){
-                    this._selectedId = [];
                     item.removeClass("selected");
+                    this._selectedId = [];
                 }else{
-                    this._selectedId = this._selectedId || [];
                     $("tr.selected",this.$gridbody).removeClass("selected");
                     item.addClass("selected");
                     this._selectedId = [rowId];
@@ -495,7 +497,8 @@
             $("tr.selected",this.$gridbody).removeClass("selected");
             item.addClass("selected");
             if(this.options.checkBox){
-                $("input[type=checkbox]",item).prop("checked",false);
+                $("input[type=checkbox]",this.$gridbody).prop("checked",false);
+                $("input[type=checkbox]",item).prop("checked",true);
             }
             op.onDblClick && op.onDblClick.call(that,that._getRowDataById(rowid));
         },

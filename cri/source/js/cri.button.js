@@ -28,6 +28,13 @@
     });
 
     $.extend(Button.prototype,{
+        _eventListen:function(){
+            var that = this,
+                enable = this.options.enable;
+            this.$button.on("click",function(){
+                enable && that.options.handler && that.options.handler.call();
+            });
+        },
 
         _init:function(){
             this._create();
@@ -51,16 +58,13 @@
         },
 
         enable:function(){
-            var that = this;
             this.$button.removeClass("disabled");
-            this.$button.on("click",function(){
-                that.options.handler && that.options.handler.call();
-            });
+            this.options.enable = false;
         },
 
         disable:function(){
             this.$button.addClass("disabled");
-            this.$button.off("click");
+            this.options.enable = true;
         }
     });
 
