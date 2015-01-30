@@ -548,8 +548,17 @@
             var $this   = $(this),
                 wnd     = $this.data('window'),
                 options = typeof option == 'object' && option;
-            if(wnd != null){
-                wnd._destory();
+            if(wnd != null) {
+                o = wnd;
+                if(!option.visible) {
+                    o.$window.show();
+                    o.toFront();
+                }
+                else{
+                    o.$window.hide();
+                }
+                    return false;
+                    //wnd._destory();
             }
             $this.data('window', (o = new Window(this, options)));
         });

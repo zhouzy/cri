@@ -759,6 +759,7 @@
 
         reload:function(param){
             param && (this.options.param = param);
+            this.options.page = 1;
             this._selectedId = [];
             this._getData();
         },
@@ -834,9 +835,7 @@
                 $icon = $('<i class="' + op.iconCls + '"></i>'),
                 text = op.text || $e.text() || $e.val();
             $button.append($icon, text);
-            $button.on("click",function(){
-                op.handler && op.handler.call();
-            });
+
             if(!op.enable){
                 this.disable();
             }
@@ -3802,6 +3801,14 @@
                 else{
                     $errormsg.text(this.options.messages[result.key]);
                 }
+                if($input.is("[readonly=readonly]")){
+                    $input.closest(".input-group").one("click",function(){
+                        $input.next(".input-warm").remove();
+                    })
+                }
+                $input.one("focus",function(){
+                    $input.next(".input-warm").remove();
+                });
             }else{
                 $input.next(".input-warm").remove();
             }
@@ -4375,8 +4382,17 @@
             var $this   = $(this),
                 wnd     = $this.data('window'),
                 options = typeof option == 'object' && option;
-            if(wnd != null){
-                wnd._destory();
+            if(wnd != null) {
+                o = wnd;
+                if(!option.visible) {
+                    o.$window.show();
+                    o.toFront();
+                }
+                else{
+                    o.$window.hide();
+                }
+                    return false;
+                    //wnd._destory();
             }
             $this.data('window', (o = new Window(this, options)));
         });

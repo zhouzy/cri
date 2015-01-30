@@ -199,6 +199,14 @@
                 else{
                     $errormsg.text(this.options.messages[result.key]);
                 }
+                if($input.is("[readonly=readonly]")){
+                    $input.closest(".input-group").one("click",function(){
+                        $input.next(".input-warm").remove();
+                    })
+                }
+                $input.one("focus",function(){
+                    $input.next(".input-warm").remove();
+                });
             }else{
                 $input.next(".input-warm").remove();
             }

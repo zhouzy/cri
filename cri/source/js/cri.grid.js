@@ -505,6 +505,7 @@
 
         reload:function(param){
             param && (this.options.param = param);
+            this.options.page = 1;
             this._selectedId = [];
             this._getData();
         },

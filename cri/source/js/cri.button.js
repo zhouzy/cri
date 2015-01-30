@@ -49,9 +49,7 @@
                 $icon = $('<i class="' + op.iconCls + '"></i>'),
                 text = op.text || $e.text() || $e.val();
             $button.append($icon, text);
-            $button.on("click",function(){
-                op.handler && op.handler.call();
-            });
+
             if(!op.enable){
                 this.disable();
             }

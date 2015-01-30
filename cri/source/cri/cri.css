@@ -344,6 +344,7 @@ table {
   height: 24px;
   padding: 3px 4px;
   overflow: hidden;
+  white-space: nowrap;
   vertical-align: middle;
   text-overflow: ellipsis;
   -moz-user-select: none;
@@ -602,7 +603,7 @@ table {
   background: #ff463c;
   color: #fff;
   font-size: 12px;
-  z-index: 10002;
+  z-index: 30002;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   -ms-border-radius: 3px;
