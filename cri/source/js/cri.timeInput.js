@@ -27,7 +27,6 @@
             return [31,28,31,30,31,30,31,31,30,31,30,31];
     }
 
-
     var _defaultOptions = {
         value:null,
         format:"yyyy/MM/dd hh:mm:ss",
@@ -41,6 +40,7 @@
         this.input = null;
         this.selectView = null;
         cri.Widgets.apply(this,arguments);
+        this.$element.attr('data-role','timeinput');
     });
 
     TimeInput.prototype._init = function(){
@@ -125,6 +125,13 @@
         }
     };
 
+    TimeInput.prototype._destroy = function(){
+        this.selectView._destroy();
+        this.$timeInputGroup.replaceWith(this.$element);
+        this.input = null;
+        this.selectView = null;
+    };
+
     var TimeSelectView = function($parent,options){
         this.$parent = $parent;
         this.$timeBox = null;
@@ -169,7 +176,7 @@
             var $minusBtn   = $('<i class="eb_toLastYear eb_yearButton fa fa-minus"></i>');
             var $plusBtn    = $('<i class="eb_toNextYear eb_yearButton fa fa-plus"></i>');
             var $year       = $('<span class="eb_year">' + date.yyyy + '</span>');
-
+            this.$year = $year;
             $minusBtn.on("click",function(){
                 $year.html(--that.date.yyyy);
                 that._change();
@@ -186,19 +193,17 @@
             var that = this,
                 date = this.date,
                 $select = $('<select class="eb_monthSelect">');
-
+            this.$month = $select;
             $.each([1,2,3,4,5,6,7,8,9,10,11,12],function(index,value){
                 value < 10 && (value = "0" + value);
                 $select.append('<option value="' + index + '">' + value + '</option>');
             });
             $select.val(date.MM);
-
             $select.on("change",function(){
-                date.MM = $select.val();
+                that.date.MM = $select.val();
                 that._refreshDaySelect();
                 that._change();
             });
-
             return $select;
         },
 
@@ -207,13 +212,14 @@
                 $week = $('<tr class="week"></tr>'),
                 week = {"Sunday":"日","Monday":"一","Tuesday":"二","Wednesday":"三",Thursday:"四","Friday":"五","Saturday":"六"},
                 that = this;
+            this.$day = $daySelect;
+
             for(var day in week){
                 var $day = $('<th>' + week[day] + '</th>');
                 day == "Sunday" && $day.addClass("eb_red");
                 day == "Saturday" && $day.addClass("red");
                 $week.append($day);
             }
-            $daySelect.append($week);
             for(var i=0; i<6; i++){
                 var $tr = $('<tr class="days"></tr>');
                 for(var j=0; j<7;j++){
@@ -260,7 +266,9 @@
                 $minuteInput = $('<input class="eb_HMSInput eb_minute"/>').val(this.date.mm),
                 $secondInput = $('<input class="eb_HMSInput eb_second"/>').val(this.date.ss),
                 that         = this;
-
+            this.$hour = $hourInput;
+            this.$minute = $minuteInput;
+            this.$second = $secondInput;
             $hourInput.on("change",_handleNumF(0,23));
             $minuteInput.on("change",_handleNumF(0,59));
             $secondInput.on("change",_handleNumF(0,59));
@@ -318,6 +326,9 @@
             this.$timeBox.css({top:top,left:left});
         },
 
+        _destroy : function(){
+            this.$timeBox.remove();
+        },
 
         toggle:function(){
             var that = this;
@@ -326,6 +337,7 @@
                 this.$timeBox.slideDown(200,function(){
                     that._clickBlank();
                 });
+
             }
             else{
                 this.$timeBox.slideUp(200);
@@ -339,6 +351,12 @@
 
         setDate:function(date){
             this.date = cri.date2Json(date);
+            this.$year.text(this.date.yyyy);
+            this.$month.val(this.date.MM);
+            this._refreshDaySelect();
+            this.$hour.val(this.date.HH);
+            this.$minute.val(this.date.mm);
+            this.$second.val(this.date.ss);
         }
     };
 
@@ -349,7 +367,7 @@
                 options = typeof option == 'object' && option;
             o = $this.data('timeInput');
             if(o != null){
-                o._destory();
+                o._destroy();
             }
             $this.data('timeInput', (o = new TimeInput(this, options)));
         });

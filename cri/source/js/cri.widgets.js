@@ -45,10 +45,43 @@
      * 销毁组件
      * @private
      */
-    Widgets.prototype._destory = function(){
+    Widgets.prototype._destroy = function(){
         var $element = this.$element;
         var $warpper = $element.parent();
         $warpper.after($element).remove();
+    };
+
+    /**
+     *
+     * @private
+     */
+    Widgets.prototype._getHeightPixelValue = function($d,value){
+        var styleHeight = $d[0].style.height,
+            propHeight  = $d[0].height,
+            calHeight   = value || styleHeight || propHeight;
+
+        if(calHeight){
+            var arr = ("" + calHeight).split("%");
+            if(arr.length>1){
+                /**
+                 * 当 parent 为隐藏元素，则不能获取到parent高度,或者 parent 未设置高度,此时返回 null
+                 */
+                var $parent = $d.parent();
+                if($parent.is(":visible") && $parent.style.height){
+                    calHeight = Math.floor($d.parent().height() * arr[0] / 100);
+                }
+                else{
+                    return null;
+                }
+                calHeight = (""+calHeight).split("px")[0];
+            }
+            if(calHeight){
+                return parseInt(calHeight);
+            }
+        }
+        else{
+            return null;
+        }
     };
 
     cri.Widgets = Widgets;

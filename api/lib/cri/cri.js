@@ -16,7 +16,7 @@
 
     Class.extend = function(subType){
         var prototype = (function(prototype){
-            function Prototype(){};
+            function Prototype(){}
             Prototype.prototype = prototype;
             return new Prototype();
         }(this.prototype));
@@ -86,6 +86,53 @@
         else{
             return cri.getFormValue($(this));
         }
+    };
+
+    /**
+     * 重置form
+     */
+    $.fn.formReset = function(param){
+        var param = param || {},
+            $this = $(this),
+            inputQuery = ":input:not(:button,[type=submit],[type=reset],[disabled])",
+            selectQuery = "select";
+        $(inputQuery,$this).each(function(){
+            var role = $(this).attr('data-role');
+            var value = this.name ? param[this.name] : '';
+            value = value || '';
+            if(role){
+                if(role=='input'){
+                    $(this).data("input").value(value);
+                }
+                else if(role == 'timeinput'){
+                    value = value || new Date();
+                    $(this).data("timeInput").value(value);
+                }
+            }
+            else{
+                $(this).val(value);
+            }
+        });
+        $(selectQuery,$this).each(function(){
+            var role = $(this).attr('data-role');
+            var value = this.name ? param[this.name] : '';
+            value = value || '';
+            if(role && role=='selectbox'){
+                if(value != ''){
+                    $(this).data("selectBox").value(value);
+                }
+                else{
+                    $(this).data("selectBox").select(0);
+                }
+            }
+            else{
+                if(value != ''){
+                    $(this).val(value);
+                }else{
+                    this.selectedIndex = 0;
+                }
+            }
+        });
     };
 
     /**
@@ -168,18 +215,69 @@
     };
     /**
      * 字符串转成日期类型
-     * 格式 MM/dd/YYYY MM-dd-YYYY YYYY/MM/dd YYYY-MM-dd
+     * 日期时间格式 YYYY/MM/dd HH:mm:ss  YYYY-MM-dd HH:mm:ss
+     * 日期格式 YYYY/MM/dd YYYY-MM-dd
      */
-    cri.string2Date  = function(DateStr){
-        var converted = Date.parse(DateStr);
-        var myDate    = new Date(converted);
-        if (isNaN(myDate))
-        {
-            var arys= DateStr.split('-');
-            myDate = new Date(arys[0],--arys[1],arys[2]);
+    cri.string2Date = function(d){
+        var dt = d.split(" "),
+            date = dt[0],
+            time = dt[1],
+            dateArr = date.split(/[\/,-]/);
+        if(time){
+            var timeArr = time.split(":");
+            return new Date(dateArr[0],--dateArr[1],dateArr[2],timeArr[0],timeArr[1],timeArr[2]);
         }
-        return myDate;
-    }
+        else{
+            return new Date(dateArr[0],--dateArr[1],dateArr[2]);
+        }
+    };
+
+    cri.parseJSON = function(json){
+        return json ? (new Function("return " + json))(): {};
+    };
+
+    cri.isNum = function(s)
+    {
+        if (s!=null && s!="")
+        {
+            return !isNaN(s);
+        }
+        return false;
+    };
+
+    cri.isPhoneNo = function(s){
+        return /((\d{11})|^((\d{7,8})|(\d{4}|\d{3})-(\d{7,8})|(\d{4}|\d{3})-(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1})|(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1}))$)/.test(s);
+    };
+
+    /**
+     * 向前兼容HTML5特性，方法
+     */
+    !function forwardCompatibleHtml5(){
+        if (!Array.prototype.indexOf) {
+            Array.prototype.indexOf = function (searchElement, fromIndex) {
+                if( this === undefined || this === null ) {
+                    throw new TypeError( '"this" is null or not defined' );
+                }
+                var length = this.length >>> 0; // Hack to convert object.length to a UInt32
+                fromIndex = +fromIndex || 0;
+                if (Math.abs(fromIndex) === Infinity) {
+                    fromIndex = 0;
+                }
+                if (fromIndex < 0) {
+                    fromIndex += length;
+                    if (fromIndex < 0) {
+                        fromIndex = 0;
+                    }
+                }
+                for (;fromIndex < length; fromIndex++) {
+                    if (this[fromIndex] === searchElement) {
+                        return fromIndex;
+                    }
+                }
+                return -1;
+            };
+        }
+    }();
 }(window);
 
 
@@ -230,7 +328,7 @@
      * 销毁组件
      * @private
      */
-    Widgets.prototype._destory = function(){
+    Widgets.prototype._destroy = function(){
         var $element = this.$element;
         var $warpper = $element.parent();
         $warpper.after($element).remove();
@@ -328,7 +426,6 @@
 
     /**
      * 表格默认属性
-     * @type {{url: null, param: {}, title: null, toolbar: null, columns: null, rows: null, onChange: null, onDblClick: null, rowNum: boolean, checkBox: boolean, onChecked: null, pagination: boolean, page: number, pageSize: number, total: number, ajaxDone: null, ajaxError: null}}
      * @private
      */
     var _defaultOptions = {
@@ -374,17 +471,24 @@
             var that = this;
             var op = this.options;
             var dragStartX = 0;
+            var clickTimer = null;
 
             this.$gridbody
                 .on("scroll",function(e){
                     $(".grid-head-wrap",that.$gridhead).scrollLeft($(this).scrollLeft());
                 })
                 .on('click', "tr", function(e){
-                    $("input[type=checkbox]",that.$gridhead).prop("checked",false);
-                    that._setSelected(e);
-                    that.options.onChange && that.options.onChange.call(that);
+                    if(clickTimer != null){
+                        clearTimeout(clickTimer);
+                    }
+                    clickTimer = window.setTimeout(function(){
+                        $("input[type=checkbox]",that.$gridhead).prop("checked",false);
+                        that._setSelected(e);
+                        that.options.onChange && that.options.onChange.call(that);
+                    },300);
                 })
                 .on('dblclick', "tr", function(e){
+                    clearTimeout(clickTimer);
                     that._onDblClickRow(e);
                 });
             $(document).on("mouseup",function(e){
@@ -541,6 +645,8 @@
                 columns  = this._columns,
                 rows     = this._rows;
 
+            this._selectedId = [];
+
             $table.append($("colgroup",this.$gridhead).clone());
 
             for(var i = 0,len = rows.length; i<len; i++){
@@ -559,7 +665,7 @@
                     var $td = $('<td></td>');
                     var $content = $('<div></div>').addClass('td-content');
                     var column = columns[j],
-                        text   = row[column.field] || "",
+                        text   = row[column.field]==null ? "" : row[column.field],
                         _text  = ("" + text).replace(/<.\w+\s*[^<]+>/g,"");
                     $content.prop("title",_text).text(_text);
                     $td.append(_text);
@@ -574,29 +680,30 @@
              */
             $("tr:nth-child(odd)",$table).css("background","#FFF");
             /**
-             *根据gird-body纵向滚动条宽度决定headWrap rightPadding
+             * 根据gird-body纵向滚动条宽度决定headWrap rightPadding
+             * 当grid-body为空时，在IE下不能取到clientWidth
              */
-            var scrollBarW = this.$gridbody.width()-this.$gridbody.prop("clientWidth");
-            this.$gridhead.css("paddingRight",scrollBarW);
+            var clientWidth = this.$gridbody.prop("clientWidth");
+            if(clientWidth){
+                var scrollBarW = this.$gridbody.width()-clientWidth;
+                this.$gridhead.css("paddingRight",scrollBarW);
+            }
         },
 
         _createColGroup:function(parentWidth){
-            var $colgroup= $("<colgroup></colgroup>"),
-                op       = this.options,
-                columns  = this._columns,
-                width    = 0;
+            var $colgroup = $("<colgroup></colgroup>"),
+                op        = this.options,
+                columns   = this._columns,
+                width     = 0;
             op.checkBox && $colgroup.append($("<col/>").width(30)) && (width+=30);
             op.rowNum   && $colgroup.append($("<col/>").width(25)) && (width+=20);
             /**
              * 当表格列宽总长度小于table宽度，设置最后一列宽度为auto,避免checkBox与rowNum列自动计算宽度
              */
-            for(var i= 0,len=columns.length; i<len;i++){
+            for(var i = 0,len = columns.length; i<len; i++){
                 var $col = $("<col/>");
-                var columnWidth = columns[i]._width;
-                columnWidth && $col.width(columnWidth) && (width+=columnWidth);
-                if(width < parentWidth){
-                    $col.width("auto");
-                }
+                var columnWidth = columns[i]._width || 'auto';
+                $col.width(columnWidth);
                 $colgroup.append($col);
             }
             return $colgroup;
@@ -641,7 +748,8 @@
                 url: this.options.url,
                 success: function(data){
                     if(op.ajaxDone){
-                        op.ajaxDone(data);
+                        var re = op.ajaxDone.call(that,data);
+                        re && (data = re);
                     }
                     that._rows = data.rows || [];
                     op.total = data.total || 0;
@@ -673,10 +781,9 @@
 
             if(!this.options.checkBox){
                 if(item.hasClass("selected")){
-                    this._selectedId = [];
                     item.removeClass("selected");
+                    this._selectedId = [];
                 }else{
-                    this._selectedId = this._selectedId || [];
                     $("tr.selected",this.$gridbody).removeClass("selected");
                     item.addClass("selected");
                     this._selectedId = [rowId];
@@ -719,18 +826,23 @@
         },
 
         _onDblClickRow:function(e){
-            var op = this.options
-                ,item = $(e.target).closest("tr")
-                ,rowid = item.data('rowid')
-                ,that = this;
+            var that  = this,
+                op    = this.options,
+                item  = $(e.target).closest("tr"),
+                rowid = item.data('rowid');
             this._selectedId = [rowid];
-            if(op.onDblClick){
-                op.onDblClick();
+            $("tr.selected",this.$gridbody).removeClass("selected");
+            item.addClass("selected");
+            if(this.options.checkBox){
+                $("input[type=checkbox]",this.$gridbody).prop("checked",false);
+                $("input[type=checkbox]",item).prop("checked",true);
             }
+            op.onDblClick && op.onDblClick.call(that,that._getRowDataById(rowid));
         },
 
         reload:function(param){
             param && (this.options.param = param);
+            this.options.page = 1;
             this._selectedId = [];
             this._getData();
         },
@@ -777,16 +889,21 @@
 
     var BUTTON = "button";
 
-    //TODO:添加enable，disable方法
-
     var Button = cri.Widgets.extend(function(element,options){
         this.options     = _defaultOptions;
         this.$inputGroup = null;
         this.$button     = null;
         cri.Widgets.apply(this,arguments);
+        this.$element.attr('data-role','button');
     });
 
     $.extend(Button.prototype,{
+        _eventListen:function(){
+            var that = this;
+            this.$button.on("click",function(){
+                that.options.enable && that.options.handler && that.options.handler.call();
+            });
+        },
 
         _init:function(){
             this._create();
@@ -801,25 +918,20 @@
                 $icon = $('<i class="' + op.iconCls + '"></i>'),
                 text = op.text || $e.text() || $e.val();
             $button.append($icon, text);
-            $button.on("click",function(){
-                op.handler && op.handler.call();
-            });
+
             if(!op.enable){
                 this.disable();
             }
         },
 
         enable:function(){
-            var that = this;
             this.$button.removeClass("disabled");
-            this.$button.on("click",function(){
-                that.options.handler && that.options.handler.call();
-            });
+            this.options.enable = true;
         },
 
         disable:function(){
             this.$button.addClass("disabled");
-            this.$button.off("click");
+            this.options.enable = false;
         }
     });
 
@@ -832,7 +944,7 @@
                 button  = $this.data('button'),
                 options = typeof option == 'object' && option;
             if(button != null){
-                button._destory();
+                button._destroy();
             }
             $this.data('button', (o = new Button(this, options)));
         });
@@ -854,20 +966,21 @@
 
     var DataGrid = cri.DataGrid = cri.Grid.extend(function(element,options){
         cri.Grid.apply(this,arguments);
+        this.$element.attr('data-role','datagrid');
     });
 
     $.fn.datagrid = function(option) {
-        var datagrid = null;
+        var o = null;
         this.each(function () {
             var $this = $(this),
-                dg    = $this.data('datagrid'),
+                dg    = $this.data('datagrid');
             options = typeof option == 'object' && option;
             if(dg != null){
-                dg._distory();
+                dg._destroy();
             }
-            $this.data('datagrid', (datagrid = new DataGrid(this, options)));
+            $this.data('datagrid', (o = new DataGrid(this, options)));
         });
-        return datagrid;
+        return o;
     };
 
 }(window);
@@ -896,6 +1009,7 @@
         this.id = this.$element.attr("id");
         this.name = this.$element.attr("name");
         this.init();
+        this.$element.attr('data-role','fileupload');
     };
 
     FileUpload.prototype.init = function(){
@@ -1075,7 +1189,9 @@
         readonly:false,
         onFocus:null,
         onBlur:null,
-        onClick:null
+        onClick:null,
+        enable:true,
+        required:false
     };
 
     var INPUT_GROUP = "input-group",
@@ -1086,6 +1202,7 @@
         this.options = _defaultOptions;
         this.$inputGroup = null;
         cri.Widgets.apply(this,arguments);
+        this.$element.attr('data-role','input');
     });
 
     $.extend(Input.prototype,{
@@ -1094,7 +1211,15 @@
         },
 
         _init:function(){
+            var op = this.options,
+                value = this.$element.val();
+            if(op.value == null && value != null){
+                op.value = value;
+            }
             this._createInputGroup();
+            if(op.value != null){
+                this._setValue(op.value)
+            }
         },
 
         _createInputGroup:function(){
@@ -1103,6 +1228,7 @@
             this.$inputGroup = $element.parent();
             this._wrapInput();
             this.$input.before(this._label());
+            this.options.enable || this.disable();
         },
 
         _wrapInput:function(){
@@ -1125,9 +1251,6 @@
 
             this.$input = $input;
 
-            if(op.value != null){
-                this._setValue(op.value)
-            }
         },
 
         /**
@@ -1137,7 +1260,7 @@
          */
         _readonlyInput:function($element){
             var that = this,
-                $input = $('<span class="readonly" role="readonly">'+this.$element.val()+'</span>');
+                $input = $('<span class="readonly" role="readonly"></span>');
             $input.on("click",function(){
                 that.options.onFocus && that.options.onFocus.call(that);
             }).blur(function(){
@@ -1149,10 +1272,11 @@
 
         _button:function(){
             var op    = this.options,
-                $icon = null;
+                $icon = null,
+                that  = this;
             if(op.button){
                 $icon = $('<i class="' + INPUT_BTN + " " + op.button.iconCls + '"></i>').on("click",function(){
-                    op.button.handler.call();
+                    op.button.handler.call(that);
                 });
             }
             return $icon;
@@ -1164,26 +1288,56 @@
                 this.$element.attr("title") ||
                 this.$element.attr("name") ||
                 "";
-            return $('<label></label>').text(label);
+            var $label = $('<label></label>').text(label);
+            if(this.options.required){
+                $label.addClass('required');
+            }
+            return $label;
         },
 
-        _destory:function(){
+        _destroy:function(){
             var $input = this.$element;
             this.$inputGroup.replaceWith($input);
         },
 
         _setValue:function(value){
+            if(value == null){
+                return ;
+            }
             if(this.$input.is("input")){
                 this.$input.val(value);
             }else{
-                this.$element.val(value);
-                this.$input.text(value);
+                if(this.$element.is("select")){
+                    this.$element.val(value);
+                    this.$input.text(this.$element.find("option:selected").text());
+                }
+                else{
+                    this.$element.val(value);
+                    this.$input.text(value);
+                }
                 this.$element.trigger("change");
             }
         },
 
         _getValue:function(){
             return this.$element.val();
+        },
+
+        /**
+         * 使输入框不能用
+         */
+        disable:function(){
+            var $layout = $('<div class="input-layout"></div>');
+            if(this.$inputGroup.has(".input-layout").length == 0){
+                this.$inputGroup.append($layout);
+            }
+        },
+
+        /**
+         * 使输入框可用
+         */
+        enable:function(){
+            this.$inputGroup.children(".input-layout").remove();
         },
 
         value:function(value){
@@ -1198,17 +1352,21 @@
     cri.Input = Input;
 
     $.fn.input = function(option) {
-        var input = null;
+        var o = null;
         this.each(function () {
             var $this   = $(this),
                 input   = $this.data('input'),
-                options = typeof option == 'object' && option;
-            if(input != null){
-                input._destory();
+                options = typeof option == 'object' && option,
+                role    = $this.attr("role");
+            if(role == "timeInput"){
+                return input;
             }
-            $this.data('input', (input = new Input(this, options)));
+            if(input != null){
+                input._destroy();
+            }
+            $this.data('input', (o = new Input(this, options)));
         });
-        return input;
+        return o;
     };
 }(window);
 /*=====================================================================================
@@ -1513,12 +1671,14 @@
         },
 
         _numberPage:function($numberPage,page,lastPage){
-            for(var i=-2; i<3; i++){
-                var shiftPage = i + page;
-                if(shiftPage>0 && shiftPage <= lastPage){
+            var start = page > 2 ? page-2:1,
+                end   = start + 5;
+
+            for(var i=start; i<end; i++){
+                if(i>0 && i<= lastPage){
                     var $li = $("<li></li>"),
-                        $a  = $("<a></a>").data("page",shiftPage).text(shiftPage);
-                    shiftPage != page ?
+                        $a  = $("<a></a>").data("page",i).text(i);
+                    i != page ?
                         $a.addClass("pager-num"):
                         $a.addClass(STATEDSTATE);
                     $numberPage.append($li.append($a));
@@ -1591,24 +1751,29 @@
     var _defaultOptions = {
         label:'',
         data:null,  //Array [{value:"",text:""},{value:"",text:""}]
-        change:null //Function: call back after select option
+        change:null, //Function: call back after select option
+        value:null,
+        enable:true
     };
 
     var SelectBox = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
         this.$selectBoxGroup = null;
         this.input = null;
+        this.listView = null;
         this._value = null;
         this._text = null;
         cri.Widgets.apply(this,arguments);
+        this.$element.attr('data-role','selectbox');
     });
 
     $.extend(SelectBox.prototype,{
-        _eventListen:function(){
-        },
-
         _init:function(){
             this._create();
+            var value = this.options.value || this.$element.val();
+            if(value != null){
+                this.value(value);
+            }
         },
 
         _create:function(){
@@ -1627,8 +1792,8 @@
             this.input = new cri.Input(this.$element,{
                 label:that.label,
                 readonly:true,
-                value:this.$element.find("option:selected").text(),
                 button:button,
+                enable:this.options.enable,
                 onFocus:function(){
                     that.listView.toggle();
                 }
@@ -1639,10 +1804,8 @@
             var that = this;
             this.listView = new ListView(this.$selectBoxGroup,{
                 data:that._data(),
-                value:that.$element.val(),
-                onChange:function(value,text){
-                    that.input.value(text);
-                    that.$element.val(value);
+                onChange:function(value){
+                    that.value(value);
                 }
             });
         },
@@ -1664,8 +1827,31 @@
                     }
                 );
             }
+            else{
+                var option = [];
+                for(var i= 0,len=data.length;i<len;i++){
+                    option.push('<option value="' + data[i].value + '">' + data[i].text + '</option>');
+                }
+                this.$element.html(option.join(""));
+            }
             this.options.data = data;
             return data;
+        },
+
+        /**
+         * 设置原生元素select option
+         * @param optionsArr [{value:value,text:text}]
+         * @private
+         */
+        _setSelectOptions:function(optionsArr){
+            var $select = this.$element;
+            if($select.is("select")){
+                $select.empty();
+                for(var i = 0,len=optionsArr.length;i<len;i++){
+                    var option = optionsArr[i];
+                    $select.append('<option value="' + option.value + '">' + option.text + '</option>');
+                }
+            }
         },
 
         /**
@@ -1683,15 +1869,45 @@
         },
 
         /**
+         * 销毁组件
+         * @private
+         */
+        _destroy:function(){
+            this.listView._destroy();
+            this.$selectBoxGroup.replaceWith(this.$element);
+            this.input = null;
+            this.listView = null;
+        },
+
+        /**
+         * 使输入框不能用
+         */
+        disable:function(){
+            this.input.disable();
+        },
+
+        /**
+         * 使输入框可用
+         */
+        enable:function(){
+            this.input.enable();
+        },
+
+        /**
          * get or set selectBox value
          * @param value
          * @returns {*}
          */
         value:function(value){
             if(arguments.length>0){
+                if(value == this._value){
+                    return ;
+                }
                 this._value = value;
-                this.$element.val(value);
-                this.input.value(this._getTextByValue(value));
+                this._text  = this._getTextByValue(value);
+                this.input.value(this._value);
+                this.listView.select(this._value);
+                this.options.change && this.options.change.call(this);
             }
             else{
                 return this._value;
@@ -1704,20 +1920,39 @@
          * @returns {*}
          */
         text:function(text){
+            var data = this.options.data;
             if(arguments.length>0){
-                var value = null;
-                for(var p in this.options.data){
-                    if(p.text === text){
-                        value = p.value || "";
+                for(var i= 0,len = data.length;i<len;i++){
+                    if(data[i].text === text){
+                        this.value(data[i].value);
                     }
                 }
-                this._value = value;
-                this.$element.val(value);
-                this.input.value(text);
             }
             else{
                 return this._text;
             }
+        },
+
+        /**
+         * 动态改变selectBox的options
+         * @param options
+         */
+        setOptions:function(options){
+            this.options.data = options;
+            this._data();
+            this._setSelectOptions(options);
+            options.length && this.value(options[0].value);
+            this.listView._destroy();
+            this._createListView();
+        },
+
+        /**
+         * 选择第几个下拉选项
+         * @param index
+         */
+        select:function(index){
+            index = parseInt(index) || 0;
+            index>=0 && index<this.options.data.length && this.value(this.options.data[index].value);
         }
     });
 
@@ -1726,9 +1961,9 @@
             data:[],
             onChange:null
         },options);
+        this.value = options.value || null;//下拉框初始值
         this.$options = null;
         this.$parent = $parent;
-        this.value = options.value;//下拉框初始值
         this._init();
         this.text = null;
     };
@@ -1741,13 +1976,13 @@
          */
         _init:function(){
             var data = this.options.data;
-            var $options = this.$options = $('<ul class="' + OPTIONS + '"></ul>').hide();
+            var $options = this.$options = $('<ul class="' + OPTIONS + '"></ul>');
             if(data){
                 for(var i = 0,len = data.length; i<len; i++){
                     $options.append(this._createOption(data[i]));
                 }
             }
-            this.$parent.append($options);
+            $('body').append($options.hide());
         },
 
         /**
@@ -1773,18 +2008,13 @@
         },
 
         /**
-         * 显示隐藏切换options选择框
+         * 设置position显示时在屏幕中的位置
          * @private
          */
-        toggle:function(){
-            var that = this;
-            this.$options.animate({
-                    height:'toggle'
-                },200,function(){
-                    if(!that.$options.is(":hidden")){
-                        that._clickBlank();
-                    }
-                });
+        _setPosition:function(){
+            var left = this.$parent.offset().left + 80;
+            var top = this.$parent.offset().top + 28;
+            this.$options.css({top:top,left:left});
         },
 
         /**
@@ -1794,34 +2024,11 @@
         _clickBlank:function(){
             var that = this;
             $(document).mouseup(function(e) {
-                var _con = that.$parent;
+                var _con = that.$options;
                 if (!_con.is(e.target) && _con.has(e.target).length === 0) {
-                    that.$options.animate({
-                        height:'hide'
-                    },200);
+                    that.$options.slideUp(200);
                 }
             });
-        },
-
-        /**
-         * 获取options定义
-         * 1.初始化时定义
-         * 2.原始select元素options获取
-         * @private
-         */
-        _data:function(){
-            var data = this.options.data;
-            if(!data){
-                data = [];
-                $("option",this.$element).each(function(){
-                        var text = $(this).text();
-                        var value = this.value;
-                        data.push({text:text,value:value});
-                    }
-                );
-            }
-            this.options.data = data;
-            return data;
         },
 
         /**
@@ -1831,6 +2038,44 @@
          */
         _change:function(){
             this.options.onChange && this.options.onChange.call(this,this.value,this.text);
+        },
+
+        select:function(value){
+            var data = this.options.data;
+            var $options = this.$options;
+            if(data){
+                for(var i = 0,len = data.length; i<len; i++){
+                    if(value == data[i].value){
+                        this.value = value;
+                        $options.children().removeClass(SELECTED);
+                        $options.children().eq(i).addClass(SELECTED);
+                        return ;
+                    }
+                }
+            }
+        },
+
+        /**
+         * 显示隐藏切换options选择框
+         */
+        toggle:function(){
+            var that = this;
+            this._setPosition();
+            if(this.$options.is(":hidden")){
+                this.$options.slideDown(200, function(){
+                    that._clickBlank();
+                });
+            }
+            else{
+                this.$options.slideUp(200);
+            }
+        },
+
+        /**
+         * 销毁ListView
+         */
+        _destroy:function(){
+            this.$options.remove();
         }
     };
 
@@ -1843,453 +2088,351 @@
                 options = typeof option == 'object' && option;
             o = $this.data('selectBox');
             if(o != null){
-                o._destory();
+                o._destroy();
             }
             $this.data('selectBox', (o = new SelectBox(this, options)));
         });
         return o;
     };
 }(window);
-
-/*=====================================================================================
- * easy-bootstrap-tabPage v2.0
+/**
+ * Author zhouzy
+ * Date   2014/12/26
  *
- * @author:niyq
- * @date:2013/09/04
- * @dependce:jquery
- *=====================================================================================*/
-!function($){
+ * TabPage
+ */
+
+!function(window){
 
     "use strict";
 
-    var TabPage = function(element,dataOptions){
-        var thisObject = this;
-        this.$element = $(element);
-        this.dataOptions = $.extend({}, $.fn.tabPage.defaults, dataOptions);
-        this.title = this.$element.attr("title");
-        this.id = this.$element.attr("id");
-        this.init();
+    var cri = window.cri,
+        $   = window.jQuery;
+
+    var TABPAGE_GROUP     = "tabPage-group",
+        TABPAGE_HEADER    = "tabPage-header",
+        TABPAGE_HEADER_LB = "tabPage-header-leftBtn",
+        TABPAGE_HEADER_RB = "tabPage-header-rightBtn",
+        TABPAGE_TABS_WRAP = "tabPage-header-tabs-wrap",
+        TABPAGE_TABS      = "tabPage-header-tabs",
+        TABPAGE_TAB       = "tabPage-header-tab",
+        TABPAGE_TAB_CLOSE = "tabPage-header-tab-close",
+        TABPAGE_BODY      = "tabPage-body",
+        TAB_WIDTH         = 150;
+
+    var _defaultOptions = {
+        onFouce:null,
+        onCloseTab:null
     };
 
-    TabPage.prototype.setHeadBarView = function(myObj){
-        var thisObject = this;
-        var obj = this.headBarObj.children('.eb_tabPageHead.on');
-        if(myObj)
-            obj = myObj;
-        var objLeft = obj.offset().left;
-        var objRight = obj.offset().left + obj.width() + 61;
-        var headBarPanelLeft = this.headBarPanelObj.offset().left;
-        var headBarPanelRight = this.headBarPanelObj.offset().left + this.headBarPanelObj.width();
-        if(objLeft < headBarPanelLeft){
-            this.headMoveLeft(obj);
-        }else if(objRight > headBarPanelRight){
-            this.headMoveRight(obj);
-        }
-    };
+    var TabPage = cri.Widgets.extend(function(element,options){
+        this.options = _defaultOptions;
+        this.$tabPageGroup = null;
+        this.$tabs = null;
+        this._pageBodyQueue = [];
+        cri.Widgets.apply(this,arguments);
+        this.$element.attr('data-role','tabpage');
+    });
 
-    TabPage.prototype.headMoveLeft = function(givenObj){
-        var thisObject = this;
-        var headBarPanelLeft = this.headBarPanelObj.offset().left;
-        var headBarLILeft = null;
-        var headBarLeftOffset = this.headBarObj.offset().left;
-        var headBarLeft = this.headBarObj.css("left");
-        if(typeof headBarLeft == "string")
-            headBarLeft = headBarLeft.split("px")[0];
-        var distance;
-        if(givenObj){
-            headBarLILeft = givenObj.offset().left;
-        }else{
-            this.headBarObj.children('.eb_tabPageHead').each(function(){
-                var left = $(this).offset().left;
-                if((left-headBarPanelLeft)<-25){
-                    headBarLILeft = left;
+    $.extend(TabPage.prototype,{
+
+        _init:function(){
+            this._create();
+        },
+
+        _create:function(){
+            this.$tabPageGroup = this.$element.addClass(TABPAGE_GROUP);
+            var bodys = [];
+            this.$element.children().each(function(){
+                bodys.push($(this).detach());
+            });
+            this._createHeader();
+            if(bodys.length>0){
+                for(var i=0; i<bodys.length; i++){
+                    this.addTab(bodys[i],(bodys[i].data("title")|| ""),bodys[i].data("close"));
+                }
+            }
+        },
+
+        _createHeader:function(){
+            var that = this,
+                $pageHeader = this.$pageHeader = $('<div class="' + TABPAGE_HEADER + '"></div>'),
+                $leftBtn    = this.$leftBtn = $('<i class="fa fa-angle-double-left ' + TABPAGE_HEADER_LB + '"></i>').hide(),
+                $rightBtn   = this.$rightBtn = $('<i class="fa fa-angle-double-right ' + TABPAGE_HEADER_RB + '"></i>').hide(),
+                $tabsWrap   = this.$tabsWrap = $('<div class="' + TABPAGE_TABS_WRAP + '"></div>');
+            $leftBtn.click(function(){
+                that._offsetL();
+            });
+            $rightBtn.click(function(){
+                that._offsetR();
+            });
+            $pageHeader.append($leftBtn,$rightBtn);
+            $pageHeader.append($tabsWrap);
+            $tabsWrap.append(this._createTabs());
+            this.$tabPageGroup.append($pageHeader);
+        },
+
+        _offsetL:function(){
+            var left = this.$tabs.position().left,
+                width = this.$tabs.width(),
+                containerWidth = this.$tabsWrap.width(),
+                viewWidth = width + left - this.$tabs.css("marginLeft").split("px")[0];
+            if(viewWidth > containerWidth){
+                if(viewWidth%150>0){
+                    this.$tabs.animate({left:"-="+(viewWidth%150)+"px"});
+                }else{
+                    this.$tabs.animate({left:"-=150px"});
+                }
+            }
+        },
+
+        _offsetR:function(){
+            var left  = this.$tabs.position().left,
+                width = this.$tabs.width(),
+                containerWidth = this.$tabsWrap.width();
+            if(left <= 0){
+                var viewWidth = width + left - this.$tabs.css("marginLeft").split("px")[0];
+                var right = containerWidth-viewWidth;
+                if(right > 0){
+                    this.$tabs.animate({left:"+="+(right%150)+"px"});
+                }
+                else{
+                    this.$tabs.animate({left:"+=150px"});
+                }
+            }
+        },
+
+        _createTabs:function(){
+            this.$tabs = $('<ul class="' + TABPAGE_TABS + '"></ul>');
+            return this.$tabs;
+        },
+
+        _closeTab:function($tab){
+            var index = $tab.data('for');
+            if(index != undefined && index != null){
+                this._pageBodyQueue[index]._destroy();
+                if(this.options.onCloseTab){
+                    this.options.onCloseTab && this.options.onCloseTab.call(this,this._pageBodyQueue[index]);
+                }
+                this._pageBodyQueue[index]=null;
+                this._pageBodyQueue.splice(index,1);
+                $('li:gt('+ index +')',this.$tabs).each(function(){
+                    var index = +$(this).data("for");
+                    $(this).data("for",index-1);
+                });
+                $tab.remove();
+                if($(".selected",this.$tabs).length == 0){
+                    if(index == this._pageBodyQueue.length){
+                        index -= 1;
+                    }
+                    index >= 0 && this.focusTab(this._getTab(index));
+                }
+            }
+        },
+
+        _leftrightBtn:function(){
+            var $tabs = this.$tabs;
+            var tabsW = $tabs.width();
+            var tabpageHeaderW = this.$pageHeader.width();
+
+            if(tabsW > tabpageHeaderW){
+                this.$leftBtn.show();
+                this.$rightBtn.show();
+                this.$pageHeader.addClass("shift");
+            }
+            else{
+                this.$leftBtn.hide();
+                this.$rightBtn.hide();
+                this.$pageHeader.removeClass("shift");
+            }
+        },
+
+        _getTab:function(index){
+            return $('li:eq('+index+')',this.$tabs);
+        },
+
+        /**
+         * 增加Tab
+         * @param content : html字符串、url、jquery对象
+         * @param title : tab name
+         * @param closeAble: 是否在该tab上提供关闭按钮
+         */
+        addTab:function(content,title,closeAble,iframe,callback){
+
+            title = title || 'New Tab';
+
+            if(closeAble == undefined || closeAble == null || closeAble == "null"){
+                closeAble = true;
+            }
+
+            var that = this,
+                $tabs = this.$tabs,
+                $tab = $('<li class="' + TABPAGE_TAB + '">' + title + '</li>').data("for",this._pageBodyQueue.length).click(function(){
+                    that.focusTab($(this));
+                }),
+                $closeBtn = $('<i class="fa fa-close ' + TABPAGE_TAB_CLOSE + '"></i>').click(function(){
+                    that._closeTab($tab);
+                });
+            closeAble && $tab.append($closeBtn);
+            $tabs.append($tab);
+
+            var tabPageBody = new TabPageBody(this.$tabPageGroup,{
+                content:content,
+                iframe:iframe,
+                callback:callback
+            });
+
+            this._pageBodyQueue.push(tabPageBody);
+            $tabs.width(this._pageBodyQueue.length*TAB_WIDTH);
+            this._offsetL();
+            this.focusTab($tab);
+            this._leftrightBtn();
+            return tabPageBody;
+        },
+
+        focusTab:function($tab){
+            var $tabs = this.$tabs,
+                index = $(".selected",$tabs).removeClass("selected").data("for");
+            index != null && this._pageBodyQueue[index].hide();
+            $tab.addClass("selected");
+            this._pageBodyQueue[$tab.data("for")].show();
+            this.options.onFouce && this.options.onFouce.call(this,$tab.data("for"));
+        },
+
+        closeTab:function(index){
+            this._closeTab(this._getTab(index));
+        },
+
+        /**
+         * 选择tab并给与焦点
+         */
+        select:function(index){
+            this.focusTab(this._getTab(index))
+        },
+
+        /**
+         * 根据索引获取tabBody
+         */
+        getTabBody:function(index){
+            return this._pageBodyQueue[index];
+        },
+
+        /**
+         * 获取TabBody的索引
+         */
+        getTabBodyIndex:function(tabBody){
+            var re = -1;
+            $.each(this._pageBodyQueue,function(index){
+                if(tabBody == this){
+                    re = index;
+                    return false;
                 }
             });
-            if(headBarLILeft == null)
-                headBarLILeft = this.headBarObj.children('.eb_tabPageHead').first().offset().left;
+            return re;
         }
-        var distance = headBarPanelLeft - headBarLILeft;
-        var newLeft =  parseInt(headBarLeft) + parseInt(distance);
-        this.headBarObj.animate({left:newLeft},200,'',function(){
-            if(thisObject.headBarObj.offset().left >= thisObject.headBarPanelObj.offset().left){
-                thisObject.leftBtnObj.children('.eb_arrow02L').hide();
-            }else{
-                thisObject.leftBtnObj.children('.eb_arrow02L').show();
-            }
-            if(thisObject.headBarObj.offset().left + thisObject.headBarObj.width() <= thisObject.headBarPanelObj.offset().left + thisObject.headBarPanelObj.width()){
-                thisObject.rightBtnObj.children('.eb_arrow02R').hide();
-            }else{
-                thisObject.rightBtnObj.children('.eb_arrow02R').show();
-            }
-        });
-    };
-
-    TabPage.prototype.headMoveRight = function(givenObj){
-        var thisObject = this;
-        var headBarPanelRight = this.headBarPanelObj.offset().left + this.headBarPanelObj.width();
-        var headBarLIleft = headBarPanelRight;
-        var headBarLIRight;
-        var headBarLeft = parseInt(this.headBarObj.css("left"));
-        var obj;
-        this.headBarObj.children('.eb_tabPageHead').each(function(){
-            var left = $(this).offset().left;
-            if(left <= headBarPanelRight+25){
-                headBarLIleft = left;
-                obj = $(this);
-            }
-        });
-        if(obj.length<=0)
-            obj = this.headBarObj.children('.eb_tabPageHead').last();
-        if(givenObj){
-            obj = givenObj;
-            headBarLIleft = givenObj.offset().left;
-        }
-        headBarLIRight = headBarLIleft + (obj.width()+61);
-        var distance = headBarLIRight - headBarPanelRight;
-        var newLeft = headBarLeft - distance;
-        this.headBarObj.animate({left:newLeft},200,'',function(){
-            if(thisObject.headBarObj.offset().left >= thisObject.headBarPanelObj.offset().left){
-                thisObject.leftBtnObj.children('.eb_arrow02L').hide();
-            }else{
-                thisObject.leftBtnObj.children('.eb_arrow02L').show();
-            }
-            if(thisObject.headBarObj.offset().left + thisObject.countWidth() <= thisObject.headBarPanelObj.offset().left + thisObject.headBarPanelObj.width()){
-                thisObject.rightBtnObj.children('.eb_arrow02R').hide();
-            }else{
-                thisObject.rightBtnObj.children('.eb_arrow02R').show();
-            }
-        });
-    }
-
-    TabPage.prototype.toggleHeadBtn = function(){
-        var thisObject = this;
-        var parentWidth = this.parent.width();
-        var pageHeadTotalWidth = this.countWidth();
-        //alert("parentWidth="+parentWidth+",pageHeadTotalWidth="+pageHeadTotalWidth+",typeof parentWidth="+(typeof pageHeadTotalWidth));
-        if(pageHeadTotalWidth > (parentWidth-14)){
-            this.headBarPanelObj.width(parentWidth-16).css("left","8px");
-            this.leftBtnObj.show();
-            this.rightBtnObj.show();
-        }else{
-            this.headBarPanelObj.width(parentWidth-2).css("left","0");
-            this.leftBtnObj.hide();
-            this.rightBtnObj.hide();
-            this.headBarObj.css("left","0");
-        }
-    }
-
-    TabPage.prototype.countWidth = function(){
-        var thisObject = this;
-        var parentWidth = this.parent.width();
-        var pageHeadTotalWidth = 0;
-        this.headBarObj.children('.eb_tabPageHead').each(function(){
-            pageHeadTotalWidth = pageHeadTotalWidth + $(this).width() + 61;
-        });
-        return pageHeadTotalWidth;
-    }
-
-    TabPage.prototype.setWidth = function(widthNum){
-        var thisObject = this;
-        var width;
-        if(this.dataOptions.width)
-            width = this.dataOptions.width;
-        if(widthNum)
-            width = widthNum;
-        if(typeof width == "string")
-            width = width.split("px")[0];
-        this.parent.width(width);
-        //this.headBarObj.width(width-2);
-        this.headBarPanelObj.width(width-2);
-        this.headBarBGObj.width(width-2);
-        this.parent.children('.eb_tabPageBody').each(function(){
-            $(this).width(width-2);
-        });
-        this.parent.children('.eb_tabPageBody').children('.eb_iframe').each(function(){
-            $(this).width(width-2);
-        });
-        this.toggleHeadBtn();
-    };
-
-    TabPage.prototype.setHeight = function(heightNum){
-        var thisObject = this;
-        var height;
-        if(this.dataOptions.height)
-            height = this.dataOptions.height;
-        if(heightNum)
-            height = heightNum;
-        if(typeof height == "string")
-            height = height.split("px")[0];
-        this.parent.height(height);
-        this.parent.children('.eb_tabPageBody').each(function(){
-            $(this).height(height-37);
-        });
-        this.parent.children('.eb_tabPageBody').children('.eb_iframe').each(function(){
-            $(this).height(height-37);
-        });
-    };
-
-    TabPage.prototype.remove = function(name){
-        var thisObject = this;
-        var cls = this.headBarObj.children('.eb_tabPageHead[name="'+name+'"]').attr("class");
-        var next = this.parent.children('.eb_tabPageBody[name="'+name+'"]').next();
-        this.parent.children('.eb_tabPageBody[name="'+name+'"]').remove();
-        this.headBarObj.children('.eb_tabPageHead[name="'+name+'"]').remove();
-        if(cls.indexOf(' on')>=0){
-            var name = '';
-            if(next.length>0){
-                name = next.attr("name");
-            }else{
-                var objArr = thisObject.headBarObj.get(0).getElementsByTagName('span');
-                var obj = objArr[objArr.length-1];
-                name = $(obj).attr('name');
-            }
-            this.select(name);
-        }
-        var lastObj = this.headBarObj.children('.eb_tabPageHead').last();
-        if(lastObj.length>0 && (lastObj.offset().left + lastObj.width() < this.headBarPanelObj.offset().left + this.headBarPanelObj.width() && this.countWidth() > this.headBarPanelObj.width()-14)){
-            this.headMoveRight(lastObj);
-        }
-        this.toggleHeadBtn();
-    };
-
-    TabPage.prototype.removeByNum = function(num){
-        var thisObject = this;
-        var objArr = thisObject.headBarObj.get(0).getElementsByTagName('span');
-        if(num < 0 || num > objArr.length-1){
-            alert('$(selecter).tabPage("remove",num) 方法输入的数字超出范围！');
-            return false;
-        }
-        var obj = objArr[num];
-        var name = $(obj).attr('name');
-        this.remove(name);
-    };
-
-    TabPage.prototype.select = function(name){
-        var thisObject = this;
-        if(this.headBarObj.children('.eb_tabPageHead[name="'+name+'"]').length>0 && this.headBarObj.children('.eb_tabPageHead[name="'+name+'"]').attr("class").indexOf(" on")<0){
-            var thisObj = this.headBarObj.children('.eb_tabPageHead[name="'+name+'"]');
-            thisObject.headBarObj.find('.on').removeClass('on');
-            $(thisObj).addClass("on");
-            thisObject.parent.find(".eb_tabPageBody").hide();
-            var bodyObj = thisObject.getBody($(thisObj));
-            if(bodyObj.children('div.eb_iframe').length>0){
-                var src = '';
-                var html = '';
-                src = bodyObj.children('.eb_iframe').attr('src');
-                html = html + '<iframe src="'+src+'" class="eb_iframe"></iframe>';
-                bodyObj.html(html);
-            }
-            bodyObj.show();
-            this.setHeadBarView();
-        }
-    };
-
-    TabPage.prototype.selectByNum = function(num){
-        var thisObject = this;
-        var objArr = thisObject.headBarObj.get(0).getElementsByTagName('span');
-        if(num < 0 || num > objArr.length-1){
-            alert('$(selecter).tabPage("remove",num) 方法输入的数字超出范围！');
-            return false;
-        }
-        var obj = objArr[num];
-        var name = $(obj).attr('name');
-        this.select(name);
-    };
-
-    TabPage.prototype.add = function(param){
-        var thisObject = this;
-        var arr = [];
-        if(isArray(param) == 'array')
-            arr = param;
-        else if(isArray(param) == "object")
-            arr[0] = param;
-        else
-            alert("$(selecter).tabPage('add',param) 方法传入参数错误！");
-        for(var i = 0;i<arr.length;i++){
-            var obj = arr[i];
-            if(this.headBarObj.children('.eb_tabPageHead[name="'+obj.name+'"]').length>0){
-                thisObject.select(obj.name);
-            }else{
-                this.parent.append($('<div class="eb_tabPageBody" style="display:none" name="'+obj.name+'"><iframe src="'+obj.src+'" class="eb_iframe"></iframe></div>'));
-                this.headBarObj.append($('<span class="eb_tabPageHead" name="'+obj.name+'">'+obj.title+'</span>').click(function(){
-                    var thisObj = this;
-                    if($(this).attr("class").indexOf(" on")<0){
-                        thisObject.headBarObj.find('.on').removeClass('on');
-                        $(this).addClass("on");
-                        thisObject.parent.find(".eb_tabPageBody").hide();
-                        thisObject.getBody($(thisObj)).show();
-                    }
-                    thisObject.setHeadBarView();
-                }).append($('<div class="eb_tabPageCloseBtn">x</div>').click(function(){
-                    var name = $(this).parent().attr("name");
-                    thisObject.remove(name);
-                }).mouseover(function(){
-                    $(this).addClass("mouseover");
-                }).mouseout(function(){
-                    $(this).removeClass("mouseover");
-                })).mouseover(function(){
-                    $(this).children('.eb_tabPageCloseBtn').show();
-                }).mouseout(function(){
-                    $(this).children('.eb_tabPageCloseBtn').hide();
-                }));
-                if(this.countWidth()>this.headBarPanelObj.width()-14){
-                    givenObj = this.headBarObj.children('.eb_tabPageHead').last();
-                    this.headMoveRight(givenObj);
-                }
-            }
-        }
-        var showPageName = arr[arr.length-1].name;
-        this.select(showPageName);
-        this.setWidth(thisObject.parent.width());
-        this.setHeight(thisObject.parent.height());
-        this.toggleHeadBtn();
-        var givenObj = null;
-
-    };
-
-    TabPage.prototype.init = function(){
-        var thisObject = this;
-        this.parent = this.$element;          //parent
-        this.parent.children('div').each(function(){
-            $(this).addClass('eb_tabPageBody');
-        });
-        this.parent.prepend($('<div class="eb_headBar"></div>'));
-        this.headBarObj = this.parent.children('.eb_headBar');                //headBarObj
-        this.headBarObj.wrap($('<div class="eb_headBarPanel"></div>'));
-        this.headBarPanelObj = this.headBarObj.parent();                      //headBarPanelObj
-        this.headBarPanelObj.wrap($('<div class="eb_headBarBG"></div>'));
-        this.headBarBGObj = this.headBarPanelObj.parent();                    //headBarBGObj
-        this.headBarBGObj.prepend($('<div class="eb_headBarLeftBtn"><div class="eb_arrow02L"></div></div>').mouseover(function(){
-            $(this).addClass('mouseover');
-        }).mouseout(function(){
-            $(this).removeClass('mouseover');
-        }).mousedown(function(){
-            $(this).addClass('mousedown');
-        }).mouseup(function(){
-            $(this).removeClass('mousedown');
-        }).click(function(){
-            thisObject.headMoveLeft();
-        })).append($('<div class="eb_headBarRightBtn"><div class="eb_arrow02R"></div></div>').mouseover(function(){
-            $(this).addClass('mouseover');
-        }).mouseout(function(){
-            $(this).removeClass('mouseover');
-        }).mousedown(function(){
-            $(this).addClass('mousedown');
-        }).mouseup(function(){
-            $(this).removeClass('mousedown');
-        }).click(function(){
-            thisObject.headMoveRight();
-        }));
-        this.leftBtnObj = this.headBarBGObj.children('.eb_headBarLeftBtn');   //leftBtnObj
-        this.rightBtnObj = this.headBarBGObj.children('.eb_headBarRightBtn');  //rightBtnObj
-        this.bodyObjArr = {};                                                //bodyObjArr
-        this.parent.children('.eb_tabPageBody').each(function(){
-            var thisObj = this;
-            thisObject.bodyObjArr[$(thisObj).attr('name')] = $(this);
-        });
-        for(var i in this.bodyObjArr){
-            var title = '';
-            var dataOptions = null;
-            if(this.bodyObjArr[i].attr('title'))
-                title = this.bodyObjArr[i].attr('title');
-            if(this.bodyObjArr[i].data('options') && (dataOptions = (new Function('return {'+this.bodyObjArr[i].data('options')+'}'))()) && dataOptions.title)
-                title = dataOptions.title;
-            this.headBarObj.append($('<span class="eb_tabPageHead" name="'+i+'">'+title+'</span>').click(function(){
-                var thisObj = this;
-                if($(this).attr("class").indexOf(" on")<0){
-                    var name = $(this).attr("name");
-                    thisObject.select(name);
-                }
-                thisObject.setHeadBarView();
-            }).append($('<div class="eb_tabPageCloseBtn">x</div>').click(function(){
-                var name = $(this).parent().attr("name");
-                thisObject.remove(name);
-            }).mouseover(function(){
-                $(this).addClass("mouseover");
-            }).mouseout(function(){
-                $(this).removeClass("mouseover");
-            })).mouseover(function(){
-                $(this).children('.eb_tabPageCloseBtn').show();
-            }).mouseout(function(){
-                $(this).children('.eb_tabPageCloseBtn').hide();
-            }));
-        }
-        this.headObjArr = {};                                                 //headObjArr
-        this.headBarObj.children(".eb_tabPageHead").each(function(){
-            var thisObj = this;
-            thisObject.headObjArr[$(thisObj).attr('name')] = $(this);
-        });
-        this.headBarObj.children(".eb_tabPageHead").first().addClass("on");    //将第一项设置为显示状态
-        this.getBody(thisObject.headBarObj.children(".eb_tabPageHead").first()).show();           //将第一项设置为显示状态
-        /*this.parent.children('.eb_tabPageBody').each(function(){
-         var thisObj = this;
-         if($(this).children('.eb_iframe').length>0){
-         var src = '';
-         var html = '';
-         src = $(this).children('.eb_iframe').attr('src');
-         html = html + '<iframe src="'+src+'" class="eb_iframe"></iframe>';
-         $(this).html(html);
-         }
-         });*/
-        this.setWidth();
-        this.setHeight();
-        this.toggleHeadBtn();
-    };
-
-    TabPage.prototype.getBody = function(headObj){
-        var name = headObj.attr("name");
-        var bodyObj = this.parent.children(".eb_tabPageBody[name='"+name+"']");
-        return bodyObj;
-    };
-
-    TabPage.prototype.getBodyByNum = function(num){
-        var thisObject = this;
-        var length = thisObject.headBarObj.get(0).getElementsByTagName('span').length;
-        if(num >= length)
-            num = length-1;
-        else if(num<0)
-            num = 0;
-        var name = $(thisObject.headBarObj.get(0).getElementsByTagName('span')[num]).attr("name");
-        var bodyObj = this.parent.children(".eb_tabPageBody[name='"+name+"']");
-        return bodyObj;
-    };
-
-    TabPage.prototype.setAction = function(){
-
-    };
-
-    $.fn.tabPage = function (option,param) {
-        var result = null;
-        var thisObj = this.each(function () {
-            var $this = $(this)
-                , thisObject = $this.data('tabPage')
-                , dataOptions = typeof option == 'object' && option;
-            if(typeof option == 'string' ){
-                result = thisObject[option](param);
-            }else{
-                $this.data('tabPage', (thisObject = new TabPage(this, dataOptions)));
-            }
-        });
-        if(typeof option == 'string' )return result;
-        return thisObj;
-    };
-
-    $.fn.tabPage.defaults = {
-
-    };
-
-    $(window).on('load', function(){
-        $(".eb_tabPage").each(function () {
-            var thisObj = $(this)
-                , dataOptionsStr = thisObj.data('options');
-            if(!dataOptionsStr)
-                thisObj.tabPage($.fn.tabPage.defaults);
-            else
-                thisObj.tabPage((new Function("return {" + dataOptionsStr + "}"))());
-        });
     });
-}(window.jQuery);
 
+    var TabPageBody = function($parent,options){
+        this.$parent = $parent;
+        this.options = $.extend({
+            content:null,
+            iframe:true,
+            callback:null
+        },options);
+        this.$body = null;
+        this._init();
+    };
+
+    $.extend(TabPageBody.prototype,{
+        _init:function(){
+            this._createBody();
+        },
+        _createBody:function(){
+            this.$body = $('<div class="' + TABPAGE_BODY + '"></div>');
+            this.$parent.append(this.$body);
+            this._load();
+        },
+        _load:function(){
+            var iframe = true,
+                that = this;
+            //jQuery
+            if(this.options.content instanceof jQuery){
+                iframe = false;
+            }
+            //HTML
+            else if(/^<\w+>.*/g.test(this.options.content)){
+                iframe = false;
+            }
+            if(iframe){
+                if(this.options.iframe){
+                    var iframeNode = document.createElement("iframe");
+                    var shame = +new Date();
+                    iframeNode.src = this.options.content;
+                    iframeNode.id = 'id_' + shame;
+                    iframeNode.name = 'name_' + shame;
+                    if (iframeNode.attachEvent){
+                        iframeNode.attachEvent("onload", function(){
+                            that.options.callback && that.options.callback.call();
+                        });
+                    }
+                    else {
+                        iframeNode.onload = function(){
+                            that.options.callback && that.options.callback.call();
+                        };
+                    }
+                    this.$body.append(iframeNode);
+                }
+                else{
+                    this.$body.load(this.options.content,function(){
+                        that.options.callback && that.options.callback.call();
+                    });
+                }
+            }
+            else{
+                this.$body.append(this.options.content);
+                this.options.callback && this.options.callback.call();
+            }
+        },
+        _destroy:function(){
+            this.$body.remove();
+        },
+
+        getContent:function(){
+            return this.$body;
+        },
+
+        show:function(){
+            this.$body.show();
+        },
+
+        hide:function(){
+            this.$body.hide();
+        },
+
+        reload:function(c,callback){
+            c && (this.options.content = c);
+            callback && (this.options.callback = callback);
+            this.$body.empty();
+            this._load();
+        }
+    });
+
+    cri.TabPage = TabPage;
+
+    $.fn.tabPage = function(option) {
+        var o = null;
+        this.each(function () {
+            var $this = $(this),
+                options = typeof option == 'object' && option;
+            o = $this.data('tabPage');
+            if(o != null){
+                o._destroy();
+            }
+            $this.data('tabPage', (o = new TabPage(this,options)));
+        });
+        return o;
+    };
+}(window);
 
 /*=====================================================================================
  * easy-bootstrap-textarea v2.0
@@ -2639,13 +2782,12 @@
     });
 }(window.jQuery);
 
-/*=====================================================================================
- * easy-bootstrap-timeInput v2.0
+/**
+ * Author zhouzy
+ * Date   2014/9/18
+ * TimeInput 组件
  *
- * @author:niyq
- * @date:2013/09/05
- * @dependce:jquery
- *=====================================================================================*/
+ */
 !function(window){
 
     "use strict";
@@ -2669,25 +2811,26 @@
             return [31,28,31,30,31,30,31,31,30,31,30,31];
     }
 
-
     var _defaultOptions = {
         value:null,
-        format:"yyyy/MM/dd",
-        HMS:false
+        format:"yyyy/MM/dd hh:mm:ss",
+        HMS:false,
+        enable:true
     };
 
     var TimeInput = cri.Widgets.extend(function(element,options){
-        if(!options.HMS && options.format){
-            options.format = options.format.replace(/\s*[Hh].*$/,"");
-        }
         this.options = _defaultOptions;
         this.date  = null;
         this.input = null;
         this.selectView = null;
         cri.Widgets.apply(this,arguments);
+        this.$element.attr('data-role','timeinput');
     });
 
     TimeInput.prototype._init = function(){
+        if(!this.options.HMS && this.options.format){
+            this.options.format = this.options.format.replace(/\s*[Hh].*$/,"");
+        }
         var $element = this.$element.attr("role","timeInput");
         $element.wrap('<div class="'+TIME_INPUT_GROUP+'"></div>');
         this.$timeInputGroup = $element.parent();
@@ -2707,9 +2850,14 @@
                 that.selectView.toggle();
             }};
 
-        this.input = new cri.Input(this.$element,{readonly:true,value:cri.formatDate(value,this.options.format),button:button,onFocus:function(){
-            that.selectView.toggle();
-        }});
+        this.input = new cri.Input(this.$element,{
+            readonly:true,
+            value:cri.formatDate(value,this.options.format),
+            button:button,
+            enable:this.options.enable,
+            onFocus:function(){
+                that.selectView.toggle();
+            }});
     };
 
     /**
@@ -2738,6 +2886,19 @@
         this.input.value(cri.formatDate(value,this.options.format));
         this.selectView.setDate(value);
     };
+    /**
+     * 使输入框不能用
+     */
+    TimeInput.prototype.disable=function(){
+        this.input.disable();
+    };
+
+    /**
+     * 使输入框可用
+     */
+    TimeInput.prototype.enable=function(){
+        this.input.enable();
+    };
 
     TimeInput.prototype.value = function(value){
         if(value == undefined){
@@ -2746,6 +2907,13 @@
         else{
             this._setValue(value);
         }
+    };
+
+    TimeInput.prototype._destroy = function(){
+        this.selectView._destroy();
+        this.$timeInputGroup.replaceWith(this.$element);
+        this.input = null;
+        this.selectView = null;
     };
 
     var TimeSelectView = function($parent,options){
@@ -2778,7 +2946,11 @@
             if(this.options.HMS == true){
                 $timeBox.append(this._hmsSelect());
             }
-            $parent.append($timeBox);
+
+            var left = $parent.offset().left + 80;
+            var top = $parent.offset().top + 28;
+
+            $("body").append($timeBox.css({top:top,left:left}));
         },
 
         _yearSelect : function(){
@@ -2875,9 +3047,9 @@
 
         _hmsSelect:function(){
             var $hmsBar      = $('<div class="eb_HMSBar">'),
-                $hourInput   = $('<input class="eb_HMSInput eb_Hour" value="00" />'),
-                $minuteInput = $('<input class="eb_HMSInput eb_minute"  value="00" />'),
-                $secondInput = $('<input class="eb_HMSInput eb_second"  value="00" />'),
+                $hourInput   = $('<input class="eb_HMSInput eb_Hour"/>').val(this.date.HH),
+                $minuteInput = $('<input class="eb_HMSInput eb_minute"/>').val(this.date.mm),
+                $secondInput = $('<input class="eb_HMSInput eb_second"/>').val(this.date.ss),
                 that         = this;
 
             $hourInput.on("change",_handleNumF(0,23));
@@ -2921,24 +3093,37 @@
         _clickBlank:function(){
             var that = this;
             $(document).mouseup(function(e) {
-                var _con = that.$parent;
+                var _con = that.$timeBox;
                 if (!_con.is(e.target) && _con.has(e.target).length === 0) {
-                    that.$timeBox.animate({
-                        height:'hide'
-                    },200);
+                    that.$timeBox.slideUp(200);
                 }
             });
+        },
+        /**
+         * 设置position显示时在屏幕中的位置
+         * @private
+         */
+        _setPosition:function(){
+            var left = this.$parent.offset().left + 80;
+            var top = this.$parent.offset().top + 28;
+            this.$timeBox.css({top:top,left:left});
+        },
+
+        _destroy : function(){
+            this.$timeBox.remove();
         },
 
         toggle:function(){
             var that = this;
-            this.$timeBox.animate({
-                height:"toggle"
-            },200,function(){
-                if(!that.$timeBox.is(":hidden")){
+            this._setPosition();
+            if(this.$timeBox.is(":hidden")){
+                this.$timeBox.slideDown(200,function(){
                     that._clickBlank();
-                }
-            });
+                });
+            }
+            else{
+                this.$timeBox.slideUp(200);
+            }
         },
 
         getDate:function(){
@@ -2958,7 +3143,7 @@
                 options = typeof option == 'object' && option;
             o = $this.data('timeInput');
             if(o != null){
-                o._destory();
+                o._destroy();
             }
             $this.data('timeInput', (o = new TimeInput(this, options)));
         });
@@ -3119,6 +3304,7 @@
         this.toolbar = null;
         this._className = "tree";
         cri.Widgets.apply(this,arguments);
+        this.$element.attr('data-role','tree');
     });
 
     $.extend(Tree.prototype,{
@@ -3130,8 +3316,8 @@
         _eventListen:function(){
             var that = this;
             this.$treebody
-                .on('click',"div.li-content",function(e){that._setSelected(e);})
-                .on('click', "li i.icon", function(e){
+                .on('click',"div.li-content",function(e){
+                    that._setSelected(e);
                     that._fold(e);
                     return false;
                 })
@@ -3404,8 +3590,6 @@
         return tree;
     };
 
-
-
 }(window);
 /**
  * Author zhouzy
@@ -3424,6 +3608,7 @@
         this._gridClassName = "treegrid";
         cri.Grid.apply(this,arguments);
         this._selfEvent();
+        this.$element.attr('data-role','treegrid');
     });
 
     TreeGrid.prototype._selfEvent = function(){
@@ -3441,11 +3626,14 @@
             columns = this._columns,
             lineNum = 1,
             paddingLeft = 1,
+            that = this,
             iconWidth = 6;
+
         $table.append(this._createColGroup($parent.width()));
         /**
          * 拼装每行HTML
          */
+        this._selectedId = [];
         !function getRowHtml(rows,isShow,id){
             for(var i = 0,len = rows.length; i<len; i++){
                 var $tr = $("<tr></tr>").data("rowid",++id).attr("data-rowid",id);
@@ -3454,10 +3642,13 @@
                 isShow == "show" || $tr.hide();
 
                 if(op.checkBox){
-                    row.check ?
-                        $tr.append($("<td></td>").addClass("line-checkbox").append('<input type="checkbox" checked/>')):
+                    if(row.check){
+                        $tr.addClass("selected");
+                        $tr.append($("<td></td>").addClass("line-checkbox").append('<input type="checkbox" checked/>'));
+                        that._selectedId.push(id);
+                    }else{
                         $tr.append($("<td></td>").addClass("line-checkbox").append('<input type="checkbox"/>'));
-
+                    }
                 }
                 if(op.rowNum){
                     $tr.append($("<td></td>").addClass("line-number").append(lineNum++));
@@ -3475,7 +3666,7 @@
                     paddingLeft -= iconWidth;
                 }
             }
-        }(op.rows,"show",0);
+        }(this._rows,"show",0);
 
         /**
          * 拼装列HTML
@@ -3490,12 +3681,12 @@
 
             $.each(colDef,function(index){
                 var $td = $("<td></td>");
-                var text  = colData[this.field] || "";
+                var text   = colData[this.field]==null ? "" : colData[this.field];
 
                 if(this.field == "text"){
                     var $icon = $("<i></i>").attr("class",fileIcons.file);
                     if(colData.hasChildren || (colData.children && colData.children.length)){
-                        colData.state == "open" ? $icon.attr("class",fileIcons.folderOpen):$icon.attr("class",fileIcons.folderClose);
+                        colData.state == "closed" ? $icon.attr("class",fileIcons.folderClose):$icon.attr("class",fileIcons.folderOpen);
                     }
                     $td.css("text-indent",textIndent).addClass("line-file-icon").append($icon).append(text);
                 }
@@ -3511,18 +3702,16 @@
         //根据gird-body 纵向滚动条决定headWrap rightPadding
         var scrollBarW = $parent.width()-$parent.prop("clientWidth");
         this.$gridhead.css("paddingRight",scrollBarW);
-    }
+    };
 
     TreeGrid.prototype._fold = function(e){
-        var op = this.options,
-            item = $(e.target).closest("tr"),
+        var op    = this.options,
+            item  = $(e.target).closest("tr"),
             rowid = item.data('rowid'),
-            that = this;
+            that  = this;
         this.selectedRow = this._getRowDataById(rowid);
-        if(this.selectedRow.state == "open") {
-            this.selectedRow.state = "closed";
-        }
-        else if(this.selectedRow.state == "closed"){
+
+        if(this.selectedRow.state == "closed") {
             this.selectedRow.state = "open";
             if(op.async && !this.selectedRow.children){
                 var pa = {};
@@ -3538,6 +3727,9 @@
                     async:false
                 });
             }
+        }
+        else{
+            this.selectedRow.state = "closed";
         }
         this._refreshBody();
     };
@@ -3584,7 +3776,7 @@
                 var k = arr[i] - 1;
                 data[k]&&(rowdata = data[k])&&(data = data[k].children);
             }
-        }(op.rows);
+        }(this._rows);
         return rowdata;
     };
 
@@ -3618,10 +3810,11 @@
 
     var INPUTSELECTOR = ":input:not(:button,[type=submit],[type=reset],[disabled])",
         CHECKBOXSELECTOR = ":checkbox:not([disabled],[readonly])",
-        NUMBERINPUTSELECTOR = "[type=number],[type=range]";
+        NUMBERINPUTSELECTOR = "[type=num],[type=range]";
 
     var emailRegExp = /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))$/i,
         urlRegExp = /^(https?|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i;
+
     function patternMatcher(value, pattern) {
         if (typeof pattern === "string") {
             pattern = new RegExp('^(?:' + pattern + ')$');
@@ -3658,7 +3851,7 @@
             return true;
         },
         min: function(input){
-            if (input.filter(NUMBERINPUTSELECTOR + ",[role=number]").filter("[min]").length && input.val() !== "") {
+            if (input.filter(NUMBERINPUTSELECTOR).filter("[min]").length && input.val() !== "") {
                 var min = parseFloat(input.attr("min")) || 0,
                     val = parseFloat(input.val());
                 return min <= val;
@@ -3666,7 +3859,7 @@
             return true;
         },
         max: function(input){
-            if (input.filter(NUMBERINPUTSELECTOR + ",[role=number]").filter("[max]").length && input.val() !== "") {
+            if (input.filter(NUMBERINPUTSELECTOR).filter("[max]").length && input.val() !== "") {
                 var max = parseFloat(input.attr("max")) || 0,
                     val = parseFloat(input.val());
                 return max >= val;
@@ -3685,6 +3878,12 @@
                 return parseDate(input.val(), input.attr("format")) !== null;
             }
             return true;
+        },
+        number: function(input) {
+            if(input.filter(NUMBERINPUTSELECTOR).length && input.val()){
+                return cri.isNum(input.val());
+            }
+            return true;
         }
     };
 
@@ -3694,7 +3893,8 @@
         max:"请输入小于的数字",
         email:"请输入合法的邮箱地址",
         url:"请输入合法的URL地址",
-        date:"请输入合法的日期"
+        date:"请输入合法的日期",
+        number:"请输入数字"
     };
 
     var _defaultOptions = {
@@ -3794,6 +3994,14 @@
                 else{
                     $errormsg.text(this.options.messages[result.key]);
                 }
+                if($input.is("[readonly=readonly]")){
+                    $input.closest(".input-group").one("click",function(){
+                        $input.next(".input-warm").remove();
+                    })
+                }
+                $input.one("focus",function(){
+                    $input.next(".input-warm").remove();
+                });
             }else{
                 $input.next(".input-warm").remove();
             }
@@ -3836,9 +4044,52 @@
 
     var icons = {Minimize:"fa fa-minus",Maximize:"fa fa-expand","Close":"fa fa-close","Resume":"fa fa-compress"},
         MINI_WINDOW_WIDTH = 140+10,
+        WINDOW_PADDING = 35,
+        WINDOW_BORDER  = 1,
         ZINDEX = 10000;
 
+    /**
+     * 格式化宽度，接受百分比、像素值、整数参数
+     * @param width
+     * @param parentWidth
+     * @returns {格式化后的宽度，如果为百分比，则返回百分比父节点宽度的整数}
+     */
+    function parseWidth(width,parentWidth){
+        width = "" + width;
+        //百分比
+        if(/^-?\d+%$/g.test(width)){
+            return Math.floor(parentWidth * width.split("%")[0] / 100);
+        }
+        //像素值
+        if(/^\d+px$/g.test(width)){
+            return parseInt(width.split("px")[0]);
+        }
+        //整数
+        return parseInt(width) || 0;
+    }
+
+    /**
+     * 格式化高度，接受百分比、像素值、整数参数
+     * @param width
+     * @param parentWidth
+     * @returns {格式化后的高度，如果为百分比，则返回百分比父节点高度的整数}
+     */
+    function parseHeight(height,parentHeight){
+        height = "" + height;
+        //百分比
+        if(/^-?\d+%$/g.test(height)){
+            return Math.floor(parentHeight * height.split("%")[0] / 100);
+        }
+        //像素值
+        if(/^\d+px$/g.test(height)){
+            return parseInt(height.split("px")[0]);
+        }
+        //整数
+        return parseInt(height) || 0;
+    }
+
     var _defaultOptions = {
+        title:"",
         actions:["Close","Minimize","Maximize"],//Colse:关闭,Minimize:最下化,Maximize:最大化
         content:null,
         visible:true,
@@ -3848,43 +4099,32 @@
         position:{top:0,left:0},
         center:true,//初始时是否居中
         resizable:true,
-        onReady:null//当窗口初始化完成时触发
+        dragable:true,
+        onReady:null,//当窗口初始化完成时触发
+        onOpen:null,//窗口打开时触发
+        onClose:null,//窗口关闭时触发
+        onMaximize:null,//窗口最大化时触发
+        onMinimize:null,//窗口最小化时触发
+        onResume:null//窗口复原时触发
     };
 
     var Window = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
         this.windowStatus = "normal";
         cri.Widgets.apply(this,arguments);
-        Window.prototype.windowStack.push(this);
+        this.windowStack.push(this);
+        this.toFront();
+        this.$element.attr('data-role','treegrid');
     });
 
     $.extend(Window.prototype,{
 
         windowStack : [],
 
-        /**
-         * 初始化组件DOM结构
-         * @private
-         */
-        _init : function(){
-            var op = this.options,
-                viewWidth = $(window).width(),
-                viewHeight = $(window).height();
-
-            this._createBody();
-            if(op.center){
-                op.position.left = (viewWidth - op.width) / 2;
-                op.position.top  = (viewHeight - op.height) / 2;
-            }
-            this.$window.css($.extend({zIndex:this._zIndex()},op.position)).width(op.width).height(op.height);
-            this._overlay();
-            this._createHead();
-            op.resizable && this._createResizeHandler();
-            $("body").append(this.$window);
-            if(op.visible){
-                this.$window.show();
-            }else{
-                this.$window.hide();
+        _initOptions:function(options) {
+            this.options = $.extend(true,{}, this.options, options);
+            if(options.actions && options.actions.length){
+                this.options.actions = options.actions;
             }
         },
 
@@ -3894,15 +4134,8 @@
          */
         _eventListen : function(){
             var that = this;
-            this.$window
-                .on("click",".action",function(){
-                    var action = that._actionForButton($(this));
-                    action && typeof that[action] === "function" && that[action]();
-                })
-                .on("click",".window-head",function(){
-                    that.toFront();
-                })
-                .on("mousedown",".window-head",function(e){
+            if(this.options.dragable){
+                this.$window.on("mousedown",".window-head",function(e){
                     var left     = +that.$window.css("left").split("px")[0],
                         top      = +that.$window.css("top").split("px")[0],
                         width    = +that.$window.width(),
@@ -3920,6 +4153,16 @@
                         startY = pageY;
                         that._setPosition({top:top,left:left,width:width,height:height});
                     });
+                })
+            }
+            this.$window
+                .on("click",".action",function(){
+                    var action = that._actionForButton($(this));
+                    action && typeof that[action] === "function" && that[action]();
+                    return false;
+                })
+                .on("click",".window-head",function(){
+                    that.toFront();
                 })
                 .on("mousedown",".window-resizer",function(e){
                     var left     = +that.$window.css("left").split("px")[0],
@@ -3960,6 +4203,26 @@
         },
 
         /**
+         * 初始化组件DOM结构
+         * @private
+         */
+        _init : function(){
+            var op = this.options;
+            op.width = parseWidth(op.width,$(window).width()) - WINDOW_BORDER*2;
+            op.height = parseHeight(op.height,$(window).height()) - WINDOW_PADDING - WINDOW_BORDER*2;
+            this._createBody();
+            this._createHead();
+            op.resizable && this._createResizeHandler();
+            $("body").append(this.$window);
+            this.$element.show();
+            if(op.visible){
+                this.$window.show();
+            }else{
+                this.$window.hide();
+            }
+        },
+
+        /**
          * 生成window 头部
          * @private
          */
@@ -3975,24 +4238,24 @@
          * @private
          */
         _createBody : function(){
-            var that     = this,
-                op       = this.options,
-                $element = this.$element,
-                $window  = $('<div class="window"></div>'),
+            var that       = this,
+                op         = this.options,
+                viewWidth  = $(window).width(),
+                viewHeight = $(window).height(),
+                $element   = this.$element,
+                $window    = $('<div class="window"></div>'),
                 $windowBody = $('<div class="window-content"></div>');
-
             $element.detach();
-            $window.append($windowBody);
             this.$window = $window;
-            $windowBody.append($element);
-            if(this.options.content){
-                $element.load(this.options.content,function(){
-                    op.onReady && op.onReady.call(that,that.$window);
-                });
-            }else{
-                op.onReady && op.onReady.call(that,that.$window);
+            if(op.center){
+                op.position.left = (viewWidth - op.width - 2*WINDOW_BORDER) / 2;
+                op.position.top  = (viewHeight - op.height - WINDOW_PADDING - 2*WINDOW_BORDER) / 2;
             }
+            this._setPosition({top:op.position.top,left:op.position.left,width:op.width,height:op.height});
+            $window.append($windowBody);
+            $windowBody.append($element);
             $("body").append(this.$window);
+            this.load(this.options.content);
         },
 
         /**
@@ -4002,8 +4265,7 @@
          */
         _createTitle : function(){
             var title = this.options.title || "";
-            var $title = $("<span></span>").addClass("title").text(title);
-            return $title;
+            return $("<span></span>").addClass("title").text(title);
         },
 
         /**
@@ -4046,18 +4308,16 @@
         },
 
         /**
-         * 生成模态窗口背景遮罩
+         * 设置模态窗口背景遮罩
          * @private
          */
-        _overlay : function(){
-            if(this.options.modal){
-                var zIndex = +this.$window.css("zIndex");
-                this.$window.css("zIndex",(zIndex+1));
-                var $overlay = $(".overlay");
-                if($overlay.length == 0){
-                    $overlay = $("<div></div>").addClass("overlay");
-                    $("body").append($overlay);
-                }
+        _overlay : function(zIndex){
+            var $overlay = $(".overlay");
+            if($overlay.length == 0){
+                $overlay = $("<div></div>").addClass("overlay").css("zIndex",zIndex);
+                $("body").append($overlay);
+            }
+            else{
                 $overlay.css("zIndex",zIndex).show();
             }
         },
@@ -4092,46 +4352,37 @@
         /**
          * 由最小化打开窗口
          */
-        open : function(){
+        open:function(){
             this._setStyleByStatus("normal");
+            $(".window-content",this.$window).show();
             this.windowStatus = "normal";
+            this.options.onOpen && this.options.onOpen.call(this);
         },
 
         /**
          * 关闭当前窗口
-         *
-         * 隐藏并且放置到最底层
+         * 销毁当前窗口
          */
         close : function(){
-            var max      = ZINDEX,
-                frontWnd = null,
-                $windows = $(".window"),
-                $overlay = $(".overlay");
-
-            this.$window.css("zIndex",ZINDEX).hide();
-            $windows.each(function(){
-                var z = +this.style.zIndex + 1;
-                this.style.zIndex = z;
-                if(z >= max){
-                    max = z;
-                    frontWnd = this;
-                }
-            });
-            frontWnd.style.zIndex = max+1;
-            $windows.is(":visible") ? $overlay.css("zIndex",max) : $overlay.hide();
-
-            this.$window.removeClass("mini-window");
-            this.windowStatus = "close";
+            this.options.onClose && this.options.onClose.call(this);
+            this._destroy();
+            if(this.windowStack.length){
+                this.windowStack[this.windowStack.length-1].toFront();
+            }
+            else{
+                $(".overlay").hide();
+            }
         },
 
         /**
          * 最大化窗口
          * 最大化后 复原、关闭
          */
-        maximize : function(){
+        maximize:function(){
             this._setStyleByStatus("maximize");
             this._setButtons("maximize");
             this.windowStatus = "maximize";
+            this.options.onMaxmize && this.options.onMaxmize.call(this);
         },
 
         /**
@@ -4146,6 +4397,7 @@
             this._setStyleByStatus("minimize");
             this.$window.css("left",left);
             this.windowStatus = "minimize";
+            this.options.onMinimize && this.options.onMinimize.call(this);
         },
 
         /**
@@ -4154,9 +4406,10 @@
         resume : function(){
             this._setButtons("normal");
             this._setStyleByStatus("normal");
+            $(".window-content",this.$window).show();
             if(this.windowStatus == "minimize"){
-                this.windowStatus = "normal";
                 var i = 0;
+                this.windowStatus = "normal";
                 $.each(Window.prototype.windowStack,function(index,wnd){
                     if(wnd.windowStatus == "minimize"){
                         wnd._moveLeft(i++);
@@ -4164,6 +4417,7 @@
                 });
             }
             this.windowStatus = "normal";
+            this.options.onResume && this.options.onResume.call(this);
         },
 
         /**
@@ -4216,69 +4470,75 @@
         },
 
         /**
-         * 把当前窗口顶至最前,与之前最上层窗口替换
+         * 销毁自身
+         * @private
          */
-        toFront : function(){
-            /**
-             * 轮询窗口，取最大zindex,替换zindex
-             */
-            var frontWnd = this._getFrontWindow();
-            if(this.$window != frontWnd){
-                var zIndex = +this.$window.css("zIndex");
-                this.$window.css("zIndex",frontWnd.css("zIndex"));
-                frontWnd.css("zIndex",zIndex);
+        _destroy : function(){
+            var $element = this.$element.hide(),
+                $wrapper = $element.parents(".window");
+            var index = this.windowStack.indexOf(this);
+            index>=0 && this.windowStack.splice(index,1);
+            $wrapper.after($element).remove();
+        },
+
+        /**
+         * 把当前窗口顶至最前
+         */
+        toFront:function(){
+            $(".overlay").hide();
+            var stack = this.windowStack;
+            var index = stack.indexOf(this);
+            stack.splice(index,1);
+            stack.push(this);
+            var len = stack.length;
+            for(var i=len-1;i>=0;i--){
+                if(stack[i].options.modal){
+                    for(var j=0;j<len;j++){
+                        j<i?stack[j].$window.css('zIndex',ZINDEX+j):
+                            stack[j].$window.css('zIndex',ZINDEX+j+1);
+                    }
+                    this._overlay(ZINDEX+i);
+                    break;
+                }
+                else{
+                    stack[i].$window.css('zIndex',ZINDEX+i);
+                }
             }
         },
 
-        /**
-         * 获取最上层窗口
-         * @private
-         */
-        _getFrontWindow : function(){
-            var zIndex = +this.$window.css("zIndex"),
-                wnd = this.$window;
-            $(".window").each(function(){
-                var tempZIndex = +this.style.zIndex;
-                if(tempZIndex  > zIndex){
-                    wnd = $(this);
-                    zIndex = tempZIndex;
-                }
-            });
-            return wnd;
-        },
-
-        /**
-         * 获取最大zIndex
-         * @returns {number}
-         * @private
-         */
-        _zIndex : function(){
-            var zindex = ZINDEX;
-            $(".window").each(function(i,element){
-                zindex = Math.max(+this.style.zIndex,zindex);
-            });
-            return ++zindex;
-        },
-
-        _destory : function(){
+        load:function(content){
             var $element = this.$element,
-                $warpper = $element.parents(".window");
-            $warpper.after($element).remove();
+                that = this,
+                op = this.options,
+                $loadingIcon = $('<i class="fa fa-spinner fa-spin"></i>').addClass("loadingIcon");
+            if(content){
+                $element.empty();
+                $element.addClass("loading").html($loadingIcon);
+                $element.load(content,function(response,status){
+                    $element.removeClass("loading");
+                    $loadingIcon.remove();
+                    op.onReady && op.onReady.call(that,that.$window);
+                });
+            }else{
+                op.onReady && op.onReady.call(that,that.$window);
+            }
         }
+
     });
+
     cri.Window = Window;
 
     $.fn.window = function(option) {
-        var wnd = null;
+        var o = null;
         this.each(function () {
             var $this   = $(this),
                 wnd     = $this.data('window'),
                 options = typeof option == 'object' && option;
-            if(wnd != null){
-                wnd._destory();
+            if(wnd != null) {
+                wnd.close();
             }
-            $this.data('window', (wnd = new Window(this, options)));
+            $this.data('window', (o = new Window(this, options)));
         });
-        return wnd;
+        return o;
     };
 }(window);

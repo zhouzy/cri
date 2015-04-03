@@ -17,38 +17,26 @@
 </head>
 <body style="padding:50px;">
 <form style="background-color: #f2c027">
-    <input id="timeinput"  name="time" data-label="timeInput"/>
-    <select id="select"  name="select" data-label="selectBox">
-        <option value="red">一二三四五六七八</option>
-        <option value="red">一二三四五六七八</option>
-        <option value="red">一二三四五六七八</option>
-        <option value="red">一二三四五六七八</option>
-        <option value="red">一二三四五六七八</option>
-        <option value="red">一二三四五六七八</option>
-        <option value="red">一二三四五六七八</option>
-        <option value="red">一二三四五六七八</option>
-        <option value="red">一二三四五六七八</option>
-        <option value="red">一二三四五六七八</option>
-        <option value="red">一二三四五六七八</option>
-        <option value="green">0f0</option>
-        <option value="blue">00f</option>
-    </select>
     <input id="input" name="input" data-label="input"/>
-    <input id="readonlyinput" name="input" data-label="readonlyinput">
-    <input type="button" value="submit" id="btn"/>
+    <input id="readonlyInput" name="input" data-label="readOnlyInput"/>
+    <input id="timeInput" name="timeinput" data-label="timeInput"/>
 </form>
-<script>
-    $("#timeinput").timeInput();
-    $("#timeinput").timeInput();
+<script type="text/javascript">
+    //1.测试重复初始化
     $("#input").input();
-    var input = $("#input").input();
-    input.disable();
-    $("#readonlyinput").input({readonly:true});
-    $("#readonlyinput").input({readonly:true});
-    $("#select").selectBox();
-    $("#select").selectBox();
-    $("#btn").button();
-    $("#btn").button();
+    $("#input").input({
+        required:true
+    });
+
+    $("#readonlyInput").input({
+        readonly:true
+    });
+    $("#readonlyInput").input({
+        readonly:true,
+        required:true
+    });
+    $("#timeInput").timeInput();
+
 </script>
 </body>
 </html>

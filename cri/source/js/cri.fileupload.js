@@ -22,6 +22,7 @@
         this.id = this.$element.attr("id");
         this.name = this.$element.attr("name");
         this.init();
+        this.$element.attr('data-role','fileupload');
     };
 
     FileUpload.prototype.init = function(){

@@ -18,9 +18,12 @@
 <body style="padding:50px;">
 <input id="timeinput"  name="time" data-label="timeInput"/>
 <script>
-    $("#timeinput").timeInput({
+    var timeInput = $("#timeinput").timeInput({
         HMS:true
     });
+    $("#timeinput").input();
+
+    timeInput.value(new Date(2014,10,23));
     </script>
 </body>
 </html>

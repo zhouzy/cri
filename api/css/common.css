@@ -1,5 +1,5 @@
 html{
-    font-family:Georgia,"Times New Roman","Microsoft YaHei","微软雅黑",STXihei,"华文细黑",serif;
+    font-family:"Times New Roman","Microsoft YaHei","微软雅黑",STXihei,"华文细黑",serif;
     font-size:14px;
 }
 .wrapper{
@@ -64,6 +64,7 @@ h2 + h3.item-head{
 
 .item-body{
     margin:20px 0;
+    line-height:1.5;
 }
 ul.item-body li{
     margin:10px 0;

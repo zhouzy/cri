@@ -12,8 +12,8 @@
     var cri = window.cri,
         $   = window.jQuery;
 
-    var TABPAGE_GROUP  = "tabPage-group",
-        TABPAGE_HEADER = "tabPage-header",
+    var TABPAGE_GROUP     = "tabPage-group",
+        TABPAGE_HEADER    = "tabPage-header",
         TABPAGE_HEADER_LB = "tabPage-header-leftBtn",
         TABPAGE_HEADER_RB = "tabPage-header-rightBtn",
         TABPAGE_TABS_WRAP = "tabPage-header-tabs-wrap",
@@ -21,10 +21,11 @@
         TABPAGE_TAB       = "tabPage-header-tab",
         TABPAGE_TAB_CLOSE = "tabPage-header-tab-close",
         TABPAGE_BODY      = "tabPage-body",
-        TAB_WIDTH         = 100;
+        TAB_WIDTH         = 150;
 
     var _defaultOptions = {
-        onFouce:null
+        onFouce:null,
+        onCloseTab:null
     };
 
     var TabPage = cri.Widgets.extend(function(element,options){
@@ -33,6 +34,7 @@
         this.$tabs = null;
         this._pageBodyQueue = [];
         cri.Widgets.apply(this,arguments);
+        this.$element.attr('data-role','tabpage');
     });
 
     $.extend(TabPage.prototype,{
@@ -79,10 +81,10 @@
                 containerWidth = this.$tabsWrap.width(),
                 viewWidth = width + left - this.$tabs.css("marginLeft").split("px")[0];
             if(viewWidth > containerWidth){
-                if(viewWidth%100>0){
-                    this.$tabs.velocity({left:"-="+(viewWidth%100)+"px"});
+                if(viewWidth%150>0){
+                    this.$tabs.animate({left:"-="+(viewWidth%150)+"px"});
                 }else{
-                    this.$tabs.velocity({left:"-=100px"});
+                    this.$tabs.animate({left:"-=150px"});
                 }
             }
         },
@@ -95,32 +97,27 @@
                 var viewWidth = width + left - this.$tabs.css("marginLeft").split("px")[0];
                 var right = containerWidth-viewWidth;
                 if(right > 0){
-                    this.$tabs.velocity({left:"+="+(right%100)+"px"});
+                    this.$tabs.animate({left:"+="+(right%150)+"px"});
                 }
                 else{
-                    this.$tabs.velocity({left:"+=100px"});
+                    this.$tabs.animate({left:"+=150px"});
                 }
             }
         },
 
         _createTabs:function(){
-            var $tabs = this.$tabs = $('<ul class="' + TABPAGE_TABS + '"></ul>');
-            return $tabs;
-        },
-
-        _fouceTab:function($tab){
-            var $tabs = this.$tabs,
-                index = $(".selected",$tabs).removeClass("selected").data("for");
-            index != null && this._pageBodyQueue[index].hide();
-            $tab.addClass("selected");
-            this._pageBodyQueue[$tab.data("for")].show();
-            this.options.onFouce && this.options.onFouce.call(this,$tab.data("for"));
+            this.$tabs = $('<ul class="' + TABPAGE_TABS + '"></ul>');
+            return this.$tabs;
         },
 
         _closeTab:function($tab){
             var index = $tab.data('for');
             if(index != undefined && index != null){
-                this._pageBodyQueue[index]._destory();
+                this._pageBodyQueue[index]._destroy();
+                if(this.options.onCloseTab){
+                    this.options.onCloseTab && this.options.onCloseTab.call(this,this._pageBodyQueue[index]);
+                }
+                this._pageBodyQueue[index]=null;
                 this._pageBodyQueue.splice(index,1);
                 $('li:gt('+ index +')',this.$tabs).each(function(){
                     var index = +$(this).data("for");
@@ -128,10 +125,10 @@
                 });
                 $tab.remove();
                 if($(".selected",this.$tabs).length == 0){
-                    if(index >= this._pageBodyQueue.length){
+                    if(index == this._pageBodyQueue.length){
                         index -= 1;
                     }
-                    index >= 0 && this._fouceTab(this._getTab(index));
+                    index >= 0 && this.focusTab(this._getTab(index));
                 }
             }
         },
@@ -163,7 +160,8 @@
          * @param title : tab name
          * @param closeAble: 是否在该tab上提供关闭按钮
          */
-        addTab:function(content,title,closeAble){
+        addTab:function(content,title,closeAble,iframe,callback){
+
             title = title || 'New Tab';
 
             if(closeAble == undefined || closeAble == null || closeAble == "null"){
@@ -173,7 +171,7 @@
             var that = this,
                 $tabs = this.$tabs,
                 $tab = $('<li class="' + TABPAGE_TAB + '">' + title + '</li>').data("for",this._pageBodyQueue.length).click(function(){
-                    that._fouceTab($(this));
+                    that.focusTab($(this));
                 }),
                 $closeBtn = $('<i class="fa fa-close ' + TABPAGE_TAB_CLOSE + '"></i>').click(function(){
                     that._closeTab($tab);
@@ -182,14 +180,26 @@
             $tabs.append($tab);
 
             var tabPageBody = new TabPageBody(this.$tabPageGroup,{
-                content:content
+                content:content,
+                iframe:iframe,
+                callback:callback
             });
 
             this._pageBodyQueue.push(tabPageBody);
             $tabs.width(this._pageBodyQueue.length*TAB_WIDTH);
             this._offsetL();
-            this._fouceTab($tab);
+            this.focusTab($tab);
             this._leftrightBtn();
+            return tabPageBody;
+        },
+
+        focusTab:function($tab){
+            var $tabs = this.$tabs,
+                index = $(".selected",$tabs).removeClass("selected").data("for");
+            index != null && this._pageBodyQueue[index].hide();
+            $tab.addClass("selected");
+            this._pageBodyQueue[$tab.data("for")].show();
+            this.options.onFouce && this.options.onFouce.call(this,$tab.data("for"));
         },
 
         closeTab:function(index){
@@ -200,7 +210,7 @@
          * 选择tab并给与焦点
          */
         select:function(index){
-            this._fouceTab(this._getTab(index))
+            this.focusTab(this._getTab(index))
         },
 
         /**
@@ -208,13 +218,29 @@
          */
         getTabBody:function(index){
             return this._pageBodyQueue[index];
+        },
+
+        /**
+         * 获取TabBody的索引
+         */
+        getTabBodyIndex:function(tabBody){
+            var re = -1;
+            $.each(this._pageBodyQueue,function(index){
+                if(tabBody == this){
+                    re = index;
+                    return false;
+                }
+            });
+            return re;
         }
     });
 
     var TabPageBody = function($parent,options){
         this.$parent = $parent;
         this.options = $.extend({
-            content:null
+            content:null,
+            iframe:true,
+            callback:null
         },options);
         this.$body = null;
         this._init();
@@ -230,7 +256,8 @@
             this._load();
         },
         _load:function(){
-            var iframe = true;
+            var iframe = true,
+                that = this;
             //jQuery
             if(this.options.content instanceof jQuery){
                 iframe = false;
@@ -240,14 +267,36 @@
                 iframe = false;
             }
             if(iframe){
-                var $iframe = $('<iframe src="'+this.options.content+'"></iframe>');
-                this.$body.append($iframe);
+                if(this.options.iframe){
+                    var iframeNode = document.createElement("iframe");
+                    var shame = +new Date();
+                    iframeNode.src = this.options.content;
+                    iframeNode.id = 'id_' + shame;
+                    iframeNode.name = 'name_' + shame;
+                    if (iframeNode.attachEvent){
+                        iframeNode.attachEvent("onload", function(){
+                            that.options.callback && that.options.callback.call();
+                        });
+                    }
+                    else {
+                        iframeNode.onload = function(){
+                            that.options.callback && that.options.callback.call();
+                        };
+                    }
+                    this.$body.append(iframeNode);
+                }
+                else{
+                    this.$body.load(this.options.content,function(){
+                        that.options.callback && that.options.callback.call();
+                    });
+                }
             }
             else{
                 this.$body.append(this.options.content);
+                this.options.callback && this.options.callback.call();
             }
         },
-        _destory:function(){
+        _destroy:function(){
             this.$body.remove();
         },
 
@@ -258,8 +307,16 @@
         show:function(){
             this.$body.show();
         },
+
         hide:function(){
             this.$body.hide();
+        },
+
+        reload:function(c,callback){
+            c && (this.options.content = c);
+            callback && (this.options.callback = callback);
+            this.$body.empty();
+            this._load();
         }
     });
 
@@ -272,7 +329,7 @@
                 options = typeof option == 'object' && option;
             o = $this.data('tabPage');
             if(o != null){
-                o._destory();
+                o._destroy();
             }
             $this.data('tabPage', (o = new TabPage(this,options)));
         });

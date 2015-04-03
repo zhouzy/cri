@@ -13,6 +13,7 @@
 
     var DataGrid = cri.DataGrid = cri.Grid.extend(function(element,options){
         cri.Grid.apply(this,arguments);
+        this.$element.attr('data-role','datagrid');
     });
 
     $.fn.datagrid = function(option) {
@@ -22,7 +23,7 @@
                 dg    = $this.data('datagrid');
             options = typeof option == 'object' && option;
             if(dg != null){
-                dg._destory();
+                dg._destroy();
             }
             $this.data('datagrid', (o = new DataGrid(this, options)));
         });

@@ -513,6 +513,14 @@ table {
   word-break: normal;
   white-space: nowrap;
 }
+.input-group label.required:after {
+  content: '*';
+  color: red;
+  display: inline-block;
+  height: 26px;
+  line-height: 26px;
+  margin-left: 5px;
+}
 .input-group .input {
   display: inline-block;
   background: #ffffff;
@@ -627,8 +635,8 @@ table {
   top: 0;
   right: 0;
   bottom: 0;
-  left: 0;
-  background: #d7d7d7;
+  left: 80px;
+  background: #f4f4f4;
   filter: alpha(opacity=50);
   opacity: .5;
 }
@@ -923,10 +931,10 @@ table {
 .options {
   background: #F2F2F2;
   position: absolute;
+  z-index: 30000;
   font-size: 12px;
   width: 178px;
   border: 1px solid #c8c8c8;
-  z-index: 10009;
   max-height: 200px;
   overflow: auto;
   overflow-x: hidden;
@@ -1067,8 +1075,9 @@ table {
   display: inline-block;
   height: 35px;
   line-height: 35px;
-  width: 80px;
+  width: 130px;
   padding-right: 20px;
+  overflow: hidden;
   cursor: pointer;
 }
 .tabPage-group .tabPage-header .tabPage-header-tabs-wrap .tabPage-header-tabs .tabPage-header-tab .tabPage-header-tab-close {
@@ -1180,7 +1189,7 @@ table {
   -webkit-box-shadow: 0 2px 2px 0 #cccccc;
   position: absolute;
   left: 80px;
-  z-index: 10004;
+  z-index: 20004;
   width: 240px;
   height: 190px;
   display: none;

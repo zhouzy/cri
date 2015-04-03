@@ -19,7 +19,8 @@
         onFocus:null,
         onBlur:null,
         onClick:null,
-        enable:true
+        enable:true,
+        required:false
     };
 
     var INPUT_GROUP = "input-group",
@@ -30,6 +31,7 @@
         this.options = _defaultOptions;
         this.$inputGroup = null;
         cri.Widgets.apply(this,arguments);
+        this.$element.attr('data-role','input');
     });
 
     $.extend(Input.prototype,{
@@ -115,10 +117,14 @@
                 this.$element.attr("title") ||
                 this.$element.attr("name") ||
                 "";
-            return $('<label></label>').text(label);
+            var $label = $('<label></label>').text(label);
+            if(this.options.required){
+                $label.addClass('required');
+            }
+            return $label;
         },
 
-        _destory:function(){
+        _destroy:function(){
             var $input = this.$element;
             this.$inputGroup.replaceWith($input);
         },
@@ -151,7 +157,9 @@
          */
         disable:function(){
             var $layout = $('<div class="input-layout"></div>');
-            this.$inputGroup.append($layout);
+            if(this.$inputGroup.has(".input-layout").length == 0){
+                this.$inputGroup.append($layout);
+            }
         },
 
         /**
@@ -177,9 +185,13 @@
         this.each(function () {
             var $this   = $(this),
                 input   = $this.data('input'),
-                options = typeof option == 'object' && option;
+                options = typeof option == 'object' && option,
+                role    = $this.attr("role");
+            if(role == "timeInput"){
+                return input;
+            }
             if(input != null){
-                input._destory();
+                input._destroy();
             }
             $this.data('input', (o = new Input(this, options)));
         });

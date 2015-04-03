@@ -15,21 +15,21 @@
         }
         .content{
             width:605px;
-            height:400px;
             margin:5px auto;
+            height:800px;
         }
     </style>
 </head>
 <body>
     <div class="content">
-    <table id="grid">
+    <table id="grid" style="height:50%;width:800px">
         <tr>
-            <td data-options="field:'propA'">propA</td>
+            <td data-options="field:'propA',width:100">propA</td>
             <td data-options="field:'propB'">propB</td>
             <td data-options="field:'propC'">propC</td>
-            <td data-options="field:'propD'">propD</td>
-            <td data-options="field:'propE'">propE</td>
-            <td data-options="field:'propF'">propF</td>
+            <td data-options="field:'propD',width:100">propD</td>
+            <td data-options="field:'propE',width:100">propE</td>
+            <td data-options="field:'propF',width:100">propF</td>
         </tr>
     </table>
     </div>
@@ -39,6 +39,7 @@
             rowNum:true,
             title:"hello grid",
             checkBox:true,
+            width:600,
             toolbar:[{
                 text:"button",
                 handler:function(){
@@ -56,6 +57,7 @@
                 console.log(data.propB);
             }
         });
+        console.debug($(".content").height());
     </script>
 </body>
 </html>

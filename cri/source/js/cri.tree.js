@@ -93,6 +93,7 @@
         this.toolbar = null;
         this._className = "tree";
         cri.Widgets.apply(this,arguments);
+        this.$element.attr('data-role','tree');
     });
 
     $.extend(Tree.prototype,{

@@ -20,44 +20,67 @@
     </style>
 </head>
 <body>
-<div id="window1">
-    <button onclick="openWindow2()">kai</button>
-</div>
-<div id="window2" style="display:none;">
-    <select id="select_color" name="color" title="颜色" class="eb_selectBox" data-options="required:true,defaultVal:'0'">
-        <option value="0">黑色</option>
-        <option value="1">白色</option>
+<div id="window1"></div>
+<div id="window2" style="display:none;"></div>
+<div id="window3" style="display:none;"></div>
+<div id="window4" style="display:none;"></div>
+<div id="window5" style="display:none;"></div>
+<div id="inputWin" style="display:none;">
+    <input name="input">
+    <input name="timeInput">
+    <select name="selectBox">
+        <option value="1">A</option>
+        <option value="2">B</option>
+        <option value="2">C</option>
+        <option value="3">D</option>
+        <option value="4">E</option>
+        <option value="5">F</option>
     </select>
-    <select id="select_type" name="type" title="类型" class="eb_selectBox" data-options="required:true,defaultVal:'0'">
-        <option value="0">参数</option>
-        <option value="1">IP</option>
-    </select>
-    <input type="text" class="eb_input" title="值" name="bwlistValue" placeholder="请输入值" value="" id="bwlistValueAdd" data-options="required:true" />
-    <textarea name="description" class="eb_textarea" title="描述" data-options="width:510"></textarea>
+    <button id="button"></button>
 </div>
 <script>
-    var win = $("#window1").window({
+    var win1 = $("#window1").window({
         title:"window1",
         actions:["Maximize","Close","Minimize"],
         position:{left:10,top:10}
     });
-    win.close();
-    $("#window1").window({
-        title:"window1",
-        actions:["Maximize","Close","Minimize"],
-        position:{left:10,top:10}
+    var win2 = $("#window2").window({
+        title:"window2",
+        modal:true
     });
-    /*
-    function openWindow2(){
-        $("#window2").window({
-            title:"window2",
-            actions:["Maximize","Close","Minimize"],
-            modal:true,
-            position:{left:10,top:10}
-        });
-    }
-    */
-    function buttonAdd(){}
+
+    var win3 = $("#window3").window({
+        title:"window3",
+        modal:true
+    });
+    var win4 = $("#window4").window({
+        title:"window4"
+    });
+    var win5 = $("#window5").window({
+        title:"window5",
+        modal:true
+    });
+
+    $("#inputWin").window({
+        title:"window5",
+        modal:true,
+        onReady:function(){
+            $("[name=input]").input();
+            $("[name=timeInput]").timeInput();
+            $("[name=selectBox]").selectBox();
+            $("#button").button();
+        }
+    });
+    $("#inputWin").window({
+        title:"window5",
+        modal:true,
+        onReady:function(){
+            $("[name=input]").input();
+            $("[name=timeInput]").timeInput();
+            $("[name=selectBox]").selectBox();
+            $("#button").button();
+        }
+    });
 </script>
 </body>
 </html>

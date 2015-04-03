@@ -27,6 +27,16 @@
         text-align: right;
         word-break: normal;
         white-space: nowrap;
+		&.required{
+			&:after{
+				content:'*';
+				color:red;
+				display:inline-block;
+				height: 26px;
+				line-height: 26px;
+				margin-left:5px;
+			}
+		}
     }
 
     .input{
@@ -117,8 +127,8 @@
         top: 0;
         right: 0;
         bottom: 0;
-        left: 0;
-        background: #d7d7d7;
+        left: 80px;
+        background: #f4f4f4;
         filter: alpha(opacity=50);
         opacity: .5;
     }

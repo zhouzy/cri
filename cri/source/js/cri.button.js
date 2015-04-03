@@ -25,14 +25,14 @@
         this.$inputGroup = null;
         this.$button     = null;
         cri.Widgets.apply(this,arguments);
+        this.$element.attr('data-role','button');
     });
 
     $.extend(Button.prototype,{
         _eventListen:function(){
-            var that = this,
-                enable = this.options.enable;
+            var that = this;
             this.$button.on("click",function(){
-                enable && that.options.handler && that.options.handler.call();
+                that.options.enable && that.options.handler && that.options.handler.call();
             });
         },
 
@@ -57,12 +57,12 @@
 
         enable:function(){
             this.$button.removeClass("disabled");
-            this.options.enable = false;
+            this.options.enable = true;
         },
 
         disable:function(){
             this.$button.addClass("disabled");
-            this.options.enable = true;
+            this.options.enable = false;
         }
     });
 
@@ -75,7 +75,7 @@
                 button  = $this.data('button'),
                 options = typeof option == 'object' && option;
             if(button != null){
-                button._destory();
+                button._destroy();
             }
             $this.data('button', (o = new Button(this, options)));
         });

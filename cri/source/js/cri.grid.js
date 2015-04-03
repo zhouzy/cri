@@ -2,7 +2,7 @@
  * Author zhouzy
  * Date   2014/9/18
  * grid 组件
- * dependens Pager
+ * include Pager
  */
 !function(window){
 
@@ -21,36 +21,6 @@
         _cellMinW     = 5;  //单元格最小宽度
 
     /**
-     * 计算表格高度
-     * 1.若初始化时，定义了高度属性
-     * 2.若设置了高度属性(height)
-     * 3.若设置了高度样式
-     * 4.都未定义 默认auto
-     * @param $ele
-     * @param height 初始化时指定的高度
-     * @private
-     */
-    function _getElementHeight($ele,height){
-        var styleHeight = $ele[0].style.height,
-            propHeight  = $ele[0].height,
-            calHeight   = height || styleHeight || propHeight;
-
-        if(calHeight){
-            var arr = ("" + calHeight).split("%");
-            if(arr.length>1){
-                calHeight = Math.floor($ele.parent().height() * arr[0] / 100);
-            }
-            calHeight = (""+calHeight).split("px")[0];
-            if(calHeight){
-                return parseInt(calHeight);
-            }
-        }
-        else{
-            return null;
-        }
-    }
-
-    /**
      * 获取Grid每列信息
      * @param $table        原始 table jquery对象
      * @param optionColumns 使用 options.columns 初始化列属性
@@ -67,13 +37,12 @@
                     fieldArr += "{title:\'" + title + "\'," + data + "},";
                 }
                 else{
-                    fieldArr  += "{title:\'" + title + "\'},";
+                    fieldArr += "{title:\'" + title + "\'},";
                 }
             });
             fieldArr += "]";
             fieldArr = fieldArr.replace(/\},\]/g, "}]").replace(/\],\]/g, "]]");
-
-            return (new Function("return " + fieldArr))();
+            return cri.parseJSON(fieldArr);
         }());
 
         $.map(columns,function(column){
@@ -88,7 +57,6 @@
 
     /**
      * 表格默认属性
-     * @type {{url: null, param: {}, title: null, toolbar: null, columns: null, rows: null, onChange: null, onDblClick: null, rowNum: boolean, checkBox: boolean, onChecked: null, pagination: boolean, page: number, pageSize: number, total: number, ajaxDone: null, ajaxError: null}}
      * @private
      */
     var _defaultOptions = {
@@ -130,14 +98,18 @@
     });
 
     $.extend(Grid.prototype,{
+        /**
+         * 监听用户事件
+         * @private
+         */
         _eventListen:function(){
-            var that = this;
-            var op = this.options;
-            var dragStartX = 0;
-            var clickTimer = null;
+            var that       = this,
+                op         = this.options,
+                dragStartX = 0,
+                clickTimer = null;
 
             this.$gridbody
-                .on("scroll",function(e){
+                .on("scroll",function(){
                     $(".grid-head-wrap",that.$gridhead).scrollLeft($(this).scrollLeft());
                 })
                 .on('click', "tr", function(e){
@@ -203,6 +175,10 @@
                 });
         },
 
+        /**
+         * 初始化组件HTML结构
+         * @private
+         */
         _init:function() {
             this._columns = _getColumnsDef(this.$element,this.options.columns);
             this._createGrid();
@@ -214,10 +190,18 @@
             this._colsWidth();
         },
 
+        /**
+         * 初始化表格HTML结构
+         * @private
+         */
         _createGrid:function(){
-            var height = _getElementHeight(this.$element,this.options.height);
-            var $grid = $("<div></div>").addClass("grid").addClass(this._gridClassName);
-            $grid.attr("style",this.$element.attr("style")).show().css("height",height);
+            var height = this.$element._getHeightPixelValue(this.options.height);
+            var width  = this.$element._getWidthPixelValue(this.options.width);
+            var $grid  = $("<div></div>").addClass("grid").addClass(this._gridClassName);
+            height && (height-=2);//减去border
+            width && (width-=2);
+            $grid.attr("style",this.$element.attr("style"))
+                .css({width:width,height:height,display:'block'});
             this.$element.wrap($grid);
             this.$element.hide();
             this.$grid = this.$element.parent();
@@ -226,6 +210,12 @@
             this._createGridView(this.$grid,height);
         },
 
+        /**
+         * 初始化表格 View HTML 结构
+         * @param $parent
+         * @param height
+         * @private
+         */
         _createGridView:function($parent,height){
             this.$gridview = $("<div></div>").addClass("grid-view");
             this.$gridhead = $("<div></div>").addClass("grid-head");
@@ -241,6 +231,11 @@
             this.$grid.append(this.$gridbody);
         },
 
+        /**
+         * 初始化表格标题 HTML 结构
+         * @param $grid
+         * @private
+         */
         _createTitle:function($grid){
             if(this.options.title){
                 this.$title = $('<div class="title"><span>' + this.options.title + '</span></div>');
@@ -248,6 +243,11 @@
             }
         },
 
+        /**
+         * 初始化表格头 HTML 结构
+         * @param $parent
+         * @private
+         */
         _createHead:function($parent){
             var $headWrap = $("<div></div>").addClass("grid-head-wrap"),
                 $table    = $("<table></table>"),
@@ -288,6 +288,12 @@
             $parent.html($headWrap.html($table));
         },
 
+        /**
+         * 初始化表格数据部分 HTML 结构
+         * @param gridBodyHeight
+         * @returns {*|HTMLElement}
+         * @private
+         */
         _createBody:function(gridBodyHeight){
             var $gridbody = $('<div class="grid-body loading"></div>'),
                 $loadingIcon = $('<i class="fa fa-spinner fa-spin"></i>').addClass("loadingIcon");
@@ -328,7 +334,7 @@
                     var $td = $('<td></td>');
                     var $content = $('<div></div>').addClass('td-content');
                     var column = columns[j],
-                        text   = row[column.field] || "",
+                        text   = row[column.field]==null ? "" : row[column.field],
                         _text  = ("" + text).replace(/<.\w+\s*[^<]+>/g,"");
                     $content.prop("title",_text).text(_text);
                     $td.append(_text);
@@ -343,35 +349,41 @@
              */
             $("tr:nth-child(odd)",$table).css("background","#FFF");
             /**
-             *根据gird-body纵向滚动条宽度决定headWrap rightPadding
+             * 根据gird-body纵向滚动条宽度决定headWrap rightPadding
+             * 当grid-body为空时，在IE下不能取到clientWidth
              */
-            var scrollBarW = this.$gridbody.width()-this.$gridbody.prop("clientWidth");
-            this.$gridhead.css("paddingRight",scrollBarW);
-
-        },
-
-        _createColGroup:function(parentWidth){
-            var $colgroup= $("<colgroup></colgroup>"),
-                op       = this.options,
-                columns  = this._columns,
-                width    = 0;
-            op.checkBox && $colgroup.append($("<col/>").width(30)) && (width+=30);
-            op.rowNum   && $colgroup.append($("<col/>").width(25)) && (width+=20);
-            /**
-             * 当表格列宽总长度小于table宽度，设置最后一列宽度为auto,避免checkBox与rowNum列自动计算宽度
-             */
-            for(var i= 0,len=columns.length; i<len;i++){
-                var $col = $("<col/>");
-                var columnWidth = columns[i]._width;
-                columnWidth && $col.width(columnWidth) && (width+=columnWidth);
-                if(width < parentWidth){
-                    $col.width("auto");
-                }
-                $colgroup.append($col);
+            var clientWidth = this.$gridbody.prop("clientWidth");
+            if(clientWidth){
+                var scrollBarW = this.$gridbody.width()-clientWidth;
+                this.$gridhead.css("paddingRight",scrollBarW);
             }
-            return $colgroup;
         },
 
+        /**
+         * 生成 cols HTML 结构
+         * @param parentWidth
+         * @returns {*|HTMLElement}
+         * @private
+         */
+        _createColGroup:function(parentWidth){
+            var $cols   = [],
+                op      = this.options,
+                columns = this._columns;
+            op.checkBox && $cols.push($("<col/>").width(30));
+            op.rowNum   && $cols.push($("<col/>").width(25));
+            for(var i = 0,len = columns.length; i<len; i++){
+                var $col = $("<col/>");
+                columns[i]._width && $col.width(columns[i]._width);
+                $cols.push($col);
+            }
+            return $("<colgroup></colgroup>").append($cols);
+        },
+
+        /**
+         * 生成工具栏 HTML 结构
+         * @param $parent
+         * @private
+         */
         _createToolbar:function($parent){
             if(this.options.toolbar) {
                 this.toolbar = new cri.ToolBar($parent, {
@@ -380,6 +392,10 @@
             }
         },
 
+        /**
+         * 生成翻页 HTML 结构
+         * @private
+         */
         _createPage:function(){
             var op = this.options;
             var grid = this;
@@ -398,6 +414,11 @@
             }
         },
 
+        /**
+         * 获取数据
+         * @returns {boolean}
+         * @private
+         */
         _getData:function(){
             var result = true,
                 op     = this.options,
@@ -417,6 +438,7 @@
                     that._rows = data.rows || [];
                     op.total = data.total || 0;
                     that.pager && that.pager.update(op.page,op.pageSize,op.total,that._rows.length);
+                    $('input[type=checkbox]',that.$gridhead).prop("checked",false);
                     that._refreshBody(that.$gridbody);
                 },
                 error: function(XMLHttpRequest, textStatus, errorThrown){
@@ -484,10 +506,21 @@
             });
         },
 
+        /**
+         * 根据 rowid 获取某一行的数据
+         * @param rowid
+         * @returns {*}
+         * @private
+         */
         _getRowDataById:function(rowid){
             return this._rows[parseInt(rowid)];
         },
 
+        /**
+         * 当用户双击某一行触发
+         * @param e
+         * @private
+         */
         _onDblClickRow:function(e){
             var that  = this,
                 op    = this.options,
@@ -503,6 +536,10 @@
             op.onDblClick && op.onDblClick.call(that,that._getRowDataById(rowid));
         },
 
+        /**
+         * 根据 param 重新加载表格
+         * @param param
+         */
         reload:function(param){
             param && (this.options.param = param);
             this.options.page = 1;
@@ -510,6 +547,10 @@
             this._getData();
         },
 
+        /**
+         * 根据 param 指定的数据加载表格
+         * @param param
+         */
         loadData:function(param){
             if(param.push){
                 this._rows = param;
@@ -517,6 +558,10 @@
             }
         },
 
+        /**
+         * 获取用户选择的数据
+         * @returns {Array}
+         */
         getSelected:function(){
             var selected = [],
                 selectedId = this._selectedId;

@@ -15,6 +15,7 @@
         this._gridClassName = "treegrid";
         cri.Grid.apply(this,arguments);
         this._selfEvent();
+        this.$element.attr('data-role','treegrid');
     });
 
     TreeGrid.prototype._selfEvent = function(){
@@ -32,11 +33,14 @@
             columns = this._columns,
             lineNum = 1,
             paddingLeft = 1,
+            that = this,
             iconWidth = 6;
+
         $table.append(this._createColGroup($parent.width()));
         /**
          * 拼装每行HTML
          */
+        this._selectedId = [];
         !function getRowHtml(rows,isShow,id){
             for(var i = 0,len = rows.length; i<len; i++){
                 var $tr = $("<tr></tr>").data("rowid",++id).attr("data-rowid",id);
@@ -45,10 +49,13 @@
                 isShow == "show" || $tr.hide();
 
                 if(op.checkBox){
-                    row.check ?
-                        $tr.append($("<td></td>").addClass("line-checkbox").append('<input type="checkbox" checked/>')):
+                    if(row.check){
+                        $tr.addClass("selected");
+                        $tr.append($("<td></td>").addClass("line-checkbox").append('<input type="checkbox" checked/>'));
+                        that._selectedId.push(id);
+                    }else{
                         $tr.append($("<td></td>").addClass("line-checkbox").append('<input type="checkbox"/>'));
-
+                    }
                 }
                 if(op.rowNum){
                     $tr.append($("<td></td>").addClass("line-number").append(lineNum++));
@@ -81,7 +88,7 @@
 
             $.each(colDef,function(index){
                 var $td = $("<td></td>");
-                var text  = colData[this.field] || "";
+                var text   = colData[this.field]==null ? "" : colData[this.field];
 
                 if(this.field == "text"){
                     var $icon = $("<i></i>").attr("class",fileIcons.file);

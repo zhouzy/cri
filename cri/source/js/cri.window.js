@@ -37,7 +37,6 @@
         if(/^\d+px$/g.test(width)){
             return parseInt(width.split("px")[0]);
         }
-
         //整数
         return parseInt(width) || 0;
     }
@@ -58,7 +57,6 @@
         if(/^\d+px$/g.test(height)){
             return parseInt(height.split("px")[0]);
         }
-
         //整数
         return parseInt(height) || 0;
     }
@@ -78,7 +76,7 @@
         onReady:null,//当窗口初始化完成时触发
         onOpen:null,//窗口打开时触发
         onClose:null,//窗口关闭时触发
-        onMaxmize:null,//窗口最大化时触发
+        onMaximize:null,//窗口最大化时触发
         onMinimize:null,//窗口最小化时触发
         onResume:null//窗口复原时触发
     };
@@ -87,7 +85,9 @@
         this.options = _defaultOptions;
         this.windowStatus = "normal";
         cri.Widgets.apply(this,arguments);
-        Window.prototype.windowStack.push(this);
+        this.windowStack.push(this);
+        this.toFront();
+        this.$element.attr('data-role','treegrid');
     });
 
     $.extend(Window.prototype,{
@@ -184,10 +184,10 @@
             op.width = parseWidth(op.width,$(window).width()) - WINDOW_BORDER*2;
             op.height = parseHeight(op.height,$(window).height()) - WINDOW_PADDING - WINDOW_BORDER*2;
             this._createBody();
-            this._overlay();
             this._createHead();
             op.resizable && this._createResizeHandler();
             $("body").append(this.$window);
+            this.$element.show();
             if(op.visible){
                 this.$window.show();
             }else{
@@ -224,17 +224,11 @@
                 op.position.left = (viewWidth - op.width - 2*WINDOW_BORDER) / 2;
                 op.position.top  = (viewHeight - op.height - WINDOW_PADDING - 2*WINDOW_BORDER) / 2;
             }
-            $window.css({zIndex:this._zIndex()});
-
             this._setPosition({top:op.position.top,left:op.position.left,width:op.width,height:op.height});
-
             $window.append($windowBody);
-
             $windowBody.append($element);
-
-            this.load(this.options.content);
-
             $("body").append(this.$window);
+            this.load(this.options.content);
         },
 
         /**
@@ -244,8 +238,7 @@
          */
         _createTitle : function(){
             var title = this.options.title || "";
-            var $title = $("<span></span>").addClass("title").text(title);
-            return $title;
+            return $("<span></span>").addClass("title").text(title);
         },
 
         /**
@@ -288,18 +281,16 @@
         },
 
         /**
-         * 生成模态窗口背景遮罩
+         * 设置模态窗口背景遮罩
          * @private
          */
-        _overlay : function(){
-            if(this.options.modal){
-                var zIndex = +this.$window.css("zIndex");
-                this.$window.css("zIndex",(zIndex+1));
-                var $overlay = $(".overlay");
-                if($overlay.length == 0){
-                    $overlay = $("<div></div>").addClass("overlay");
-                    $("body").append($overlay);
-                }
+        _overlay : function(zIndex){
+            var $overlay = $(".overlay");
+            if($overlay.length == 0){
+                $overlay = $("<div></div>").addClass("overlay").css("zIndex",zIndex);
+                $("body").append($overlay);
+            }
+            else{
                 $overlay.css("zIndex",zIndex).show();
             }
         },
@@ -334,7 +325,7 @@
         /**
          * 由最小化打开窗口
          */
-        open : function(){
+        open:function(){
             this._setStyleByStatus("normal");
             $(".window-content",this.$window).show();
             this.windowStatus = "normal";
@@ -343,44 +334,24 @@
 
         /**
          * 关闭当前窗口
-         *
-         * 隐藏并且放置到最底层
+         * 销毁当前窗口
          */
         close : function(){
-            var max      = ZINDEX,
-                frontWnd = null,
-                $windows = $(".window"),
-                $overlay = $(".overlay");
-
-            this.$window.css("zIndex",ZINDEX).hide();
-            this.windowStatus = "close";
-            this.$window.removeClass("mini-window");
-            $windows.each(function(){
-                var z = +this.style.zIndex + 1;
-                this.style.zIndex = z;
-                if(z >= max){
-                    max = z;
-                    frontWnd = this;
-                }
-            });
-            //当所有显示的窗口没有模态窗口时，隐藏overlay,也就是找到一个显示的模态窗口就显示overlay
-            $overlay.hide();
-            for(var i=this.windowStack.length - 1; i>=0; i--){
-                if(this.windowStack[i].windowStatus != "close" && this.windowStack[i].options.modal){
-                    frontWnd.style.zIndex = max+1;
-                    $overlay.css("zIndex",max);
-                    $overlay.show();
-                    return ;
-                }
-            }
             this.options.onClose && this.options.onClose.call(this);
+            this._destroy();
+            if(this.windowStack.length){
+                this.windowStack[this.windowStack.length-1].toFront();
+            }
+            else{
+                $(".overlay").hide();
+            }
         },
 
         /**
          * 最大化窗口
          * 最大化后 复原、关闭
          */
-        maximize : function(){
+        maximize:function(){
             this._setStyleByStatus("maximize");
             this._setButtons("maximize");
             this.windowStatus = "maximize";
@@ -472,35 +443,40 @@
         },
 
         /**
-         * 把当前窗口顶至最前,与之前最上层窗口替换
+         * 销毁自身
+         * @private
          */
-        toFront : function(){
-            /**
-             * 轮询窗口，取最大zindex,替换zindex
-             */
-            var frontWnd = this._getFrontWindow();
-            if(this.$window != frontWnd){
-                var zIndex = +this.$window.css("zIndex");
-                this.$window.css("zIndex",frontWnd.css("zIndex"));
-                frontWnd.css("zIndex",zIndex);
-            }
+        _destroy : function(){
+            var $element = this.$element.hide(),
+                $wrapper = $element.parents(".window");
+            var index = this.windowStack.indexOf(this);
+            index>=0 && this.windowStack.splice(index,1);
+            $wrapper.after($element).remove();
         },
 
         /**
-         * 获取最上层窗口
-         * @private
+         * 把当前窗口顶至最前
          */
-        _getFrontWindow : function(){
-            var zIndex = +this.$window.css("zIndex"),
-                wnd = this.$window;
-            $(".window").each(function(){
-                var tempZIndex = +this.style.zIndex;
-                if(tempZIndex  > zIndex){
-                    wnd = $(this);
-                    zIndex = tempZIndex;
+        toFront:function(){
+            $(".overlay").hide();
+            var stack = this.windowStack;
+            var index = stack.indexOf(this);
+            stack.splice(index,1);
+            stack.push(this);
+            var len = stack.length;
+            for(var i=len-1;i>=0;i--){
+                if(stack[i].options.modal){
+                    for(var j=0;j<len;j++){
+                        j<i?stack[j].$window.css('zIndex',ZINDEX+j):
+                            stack[j].$window.css('zIndex',ZINDEX+j+1);
+                    }
+                    this._overlay(ZINDEX+i);
+                    break;
                 }
-            });
-            return wnd;
+                else{
+                    stack[i].$window.css('zIndex',ZINDEX+i);
+                }
+            }
         },
 
         load:function(content){
@@ -509,6 +485,7 @@
                 op = this.options,
                 $loadingIcon = $('<i class="fa fa-spinner fa-spin"></i>').addClass("loadingIcon");
             if(content){
+                $element.empty();
                 $element.addClass("loading").html($loadingIcon);
                 $element.load(content,function(response,status){
                     $element.removeClass("loading");
@@ -518,26 +495,8 @@
             }else{
                 op.onReady && op.onReady.call(that,that.$window);
             }
-        },
-
-        /**
-         * 获取最大zIndex
-         * @returns {number}
-         * @private
-         */
-        _zIndex : function(){
-            var zindex = ZINDEX;
-            $(".window").each(function(i,element){
-                zindex = Math.max(+this.style.zIndex,zindex);
-            });
-            return ++zindex;
-        },
-
-        _destory : function(){
-            var $element = this.$element,
-                $warpper = $element.parents(".window");
-            $warpper.after($element).remove();
         }
+
     });
 
     cri.Window = Window;
@@ -549,16 +508,7 @@
                 wnd     = $this.data('window'),
                 options = typeof option == 'object' && option;
             if(wnd != null) {
-                o = wnd;
-                if(!option.visible) {
-                    o.$window.show();
-                    o.toFront();
-                }
-                else{
-                    o.$window.hide();
-                }
-                    return false;
-                    //wnd._destory();
+                wnd.close();
             }
             $this.data('window', (o = new Window(this, options)));
         });

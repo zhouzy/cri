@@ -28,13 +28,14 @@
         this.options = _defaultOptions;
         this.$selectBoxGroup = null;
         this.input = null;
+        this.listView = null;
         this._value = null;
         this._text = null;
         cri.Widgets.apply(this,arguments);
+        this.$element.attr('data-role','selectbox');
     });
 
     $.extend(SelectBox.prototype,{
-
         _init:function(){
             this._create();
             var value = this.options.value || this.$element.val();
@@ -134,6 +135,18 @@
                 }
             }
         },
+
+        /**
+         * 销毁组件
+         * @private
+         */
+        _destroy:function(){
+            this.listView._destroy();
+            this.$selectBoxGroup.replaceWith(this.$element);
+            this.input = null;
+            this.listView = null;
+        },
+
         /**
          * 使输入框不能用
          */
@@ -197,10 +210,18 @@
             this._data();
             this._setSelectOptions(options);
             options.length && this.value(options[0].value);
-            this.listView.destory();
+            this.listView._destroy();
             this._createListView();
-        }
+        },
 
+        /**
+         * 选择第几个下拉选项
+         * @param index
+         */
+        select:function(index){
+            index = parseInt(index) || 0;
+            index>=0 && index<this.options.data.length && this.value(this.options.data[index].value);
+        }
     });
 
     var ListView = function($parent,options){
@@ -321,7 +342,7 @@
         /**
          * 销毁ListView
          */
-        destory:function(){
+        _destroy:function(){
             this.$options.remove();
         }
     };
@@ -335,7 +356,7 @@
                 options = typeof option == 'object' && option;
             o = $this.data('selectBox');
             if(o != null){
-                o._destory();
+                o._destroy();
             }
             $this.data('selectBox', (o = new SelectBox(this, options)));
         });
