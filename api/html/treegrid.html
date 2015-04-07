@@ -2,9 +2,253 @@
     <div class="name">cri.TreeGrid</div>
     <div class="des">树形列表组件,继承Grid</div>
 </div>
-<div id="grid"></div>
-<script type="text/javascript">
-    $(function(){
-        $("#grid").load('./html/grid.html');
-    });
-</script>
+<h2>属性</h2>
+<h3 class="item-head">
+    <span class="name">title</span>
+    <span class="type">String</span>
+</h3>
+<div class="item-body">定义题标</div>
+
+<h3 class="item-head">
+    <span class="name">height</span>
+    <span class="type">Number|String|百分比</span>
+</h3>
+<div class="item-body">
+    <p>定义表格高度;</p>
+    <p>未指定时,依次查找style中的高度、height属性;如果都未设置，则高度随着表格数据行的增加而增加;</p>
+    <p>接受String,最后会转化为Number;</p>
+    <p>接受百分比,当父节点未指定高度，该值会忽略。</p>
+</div>
+
+<h3 class="item-head">
+    <span class="name">width</span>
+    <span class="type">Number|String|百分比</span>
+</h3>
+<div class="item-body">
+    <p>定义表格宽度;</p>
+    <p>未指定时,依次查找style中的宽度、width属性;如果都未设置,则为父节点的100%;</p>
+    <p>当设置为百分比时，如果父节点隐藏或者未指定宽度，该值无效</p>
+</div>
+
+<h3 class="item-head">
+    <span class="name">toolbar</span>
+    <span class="type">Array</span>
+</h3>
+<div class="item-body">
+    <p>定义表格工具栏</p>
+    <pre class="code"><code>
+        text:按钮文本
+        iconCls:按钮图标,根据项目使用的字体库,cri默认依赖Font-Awesome字体库,请到Font-Awesome挑选图标
+        handler:回调函数
+        toolbar:[{text:'添加',iconCls:'fa fa-plus',handler:addFun},
+            {text:'删除',iconCls:'fa fa-times',handler:deleteFun},
+            {text:'修改',iconCls:'fa fa-pencil',handler:updateFun}
+        ]
+    </code></pre>
+</div>
+
+<h3 class="item-head">
+    <span class="name">url</span>
+    <span class="type">String</span>
+</h3>
+<p class="item-body">数据请求地址</p>
+
+<h3 class="item-head">
+    <span class="name">param</span>
+    <span class="type">Object</span>
+</h3>
+<p class="item-body">请求数据参数</p>
+
+<h3 class="item-head">
+    <span class="name">checkBox</span>
+    <span class="type">Boolean</span>
+</h3>
+<p class="item-body">是否显示checkBox,true:左侧出现checkbox列,默认false</p>
+
+<h3 class="item-head">
+    <span class="name">rowNum</span>
+    <span class="type">Boolean</span>
+</h3>
+<p class="item-body">是否显示行号,true:显示,false:不显示.默认false</p>
+
+<h3 class="item-head">
+    <span class="name">columns</span>
+    <span class="type">Array</span>
+</h3>
+<div class="item-body">
+    <p>详细定义每列属性,指定该属性后，将覆盖在 table tr 中定义的 data-options</p>
+    <p>可设置width,指定列的宽度,未设置该值,该列宽度为auto</p>
+    <p>可设置title,指定列的title属性</p>
+    <p>可设置style,个性化某一列的样式</p>
+    <pre class="code"><code>
+        columns:[
+        {field:'fieldNameA',width:100,style:{color:'red',text-align:'center'}},
+        {field:'fieldNameB',width:200,title:'这个是fieldNameB'},
+        {field:'fieldNameC',width:200}
+        ]
+    </code></pre>
+    <div class="sub-item">
+        <h3 class="sub-item-title">
+            树形表格的后台数据中，请注意以下几个字段:
+        </h3>
+        <h3 class="sub-item-head">text</h3>
+        <p>显示为树形结构列，PO中必须包含text字段</p>
+        <h3 class="sub-item-head">hasChildren</h3>
+        <p>该值为true时，认为该节点有子节点，继续通过state参数判断展开节点还是闭合节点</p>
+        <h3 class="sub-item-head">children</h3>
+        <p>子节点数据,当hasChildren未设置或者值为null,将判断children参数来确定当前节点是否为父节点</p>
+        <h3 class="sub-item-head">state</h3>
+        <p>通过hasChildren和children判断出该节点为父节点后，将通过state字段来确定是否展开节点</p>
+    </div>
+</div>
+
+<h3 class="item-head">
+    <span class="name">pagination</span>
+    <span class="type">Boolean</span>
+</h3>
+<p class="item-body">是否分页,true:分页,false:不分页.默认true</p>
+
+<h3 class="item-head">
+    <span class="name">page</span>
+    <span class="type">Number</span>
+</h3>
+<p class="item-body">当前页数.默认1</p>
+
+<h3 class="item-head">
+    <span class="name">pageSize</span>
+    <span class="type">Number</span>
+</h3>
+<p class="item-body">每页显示数据条数.默认10</p>
+
+<h2>方法</h2>
+
+<h3 class="item-head">
+    <span class="name">reload</span>
+</h3>
+<div class="item-body">
+    <p>根据参数重新请求数据刷新表格</p>
+    <p>该方法将会清空已选择项</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">参数</h3>
+        <h3 class="sub-item-head">
+            <span class="name">param</span>
+            <span class="type">Object</span>
+        </h3>
+        <p>请求参数，未指定时，使用上一次请求参数</p>
+    </div>
+</div>
+
+<h3 class="item-head">
+    <span class="name">getSelected</span>
+</h3>
+<div class="item-body">
+    <p>获取用户当前选择的所有节点数据</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">返回值</h3>
+        <h3 class="sub-item-head">
+            <span class="type">Array</span>
+        </h3>
+        <p>返回值为数组，当用户只选择一行数据时，数组长度为1，未选择时长度为0</p>
+    </div>
+</div>
+
+<h3 class="item-head">
+    <span class="name">loadData</span>
+</h3>
+<div class="item-body">
+    <p>根据参数中的数据构造Grid</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">参数</h3>
+        <h3 class="sub-item-head">
+            <span class="name">data</span>
+            <span class="type">Array</span>
+        </h3>
+        <pre class="code"><code>
+            var grid = $("#tt").datagrid();
+            grid.loadData([
+            {fieldA:'A',fieldB:'B',fieldC:'C'},
+            {fieldA:'A',fieldB:'B',fieldC:'C'},
+            {fieldA:'A',fieldB:'B',fieldC:'C'},
+            {fieldA:'A',fieldB:'B',fieldC:'C'},
+            {fieldA:'A',fieldB:'B',fieldC:'C'}
+            ]);
+        </code></pre>
+    </div>
+</div>
+
+<h2>事件</h2>
+
+<h3 class="item-head">
+    <span class="name">onChange</span>
+</h3>
+<div class="item-body">
+    <p>当用户选择某行，获取取消选择莫行，或者通过表头的checkBox改变选择行，触发该事件</p>
+    <p>在方法中，this 指向 grid 实例</p>
+</div>
+
+<h3 class="item-head">
+    <span class="name">onSelected</span>
+</h3>
+<div class="item-body">
+    <p>当用户选择了一行或者多行时触发该事件</p>
+    <p>在方法中，this 指向 grid 实例</p>
+</div>
+
+<h3 class="item-head">
+    <span class="name">onDblClick</span>
+</h3>
+<div class="item-body">
+    <p>当双击表格行时，触发该事件</p>
+    <p>在方法中，this 指向 grid 实例</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">事件数据</h3>
+        <h3 class="sub-item-head">
+            <span class="name">selectData</span>
+            <span class="type">Object</span>
+        </h3>
+        <pre class="code"><code>
+            var grid = $("#tt").datagrid({
+            onDblClick:function(selectData){
+            console.dir(selectData);//用户当前双击选择的行数据
+            console.dir(this.getSelected());//用户当前选择的所有行数据，this指向grid实例
+            }
+            });
+
+        </code></pre>
+    </div>
+</div>
+
+<h3 class="item-head">
+    <span class="name">onLoad</span>
+</h3>
+<div class="item-body">
+    <p>当表格完成HTML构造后触发</p>
+    <p>在方法中，this 指向 grid 实例</p>
+</div>
+
+<h3 class="item-head">
+    <span class="name">ajaxDone</span>
+</h3>
+<div class="item-body">
+    <p>数据请求成功后触发</p>
+    <p>在方法中，this 指向 grid 实例</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">事件数据</h3>
+        <h3 class="sub-item-head">
+            <span class="name">data</span>
+            <span class="type">Object</span>
+        </h3>
+        <p>向该回调函数传入ajax请求到的数据，如果回调函数返回处理后的data，就使用该值生成表格,否则，则使用ajax请求到的数据生成表格</p>
+        <pre class="code"><code>
+            $("#tt").datagrid({
+            ajaxDone:function(data){
+            console.dir(data);//ajax请求到的数据
+            //TODO:对数据进行一些处理
+
+            return data;//返回处理后的数据
+            }
+            });
+        </code></pre>
+    </div>
+</div>
+

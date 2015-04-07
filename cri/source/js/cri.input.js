@@ -18,7 +18,6 @@
         readonly:false,
         onFocus:null,
         onBlur:null,
-        onClick:null,
         enable:true,
         required:false
     };

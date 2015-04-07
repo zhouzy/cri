@@ -3,78 +3,189 @@
     <div class="des">cri框架基础方法</div>
 </div>
 
-<h2>方法</h2>
+<h2>jQuery 拓展方法</h2>
 <h3 class="item-head">
-    <div class="name">formValue</div>
-    <div class="type">Object</div>
+    <span class="name">formValue</span>
 </h3>
-<p class="item-body">
-    获取或者设置表单值
+<div class="item-body">
+    <p>获取或者设置表单值</p>
     <pre class="code"><code>
         //获取值
         var nameValues = $("form").formValue();
-
         //设置值
         $("form").formValue(nameValues);
     </code></pre>
-</p>
+</div>
 <h3 class="item-head">
-    <div class="name">isLeapYear</div>
-    <div class="type">Boolean</div>
+    <span class="name">formReset</span>
 </h3>
-<p class="item-body">
-    判断闰年
+<div class="item-body">
+    <p>重置表单</p>
+    <p>该方法可接收一个对象，用来指定某些字段的默认值</p>
+    <h3 class="sub-item-title">参数</h3>
+    <h3 class="sub-item-head"><span class="name">data</span></h3>
+    <pre class="code"><code>
+        $("form").formReset({
+            fieldA:'abc',
+            fieldB:123
+        });
+    </code></pre>
+</div>
+
+<h2>日期类工具函数</h2>
+
+<h3 class="item-head">
+    <span class="name">isLeapYear</span>
+</h3>
+<div class="item-body">
+    <p>判断闰年</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">参数</h3>
+        <h3 class="sub-item-head">
+            <span class="name">year</span>
+            <span class="type">Number|String</span>
+        </h3>
+        <p>整数年份,或者字符串</p>
+    </div>
+    <div class="sub-item">
+        <h3 class="sub-item-title">返回值</h3>
+        <h3 class="sub-item-head">
+            <span class="type">Boolean</span>
+        </h3>
+    </div>
     <pre class="code"><code>
         var isLeapYear = cri.isLeapYear(new Date());
     </code></pre>
-</p>
+</div>
 <h3 class="item-head">
-    <div class="name">formatDate</div>
-    <div class="type">String</div>
+    <span class="name">formatDate</span>
 </h3>
-<p class="item-body">
-    转换日期成字符串
+<div class="item-body">
+    <p>将日期转换成指定日期格式的字符串</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">参数</h3>
+        <h3 class="sub-item-head">
+            <span class="name">date</span>
+            <span class="type">Date</span>
+        </h3>
+        <p>准备转化的日期对象</p>
+        <h3 class="sub-item-head">
+            <span class="name">formatStr</span>
+            <span class="type">String</span>
+        </h3>
+        <p>日期格式串,未指定该值时,默认使用 'yyyy-MM-dd' 格式串</p>
+        <p>YYYY/yyyy/YY/yy 表示年份</p>
+        <p>MM/M 月份</p>
+        <p>W/w 星期</p>
+        <p>dd/DD/d/D 日期</p>
+        <p>hh/HH/h/H 时间</p>
+        <p>mm/m 分钟</p>
+        <p>ss/SS/s/S 秒</p>
+    </div>
+    <div class="sub-item">
+        <h3 class="sub-item-title">返回值</h3>
+        <h3 class="sub-item-head">
+            <span class="type">String</span>
+        </h3>
+        <p>格式化后的日期字符串</p>
+    </div>
     <pre class="code"><code>
-        var dateStr = cri.formatDate(new Date());
+        var dateStr = cri.formatDate(new Date(),'yyyy-MM-dd HH:mm:ss');
     </code></pre>
-</p>
+</div>
 <h3 class="item-head">
-    <div class="name">string2Date</div>
-    <div class="type">Date</div>
+    <span class="name">string2Date</span>
 </h3>
-<p class="item-body">
-    字符串转换成Date
+<div class="item-body">
+    <p>字符串转换成Date</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">参数</h3>
+        <h3 class="sub-item-head">
+            <span class="name">dateStr</span>
+            <span class="type">String</span>
+        </h3>
+        <p>日期字符串,日期格式目前只接收 YYYY/MM/dd HH:mm:ss YYYY-MM-dd HH:mm:ss YYYY/MM/dd YYYY-MM-dd</p>
+    </div>
+    <div class="sub-item">
+        <h3 class="sub-item-title">返回值</h3>
+        <h3 class="sub-item-head">
+            <span class="type">Date</span>
+        </h3>
+        <p>日期对象</p>
+    </div>
     <pre class="code"><code>
         var date = cri.string2Date('2014/06/07');
     </code></pre>
-</p>
+</div>
+
+<h2>验证工具函数</h2>
+
 <h3 class="item-head">
-    <div class="name">date2Json</div>
-    <div class="type">Object</div>
+    <span class="name">isArray</span>
 </h3>
-<p class="item-body">
-    Date转换成对象{yyyy:'2015',MM:'01',dd:'01',mm:'00',HH:'00',ss:'00',ww:'4'}
+<div class="item-body">
+    <p>判断是否为数组</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">参数</h3>
+        <h3 class="sub-item-head">
+            <span class="name">o</span>
+            <span class="type">Array|Object|String|Number</span>
+        </h3>
+    </div>
+    <div class="sub-item">
+        <h3 class="sub-item-title">返回值</h3>
+        <h3 class="sub-item-head">
+            <span class="type">Boolean</span>
+        </h3>
+        <p>当参数为数组时，返回真</p>
+    </div>
     <pre class="code"><code>
-        var date = cri.date2Json('2015/01/01');
+        cri.isArray([1,12,3]);
     </code></pre>
-</p>
+</div>
 <h3 class="item-head">
-    <div class="name">date2Array</div>
-    <div class="type">Array</div>
+    <span class="name">isNum</span>
 </h3>
-<p class="item-body">
-    Date保存到数组[年,月,日,时,分,秒]
+<div class="item-body">
+    <p>判断是否为数组</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">参数</h3>
+        <h3 class="sub-item-head">
+            <span class="name">o</span>
+            <span class="type">Array|Object|String|Number</span>
+        </h3>
+    </div>
+    <div class="sub-item">
+        <h3 class="sub-item-title">返回值</h3>
+        <h3 class="sub-item-head">
+            <span class="type">Boolean</span>
+        </h3>
+        <p>当参数为数字时，返回真</p>
+    </div>
     <pre class="code"><code>
-        var arr = cri.date2Array(new Date());
+        cri.isNum('123');
     </code></pre>
-</p>
+</div>
 <h3 class="item-head">
-    <div class="name">parseJSON</div>
-    <div class="type">Object</div>
+    <span class="name">isPhoneNo</span>
 </h3>
-<p class="item-body">
-    把字符串转换成 JSON 对象
-<pre class="code"><code>
-    var jsonObject = cri.parseJSON("{key:value,key0:value0}");
-</code></pre>
-</p>
+<div class="item-body">
+    <p>判断是否有效电话号码</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">参数</h3>
+        <h3 class="sub-item-head">
+            <span class="name">phoneNo</span>
+            <span class="type">String</span>
+        </h3>
+    </div>
+    <div class="sub-item">
+        <h3 class="sub-item-title">返回值</h3>
+        <h3 class="sub-item-head">
+            <span class="type">Boolean</span>
+        </h3>
+        <p>当参数为有效电话时，返回真</p>
+    </div>
+    <pre class="code"><code>
+        cri.isPhoneNo('1801234567');
+    </code></pre>
+</div>

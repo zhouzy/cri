@@ -32,10 +32,6 @@
 
     cri.Class = Class;
 
-    cri.isArray = function(o){
-        return Object.prototype.toString.call(o) === '[object Array]';
-    };
-
     /**
      * 获取表单值
      * @param $form
@@ -74,68 +70,6 @@
     };
 
     /**
-     * 拓展 jquery formValue 方法
-     *
-     * @param o
-     * @returns {{}}
-     */
-    $.fn.formValue = function(o){
-        if(arguments.length>0){
-            cri.setFormValue($(this),o);
-        }
-        else{
-            return cri.getFormValue($(this));
-        }
-    };
-
-    /**
-     * 重置form
-     */
-    $.fn.formReset = function(param){
-        var param = param || {},
-            $this = $(this),
-            inputQuery = ":input:not(:button,[type=submit],[type=reset],[disabled])",
-            selectQuery = "select";
-        $(inputQuery,$this).each(function(){
-            var role = $(this).attr('data-role');
-            var value = this.name ? param[this.name] : '';
-            value = value || '';
-            if(role){
-                if(role=='input'){
-                    $(this).data("input").value(value);
-                }
-                else if(role == 'timeinput'){
-                    value = value || new Date();
-                    $(this).data("timeInput").value(value);
-                }
-            }
-            else{
-                $(this).val(value);
-            }
-        });
-        $(selectQuery,$this).each(function(){
-            var role = $(this).attr('data-role');
-            var value = this.name ? param[this.name] : '';
-            value = value || '';
-            if(role && role=='selectbox'){
-                if(value != ''){
-                    $(this).data("selectBox").value(value);
-                }
-                else{
-                    $(this).data("selectBox").select(0);
-                }
-            }
-            else{
-                if(value != ''){
-                    $(this).val(value);
-                }else{
-                    this.selectedIndex = 0;
-                }
-            }
-        });
-    };
-
-    /**
      * 判断是否为闰年
      * @param year
      * @returns {boolean}
@@ -155,7 +89,7 @@
      * ss/SS/s/S 秒
      */
     cri.formatDate = function(date,formatStr){
-        var str    = formatStr,
+        var str    = formatStr || 'yyyy-MM-dd',
             year   = date.getFullYear(),
             month  = date.getMonth()+1,
             day    = date.getDate(),
@@ -213,6 +147,7 @@
             ww:myDate.getDay()
         };
     };
+
     /**
      * 字符串转成日期类型
      * 日期时间格式 YYYY/MM/dd HH:mm:ss  YYYY-MM-dd HH:mm:ss
@@ -232,19 +167,43 @@
         }
     };
 
+    /**
+     * 将json格式字符串转换成对象
+     * @param json
+     * @returns {*}
+     *
+     * {{deprecated}}
+     */
     cri.parseJSON = function(json){
         return json ? (new Function("return " + json))(): {};
     };
 
-    cri.isNum = function(s)
-    {
-        if (s!=null && s!="")
-        {
+    /**
+     * 判断是否为数组
+     * @param o
+     * @returns {boolean}
+     */
+    cri.isArray = function(o){
+        return Object.prototype.toString.call(o) === '[object Array]';
+    };
+
+    /**
+     * 判断是否为数字
+     * @param s
+     * @returns {boolean}
+     */
+    cri.isNum = function(s){
+        if (s!=null && s!=""){
             return !isNaN(s);
         }
         return false;
     };
 
+    /**
+     * 判断是否为电话号码
+     * @param s
+     * @returns {boolean}
+     */
     cri.isPhoneNo = function(s){
         return /((\d{11})|^((\d{7,8})|(\d{4}|\d{3})-(\d{7,8})|(\d{4}|\d{3})-(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1})|(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1}))$)/.test(s);
     };
@@ -277,6 +236,14 @@
                 return -1;
             };
         }
+        JSON || (window['JSON'] = {
+            parse:function(jsonStr){
+                return cri.parseJSON(jsonStr);
+            },
+            stringify:function(obj){
+                return obj.toSource();
+            }
+        });
     }();
 
 
@@ -348,6 +315,68 @@
             else{
                 return null;
             }
+        };
+
+        /**
+         * 拓展 jquery formValue 方法
+         *
+         * @param o
+         * @returns {{}}
+         */
+        $.fn.formValue = function(o){
+            if(arguments.length>0){
+                cri.setFormValue($(this),o);
+            }
+            else{
+                return cri.getFormValue($(this));
+            }
+        };
+
+        /**
+         * 重置form
+         */
+        $.fn.formReset = function(param){
+            var $this = $(this),
+                inputQuery = ":input:not(:button,[type=submit],[type=reset],[disabled])",
+                selectQuery = "select";
+            param = param || {};
+            $(inputQuery,$this).each(function(){
+                var role = $(this).attr('data-role');
+                var value = this.name ? param[this.name] : '';
+                value = value || '';
+                if(role){
+                    if(role=='input'){
+                        $(this).data("input").value(value);
+                    }
+                    else if(role == 'timeinput'){
+                        value = value || new Date();
+                        $(this).data("timeInput").value(value);
+                    }
+                }
+                else{
+                    $(this).val(value);
+                }
+            });
+            $(selectQuery,$this).each(function(){
+                var role = $(this).attr('data-role');
+                var value = this.name ? param[this.name] : '';
+                value = value || '';
+                if(role && role=='selectbox'){
+                    if(value != ''){
+                        $(this).data("selectBox").value(value);
+                    }
+                    else{
+                        $(this).data("selectBox").select(0);
+                    }
+                }
+                else{
+                    if(value != ''){
+                        $(this).val(value);
+                    }else{
+                        this.selectedIndex = 0;
+                    }
+                }
+            });
         };
     }(jQuery);
 }(window);

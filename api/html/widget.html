@@ -1,15 +1,25 @@
 <div class="header">
     <div class="name">cri.Widgets</div>
-    <div class="des">cri框架,插件基类</div>
+    <div class="des">cri框架,插件基类,定义了组件的生命周期</div>
 </div>
 
-<ul class="item-body">
-    <li>1.属性拓展:_initOptions</li>
-
-    <li>2.定义组件初始化方法:_create</li>
-
-    <li>3.事件监听方法:_eventListen</li>
-
-    <li>4.组件销毁方法:_destroy</li>
-</ul>
-
+<div class="item-body">
+    <p>组件的生命周期包含四个阶段，子类需要根据实际情况分别重写下列函数</p>
+    <p>四个阶段分别为:</p>
+    <div class="sub-item">
+        <h3 class="sub-item-head">1._initOptions</h3>
+        <p>组件初始化参数处理</p>
+    </div>
+    <div class="sub-item">
+        <h3 class="sub-item-head">2._create</h3>
+        <p>组件HTML结构初始化</p>
+    </div>
+    <div class="sub-item">
+        <h3 class="sub-item-head">3._eventListen</h3>
+        <p>注册用户事件</p>
+    </div>
+    <div class="sub-item">
+        <h3 class="sub-item-head">4._destroy</h3>
+        <p>组件销毁</p>
+    </div>
+</div>

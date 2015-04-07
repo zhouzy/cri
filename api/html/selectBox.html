@@ -1,65 +1,146 @@
-
 <div class="header">
     <div class="name">cri.SelectBox</div>
     <div class="des">下拉选择框组件</div>
 </div>
 <h2>属性</h2>
 <h3 class="item-head">
-    <div class="name">label</div>
-    <div class="type">String</div>
+    <span class="name">label</span>
 </h3>
-<p class="item-body">设置label,当未设置时,默认使用标签data-label,title,name属性值</p>
+<div class="item-body">
+    <p>设置label,当未设置时,默认使用标签data-label,title,name属性值</p>
+</div>
 <h3 class="item-head">
-    <div class="name">value</div>
-    <div class="type">String</div>
+    <span class="name">value</span>
 </h3>
-<p class="item-body">设置初始值</p>
+<div class="item-body">
+    <p>设置初始值</p>
+    <p>未设置值，则使用原生元素value值</p>
+</div>
 <h3 class="item-head">
-    <div class="name">data</div>
-    <div class="type">Array</div>
+    <span class="name">data</span>
 </h3>
-<p class="item-body">
-    定义下拉框options
+<div class="item-body">
+    <p>定义下拉框options</p>
     <pre class="code"><code>
-        data:[{value:"",text:""},{value:"",text:""}]
+        data:[{value:"1",text:"1"},{value:"2",text:"2"}]
     </code></pre>
-</p>
+</div>
 
 <h2>方法</h2>
 <h3 class="item-head">
-    <div class="name">enable</div>
-    <div class="type">void</div>
+    <span class="name">enable</span>
 </h3>
-<p class="item-body">使可用</p>
+<div class="item-body">选择框可用</div>
 
 <h3 class="item-head">
-    <div class="name">disable</div>
-    <div class="type">void</div>
+    <span class="name">disable</span>
 </h3>
-<p class="item-body">使不可用</p>
+<div class="item-body">选择框不可用</div>
 
 <h3 class="item-head">
-    <div class="name">value</div>
-    <div class="type">String</div>
+    <span class="name">value</span>
 </h3>
-<p class="item-body">设置、获取当前下拉框值</p>
+<div class="item-body">
+    <p>设置、获取选择框值</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">参数</h3>
+        <h3 class="sub-item-head">
+            <span class="name">value</span>
+            <span class="type">String|Number</span>
+        </h3>
+        <p>当value不为空，则该函数设置selectBox值，否则返回selectBox当前选择项的值</p>
+
+        <h3 class="sub-item-title">返回值</h3>
+        <h3 class="sub-item-head">
+            <span class="type">String</span>
+        </h3>
+        <p>当value不为空，则该函数设置selectBox值，否则返回selectBox当前选择项的值</p>
+        <pre class="code"><code>
+            //取值
+            $("select").data("selectBox").value();
+            //设值
+            $("select").data("selectBox").value("1");
+        </code></pre>
+    </div>
+</div>
+<div class="item-body">
+    <p>设置、获取选择框文本值</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">参数</h3>
+        <h3 class="sub-item-head">
+            <span class="name">text</span>
+            <span class="type">String|Number</span>
+        </h3>
+        <p>当text不为空，则该函数设置selectBox文本为text，否则返回selectBox当前选择项的文本值</p>
+
+        <h3 class="sub-item-title">返回值</h3>
+        <h3 class="sub-item-head">
+            <span class="type">String</span>
+        </h3>
+        <p>当text不为空，则该函数设置selectBox文本为text，否则返回selectBox当前选择项的文本值</p>
+        <pre class="code"><code>
+            //取值
+            $("select").data("selectBox").text();
+            //设值
+            $("select").data("selectBox").text("A");
+        </code></pre>
+    </div>
+</div>
 
 <h3 class="item-head">
-    <div class="name">text</div>
-    <div class="type">String</div>
+    <span class="name">setOptions</span>
 </h3>
-<p class="item-body">设置、获取当前下拉框显示文本值</p>
+<div class="item-body">
+    <p>重新设置selectBox下拉选项</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">参数</h3>
+        <h3 class="sub-item-head">
+            <span class="name">options</span>
+            <span class="type">Array</span>
+        </h3>
+        <p>参数为数组，数组中的每一项为一个包含value、text字段的对象</p>
+        <pre class="code"><code>
+            $("select").data("selectBox").setOptions([
+                {value:1,text:'A'},
+                {value:2,text:'B'},
+                {value:3,text:'C'},
+                {value:4,text:'D'}
+            ]);
+        </code></pre>
+    </div>
+</div>
 
 <h3 class="item-head">
-    <div class="name">setOptions</div>
-    <div class="type">void</div>
+    <span class="name">select</span>
 </h3>
-<p class="item-body">重新设置selectBox下拉选项<</p>
+<div class="item-body">
+    <p>选择下拉选择框第几项</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">参数</h3>
+        <h3 class="sub-item-head">
+            <span class="name">index</span>
+            <span class="type">Number</span>
+        </h3>
+        <p>从0开始的一个整形</p>
+        <pre class="code"><code>
+            $("select").data("selectBox").select(0);//选择第一项
+        </code></pre>
+    </div>
+</div>
 
 <h2>事件</h2>
 <h3 class="item-head">
-    <div class="name">change</div>
-    <div class="type">Function</div>
+    <span class="name">change</span>
 </h3>
-<p class="item-body">当下拉框值改变时触发</p>
+<div class="item-body">
+    <p>当下拉框值改变时触发</p>
+    <p>this 指向 selectBox 实例</p>
+    <pre class="code"><code>
+        $("select").selectBox({
+            change:function(){
+                console.dir(this.value());//当选择框选择项发生改变时，打印当前值
+            }
+        });
+    </code></pre>
+</div>
 

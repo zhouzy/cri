@@ -24,7 +24,7 @@
         TAB_WIDTH         = 150;
 
     var _defaultOptions = {
-        onFouce:null,
+        onFocus:null,
         onCloseTab:null
     };
 
@@ -161,24 +161,23 @@
          * @param closeAble: 是否在该tab上提供关闭按钮
          */
         addTab:function(content,title,closeAble,iframe,callback){
-
             title = title || 'New Tab';
-
             if(closeAble == undefined || closeAble == null || closeAble == "null"){
                 closeAble = true;
             }
-
             var that = this,
                 $tabs = this.$tabs,
-                $tab = $('<li class="' + TABPAGE_TAB + '">' + title + '</li>').data("for",this._pageBodyQueue.length).click(function(){
-                    that.focusTab($(this));
-                }),
+                $tab = $('<li class="' + TABPAGE_TAB + '">' + title + '</li>')
+                    .data("for",this._pageBodyQueue.length)
+                    .click(function(){
+                        that.focusTab($(this));
+                    }
+                ),
                 $closeBtn = $('<i class="fa fa-close ' + TABPAGE_TAB_CLOSE + '"></i>').click(function(){
                     that._closeTab($tab);
                 });
             closeAble && $tab.append($closeBtn);
             $tabs.append($tab);
-
             var tabPageBody = new TabPageBody(this.$tabPageGroup,{
                 content:content,
                 iframe:iframe,
@@ -199,7 +198,7 @@
             index != null && this._pageBodyQueue[index].hide();
             $tab.addClass("selected");
             this._pageBodyQueue[$tab.data("for")].show();
-            this.options.onFouce && this.options.onFouce.call(this,$tab.data("for"));
+            this.options.onFocus && this.options.onFocus.call(this,$tab.data("for"));
         },
 
         closeTab:function(index){

@@ -195,8 +195,8 @@
          */
         _createTree:function(){
             var op      = this.options,
-                height  = _getElementHeight(this.$element,op.height),
-                width   = _getElementWidth(this.$element,op.width),
+                height  = this.$element._getHeightPixelValue(op.height),
+                width   = this.$element._getWidthPixelValue(op.width),
                 $tree   = $("<div></div>").addClass(this._className).width(width),
 
                 $treeview = this.$treeview = $("<div></div>").addClass("tree-view"),
@@ -369,7 +369,7 @@
         }
     });
 
-    $.fn.tree = function (option,param) {
+    $.fn.tree = function (option) {
         var tree = null;
         this.each(function () {
             var $this   = $(this),

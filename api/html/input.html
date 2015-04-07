@@ -5,71 +5,109 @@
 
 <h2>属性</h2>
 <h3 class="item-head">
-    <div class="name">label</div>
-    <div class="type">String</div>
+    <span class="name">label</span>
+    <span class="type">String</span>
 </h3>
-<p class="item-body">设置label,当未设置时,默认使用标签data-label,title,name属性值</p>
+<div class="item-body">
+    <p>设置label,当未设置时,默认使用标签data-label,title,name属性值</p>
+</div>
 
 <h3 class="item-head">
-    <div class="name">value</div>
-    <div class="type">String|Number</div>
+    <span class="name">value</span>
+    <span class="type">String|Number</span>
 </h3>
-<p class="item-body">初始化时值</p>
+<p class="item-body">初始化值</p>
 
 <h3 class="item-head">
-    <div class="name">button</div>
-    <div class="type">Object</div>
+    <span class="name">button</span>
+    <span class="type">Object</span>
 </h3>
-<p class="item-body">
+<div class="item-body">
     input右侧按钮
     <pre class="code"><code>
-    button={
-        iconCls:"fa fa-times", //按钮图标
-        handler:function(){}   //点击按钮回调函数,this指向Input实例
-    };
+        button={
+            iconCls:"fa fa-times", //按钮图标
+            handler:function(){   //点击按钮回调函数,this指向Input实例
+                console.dir(this.value());
+            }
+        };
     </code></pre>
-</p>
+</div>
 
 <h3 class="item-head">
-    <div class="name">readonly</div>
-    <div class="type">Boolean</div>
+    <span class="name">readonly</span>
+    <span class="type">Boolean</span>
 </h3>
 <p class="item-body">是否只读</p>
 
 <h2>方法</h2>
 <h3 class="item-head">
-    <div class="name">enable</div>
-    <div class="type">void</div>
+    <span class="name">enable</span>
 </h3>
-<p class="item-body">使可用</p>
+<div class="item-body">
+    <p>输入框可用</p>
+</div>
 
 <h3 class="item-head">
-    <div class="name">disable</div>
-    <div class="type">void</div>
+    <span class="name">disable</span>
 </h3>
-<p class="item-body">使不可用</p>
+<div class="item-body">
+    <p>输入框不可用</p>
+</div>
 
 <h3 class="item-head">
-    <div class="name">value</div>
-    <div class="type">String</div>
+    <span class="name">value</span>
 </h3>
-<p class="item-body">设置、获取输入框值</p>
+<div class="item-body">
+    <p>设置、获取输入框值</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">参数</h3>
+        <h3 class="sub-item-head">
+            <span class="name">value</span>
+            <span class="type">String|Number</span>
+        </h3>
+        <p>当value不为空，则该函数设置input值，否则返回input值</p>
+        <h3 class="sub-item-title">返回值</h3>
+        <h3 class="sub-item-head">
+            <span class="type">String</span>
+        </h3>
+        <p>当value不为空，则该函数设置input值，否则返回input值</p>
+        <pre class="code"><code>
+            //取值
+            $("input").data("input").value();
+            //设值
+            $("input").data("input").value("hello");
+        </code></pre>
+    </div>
+</div>
 
 <h2>事件</h2>
 <h3 class="item-head">
-    <div class="name">onFocus</div>
-    <div class="type">Function</div>
+    <span class="name">onFocus</span>
 </h3>
-<p class="item-body">当输入框获取焦点时触发</p>
+<div class="item-body">
+    <p>当输入框获取焦点时触发</p>
+    <p>方法中 this 指向 input 实例</p>
+    <pre class="code"><code>
+        $("#input").input({
+            onFocus:function(){
+                console.dir(this.value());
+            }
+        });
+    </code></pre>
+</div>
 
 <h3 class="item-head">
-    <div class="name">onBlur</div>
-    <div class="type">Function</div>
+    <span class="name">onBlur</span>
 </h3>
-<p class="item-body">当输入框失去焦点时触发</p>
-
-<h3 class="item-head">
-    <div class="name">onClick</div>
-    <div class="type">Function</div>
-</h3>
-<p class="item-body">当点击输入框时触发</p>
+<div class="item-body">
+    <p>当输入框失去焦点时触发</p>
+    <p>方法中 this 指向 input 实例</p>
+    <pre class="code"><code>
+        $("#input").input({
+            onBlur:function(){
+                console.dir(this.value());
+            }
+        });
+    </code></pre>
+</div>

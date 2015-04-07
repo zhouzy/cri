@@ -44,128 +44,193 @@
 </div>
 
 <h3 class="item-head">
-    <div class="name">url</div>
-    <div class="type">String</div>
+    <span class="name">url</span>
+    <span class="type">String</span>
 </h3>
 <p class="item-body">数据请求地址</p>
 
 <h3 class="item-head">
-    <div class="name">param</div>
-    <div class="type">Object</div>
+    <span class="name">param</span>
+    <span class="type">Object</span>
 </h3>
 <p class="item-body">请求数据参数</p>
 
 <h3 class="item-head">
-    <div class="name">checkBox</div>
-    <div class="type">Boolean</div>
+    <span class="name">checkBox</span>
+    <span class="type">Boolean</span>
 </h3>
 <p class="item-body">是否显示checkBox,true:左侧出现checkbox列,默认false</p>
 
 <h3 class="item-head">
-    <div class="name">rowNum</div>
-    <div class="type">Boolean</div>
+    <span class="name">rowNum</span>
+    <span class="type">Boolean</span>
 </h3>
 <p class="item-body">是否显示行号,true:显示,false:不显示.默认false</p>
 
 <h3 class="item-head">
-    <div class="name">columns</div>
-    <div class="type">Array</div>
+    <span class="name">columns</span>
+    <span class="type">Array</span>
 </h3>
-<p class="item-body">
-    列定义
+<div class="item-body">
+    <p>详细定义每列属性,指定该属性后，将覆盖在 table tr 中定义的 data-options</p>
+    <p>可设置width,指定列的宽度,未设置该值,该列宽度为auto</p>
+    <p>可设置title,指定列的title属性</p>
+    <p>可设置style,个性化某一列的样式</p>
     <pre class="code"><code>
-        field :显示PO中的指定的字段
-        width :列宽度
         columns:[
-            {field:'fieldNameA',width:100},
-            {field:'fieldNameB',width:200},
+            {field:'fieldNameA',width:100,style:{color:'red',text-align:'center'}},
+            {field:'fieldNameB',width:200,title:'这个是fieldNameB'},
             {field:'fieldNameC',width:200}
         ]
     </code></pre>
-</p>
+</div>
 
 <h3 class="item-head">
-    <div class="name">pagination</div>
-    <div class="type">Boolean</div>
+    <span class="name">pagination</span>
+    <span class="type">Boolean</span>
 </h3>
 <p class="item-body">是否分页,true:分页,false:不分页.默认true</p>
 
 <h3 class="item-head">
-    <div class="name">page</div>
-    <div class="type">Number</div>
+    <span class="name">page</span>
+    <span class="type">Number</span>
 </h3>
 <p class="item-body">当前页数.默认1</p>
 
 <h3 class="item-head">
-    <div class="name">pageSize</div>
-    <div class="type">Number</div>
+    <span class="name">pageSize</span>
+    <span class="type">Number</span>
 </h3>
 <p class="item-body">每页显示数据条数.默认10</p>
 
 <h2>方法</h2>
-<h3 class="item-head">
-    <div class="name">reload</div>
-    <div class="type">void</div>
-</h3>
-<p class="item-body">根据参数重新请求数据并生成树</p>
 
 <h3 class="item-head">
-    <div class="name">getSelected</div>
-    <div class="type">Array</div>
+    <span class="name">reload</span>
 </h3>
-<p class="item-body">获取当前选择的所有节点数据</p>
+<div class="item-body">
+    <p>根据参数重新请求数据刷新表格</p>
+    <p>该方法将会清空已选择项</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">参数</h3>
+        <h3 class="sub-item-head">
+            <span class="name">param</span>
+            <span class="type">Object</span>
+        </h3>
+        <p>请求参数，未指定时，使用上一次请求参数</p>
+    </div>
+</div>
 
 <h3 class="item-head">
-    <div class="name">loadData</div>
-    <div class="type">null</div>
+    <span class="name">getSelected</span>
 </h3>
-<p class="item-body">
-    根据参数中的数据构造Grid
-    <pre class="code"><code>
-        var grid = $("#tt").datagrid();
-        grid.loadData([
-            {fieldA:'A',fieldB:'B',fieldC:'C'},
-            {fieldA:'A',fieldB:'B',fieldC:'C'},
-            {fieldA:'A',fieldB:'B',fieldC:'C'},
-            {fieldA:'A',fieldB:'B',fieldC:'C'},
-            {fieldA:'A',fieldB:'B',fieldC:'C'}
-        ]);
-    </code></pre>
-</p>
+<div class="item-body">
+    <p>获取用户当前选择的所有节点数据</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">返回值</h3>
+        <h3 class="sub-item-head">
+            <span class="type">Array</span>
+        </h3>
+        <p>返回值为数组，当用户只选择一行数据时，数组长度为1，未选择时长度为0</p>
+    </div>
+</div>
+
+<h3 class="item-head">
+    <span class="name">loadData</span>
+</h3>
+<div class="item-body">
+    <p>根据参数中的数据构造Grid</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">参数</h3>
+        <h3 class="sub-item-head">
+            <span class="name">data</span>
+            <span class="type">Array</span>
+        </h3>
+        <pre class="code"><code>
+            var grid = $("#tt").datagrid();
+            grid.loadData([
+                {fieldA:'A',fieldB:'B',fieldC:'C'},
+                {fieldA:'A',fieldB:'B',fieldC:'C'},
+                {fieldA:'A',fieldB:'B',fieldC:'C'},
+                {fieldA:'A',fieldB:'B',fieldC:'C'},
+                {fieldA:'A',fieldB:'B',fieldC:'C'}
+            ]);
+        </code></pre>
+    </div>
+</div>
 
 <h2>事件</h2>
-<h3 class="item-head">
-    <div class="name">onChange</div>
-    <div class="type">Function</div>
-</h3>
-<p class="item-body">用户选择行发生变化时触发</p>
 
 <h3 class="item-head">
-    <div class="name">onDblClick</div>
-    <div class="type">Function</div>
+    <span class="name">onChange</span>
 </h3>
-<p class="item-body">当双击表格行时，触发该事件</p>
+<div class="item-body">
+    <p>当用户选择某行，获取取消选择莫行，或者通过表头的checkBox改变选择行，触发该事件</p>
+    <p>在方法中，this 指向 grid 实例</p>
+</div>
 
 <h3 class="item-head">
-    <div class="name">onSelected</div>
-    <div class="type">Function</div>
+    <span class="name">onSelected</span>
 </h3>
-<p class="item-body">当用户选择一行或者多行时触发该事件</p>
+<div class="item-body">
+    <p>当用户选择了一行或者多行时触发该事件</p>
+    <p>在方法中，this 指向 grid 实例</p>
+</div>
 
 <h3 class="item-head">
-    <div class="name">onLoad</div>
-    <div class="type">Function</div>
+    <span class="name">onDblClick</span>
 </h3>
-<p class="item-body">当表格完成HTML构造后触发</p>
+<div class="item-body">
+    <p>当双击表格行时，触发该事件</p>
+    <p>在方法中，this 指向 grid 实例</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">事件数据</h3>
+        <h3 class="sub-item-head">
+            <span class="name">selectData</span>
+            <span class="type">Object</span>
+        </h3>
+        <pre class="code"><code>
+            var grid = $("#tt").datagrid({
+                onDblClick:function(selectData){
+                    console.dir(selectData);//用户当前双击选择的行数据
+                    console.dir(this.getSelected());//用户当前选择的所有行数据，this指向grid实例
+                }
+            });
+
+        </code></pre>
+    </div>
+</div>
 
 <h3 class="item-head">
-    <div class="name">ajaxDone</div>
-    <div class="type">Function</div>
+    <span class="name">onLoad</span>
 </h3>
-<p class="item-body">数据请求成功后触发</p>
+<div class="item-body">
+    <p>当表格完成HTML构造后触发</p>
+    <p>在方法中，this 指向 grid 实例</p>
+</div>
 
 <h3 class="item-head">
-    <div class="name">ajaxError</div>
-    <div class="type">Function</div>
+    <span class="name">ajaxDone</span>
 </h3>
-<p class="item-body">ajax 发生异常时触发</p>
+<div class="item-body">
+    <p>数据请求成功后触发</p>
+    <p>在方法中，this 指向 grid 实例</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">事件数据</h3>
+        <h3 class="sub-item-head">
+            <span class="name">data</span>
+            <span class="type">Object</span>
+        </h3>
+        <p>向该回调函数传入ajax请求到的数据，如果回调函数返回处理后的data，就使用该值生成表格,否则，则使用ajax请求到的数据生成表格</p>
+        <pre class="code"><code>
+            $("#tt").datagrid({
+                ajaxDone:function(data){
+                    console.dir(data);//ajax请求到的数据
+                    //TODO:对数据进行一些处理
+
+                    return data;//返回处理后的数据
+                }
+            });
+        </code></pre>
+    </div>
+</div>

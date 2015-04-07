@@ -89,6 +89,7 @@
             onChange:function(){
                 that.date = this.getDate();
                 that.input.value(cri.formatDate(that.date,that.options.format));
+                that.options.change && that.options.change.call(that);
             }
         });
     };
@@ -102,6 +103,18 @@
         this.input.value(cri.formatDate(value,this.options.format));
         this.selectView.setDate(value);
     };
+
+    /**
+     * 销毁组件
+     * @private
+     */
+    TimeInput.prototype._destroy = function(){
+        this.selectView._destroy();
+        this.$timeInputGroup.replaceWith(this.$element);
+        this.input = null;
+        this.selectView = null;
+    };
+
     /**
      * 使输入框不能用
      */
@@ -116,6 +129,11 @@
         this.input.enable();
     };
 
+    /**
+     * 获取设置时间输入框的值
+     * @param value
+     * @returns {*|Date}
+     */
     TimeInput.prototype.value = function(value){
         if(value == undefined){
             return this.date;
@@ -125,13 +143,12 @@
         }
     };
 
-    TimeInput.prototype._destroy = function(){
-        this.selectView._destroy();
-        this.$timeInputGroup.replaceWith(this.$element);
-        this.input = null;
-        this.selectView = null;
-    };
-
+    /**
+     * 时间输入框下拉面板
+     * @param $parent
+     * @param options
+     * @constructor
+     */
     var TimeSelectView = function($parent,options){
         this.$parent = $parent;
         this.$timeBox = null;
@@ -169,6 +186,11 @@
             $("body").append($timeBox.css({top:top,left:left}));
         },
 
+        /**
+         * 年份选择
+         * @returns {*|jQuery|HTMLElement}
+         * @private
+         */
         _yearSelect : function(){
             var that = this;
             var date = this.date;
@@ -189,6 +211,11 @@
             return $yearSelect;
         },
 
+        /**
+         * 月份选择
+         * @returns {*|jQuery|HTMLElement}
+         * @private
+         */
         _monthSelect:function(){
             var that = this,
                 date = this.date,
@@ -207,6 +234,11 @@
             return $select;
         },
 
+        /**
+         * 日期选择
+         * @returns {*|jQuery|HTMLElement}
+         * @private
+         */
         _daySelect:function(){
             var $daySelect = this.$daySelect = $('<table></table>'),
                 $week = $('<tr class="week"></tr>'),
@@ -260,6 +292,11 @@
             }
         },
 
+        /**
+         * 时间选择
+         * @returns {*|jQuery|HTMLElement}
+         * @private
+         */
         _hmsSelect:function(){
             var $hmsBar      = $('<div class="eb_HMSBar">'),
                 $hourInput   = $('<input class="eb_HMSInput eb_Hour"/>').val(this.date.HH),
@@ -326,10 +363,17 @@
             this.$timeBox.css({top:top,left:left});
         },
 
+        /**
+         * 销毁时间选择面板
+         * @private
+         */
         _destroy : function(){
             this.$timeBox.remove();
         },
 
+        /**
+         * 展开收缩时间选择面板
+         */
         toggle:function(){
             var that = this;
             this._setPosition();
@@ -337,18 +381,25 @@
                 this.$timeBox.slideDown(200,function(){
                     that._clickBlank();
                 });
-
             }
             else{
                 this.$timeBox.slideUp(200);
             }
         },
 
+        /**
+         * 获取时间选择面板中保存的日期
+         * @returns {Date}
+         */
         getDate:function(){
             var date = this.date;
             return new Date(date.yyyy,date.MM,date.dd,date.HH,date.mm,date.ss);
         },
 
+        /**
+         * 设置时间选择面板各个选择项的值
+         * @param date
+         */
         setDate:function(date){
             this.date = cri.date2Json(date);
             this.$year.text(this.date.yyyy);

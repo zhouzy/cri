@@ -4,8 +4,9 @@
     <div class="des">TabPage分页组件</div>
 </div>
 <h2>说明</h2>
-<p class="item-body">
-    该组件初始化时，读取直接子节点生成tab页，在每个子节点上获取data-title,data-close属性设置tab页标题和确定是否显示关闭按钮,当未设置data-close默认提供关闭按钮
+<div class="item-body">
+    <p>该组件初始化时，读取直接子节点生成tab页</p>
+    <p>在每个子节点上获取data-title,data-close属性设置tab页标题和确定是否显示关闭按钮,当未设置data-close默认提供关闭按钮</p>
     <pre class="code"><code>
         &lt;div id="tabpage"&gt;
             &lt;div data-title="tab1" data-close="false"&gt;
@@ -16,26 +17,53 @@
             &lt;/div&gt;
         &lt;/div&gt;
     </code></pre>
-</p>
+</div>
+
 <h2>事件</h2>
 <h3 class="item-head">
-    <div class="name">onFouce</div>
-    <div class="type">void</div>
+    <span class="name">onFocus</span>
 </h3>
-<p class="item-body">
-    当用户切换tab时触发
+<div class="item-body">
+    <p>当发生切换tab时触发</p>
+    <p>this 指向 tabPage 实例</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">事件数据</h3>
+        <h3 class="sub-item-head">
+            <span class="name">index</span>
+        </h3>
+        <p>该事件向回调函数传入一个整形值，该值表示当前第几个Tab页被选中</p>
+        <p>该值从0开始</p>
+    </div>
     <pre class="code"><code>
-        tabPage.addTab(
-            content,  //tabPage 内容，可以传入 URL、jQuery、HTML字符串
-            title,    //标题
-            closeAble, //在tabPage 标签头上是否提供关闭按钮
-            onFouce:function(index){//参数为当前tab索引
-                var $tabBody = this.getTabBody(index);
+        $("#tabPage").tabPage({
+            onFocus:function(index){
+                var tabBody = this.getTabBody(index);//当选择某个Tab后,获取到TabBody对象
             }
-        );
+        });
     </code></pre>
-</p>
+</div>
 
+<h3 class="item-head">
+    <span class="name">onCloseTab</span>
+</h3>
+<div class="item-body">
+    <p>当关闭某个Tab时触发</p>
+    <p>this 指向 tabPage 实例</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">事件数据</h3>
+        <h3 class="sub-item-head">
+            <span class="name">TabBody</span>
+        </h3>
+        <p>该事件向回调函数传入一个TabBody对象</p>
+    </div>
+    <pre class="code"><code>
+        $("#tabPage").tabPage({
+            onCloseTab:function(tabBody){
+                var content = tabBody.getContent();//获取tabBody中的内容的jQuery对象
+            }
+        });
+    </code></pre>
+</div>
 <h2>方法</h2>
 <h3 class="item-head">
     <div class="name">addTab</div>

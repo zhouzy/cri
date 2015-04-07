@@ -74,11 +74,10 @@
         pageSize:10,
 
         onChange:null,   //行点击时触发
-        onDblClick:null, //双击行时触发
         onSelected:null, //当选择一行或者多行时触发
+        onDblClick:null, //双击行时触发
         onLoad:null,     //构造表格结束时触发
-        ajaxDone:null,   //当AJAX请求成功后触发
-        ajaxError:null   //当AJAX请求失败后触发
+        ajaxDone:null   //当AJAX请求成功后触发
     };
 
     var Grid = cri.Widgets.extend(function(element,options){
@@ -276,8 +275,8 @@
                     if(key == 'title'){
                         $tdContent.prop('title',value).append(value);
                     }
-                    else if(key !== 'field' && key !== 'width'){
-                        $td.css(key,value);
+                    else if(key == 'style'){
+                        $td.css(value);
                     }
                 }
                 $td.append($tdContent);

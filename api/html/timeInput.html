@@ -2,52 +2,90 @@
     <div class="name">cri.TimeInput</div>
     <div class="des">时间输入框</div>
 </div>
+
 <h2>属性</h2>
-<h3 class="item-head">
-    <div class="name">value</div>
-    <div class="type">Date</div>
-</h3>
-<p class="item-body">定义初始值</p>
-<h3 class="item-head">
-    <div class="name">format</div>
-    <div class="type">String</div>
-</h3>
-<p class="item-body">Date 格式化字符串 默认值 yyyy/MM/dd</p>
 
 <h3 class="item-head">
-    <div class="name">HMS</div>
-    <div class="type">Boolean</div>
+    <span class="name">value</span>
+    <span class="type">Date</span>
 </h3>
-<p class="item-body">是否包括小时分钟秒，当该值为false时，将切除掉 format 小时分钟秒部分</p>
+<div class="item-body">
+    <p>定义初始值</p>
+    <p>未设置时，默认使用当前系统时间</p>
+</div>
+
+<h3 class="item-head">
+    <span class="name">format</span>
+    <span class="type">String</span>
+</h3>
+<div class="item-body">
+    <p>Date 日期格式化字符串</p>
+    <p>默认值:yyyy/MM/dd HH:mm:ss</p>
+</div>
+
+<h3 class="item-head">
+    <span class="name">HMS</span>
+    <span class="type">Boolean</span>
+</h3>
+<div class="item-body">
+    <p>是否包括时分秒</p>
+    <p>当该值为false时，将忽略 format 时分秒部分</p>
+</div>
 
 <h2>方法</h2>
 <h3 class="item-head">
-    <div class="name">enable</div>
-    <div class="type">void</div>
+    <span class="name">enable</span>
 </h3>
-<p class="item-body">使可用</p>
+<div class="item-body">
+    <p>时间输入框可用</p>
+</div>
 
 <h3 class="item-head">
-    <div class="name">disable</div>
-    <div class="type">void</div>
+    <span class="name">disable</span>
 </h3>
-<p class="item-body">使不可用</p>
+<div class="item-body">
+    <p>时间输入框不可用</p>
+</div>
 
 <h3 class="item-head">
-    <div class="name">value</div>
-    <div class="type">String</div>
+    <span class="name">value</span>
 </h3>
-<p class="item-body">设置、获取当前下拉框值</p>
-
-<h3 class="item-head">
-    <div class="name">text</div>
-    <div class="type">String</div>
-</h3>
-<p class="item-body">设置、获取当前下拉框显示文本值</p>
+<div class="item-body">
+    <p>设置、获取时间输入框值</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">参数</h3>
+        <h3 class="sub-item-head">
+            <span class="name">value</span>
+            <span class="type">Date</span>
+        </h3>
+        <p>当value不为空，则该函数设置值，否则返回值</p>
+        <h3 class="sub-item-title">返回值</h3>
+        <h3 class="sub-item-head">
+            <span class="type">Date</span>
+        </h3>
+        <p>当value不为空，则该函数设置值，否则返回值</p>
+        <pre class="code"><code>
+            //取值
+            $("#timeInput").data("timeInput").value();
+            //设值
+            $("#timeInput").data("timeInput").value(new Date());
+        </code></pre>
+    </div>
+</div>
 
 <h2>事件</h2>
 <h3 class="item-head">
-    <div class="name">change</div>
-    <div class="type">Function</div>
+    <span class="name">change</span>
 </h3>
-<p class="item-body">当下拉框选择项索引值发生改变时触发</p>
+<div class="item-body">
+    <p>当时间输入框值改变时触发</p>
+    <p>this 指向 timeInput 实例</p>
+    <pre class="code"><code>
+        $("#timeInput").timeInput({
+            change:function(){
+                console.dir(this.value());//当时间输入框发生改变时，打印当前值
+            }
+        });
+    </code></pre>
+</div>
+
