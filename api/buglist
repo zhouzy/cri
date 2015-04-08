@@ -1,6 +1,7 @@
 Tree
 1.折叠节点会同时触发onSelect事件(fixed)
 2.未指定节点状态时，图标为closed,同时子节点未隐藏(fixed)
+3.异步树，异常(fixed)
 
 Grid
 1.树形菜单点击文件按钮，会触发click事件(fixed)
