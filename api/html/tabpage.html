@@ -1,4 +1,3 @@
-
 <div class="header">
     <div class="name">cri.TabPage</div>
     <div class="des">TabPage分页组件</div>
@@ -37,7 +36,7 @@
     <pre class="code"><code>
         $("#tabPage").tabPage({
             onFocus:function(index){
-                var tabBody = this.getTabBody(index);//当选择某个Tab后,获取到TabBody对象
+                var tabBody = this.getTabBody(index);//当选择某个Tab后,获取到ContentLoader对象
             }
         });
     </code></pre>
@@ -54,7 +53,7 @@
         <h3 class="sub-item-head">
             <span class="name">TabBody</span>
         </h3>
-        <p>该事件向回调函数传入一个TabBody对象</p>
+        <p>该事件向回调函数传入一个ContentLoader对象</p>
     </div>
     <pre class="code"><code>
         $("#tabPage").tabPage({
@@ -66,11 +65,45 @@
 </div>
 <h2>方法</h2>
 <h3 class="item-head">
-    <div class="name">addTab</div>
-    <div class="type">void</div>
+    <span class="name">addTab</span>
 </h3>
 <div class="item-body">
-    增加Tab
+    <p>增加Tab</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">参数</h3>
+        <h3 class="sub-item-head">
+            <span class="name">content</span>
+            <span class="type">String|jQuery</span>
+        </h3>
+        <p>接受html字符串、jquery对象、URL用来生成TabBody内容</p>
+        <h3 class="sub-item-head">
+            <span class="name">title</span>
+            <span class="type">String</span>
+        </h3>
+        <p>在Tab上显示的标题</p>
+        <h3 class="sub-item-head">
+            <span class="name">closeAble</span>
+            <span class="type">Boolean</span>
+        </h3>
+        <p>是否在Tab上显示关闭按钮，默认值为显示关闭按钮</p>
+        <h3 class="sub-item-head">
+            <span class="name">isIframe</span>
+            <span class="type">Boolean</span>
+        </h3>
+        <p>当content为URL，将会根据isIframe参数决定是否使用iframe加载内容，否则使用jQuery.load方式加载内容</p>
+        <h3 class="sub-item-head">
+            <span class="name">callBack</span>
+            <span class="type">Function</span>
+        </h3>
+        <p>在生成TabBody后，回调该函数</p>
+    </div>
+    <div class="sub-item">
+        <h3 class="sub-item-title">返回值</h3>
+        <h3 class="sub-item-head">
+            <span class="type">ContentLoader</span>
+        </h3>
+        <p>返回一个TabBody对象</p>
+    </div>
     <pre class="code"><code>
         tabPage.addTab(
             content,  //tabPage 内容，可以传入 URL、jQuery、HTML字符串
@@ -81,37 +114,58 @@
 </div>
 
 <h3 class="item-head">
-    <div class="name">closeTab</div>
-    <div class="type">void</div>
+    <span class="name">closeTab</span>
 </h3>
-<p class="item-body">
-    关闭第几个标签页
+<div class="item-body">
+    <p>关闭第几个标签页</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">参数</h3>
+        <h3 class="sub-item-head">
+            <span class="name">index</span>
+            <span class="type">Number|String</span>
+        </h3>
+        <p>接收一个整形，表示关闭第几个Tab,该值从0开始</p>
+    </div>
     <pre class="code"><code>
         //参数为tab标签的索引值，索引值从0开始从左到右依次递增
         tabPage.closeTab(index);
     </code></pre>
-</p>
+</div>
+
 <h3 class="item-head">
-    <div class="name">select</div>
-    <div class="type">void</div>
+    <span class="name">select</span>
 </h3>
-<p class="item-body">
-    选择第几个标签页
+<div class="item-body">
+    <p>选择第几个标签页</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">参数</h3>
+        <h3 class="sub-item-head">
+            <span class="name">index</span>
+            <span class="type">Number|String</span>
+        </h3>
+        <p>接收一个整形，表示选择第几个Tab,该值从0开始</p>
+    </div>
     <pre class="code"><code>
         //参数为tab标签的索引值，索引值从0开始从左到右依次递增
         tabPage.select(index);
     </code></pre>
-</p>
+</div>
 
 <h3 class="item-head">
-    <div class="name">getTabBody</div>
-    <div class="type">void</div>
+    <span class="name">getTabBody</span>
 </h3>
-<p class="item-body">
-    根据索引获取TabBody
+<div class="item-body">
+    <p>根据索引获取TabBody</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">参数</h3>
+        <h3 class="sub-item-head">
+            <span class="name">index</span>
+            <span class="type">Number|String</span>
+        </h3>
+        <p>接收一个整形，表示获取第几个TabBody,该值从0开始</p>
+    </div>
     <pre class="code"><code>
         //参数为tab标签的索引值，索引值从0开始从左到右依次递增
         tabPage.getTabBody(index);
     </code></pre>
-</p>
-
+</div>

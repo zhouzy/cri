@@ -5,11 +5,11 @@
 
 <h2>属性</h2>
 <h3 class="item-head">
-    <div class="name">rules</div>
-    <div class="type">Object</div>
+    <span class="name">rules</span>
+    <span class="type">Object</span>
 </h3>
-<p class="item-body">
-    定义验证规则
+<div class="item-body">
+    <p>定义验证规则</p>
     <pre class="code"><code>
         rules:{
             endDate:function($input){
@@ -34,43 +34,44 @@
             }
         }
     </code></pre>
-</p>
+</div>
 
 <h3 class="item-head">
-    <div class="name">messages</div>
-    <div class="type">Object</div>
+    <span class="name">messages</span>
+    <span class="type">Object</span>
 </h3>
-<p class="item-body">
-    定义rules对应的错误提示消息
+<div class="item-body">
+    <p>定义rules对应的错误提示消息</p>
     <pre><code>
     messages:{
         endDate:"结束时间不能小于结束时间",
         startDate:"开始时间不能大于结束时间"
     }
     </code></pre>
-</p>
+</div>
 
 <h3 class="item-head">
-    <div class="name">validateOnBlur</div>
-    <div class="type">Boolean</div>
+    <span class="name">validateOnBlur</span>
+    <span class="type">Boolean</span>
 </h3>
-<p class="item-body">是否在输入框失去焦点时进行验证</p>
+<div class="item-body">
+    <p>是否在输入框失去焦点时进行验证</p>
+</div>
 
 <h2>方法</h2>
 <h3 class="item-head">
-    <div class="name">validate</div>
-    <div class="type">Function</div>
+    <span class="name">validate</span>
 </h3>
-<p class="item-body">
-    开始验证
+<div class="item-body">
+    <p>进行验证</p>
+    <p>说明：请在标签上，通过添加属性，指定验证类型，内置的验证类型如下：</p>
     <pre class="code"><code>
-    说明：请在标签上，通过添加属性，指定验证类型，内置的验证类型如下：
-    1.required ([required])
-    2.email ([role=email])
-    3.url ([role=url])
-    4.date ([role=date])
-    5.pattern (在[role=text]|[role=email]|[role=url]|[role=tel]|[role=search]|[role=password]类型中根据[pattern]值进行正则验证)
-    6.min(在[role=number]类型的输入框中根据[min='number']指定的值进行验证，当输入框中的值小于min指定的值，验证通过)
-    7.max(在[role=number]类型的输入框中根据[max='number']指定的值进行验证，当输入框中的值大于max指定的值，验证通过)
+        1.required ([required])
+        2.email ([role=email])
+        3.url ([role=url])
+        4.date ([role=date])
+        5.pattern (在[role=text]|[role=email]|[role=url]|[role=tel]|[role=search]|[role=password]类型中根据[pattern]值进行正则验证)
+        6.min(在[role=number]类型的输入框中根据[min='number']指定的值进行验证，当输入框中的值小于min指定的值，验证通过)
+        7.max(在[role=number]类型的输入框中根据[max='number']指定的值进行验证，当输入框中的值大于max指定的值，验证通过)
     </code></pre>
-</p>
+</div>

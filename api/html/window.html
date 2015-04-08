@@ -5,94 +5,220 @@
 
 <h2>属性</h2>
 <h3 class="item-head">
-    <div class="name">actions</div>
-    <div class="type">Array</div>
+    <span class="name">actions</span>
+    <span class="type">Array</span>
 </h3>
-<p class="item-body">定义窗口按钮,候选值:"Close","Minimize","Maximize",模态窗口下(modal:true),忽略最小化action</p>
+<div class="item-body">
+    <p>定义窗口按钮,候选值:"Close","Minimize","Maximize"</p>
+    <p>模态窗口下(modal:true),忽略最小化action</p>
+</div>
 
 <h3 class="item-head">
-    <div class="name">content</div>
-    <div class="type">String</div>
+    <span class="name">content</span>
+    <span class="type">String|jQuery</span>
 </h3>
-<p class="item-body">定义窗口内容请求地址，返回值HTML作为窗口内容</p>
+<div class="item-body">
+    <p>接受html字符串、jquery对象、URL用来生成TabBody内容</p>
+</div>
+<h3 class="item-head">
+    <span class="name">isIframe</span>
+    <span class="type">Boolean</span>
+</h3>
+<div class="item-body">
+    <p>是否使用iframe,默认值:false</p>
+    <p>当content值为URL，根据isIframe判定是否通过iframe请求窗口内容，否则使用jQuery.load方式请求页面</p>
+</div>
 
 <h3 class="item-head">
-    <div class="name">visible</div>
-    <div class="type">Boolean</div>
+    <span class="name">visible</span>
+    <span class="type">Boolean</span>
 </h3>
-<p class="item-body">是否隐藏窗口,默认值:true</p>
+<div class="item-body">
+    <p>是否显示窗口,默认值:true</p>
+</div>
 
 <h3 class="item-head">
-    <div class="name">modal</div>
-    <div class="type">Boolean</div>
+    <span class="name">modal</span>
+    <span class="type">Boolean</span>
 </h3>
-<p class="item-body">定义为模态窗口,默认值:false</p>
+<div class="item-body">
+    <p>是否初始化为模态窗口,默认值:false</p>
+</div>
 
 <h3 class="item-head">
-    <div class="name">width</div>
-    <div class="type">Number</div>
+    <span class="name">width</span>
+    <span class="type">Number</span>
 </h3>
-<p class="item-body">定义窗口宽度,默认值:600</p>
+<div class="item-body">
+    <p>定义窗口宽度,默认值:600</p>
+</div>
 
 <h3 class="item-head">
-    <div class="name">height</div>
-    <div class="type">Number</div>
+    <span class="name">height</span>
+    <span class="type">Number</span>
 </h3>
-<p class="item-body">定义窗口高度,默认值:400</p>
+<div class="item-body">
+    <p>定义窗口高度,默认值:400</p>
+</div>
 
 <h3 class="item-head">
-    <div class="name">position</div>
-    <div class="type">Object</div>
+    <span class="name">position</span>
+    <span class="type">Object</span>
 </h3>
-<p class="item-body">定义窗口位置,默认值:{top:0,left:0};该值在center:false时起作用</p>
+<div class="item-body">
+    <p>定义窗口位置,默认值:{top:0,left:0};</p>
+    <p>该值在center:false时起作用</p>
+</div>
 
 <h3 class="item-head">
-    <div class="name">center</div>
-    <div class="type">Boolean</div>
+    <span class="name">center</span>
+    <span class="type">Boolean</span>
 </h3>
-<p class="item-body">居中显示窗口,该值为真时会屏蔽掉position设置</p>
+<div class="item-body">
+    <p>居中显示窗口</p>
+    <p>该值为真时会屏蔽掉position设置</p>
+</div>
 
 <h3 class="item-head">
-    <div class="name">resizable</div>
-    <div class="type">Boolean</div>
+    <span class="name">resizable</span>
+    <span class="type">Boolean</span>
 </h3>
-<p class="item-body">是否能缩放窗口</p>
+<div class="item-body">
+    <p>是否能缩放窗口,默认值：true</p>
+</div>
+
+<h3 class="item-head">
+    <span class="name">dragable</span>
+    <span class="type">Boolean</span>
+</h3>
+<div class="item-body">
+    <p>是否能拖动窗口,默认值：true</p>
+</div>
 
 <h2>事件</h2>
 <h3 class="item-head">
-    <div class="name">onReady</div>
-    <div class="type">Function</div>
+    <span class="name">onReady</span>
 </h3>
-<p class="item-body">当窗口完成构造时触发,this指向组件实例,传入参数Window组件Jquery对象</p>
+<div class="item-body">
+    <p>当窗口完成构造时触发,this指向组件实例,并向回调函数传入窗口内容的Jquery对象</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">事件数据</h3>
+        <h3 class="sub-item-head">
+            <span class="name">content</span>
+            <span class="type">jQuery</span>
+        </h3>
+        <p>窗口内容的Jquery对象</p>
+    </div>
+    <pre class="code"><code>
+        $("#window").window({
+            onReady:function($content){
+                $content.find("input").input();//对窗口中所有input初始化
+                this.open();//打开窗口
+            }
+        });
+    </code></pre>
+</div>
+
+<h3 class="item-head">
+    <span class="name">onOpen</span>
+</h3>
+<div class="item-body">
+    <p>当打开窗口时触发,this指向组件实例</p>
+</div>
+
+<h3 class="item-head">
+    <span class="name">onClose</span>
+</h3>
+<div class="item-body">
+    <p>当关闭窗口时触发,this指向组件实例</p>
+</div>
+
+<h3 class="item-head">
+    <span class="name">onMaximize</span>
+</h3>
+<div class="item-body">
+    <p>当最大化窗口时触发,this指向组件实例</p>
+</div>
+
+<h3 class="item-head">
+    <span class="name">onMinimize</span>
+</h3>
+<div class="item-body">
+    <p>当最小化窗口时触发,this指向组件实例</p>
+</div>
+
+<h3 class="item-head">
+    <span class="name">onResume</span>
+</h3>
+<div class="item-body">
+    <p>当复原窗口时触发,this指向组件实例</p>
+</div>
 
 <h2>方法</h2>
 <h3 class="item-head">
-    <div class="name">open</div>
-    <div class="type">void</div>
+    <span class="name">load</span>
 </h3>
-<p class="item-body">打开窗口</p>
+<div class="item-body">
+    <p>加载窗口内容</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">参数</h3>
+        <h3 class="sub-item-head">
+            <span class="name">content</span>
+            <span class="type">String|jQuery|URL</span>
+        </h3>
+        <p>接受HTML字符串，jQuery对象，URL</p>
+        <p>当参数为URL,将通过配置中的isIframe决定是否使用iframe加载内容，默认使用jQuery.load方式加载</p>
+    </div>
+    <pre class="code"><code>
+        var win = $("#window").window({
+            onReady:function($content){
+                var iframe = $content.find('iframe');
+                console.dir(iframe[0].id);//打印iframe的id
+            }
+        });
+        win.load('http://www.channelsoft.com');
+    </code></pre>
+</div>
+<h3 class="item-head">
+    <span class="name">open</span>
+</h3>
+<div class="item-body">
+    <p>打开窗口</p>
+</div>
 
 <h3 class="item-head">
-    <div class="name">resume</div>
-    <div class="type">void</div>
+    <span class="name">resume</span>
 </h3>
-<p class="item-body">还原窗口</p>
+<div class="item-body">
+    <p>还原窗口</p>
+</div>
 
 <h3 class="item-head">
-    <div class="name">minimize</div>
-    <div class="type">void</div>
+    <span class="name">minimize</span>
 </h3>
-<p class="item-body">最小化窗口</p>
+<div class="item-body">
+    <p>最小化窗口</p>
+</div>
 
 <h3 class="item-head">
-    <div class="name">maximize</div>
-    <div class="type">void</div>
+    <span class="name">maximize</span>
 </h3>
-<p class="item-body">最大化窗口</p>
+<div class="item-body">
+    <p>最大化窗口</p>
+</div>
 
 <h3 class="item-head">
-    <div class="name">close</div>
-    <div class="type">void</div>
+    <span class="name">close</span>
 </h3>
-<p class="item-body">关闭窗口</p>
+<div class="item-body">
+    <p>关闭窗口</p>
+    <p>该方法将会销毁窗口实例</p>
+</div>
+
+<h3 class="item-head">
+    <span class="name">toFront</span>
+</h3>
+<div class="item-body">
+    <p>使窗口置为最前</p>
+</div>
 

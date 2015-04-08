@@ -23,15 +23,16 @@
     var fileIcons = {"file":"icon fa fa-file","folderOpen":"icon fa fa-folder-open","folderClose":"icon fa fa-folder"};
 
     var _defaultOptions = {
-        url:"",
         title:null,
+        toolbar:null,
+        url:null,
         param:null,
-        rows:[],
-        onSelected:null,
-        onDblClick:null,
-        page:true,
         async:false,
-        asyncUrl:null
+        asyncUrl:null,
+        page:true,
+
+        onSelected:null,
+        onDblClick:null
     };
 
     /**
@@ -91,82 +92,34 @@
         this.$treebody = null;
         this.selectedRow = null;
         this.toolbar = null;
+        this.rows = null;
         this._className = "tree";
         cri.Widgets.apply(this,arguments);
         this.$element.attr('data-role','tree');
     });
 
     $.extend(Tree.prototype,{
-        _init:function () {
-            this._getData();
-            this._createTree();
-        },
 
         _eventListen:function(){
-            var that = this;
+            var that = this,
+                op   = that.options;
             this.$treebody
                 .on('click',"div.li-content",function(e){
-                    that._setSelected(e);
+                    that._select(e);
                     that._fold(e);
+                    op.onSelected && op.onSelected.call(that,that.selectedRow);
                     return false;
                 })
                 .on('dblclick', "div.li-content", function(e){
-                    that._onDblClickRow(e);
+                    that._select(e);
+                    op.onDblClick && op.onDblClick.call(that,that.selectedRow);
+                    return false;
                 });
         },
 
-        /**
-         * 展开、收缩子节点
-         * @param e
-         * @private
-         */
-        _fold:function(e){
-            var op = this.options,
-                item = $(e.target).closest("div"),
-                id = item.data('uid'),
-                $li = $(e.target).closest("li"),
-                $icon = $("i",item);
-
-            $icon.is(".fa-folder")?
-                $icon.removeClass("fa-folder").addClass("fa-folder-open"):
-                $icon.removeClass("fa-folder-open").addClass("fa-folder");
-
-            this._getDataById(id);
-
-            if(op.async){
-                var pa = {};
-                $.each(op.selectedRow,function(index,data){index != "childrenList" && (pa[index] = data);});
-                op.selectedRow.childrenList || $.ajax({
-                    type: "get",
-                    url: op.asyncUrl,
-                    success: function(data){
-                        op.selectedRow.childrenList = data.rows;
-                        this._appendChildren($li,data.rows);
-                    },
-                    data:pa,
-                    dataType:"JSON",
-                    async:false
-                });
-            }
-            else{
-                this._expand($li);
-            }
-        },
-
-        /**
-         * 收缩、展开后代节点
-         * @param $li
-         * @private
-         */
-        _expand:function($li){
-            var $ul = $li.children("ul");
-            if($ul.length){
-                $ul.children("li").each(function(){
-                    $(this).animate({
-                        height:"toggle"
-                    },500);
-                });
-            }
+        _init:function () {
+            this._getData();
+            this._createTree();
         },
 
         /**
@@ -179,8 +132,8 @@
             $.ajax({
                 type: "get",
                 url: this.options.url,
-                success:function(data, textStatus){
-                    tree.options.rows = data.rows;
+                success:function(data){
+                    tree.rows = data.rows;
                 },
                 data:this.options.param,
                 dataType:"JSON",
@@ -214,7 +167,7 @@
             this.$tree = this.$element.parent();
             this._createTitle(this.$tree);
             this._createToolbar(this.$tree);
-            this._eachNode($treebody,op.rows,"show",0,0);
+            this._eachNode($treebody,this.rows,"show",0,0);
             this.$tree.append($treeview);
         },
 
@@ -227,8 +180,10 @@
          */
         _appendChildren:function($li,children){
             var $ul    = $("<ul></ul>"),
-                indent = $(i,$li).attr("marginLeft");
-            this._eachNode($ul,children,"show",0,indent);
+                uid    = $(".li-content",$li).data('uid') * 1000,
+                indent = +($('i',$li).css("marginLeft").split('px')[0]);
+            indent += _iconWidth;
+            this._eachNode($ul,children,"show",uid,indent);
             $li.append($ul);
         },
 
@@ -257,7 +212,8 @@
                 $icon.attr("class",fileIcons[row.iconType]);
                 $ul.append($li.append($content.append($icon,$text)));
                 isShow == "hide" && $li.hide();
-                if(row.hasChildren){
+
+                if(row.hasChildren && row.children && row.children.length){
                     var $parent = $("<ul></ul>");
                     $li.append($parent);
                     indent += _iconWidth;
@@ -292,6 +248,7 @@
                     node.iconType = "folderOpen";
                 }
                 else{
+                    node.state = "close";
                     node.iconType = "folderClose";
                 }
             }
@@ -312,26 +269,68 @@
             }
         },
 
-        _setSelected:function(e){
-            var item = $(e.target).closest("div")
-                ,id = item.data('uid')
-                ,op = this.options;
-            this._getDataById(id);
-            if(op.onSelected){
-                op.onSelected(op.selectedRow);
+        /**
+         * 展开、收缩子节点
+         * @param e
+         * @private
+         */
+        _fold:function(e){
+            var op = this.options,
+                that = this,
+                item = $(e.target).closest("div"),
+                $li = $(e.target).closest("li"),
+                $icon = $("i",item);
+
+            $icon.is(".fa-folder")?
+                $icon.removeClass("fa-folder").addClass("fa-folder-open"):
+                $icon.removeClass("fa-folder-open").addClass("fa-folder");
+
+            if(!that.selectedRow.children && op.async){
+                var pa = {};
+                $.each(that.selectedRow,function(index,data){
+                    index != "children" && (pa[index] = data);
+                });
+                that.selectedRow.children || $.ajax({
+                    type: "get",
+                    url: op.asyncUrl,
+                    success: function(data){
+                        that.selectedRow.children = data.rows;
+                        that._appendChildren($li,data.rows);
+                    },
+                    data:pa,
+                    dataType:"JSON",
+                    async:false
+                });
+            }
+            else{
+                this._expand($li);
             }
         },
 
-        _clickToolbar:function(e){
-            var toolbar = $(e.target)
-                ,index = toolbar.data('toolbar');
-            this.options.toolbar[index].handler();
+        /**
+         * 收缩、展开后代节点
+         * @param $li
+         * @private
+         */
+        _expand:function($li){
+            var $ul = $li.children("ul");
+            if($ul.length){
+                $ul.children("li").each(function(){
+                    $(this).animate({
+                        height:"toggle"
+                    },500);
+                });
+            }
+        },
+
+        _select:function(e){
+            var item = $(e.target).closest("div"),
+                uid = item.data('uid');
+            this.selectedRow = this._getDataById(uid);
         },
 
         _getDataById:function(id){
-            var op = this.options
-                ,rowdata = null;
-
+            var row = null;
             !function getRow(data){
                 var arr = [];
                 while(id >= 1){
@@ -341,26 +340,16 @@
                 }
                 for(var i = arr.length - 1; i >= 0 ; i--){
                     var k = arr[i] - 1;
-                    data[k]&&(rowdata = data[k])&&(data = data[k].children);
+                    data[k]&&(row = data[k])&&(data = data[k].children);
                 }
-            }(op.rows);
-
-            op.selectedRow = rowdata;
+            }(this.rows);
+            return row;
         },
 
-        _onDblClickRow:function(e){
-            var item = $(e.target).closest("div")
-                ,id = item.data('uid')
-                ,op = this.options;
-            this._getDataById(id);
-            if(op.onDblClick){
-                op.onDblClick(op.selectedRow);
-            }
-            return false;
-        },
+
 
         getSelected:function(){
-            return this.options.selectedRow;
+            return this.selectedRow;
         },
 
         reload:function(param){

@@ -4,7 +4,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-concat'); // 合并 js 文件
     grunt.loadNpmTasks('grunt-contrib-uglify'); // 压缩 js 文件
     grunt.loadNpmTasks('grunt-contrib-watch');  // 动态执行任务
-    grunt.loadNpmTasks('grunt-tomcat-deploy');  //发布
+    //grunt.loadNpmTasks('grunt-tomcat-deploy');  //发布
     grunt.loadNpmTasks('grunt-zip');  //发布
 
     // 配置
@@ -58,6 +58,7 @@ module.exports = function (grunt) {
             }
         },
 
+        /*
         tomcat_deploy: {
             host: '10.132.10.203',
             login: 'tomcat',
@@ -68,6 +69,7 @@ module.exports = function (grunt) {
             deploy: '/manager/deploy',
             undeploy: '/manager/undeploy'
         },
+        */
         zip: {
             cri:{
                 dest:'api/download/cri.zip',
@@ -84,10 +86,12 @@ module.exports = function (grunt) {
                 files: 'cri/source/less/*.less',
                 tasks: ['less:production']
             },
+            /*
             redeploy:{
                 files: 'api/**',
                 tasks: "tomcat_redeploy"
             },
+            */
             zip:{
                 files: 'cri/source/cri/*.*',
                 tasks: "zip:cri"

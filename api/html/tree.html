@@ -8,56 +8,131 @@
     <span class="name">title</span>
     <span class="type">String</span>
 </h3>
-<p class="item-body">定义树形菜单题标</p>
+<div class="item-body">
+    <p>定义树形菜单题标</p>
+</div>
 
 <h3 class="item-head">
     <span class="name">toolbar</span>
     <span class="type">Array</span>
 </h3>
-<p class="item-body">定义树形菜单工具栏</p>
+<div class="item-body">
+    <p>定义树形菜单工具栏</p>
+    <pre class="code"><code>
+        text:按钮文本
+        iconCls:按钮图标,根据项目使用的字体库,cri默认依赖Font-Awesome字体库,请到Font-Awesome挑选图标
+        handler:回调函数
+        toolbar:[{text:'添加',iconCls:'fa fa-plus',handler:addFun},
+            {text:'删除',iconCls:'fa fa-times',handler:deleteFun},
+            {text:'修改',iconCls:'fa fa-pencil',handler:updateFun}
+        ]
+    </code></pre>
+</div>
 
 <h3 class="item-head">
     <span class="name">url</span>
     <span class="type">String</span>
 </h3>
-<p class="item-body">数据请求地址</p>
+<div class="item-body">
+    <p>数据请求地址</p>
+</div>
 
 <h3 class="item-head">
     <span class="name">param</span>
     <span class="type">Object</span>
 </h3>
-<p class="item-body">请求数据参数</p>
+<div class="item-body">
+    <p>请求数据参数</p>
+</div>
 
 <h3 class="item-head">
     <span class="name">async</span>
     <span class="type">Boolean</span>
 </h3>
-<p class="item-body">请求数据是否异步执行 true:异步 false：同步,默认值:false</p>
+<div class="item-body">
+    <p>是否展开节点时，请求节点数据,默认值:false</p>
+</div>
 
 <h3 class="item-head">
     <span class="name">asyncUrl</span>
     <span class="type">String</span>
 </h3>
-<p class="item-body">当async为true,请求该地址请求数据</p>
+<div class="item-body">
+    <p>当async为true,通过该地址请求数据</p>
+</div>
 
 <h2>方法</h2>
 <h3 class="item-head">
     <span class="name">reload</span>
 </h3>
-<p class="item-body">根据参数重新请求数据并生成树</p>
+<div class="item-body">
+    <p>根据参数重新请求数据并生成树</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">参数</h3>
+        <h3 class="sub-item-head">
+            <span class="name">param</span>
+            <span class="type">Object</span>
+        </h3>
+        <p>请求参数，未指定时，使用上一次请求参数</p>
+    </div>
+</div>
 
 <h3 class="item-head">
     <span class="name">getSelected</span>
 </h3>
-<p class="item-body">获取当前选择节点数据</p>
+<div class="item-body">
+    <p>获取当前选择节点数据</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">返回值</h3>
+        <h3 class="sub-item-head">
+            <span class="type">Object</span>
+        </h3>
+        <p>返回用户当前选择节点数据</p>
+    </div>
+</div>
 
 <h2>事件</h2>
 <h3 class="item-head">
     <span class="name">onSelected</span>
 </h3>
-<p class="item-body">当点击选中节点时，触发该事件</p>
+<div class="item-body">
+    <p>当点击选中节点时，触发该事件</p>
+    <p>在方法中，this 指向 grid 实例</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">事件数据</h3>
+        <h3 class="sub-item-head">
+            <span class="name">selectData</span>
+            <span class="type">Object</span>
+        </h3>
+        <pre class="code"><code>
+            $("#tt").tree({
+                onSelected:function(selectData){
+                    console.dir(selectData);//用户当前选择的节点数据
+                }
+            });
+
+        </code></pre>
+    </div>
+</div>
 
 <h3 class="item-head">
     <span class="name">onDblClick</span>
 </h3>
-<p class="item-body">双击树形控件节点时触发</p>
+<div class="item-body">
+    <p>双击树形控件节点时触发</p>
+    <p>在方法中，this 指向 grid 实例</p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">事件数据</h3>
+        <h3 class="sub-item-head">
+            <span class="name">selectData</span>
+            <span class="type">Object</span>
+        </h3>
+        <pre class="code"><code>
+            $("#tt").tree({
+                onDblClick:function(selectData){
+                    console.dir(selectData);//用户双击,当前选择的节点数据
+                }
+            });
+        </code></pre>
+    </div>
+</div>

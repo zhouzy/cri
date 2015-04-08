@@ -39,24 +39,7 @@
                 "name":"MySQL",
                 "size":"",
                 "date":"01/13/2010",
-                "state":"closed",
-                "children":[{
-                    "id":221,
-                    "text":"my.ini",
-                    "name":"my.ini",
-                    "size":"10 KB",
-                    "date":"02/26/2009"
-                },{
-                    "id":222,
-                    "name":"my-huge.ini",
-                    "size":"5 KB",
-                    "date":"02/26/2009"
-                },{
-                    "id":223,
-                    "name":"my-large.ini",
-                    "size":"5 KB",
-                    "date":"02/26/2009"
-                }]
+                "hasChildren":true
             }]
         },{
             "id":3,

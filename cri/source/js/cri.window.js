@@ -65,6 +65,7 @@
         title:"",
         actions:["Close","Minimize","Maximize"],//Colse:关闭,Minimize:最下化,Maximize:最大化
         content:null,
+        isIframe:false,
         visible:true,
         modal:false,//模态窗口
         width:600,
@@ -73,6 +74,7 @@
         center:true,//初始时是否居中
         resizable:true,
         dragable:true,
+
         onReady:null,//当窗口初始化完成时触发
         onOpen:null,//窗口打开时触发
         onClose:null,//窗口关闭时触发
@@ -84,6 +86,7 @@
     var Window = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
         this.windowStatus = "normal";
+        this.contentLoader = null;
         cri.Widgets.apply(this,arguments);
         this.windowStack.push(this);
         this.toFront();
@@ -323,77 +326,6 @@
         },
 
         /**
-         * 由最小化打开窗口
-         */
-        open:function(){
-            this._setStyleByStatus("normal");
-            $(".window-content",this.$window).show();
-            this.windowStatus = "normal";
-            this.options.onOpen && this.options.onOpen.call(this);
-        },
-
-        /**
-         * 关闭当前窗口
-         * 销毁当前窗口
-         */
-        close : function(){
-            this.options.onClose && this.options.onClose.call(this);
-            this._destroy();
-            if(this.windowStack.length){
-                this.windowStack[this.windowStack.length-1].toFront();
-            }
-            else{
-                $(".overlay").hide();
-            }
-        },
-
-        /**
-         * 最大化窗口
-         * 最大化后 复原、关闭
-         */
-        maximize:function(){
-            this._setStyleByStatus("maximize");
-            this._setButtons("maximize");
-            this.windowStatus = "maximize";
-            this.options.onMaxmize && this.options.onMaxmize.call(this);
-        },
-
-        /**
-         * 最小化窗口
-         * 依次排放到左下侧
-         * 模态窗口没有最小化按钮
-         */
-        minimize : function(){
-            this._setButtons("minimize");
-            $(".window-content",this.$window).hide();
-            var left = $(".mini-window").size() * MINI_WINDOW_WIDTH;
-            this._setStyleByStatus("minimize");
-            this.$window.css("left",left);
-            this.windowStatus = "minimize";
-            this.options.onMinimize && this.options.onMinimize.call(this);
-        },
-
-        /**
-         * 复原窗口到初始(缩放、移动窗口会改变初始位置尺寸信息)尺寸、位置
-         */
-        resume : function(){
-            this._setButtons("normal");
-            this._setStyleByStatus("normal");
-            $(".window-content",this.$window).show();
-            if(this.windowStatus == "minimize"){
-                var i = 0;
-                this.windowStatus = "normal";
-                $.each(Window.prototype.windowStack,function(index,wnd){
-                    if(wnd.windowStatus == "minimize"){
-                        wnd._moveLeft(i++);
-                    }
-                });
-            }
-            this.windowStatus = "normal";
-            this.options.onResume && this.options.onResume.call(this);
-        },
-
-        /**
          * 根据窗口的状态设置窗口样式
          * @private
          */
@@ -455,6 +387,77 @@
         },
 
         /**
+         * 由最小化打开窗口
+         */
+        open:function(){
+            this._setStyleByStatus("normal");
+            $(".window-content",this.$window).show();
+            this.windowStatus = "normal";
+            this.options.onOpen && this.options.onOpen.call(this);
+        },
+
+        /**
+         * 销毁当前窗口
+         */
+        close : function(){
+            this.options.onClose && this.options.onClose.call(this);
+            this._destroy();
+            if(this.windowStack.length){
+                this.windowStack[this.windowStack.length-1].toFront();
+            }
+            else{
+                $(".overlay").hide();
+            }
+        },
+
+        /**
+         * 最大化窗口
+         * 最大化后 复原、关闭
+         */
+        maximize:function(){
+            this._setStyleByStatus("maximize");
+            this._setButtons("maximize");
+            this.windowStatus = "maximize";
+            this.options.onMaxmize && this.options.onMaxmize.call(this);
+        },
+
+        /**
+         * 最小化窗口
+         * 依次排放到左下侧
+         * 模态窗口没有最小化按钮
+         */
+        minimize : function(){
+            this._setButtons("minimize");
+            $(".window-content",this.$window).hide();
+            var left = $(".mini-window").size() * MINI_WINDOW_WIDTH;
+            this._setStyleByStatus("minimize");
+            this.$window.css("left",left);
+            this.windowStatus = "minimize";
+            this.options.onMinimize && this.options.onMinimize.call(this);
+        },
+
+        /**
+         * 复原窗口到初始(缩放、移动窗口会改变初始位置尺寸信息)尺寸、位置
+         */
+        resume : function(){
+            this._setButtons("normal");
+            this._setStyleByStatus("normal");
+            $(".window-content",this.$window).show();
+            if(this.windowStatus == "minimize"){
+                var i = 0;
+                this.windowStatus = "normal";
+                $.each(Window.prototype.windowStack,function(index,wnd){
+                    if(wnd.windowStatus == "minimize"){
+                        wnd._moveLeft(i++);
+                    }
+                });
+            }
+            this.windowStatus = "normal";
+            this.options.onResume && this.options.onResume.call(this);
+        },
+
+
+        /**
          * 把当前窗口顶至最前
          */
         toFront:function(){
@@ -487,16 +490,19 @@
             if(content){
                 $element.empty();
                 $element.addClass("loading").html($loadingIcon);
-                $element.load(content,function(response,status){
-                    $element.removeClass("loading");
-                    $loadingIcon.remove();
-                    op.onReady && op.onReady.call(that,that.$window);
+                this.contentLoader = new cri.ContentLoader($element,{
+                    content:content,
+                    isIframe:op.isIframe,
+                    onReady:function(){
+                        $element.removeClass("loading");
+                        $loadingIcon.remove();
+                        op.onReady && op.onReady.call(that,that.$window);
+                    }
                 });
             }else{
                 op.onReady && op.onReady.call(that,that.$window);
             }
         }
-
     });
 
     cri.Window = Window;

@@ -440,7 +440,7 @@
                     $('input[type=checkbox]',that.$gridhead).prop("checked",false);
                     that._refreshBody(that.$gridbody);
                 },
-                error: function(XMLHttpRequest, textStatus, errorThrown){
+                error: function(){
                     that._rows = [];
                     op.total = 0;
                     that.pager && that.pager.update(op.page,op.pageSize,op.total,that._rows.length);

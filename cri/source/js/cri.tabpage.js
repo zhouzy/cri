@@ -20,7 +20,6 @@
         TABPAGE_TABS      = "tabPage-header-tabs",
         TABPAGE_TAB       = "tabPage-header-tab",
         TABPAGE_TAB_CLOSE = "tabPage-header-tab-close",
-        TABPAGE_BODY      = "tabPage-body",
         TAB_WIDTH         = 150;
 
     var _defaultOptions = {
@@ -45,14 +44,14 @@
 
         _create:function(){
             this.$tabPageGroup = this.$element.addClass(TABPAGE_GROUP);
-            var bodys = [];
+            var contents = [];
             this.$element.children().each(function(){
-                bodys.push($(this).detach());
+                contents.push($(this).detach());
             });
             this._createHeader();
-            if(bodys.length>0){
-                for(var i=0; i<bodys.length; i++){
-                    this.addTab(bodys[i],(bodys[i].data("title")|| ""),bodys[i].data("close"));
+            if(contents.length>0){
+                for(var i=0; i<contents.length; i++){
+                    this.addTab(contents[i],(contents[i].data("title")|| ""),contents[i].data("close"));
                 }
             }
         },
@@ -133,7 +132,7 @@
             }
         },
 
-        _leftrightBtn:function(){
+        _leftRightBtn:function(){
             var $tabs = this.$tabs;
             var tabsW = $tabs.width();
             var tabpageHeaderW = this.$pageHeader.width();
@@ -160,7 +159,7 @@
          * @param title : tab name
          * @param closeAble: 是否在该tab上提供关闭按钮
          */
-        addTab:function(content,title,closeAble,iframe,callback){
+        addTab:function(content,title,closeAble,isIframe,callBack){
             title = title || 'New Tab';
             if(closeAble == undefined || closeAble == null || closeAble == "null"){
                 closeAble = true;
@@ -178,17 +177,17 @@
                 });
             closeAble && $tab.append($closeBtn);
             $tabs.append($tab);
-            var tabPageBody = new TabPageBody(this.$tabPageGroup,{
+            var tabPageBody = new cri.ContentLoader(this.$tabPageGroup,{
                 content:content,
-                iframe:iframe,
-                callback:callback
+                isIframe:isIframe,
+                onReady:callBack
             });
 
             this._pageBodyQueue.push(tabPageBody);
             $tabs.width(this._pageBodyQueue.length*TAB_WIDTH);
             this._offsetL();
             this.focusTab($tab);
-            this._leftrightBtn();
+            this._leftRightBtn();
             return tabPageBody;
         },
 
@@ -231,91 +230,6 @@
                 }
             });
             return re;
-        }
-    });
-
-    var TabPageBody = function($parent,options){
-        this.$parent = $parent;
-        this.options = $.extend({
-            content:null,
-            iframe:true,
-            callback:null
-        },options);
-        this.$body = null;
-        this._init();
-    };
-
-    $.extend(TabPageBody.prototype,{
-        _init:function(){
-            this._createBody();
-        },
-        _createBody:function(){
-            this.$body = $('<div class="' + TABPAGE_BODY + '"></div>');
-            this.$parent.append(this.$body);
-            this._load();
-        },
-        _load:function(){
-            var iframe = true,
-                that = this;
-            //jQuery
-            if(this.options.content instanceof jQuery){
-                iframe = false;
-            }
-            //HTML
-            else if(/^<\w+>.*/g.test(this.options.content)){
-                iframe = false;
-            }
-            if(iframe){
-                if(this.options.iframe){
-                    var iframeNode = document.createElement("iframe");
-                    var shame = +new Date();
-                    iframeNode.src = this.options.content;
-                    iframeNode.id = 'id_' + shame;
-                    iframeNode.name = 'name_' + shame;
-                    if (iframeNode.attachEvent){
-                        iframeNode.attachEvent("onload", function(){
-                            that.options.callback && that.options.callback.call();
-                        });
-                    }
-                    else {
-                        iframeNode.onload = function(){
-                            that.options.callback && that.options.callback.call();
-                        };
-                    }
-                    this.$body.append(iframeNode);
-                }
-                else{
-                    this.$body.load(this.options.content,function(){
-                        that.options.callback && that.options.callback.call();
-                    });
-                }
-            }
-            else{
-                this.$body.append(this.options.content);
-                this.options.callback && this.options.callback.call();
-            }
-        },
-        _destroy:function(){
-            this.$body.remove();
-        },
-
-        getContent:function(){
-            return this.$body;
-        },
-
-        show:function(){
-            this.$body.show();
-        },
-
-        hide:function(){
-            this.$body.hide();
-        },
-
-        reload:function(c,callback){
-            c && (this.options.content = c);
-            callback && (this.options.callback = callback);
-            this.$body.empty();
-            this._load();
         }
     });
 

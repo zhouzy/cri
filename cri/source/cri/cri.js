@@ -32,10 +32,6 @@
 
     cri.Class = Class;
 
-    cri.isArray = function(o){
-        return Object.prototype.toString.call(o) === '[object Array]';
-    };
-
     /**
      * 获取表单值
      * @param $form
@@ -74,68 +70,6 @@
     };
 
     /**
-     * 拓展 jquery formValue 方法
-     *
-     * @param o
-     * @returns {{}}
-     */
-    $.fn.formValue = function(o){
-        if(arguments.length>0){
-            cri.setFormValue($(this),o);
-        }
-        else{
-            return cri.getFormValue($(this));
-        }
-    };
-
-    /**
-     * 重置form
-     */
-    $.fn.formReset = function(param){
-        var param = param || {},
-            $this = $(this),
-            inputQuery = ":input:not(:button,[type=submit],[type=reset],[disabled])",
-            selectQuery = "select";
-        $(inputQuery,$this).each(function(){
-            var role = $(this).attr('data-role');
-            var value = this.name ? param[this.name] : '';
-            value = value || '';
-            if(role){
-                if(role=='input'){
-                    $(this).data("input").value(value);
-                }
-                else if(role == 'timeinput'){
-                    value = value || new Date();
-                    $(this).data("timeInput").value(value);
-                }
-            }
-            else{
-                $(this).val(value);
-            }
-        });
-        $(selectQuery,$this).each(function(){
-            var role = $(this).attr('data-role');
-            var value = this.name ? param[this.name] : '';
-            value = value || '';
-            if(role && role=='selectbox'){
-                if(value != ''){
-                    $(this).data("selectBox").value(value);
-                }
-                else{
-                    $(this).data("selectBox").select(0);
-                }
-            }
-            else{
-                if(value != ''){
-                    $(this).val(value);
-                }else{
-                    this.selectedIndex = 0;
-                }
-            }
-        });
-    };
-
-    /**
      * 判断是否为闰年
      * @param year
      * @returns {boolean}
@@ -155,7 +89,7 @@
      * ss/SS/s/S 秒
      */
     cri.formatDate = function(date,formatStr){
-        var str    = formatStr,
+        var str    = formatStr || 'yyyy-MM-dd',
             year   = date.getFullYear(),
             month  = date.getMonth()+1,
             day    = date.getDate(),
@@ -213,6 +147,7 @@
             ww:myDate.getDay()
         };
     };
+
     /**
      * 字符串转成日期类型
      * 日期时间格式 YYYY/MM/dd HH:mm:ss  YYYY-MM-dd HH:mm:ss
@@ -232,19 +167,43 @@
         }
     };
 
+    /**
+     * 将json格式字符串转换成对象
+     * @param json
+     * @returns {*}
+     *
+     * {{deprecated}}
+     */
     cri.parseJSON = function(json){
         return json ? (new Function("return " + json))(): {};
     };
 
-    cri.isNum = function(s)
-    {
-        if (s!=null && s!="")
-        {
+    /**
+     * 判断是否为数组
+     * @param o
+     * @returns {boolean}
+     */
+    cri.isArray = function(o){
+        return Object.prototype.toString.call(o) === '[object Array]';
+    };
+
+    /**
+     * 判断是否为数字
+     * @param s
+     * @returns {boolean}
+     */
+    cri.isNum = function(s){
+        if (s!=null && s!=""){
             return !isNaN(s);
         }
         return false;
     };
 
+    /**
+     * 判断是否为电话号码
+     * @param s
+     * @returns {boolean}
+     */
     cri.isPhoneNo = function(s){
         return /((\d{11})|^((\d{7,8})|(\d{4}|\d{3})-(\d{7,8})|(\d{4}|\d{3})-(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1})|(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1}))$)/.test(s);
     };
@@ -277,6 +236,14 @@
                 return -1;
             };
         }
+        JSON || (window['JSON'] = {
+            parse:function(jsonStr){
+                return cri.parseJSON(jsonStr);
+            },
+            stringify:function(obj){
+                return obj.toSource();
+            }
+        });
     }();
 
 
@@ -348,6 +315,68 @@
             else{
                 return null;
             }
+        };
+
+        /**
+         * 拓展 jquery formValue 方法
+         *
+         * @param o
+         * @returns {{}}
+         */
+        $.fn.formValue = function(o){
+            if(arguments.length>0){
+                cri.setFormValue($(this),o);
+            }
+            else{
+                return cri.getFormValue($(this));
+            }
+        };
+
+        /**
+         * 重置form
+         */
+        $.fn.formReset = function(param){
+            var $this = $(this),
+                inputQuery = ":input:not(:button,[type=submit],[type=reset],[disabled])",
+                selectQuery = "select";
+            param = param || {};
+            $(inputQuery,$this).each(function(){
+                var role = $(this).attr('data-role');
+                var value = this.name ? param[this.name] : '';
+                value = value || '';
+                if(role){
+                    if(role=='input'){
+                        $(this).data("input").value(value);
+                    }
+                    else if(role == 'timeinput'){
+                        value = value || new Date();
+                        $(this).data("timeInput").value(value);
+                    }
+                }
+                else{
+                    $(this).val(value);
+                }
+            });
+            $(selectQuery,$this).each(function(){
+                var role = $(this).attr('data-role');
+                var value = this.name ? param[this.name] : '';
+                value = value || '';
+                if(role && role=='selectbox'){
+                    if(value != ''){
+                        $(this).data("selectBox").value(value);
+                    }
+                    else{
+                        $(this).data("selectBox").select(0);
+                    }
+                }
+                else{
+                    if(value != ''){
+                        $(this).val(value);
+                    }else{
+                        this.selectedIndex = 0;
+                    }
+                }
+            });
         };
     }(jQuery);
 }(window);
@@ -517,11 +546,10 @@
         pageSize:10,
 
         onChange:null,   //行点击时触发
-        onDblClick:null, //双击行时触发
         onSelected:null, //当选择一行或者多行时触发
+        onDblClick:null, //双击行时触发
         onLoad:null,     //构造表格结束时触发
-        ajaxDone:null,   //当AJAX请求成功后触发
-        ajaxError:null   //当AJAX请求失败后触发
+        ajaxDone:null   //当AJAX请求成功后触发
     };
 
     var Grid = cri.Widgets.extend(function(element,options){
@@ -645,7 +673,6 @@
             width && (width-=2);
             $grid.attr("style",this.$element.attr("style"))
                 .css({width:width,height:height,display:'block'});
-
             this.$element.wrap($grid);
             this.$element.hide();
             this.$grid = this.$element.parent();
@@ -720,8 +747,8 @@
                     if(key == 'title'){
                         $tdContent.prop('title',value).append(value);
                     }
-                    else if(key !== 'field' && key !== 'width'){
-                        $td.css(key,value);
+                    else if(key == 'style'){
+                        $td.css(value);
                     }
                 }
                 $td.append($tdContent);
@@ -885,7 +912,7 @@
                     $('input[type=checkbox]',that.$gridhead).prop("checked",false);
                     that._refreshBody(that.$gridbody);
                 },
-                error: function(XMLHttpRequest, textStatus, errorThrown){
+                error: function(){
                     that._rows = [];
                     op.total = 0;
                     that.pager && that.pager.update(op.page,op.pageSize,op.total,that._rows.length);
@@ -1103,6 +1130,112 @@
         return o;
     };
 }(window);
+/**
+ * Author zhouzy
+ * Date   2015/4/8
+ *
+ * ContentLoader
+ * ���ڼ���HTML
+ */
+!function(window){
+
+    "use strict";
+
+    var cri = window.cri,
+        $   = window.jQuery;
+
+    var CONTENT_LOADER = 'content-loader';
+    var _defaultOptions = {
+        content:null,
+        isIframe:false,
+        onReady:null
+    };
+
+    var ContentLoader = cri.Widgets.extend(function($element,options){
+        this.options = _defaultOptions;
+        cri.Widgets.apply(this,arguments);
+        this.$content.attr('data-role','content-loader');
+    });
+
+    $.extend(ContentLoader.prototype,{
+
+        _init:function(){
+            this._createBody();
+        },
+
+        _createBody:function(){
+            this.$content = $('<div class="' + CONTENT_LOADER + '"></div>');
+            this.$element.append(this.$content);
+            this._load();
+        },
+
+        _load:function(){
+            var iframe = true,
+                that = this;
+            //jQuery
+            if(this.options.content instanceof jQuery){
+                iframe = false;
+            }
+            //HTML
+            else if(/^<\w+>.*/g.test(this.options.content)){
+                iframe = false;
+            }
+            if(iframe){
+                if(this.options.isIframe){
+                    var iframeNode = document.createElement("iframe");
+                    var shame = +new Date();
+                    iframeNode.src = this.options.content;
+                    iframeNode.id = 'id_' + shame;
+                    iframeNode.name = 'name_' + shame;
+                    if (iframeNode.attachEvent){
+                        iframeNode.attachEvent("onload", function(){
+                            that.options.callback && that.options.callback.call();
+                        });
+                    }
+                    else {
+                        iframeNode.onload = function(){
+                            that.options.onReady && that.options.onReady.call();
+                        };
+                    }
+                    this.$content.append(iframeNode);
+                }
+                else{
+                    this.$content.load(this.options.content,function(){
+                        that.options.onReady && that.options.onReady.call();
+                    });
+                }
+            }
+            else{
+                this.$content.append(this.options.content);
+                this.options.onReady && this.options.onReady.call();
+            }
+        },
+        _destroy:function(){
+            this.$content.remove();
+        },
+
+        getContent:function(){
+            return this.$content;
+        },
+
+        show:function(){
+            this.$content.show();
+        },
+
+        hide:function(){
+            this.$content.hide();
+        },
+
+        reload:function(c,onReady){
+            c && (this.options.content = c);
+            onReady && (this.options.onReady = onReady);
+            this._destroy();
+            this._load();
+        }
+    });
+    cri.ContentLoader = ContentLoader;
+}(window);
+
 /**
  * Author zhouzy
  * Date   2014/9/23
@@ -1341,7 +1474,6 @@
         readonly:false,
         onFocus:null,
         onBlur:null,
-        onClick:null,
         enable:true,
         required:false
     };
@@ -2269,11 +2401,10 @@
         TABPAGE_TABS      = "tabPage-header-tabs",
         TABPAGE_TAB       = "tabPage-header-tab",
         TABPAGE_TAB_CLOSE = "tabPage-header-tab-close",
-        TABPAGE_BODY      = "tabPage-body",
         TAB_WIDTH         = 150;
 
     var _defaultOptions = {
-        onFouce:null,
+        onFocus:null,
         onCloseTab:null
     };
 
@@ -2294,14 +2425,14 @@
 
         _create:function(){
             this.$tabPageGroup = this.$element.addClass(TABPAGE_GROUP);
-            var bodys = [];
+            var contents = [];
             this.$element.children().each(function(){
-                bodys.push($(this).detach());
+                contents.push($(this).detach());
             });
             this._createHeader();
-            if(bodys.length>0){
-                for(var i=0; i<bodys.length; i++){
-                    this.addTab(bodys[i],(bodys[i].data("title")|| ""),bodys[i].data("close"));
+            if(contents.length>0){
+                for(var i=0; i<contents.length; i++){
+                    this.addTab(contents[i],(contents[i].data("title")|| ""),contents[i].data("close"));
                 }
             }
         },
@@ -2382,7 +2513,7 @@
             }
         },
 
-        _leftrightBtn:function(){
+        _leftRightBtn:function(){
             var $tabs = this.$tabs;
             var tabsW = $tabs.width();
             var tabpageHeaderW = this.$pageHeader.width();
@@ -2409,36 +2540,35 @@
          * @param title : tab name
          * @param closeAble: 是否在该tab上提供关闭按钮
          */
-        addTab:function(content,title,closeAble,iframe,callback){
-
+        addTab:function(content,title,closeAble,isIframe,callBack){
             title = title || 'New Tab';
-
             if(closeAble == undefined || closeAble == null || closeAble == "null"){
                 closeAble = true;
             }
-
             var that = this,
                 $tabs = this.$tabs,
-                $tab = $('<li class="' + TABPAGE_TAB + '">' + title + '</li>').data("for",this._pageBodyQueue.length).click(function(){
-                    that.focusTab($(this));
-                }),
+                $tab = $('<li class="' + TABPAGE_TAB + '">' + title + '</li>')
+                    .data("for",this._pageBodyQueue.length)
+                    .click(function(){
+                        that.focusTab($(this));
+                    }
+                ),
                 $closeBtn = $('<i class="fa fa-close ' + TABPAGE_TAB_CLOSE + '"></i>').click(function(){
                     that._closeTab($tab);
                 });
             closeAble && $tab.append($closeBtn);
             $tabs.append($tab);
-
-            var tabPageBody = new TabPageBody(this.$tabPageGroup,{
+            var tabPageBody = new cri.ContentLoader(this.$tabPageGroup,{
                 content:content,
-                iframe:iframe,
-                callback:callback
+                isIframe:isIframe,
+                onReady:callBack
             });
 
             this._pageBodyQueue.push(tabPageBody);
             $tabs.width(this._pageBodyQueue.length*TAB_WIDTH);
             this._offsetL();
             this.focusTab($tab);
-            this._leftrightBtn();
+            this._leftRightBtn();
             return tabPageBody;
         },
 
@@ -2448,7 +2578,7 @@
             index != null && this._pageBodyQueue[index].hide();
             $tab.addClass("selected");
             this._pageBodyQueue[$tab.data("for")].show();
-            this.options.onFouce && this.options.onFouce.call(this,$tab.data("for"));
+            this.options.onFocus && this.options.onFocus.call(this,$tab.data("for"));
         },
 
         closeTab:function(index){
@@ -2481,91 +2611,6 @@
                 }
             });
             return re;
-        }
-    });
-
-    var TabPageBody = function($parent,options){
-        this.$parent = $parent;
-        this.options = $.extend({
-            content:null,
-            iframe:true,
-            callback:null
-        },options);
-        this.$body = null;
-        this._init();
-    };
-
-    $.extend(TabPageBody.prototype,{
-        _init:function(){
-            this._createBody();
-        },
-        _createBody:function(){
-            this.$body = $('<div class="' + TABPAGE_BODY + '"></div>');
-            this.$parent.append(this.$body);
-            this._load();
-        },
-        _load:function(){
-            var iframe = true,
-                that = this;
-            //jQuery
-            if(this.options.content instanceof jQuery){
-                iframe = false;
-            }
-            //HTML
-            else if(/^<\w+>.*/g.test(this.options.content)){
-                iframe = false;
-            }
-            if(iframe){
-                if(this.options.iframe){
-                    var iframeNode = document.createElement("iframe");
-                    var shame = +new Date();
-                    iframeNode.src = this.options.content;
-                    iframeNode.id = 'id_' + shame;
-                    iframeNode.name = 'name_' + shame;
-                    if (iframeNode.attachEvent){
-                        iframeNode.attachEvent("onload", function(){
-                            that.options.callback && that.options.callback.call();
-                        });
-                    }
-                    else {
-                        iframeNode.onload = function(){
-                            that.options.callback && that.options.callback.call();
-                        };
-                    }
-                    this.$body.append(iframeNode);
-                }
-                else{
-                    this.$body.load(this.options.content,function(){
-                        that.options.callback && that.options.callback.call();
-                    });
-                }
-            }
-            else{
-                this.$body.append(this.options.content);
-                this.options.callback && this.options.callback.call();
-            }
-        },
-        _destroy:function(){
-            this.$body.remove();
-        },
-
-        getContent:function(){
-            return this.$body;
-        },
-
-        show:function(){
-            this.$body.show();
-        },
-
-        hide:function(){
-            this.$body.hide();
-        },
-
-        reload:function(c,callback){
-            c && (this.options.content = c);
-            callback && (this.options.callback = callback);
-            this.$body.empty();
-            this._load();
         }
     });
 
@@ -3025,6 +3070,7 @@
             onChange:function(){
                 that.date = this.getDate();
                 that.input.value(cri.formatDate(that.date,that.options.format));
+                that.options.change && that.options.change.call(that);
             }
         });
     };
@@ -3038,6 +3084,18 @@
         this.input.value(cri.formatDate(value,this.options.format));
         this.selectView.setDate(value);
     };
+
+    /**
+     * 销毁组件
+     * @private
+     */
+    TimeInput.prototype._destroy = function(){
+        this.selectView._destroy();
+        this.$timeInputGroup.replaceWith(this.$element);
+        this.input = null;
+        this.selectView = null;
+    };
+
     /**
      * 使输入框不能用
      */
@@ -3052,6 +3110,11 @@
         this.input.enable();
     };
 
+    /**
+     * 获取设置时间输入框的值
+     * @param value
+     * @returns {*|Date}
+     */
     TimeInput.prototype.value = function(value){
         if(value == undefined){
             return this.date;
@@ -3061,13 +3124,12 @@
         }
     };
 
-    TimeInput.prototype._destroy = function(){
-        this.selectView._destroy();
-        this.$timeInputGroup.replaceWith(this.$element);
-        this.input = null;
-        this.selectView = null;
-    };
-
+    /**
+     * 时间输入框下拉面板
+     * @param $parent
+     * @param options
+     * @constructor
+     */
     var TimeSelectView = function($parent,options){
         this.$parent = $parent;
         this.$timeBox = null;
@@ -3105,6 +3167,11 @@
             $("body").append($timeBox.css({top:top,left:left}));
         },
 
+        /**
+         * 年份选择
+         * @returns {*|jQuery|HTMLElement}
+         * @private
+         */
         _yearSelect : function(){
             var that = this;
             var date = this.date;
@@ -3125,6 +3192,11 @@
             return $yearSelect;
         },
 
+        /**
+         * 月份选择
+         * @returns {*|jQuery|HTMLElement}
+         * @private
+         */
         _monthSelect:function(){
             var that = this,
                 date = this.date,
@@ -3143,6 +3215,11 @@
             return $select;
         },
 
+        /**
+         * 日期选择
+         * @returns {*|jQuery|HTMLElement}
+         * @private
+         */
         _daySelect:function(){
             var $daySelect = this.$daySelect = $('<table></table>'),
                 $week = $('<tr class="week"></tr>'),
@@ -3196,6 +3273,11 @@
             }
         },
 
+        /**
+         * 时间选择
+         * @returns {*|jQuery|HTMLElement}
+         * @private
+         */
         _hmsSelect:function(){
             var $hmsBar      = $('<div class="eb_HMSBar">'),
                 $hourInput   = $('<input class="eb_HMSInput eb_Hour"/>').val(this.date.HH),
@@ -3262,10 +3344,17 @@
             this.$timeBox.css({top:top,left:left});
         },
 
+        /**
+         * 销毁时间选择面板
+         * @private
+         */
         _destroy : function(){
             this.$timeBox.remove();
         },
 
+        /**
+         * 展开收缩时间选择面板
+         */
         toggle:function(){
             var that = this;
             this._setPosition();
@@ -3273,18 +3362,25 @@
                 this.$timeBox.slideDown(200,function(){
                     that._clickBlank();
                 });
-
             }
             else{
                 this.$timeBox.slideUp(200);
             }
         },
 
+        /**
+         * 获取时间选择面板中保存的日期
+         * @returns {Date}
+         */
         getDate:function(){
             var date = this.date;
             return new Date(date.yyyy,date.MM,date.dd,date.HH,date.mm,date.ss);
         },
 
+        /**
+         * 设置时间选择面板各个选择项的值
+         * @param date
+         */
         setDate:function(date){
             this.date = cri.date2Json(date);
             this.$year.text(this.date.yyyy);
@@ -3394,15 +3490,16 @@
     var fileIcons = {"file":"icon fa fa-file","folderOpen":"icon fa fa-folder-open","folderClose":"icon fa fa-folder"};
 
     var _defaultOptions = {
-        url:"",
         title:null,
+        toolbar:null,
+        url:null,
         param:null,
-        rows:[],
-        onSelected:null,
-        onDblClick:null,
-        page:true,
         async:false,
-        asyncUrl:null
+        asyncUrl:null,
+        page:true,
+
+        onSelected:null,
+        onDblClick:null
     };
 
     /**
@@ -3462,82 +3559,34 @@
         this.$treebody = null;
         this.selectedRow = null;
         this.toolbar = null;
+        this.rows = null;
         this._className = "tree";
         cri.Widgets.apply(this,arguments);
         this.$element.attr('data-role','tree');
     });
 
     $.extend(Tree.prototype,{
-        _init:function () {
-            this._getData();
-            this._createTree();
-        },
 
         _eventListen:function(){
-            var that = this;
+            var that = this,
+                op   = that.options;
             this.$treebody
                 .on('click',"div.li-content",function(e){
-                    that._setSelected(e);
+                    that._select(e);
                     that._fold(e);
+                    op.onSelected && op.onSelected.call(that,that.selectedRow);
                     return false;
                 })
                 .on('dblclick', "div.li-content", function(e){
-                    that._onDblClickRow(e);
+                    that._select(e);
+                    op.onDblClick && op.onDblClick.call(that,that.selectedRow);
+                    return false;
                 });
         },
 
-        /**
-         * 展开、收缩子节点
-         * @param e
-         * @private
-         */
-        _fold:function(e){
-            var op = this.options,
-                item = $(e.target).closest("div"),
-                id = item.data('uid'),
-                $li = $(e.target).closest("li"),
-                $icon = $("i",item);
-
-            $icon.is(".fa-folder")?
-                $icon.removeClass("fa-folder").addClass("fa-folder-open"):
-                $icon.removeClass("fa-folder-open").addClass("fa-folder");
-
-            this._getDataById(id);
-
-            if(op.async){
-                var pa = {};
-                $.each(op.selectedRow,function(index,data){index != "childrenList" && (pa[index] = data);});
-                op.selectedRow.childrenList || $.ajax({
-                    type: "get",
-                    url: op.asyncUrl,
-                    success: function(data){
-                        op.selectedRow.childrenList = data.rows;
-                        this._appendChildren($li,data.rows);
-                    },
-                    data:pa,
-                    dataType:"JSON",
-                    async:false
-                });
-            }
-            else{
-                this._expand($li);
-            }
-        },
-
-        /**
-         * 收缩、展开后代节点
-         * @param $li
-         * @private
-         */
-        _expand:function($li){
-            var $ul = $li.children("ul");
-            if($ul.length){
-                $ul.children("li").each(function(){
-                    $(this).animate({
-                        height:"toggle"
-                    },500);
-                });
-            }
+        _init:function () {
+            this._getData();
+            this._createTree();
         },
 
         /**
@@ -3550,8 +3599,8 @@
             $.ajax({
                 type: "get",
                 url: this.options.url,
-                success:function(data, textStatus){
-                    tree.options.rows = data.rows;
+                success:function(data){
+                    tree.rows = data.rows;
                 },
                 data:this.options.param,
                 dataType:"JSON",
@@ -3566,8 +3615,8 @@
          */
         _createTree:function(){
             var op      = this.options,
-                height  = _getElementHeight(this.$element,op.height),
-                width   = _getElementWidth(this.$element,op.width),
+                height  = this.$element._getHeightPixelValue(op.height),
+                width   = this.$element._getWidthPixelValue(op.width),
                 $tree   = $("<div></div>").addClass(this._className).width(width),
 
                 $treeview = this.$treeview = $("<div></div>").addClass("tree-view"),
@@ -3585,7 +3634,7 @@
             this.$tree = this.$element.parent();
             this._createTitle(this.$tree);
             this._createToolbar(this.$tree);
-            this._eachNode($treebody,op.rows,"show",0,0);
+            this._eachNode($treebody,this.rows,"show",0,0);
             this.$tree.append($treeview);
         },
 
@@ -3598,8 +3647,10 @@
          */
         _appendChildren:function($li,children){
             var $ul    = $("<ul></ul>"),
-                indent = $(i,$li).attr("marginLeft");
-            this._eachNode($ul,children,"show",0,indent);
+                uid    = $(".li-content",$li).data('uid') * 1000,
+                indent = +($('i',$li).css("marginLeft").split('px')[0]);
+            indent += _iconWidth;
+            this._eachNode($ul,children,"show",uid,indent);
             $li.append($ul);
         },
 
@@ -3628,7 +3679,8 @@
                 $icon.attr("class",fileIcons[row.iconType]);
                 $ul.append($li.append($content.append($icon,$text)));
                 isShow == "hide" && $li.hide();
-                if(row.hasChildren){
+
+                if(row.hasChildren && row.children && row.children.length){
                     var $parent = $("<ul></ul>");
                     $li.append($parent);
                     indent += _iconWidth;
@@ -3663,6 +3715,7 @@
                     node.iconType = "folderOpen";
                 }
                 else{
+                    node.state = "close";
                     node.iconType = "folderClose";
                 }
             }
@@ -3683,26 +3736,68 @@
             }
         },
 
-        _setSelected:function(e){
-            var item = $(e.target).closest("div")
-                ,id = item.data('uid')
-                ,op = this.options;
-            this._getDataById(id);
-            if(op.onSelected){
-                op.onSelected(op.selectedRow);
+        /**
+         * 展开、收缩子节点
+         * @param e
+         * @private
+         */
+        _fold:function(e){
+            var op = this.options,
+                that = this,
+                item = $(e.target).closest("div"),
+                $li = $(e.target).closest("li"),
+                $icon = $("i",item);
+
+            $icon.is(".fa-folder")?
+                $icon.removeClass("fa-folder").addClass("fa-folder-open"):
+                $icon.removeClass("fa-folder-open").addClass("fa-folder");
+
+            if(!that.selectedRow.children && op.async){
+                var pa = {};
+                $.each(that.selectedRow,function(index,data){
+                    index != "children" && (pa[index] = data);
+                });
+                that.selectedRow.children || $.ajax({
+                    type: "get",
+                    url: op.asyncUrl,
+                    success: function(data){
+                        that.selectedRow.children = data.rows;
+                        that._appendChildren($li,data.rows);
+                    },
+                    data:pa,
+                    dataType:"JSON",
+                    async:false
+                });
+            }
+            else{
+                this._expand($li);
             }
         },
 
-        _clickToolbar:function(e){
-            var toolbar = $(e.target)
-                ,index = toolbar.data('toolbar');
-            this.options.toolbar[index].handler();
+        /**
+         * 收缩、展开后代节点
+         * @param $li
+         * @private
+         */
+        _expand:function($li){
+            var $ul = $li.children("ul");
+            if($ul.length){
+                $ul.children("li").each(function(){
+                    $(this).animate({
+                        height:"toggle"
+                    },500);
+                });
+            }
+        },
+
+        _select:function(e){
+            var item = $(e.target).closest("div"),
+                uid = item.data('uid');
+            this.selectedRow = this._getDataById(uid);
         },
 
         _getDataById:function(id){
-            var op = this.options
-                ,rowdata = null;
-
+            var row = null;
             !function getRow(data){
                 var arr = [];
                 while(id >= 1){
@@ -3712,26 +3807,16 @@
                 }
                 for(var i = arr.length - 1; i >= 0 ; i--){
                     var k = arr[i] - 1;
-                    data[k]&&(rowdata = data[k])&&(data = data[k].children);
+                    data[k]&&(row = data[k])&&(data = data[k].children);
                 }
-            }(op.rows);
-
-            op.selectedRow = rowdata;
+            }(this.rows);
+            return row;
         },
 
-        _onDblClickRow:function(e){
-            var item = $(e.target).closest("div")
-                ,id = item.data('uid')
-                ,op = this.options;
-            this._getDataById(id);
-            if(op.onDblClick){
-                op.onDblClick(op.selectedRow);
-            }
-            return false;
-        },
+
 
         getSelected:function(){
-            return this.options.selectedRow;
+            return this.selectedRow;
         },
 
         reload:function(param){
@@ -3740,7 +3825,7 @@
         }
     });
 
-    $.fn.tree = function (option,param) {
+    $.fn.tree = function (option) {
         var tree = null;
         this.each(function () {
             var $this   = $(this),
@@ -4252,6 +4337,7 @@
         title:"",
         actions:["Close","Minimize","Maximize"],//Colse:关闭,Minimize:最下化,Maximize:最大化
         content:null,
+        isIframe:false,
         visible:true,
         modal:false,//模态窗口
         width:600,
@@ -4260,6 +4346,7 @@
         center:true,//初始时是否居中
         resizable:true,
         dragable:true,
+
         onReady:null,//当窗口初始化完成时触发
         onOpen:null,//窗口打开时触发
         onClose:null,//窗口关闭时触发
@@ -4271,6 +4358,7 @@
     var Window = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
         this.windowStatus = "normal";
+        this.contentLoader = null;
         cri.Widgets.apply(this,arguments);
         this.windowStack.push(this);
         this.toFront();
@@ -4510,77 +4598,6 @@
         },
 
         /**
-         * 由最小化打开窗口
-         */
-        open:function(){
-            this._setStyleByStatus("normal");
-            $(".window-content",this.$window).show();
-            this.windowStatus = "normal";
-            this.options.onOpen && this.options.onOpen.call(this);
-        },
-
-        /**
-         * 关闭当前窗口
-         * 销毁当前窗口
-         */
-        close : function(){
-            this.options.onClose && this.options.onClose.call(this);
-            this._destroy();
-            if(this.windowStack.length){
-                this.windowStack[this.windowStack.length-1].toFront();
-            }
-            else{
-                $(".overlay").hide();
-            }
-        },
-
-        /**
-         * 最大化窗口
-         * 最大化后 复原、关闭
-         */
-        maximize:function(){
-            this._setStyleByStatus("maximize");
-            this._setButtons("maximize");
-            this.windowStatus = "maximize";
-            this.options.onMaxmize && this.options.onMaxmize.call(this);
-        },
-
-        /**
-         * 最小化窗口
-         * 依次排放到左下侧
-         * 模态窗口没有最小化按钮
-         */
-        minimize : function(){
-            this._setButtons("minimize");
-            $(".window-content",this.$window).hide();
-            var left = $(".mini-window").size() * MINI_WINDOW_WIDTH;
-            this._setStyleByStatus("minimize");
-            this.$window.css("left",left);
-            this.windowStatus = "minimize";
-            this.options.onMinimize && this.options.onMinimize.call(this);
-        },
-
-        /**
-         * 复原窗口到初始(缩放、移动窗口会改变初始位置尺寸信息)尺寸、位置
-         */
-        resume : function(){
-            this._setButtons("normal");
-            this._setStyleByStatus("normal");
-            $(".window-content",this.$window).show();
-            if(this.windowStatus == "minimize"){
-                var i = 0;
-                this.windowStatus = "normal";
-                $.each(Window.prototype.windowStack,function(index,wnd){
-                    if(wnd.windowStatus == "minimize"){
-                        wnd._moveLeft(i++);
-                    }
-                });
-            }
-            this.windowStatus = "normal";
-            this.options.onResume && this.options.onResume.call(this);
-        },
-
-        /**
          * 根据窗口的状态设置窗口样式
          * @private
          */
@@ -4642,6 +4659,77 @@
         },
 
         /**
+         * 由最小化打开窗口
+         */
+        open:function(){
+            this._setStyleByStatus("normal");
+            $(".window-content",this.$window).show();
+            this.windowStatus = "normal";
+            this.options.onOpen && this.options.onOpen.call(this);
+        },
+
+        /**
+         * 销毁当前窗口
+         */
+        close : function(){
+            this.options.onClose && this.options.onClose.call(this);
+            this._destroy();
+            if(this.windowStack.length){
+                this.windowStack[this.windowStack.length-1].toFront();
+            }
+            else{
+                $(".overlay").hide();
+            }
+        },
+
+        /**
+         * 最大化窗口
+         * 最大化后 复原、关闭
+         */
+        maximize:function(){
+            this._setStyleByStatus("maximize");
+            this._setButtons("maximize");
+            this.windowStatus = "maximize";
+            this.options.onMaxmize && this.options.onMaxmize.call(this);
+        },
+
+        /**
+         * 最小化窗口
+         * 依次排放到左下侧
+         * 模态窗口没有最小化按钮
+         */
+        minimize : function(){
+            this._setButtons("minimize");
+            $(".window-content",this.$window).hide();
+            var left = $(".mini-window").size() * MINI_WINDOW_WIDTH;
+            this._setStyleByStatus("minimize");
+            this.$window.css("left",left);
+            this.windowStatus = "minimize";
+            this.options.onMinimize && this.options.onMinimize.call(this);
+        },
+
+        /**
+         * 复原窗口到初始(缩放、移动窗口会改变初始位置尺寸信息)尺寸、位置
+         */
+        resume : function(){
+            this._setButtons("normal");
+            this._setStyleByStatus("normal");
+            $(".window-content",this.$window).show();
+            if(this.windowStatus == "minimize"){
+                var i = 0;
+                this.windowStatus = "normal";
+                $.each(Window.prototype.windowStack,function(index,wnd){
+                    if(wnd.windowStatus == "minimize"){
+                        wnd._moveLeft(i++);
+                    }
+                });
+            }
+            this.windowStatus = "normal";
+            this.options.onResume && this.options.onResume.call(this);
+        },
+
+
+        /**
          * 把当前窗口顶至最前
          */
         toFront:function(){
@@ -4674,16 +4762,19 @@
             if(content){
                 $element.empty();
                 $element.addClass("loading").html($loadingIcon);
-                $element.load(content,function(response,status){
-                    $element.removeClass("loading");
-                    $loadingIcon.remove();
-                    op.onReady && op.onReady.call(that,that.$window);
+                this.contentLoader = new cri.ContentLoader($element,{
+                    content:content,
+                    isIframe:op.isIframe,
+                    onReady:function(){
+                        $element.removeClass("loading");
+                        $loadingIcon.remove();
+                        op.onReady && op.onReady.call(that,that.$window);
+                    }
                 });
             }else{
                 op.onReady && op.onReady.call(that,that.$window);
             }
         }
-
     });
 
     cri.Window = Window;
