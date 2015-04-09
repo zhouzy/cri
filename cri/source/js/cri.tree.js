@@ -346,8 +346,6 @@
             return row;
         },
 
-
-
         getSelected:function(){
             return this.selectedRow;
         },
