@@ -96,31 +96,46 @@
         }
     }
     .input-warm{
-        position: absolute;
-        top:-34px;
-        left: 85px;
+		font-style:italic;
+		display:none;
+        position:fixed;
+        top:0;
+        left:0;
         min-width: 140px;
-        height: 24px;
-        line-height: 24px;
-        padding: 0 10px;
-        border: @color-input-border;
+        height: 18px;
+        line-height: 18px;
+        padding-left:5px;
         background: @color-input-warm;
-        color: #fff;
+        color: #ffffff;
         font-size: 12px;
         z-index:30002;
-        .rounded-corners(3px);
+		opacity: .8;
+		filter:alpha(opacity=80);
+		.rounded-corners(9px);
+		border:1px solid #c52332;
+		margin-left:5px;
         &:before{
             content:" ";
             display:inline-block;
             position:absolute;
-            top:24px;
-            left:5px;
+            top:18px;
+            left:10px;
             width: 0;
             height: 0;
             border-left: 5px solid transparent;
             border-right: 5px solid transparent;
-            border-top: 10px solid @color-input-warm;
+            border-top: 5px solid @color-input-warm;
+			border-bottom:none;
         }
+		&.bottom-input:before{
+			top:-5px;
+			width: 0;
+			height: 0;
+			border-left: 5px solid transparent;
+			border-right: 5px solid transparent;
+			border-bottom: 5px solid @color-input-warm;
+			border-top:none;
+		}
     }
     .input-layout{
         position: absolute;

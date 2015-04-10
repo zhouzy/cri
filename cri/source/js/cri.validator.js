@@ -15,7 +15,12 @@
 
     var INPUTSELECTOR = ":input:not(:button,[type=submit],[type=reset],[disabled])",
         CHECKBOXSELECTOR = ":checkbox:not([disabled],[readonly])",
-        NUMBERINPUTSELECTOR = "[type=num],[type=range]";
+        NUMBERINPUTSELECTOR = "[type=num],[type=range]",
+
+        ERROR_MSG_HEIGHT = 23,//验证消息框高度
+        ERROR_MSG_NARROW_HEIGHT = 5;//验证消息框箭头高度
+
+
 
     var emailRegExp = /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))$/i,
         urlRegExp = /^(https?|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i;
@@ -114,7 +119,6 @@
     });
 
     $.extend(Validator.prototype,{
-        _init: function(element, options){},
         _eventListen:function(){
             /**
              * 如果是表单,在提交时验证
@@ -192,25 +196,39 @@
             var result = this._checkValidity($input),
                 valid = result.valid;
             if(!valid){
-                var $errormsg = $input.next(".input-warm");
-                if($errormsg.length == 0){
-                    $input.after($('<span class="input-warm">' + this.options.messages[result.key] + '</span>'));
+                var offset = $input.is("[data-role=selectbox]") ? $input.siblings('span[role=readonly]').offset() : $input.offset(),
+                    $errorMsg = $input.next(".input-warm");
+
+                if($errorMsg.length == 0){
+                    $errorMsg = $('<span class="input-warm">' + this.options.messages[result.key] + '</span>');
+                    $input.after($errorMsg);
                 }
                 else{
-                    $errormsg.text(this.options.messages[result.key]);
+                    $errorMsg.text(this.options.messages[result.key]);
                 }
+                if(offset.top <= (ERROR_MSG_HEIGHT)){
+                    var outerHeight = $input.is("[data-role=selectbox]") ? $input.siblings('span[role=readonly]').outerHeight() : $input.outerHeight();
+                    offset.top += outerHeight + ERROR_MSG_NARROW_HEIGHT;
+                    $errorMsg.addClass("bottom-input");
+                }else{
+                    offset.top -= (ERROR_MSG_HEIGHT);
+                }
+                $errorMsg.css(offset).show();
                 if($input.is("[readonly=readonly]")){
                     $input.closest(".input-group").one("click",function(){
-                        $input.next(".input-warm").remove();
+                        $input.next(".input-warm").hide();
                     })
                 }
                 $input.one("focus",function(){
-                    $input.next(".input-warm").remove();
+                    $input.next(".input-warm").hide();
                 });
             }else{
-                $input.next(".input-warm").remove();
+                $input.next(".input-warm").hide();
             }
             return valid;
+        },
+        hideMessages:function(){
+            $(".input-warm",this.$element).hide();
         }
     });
 

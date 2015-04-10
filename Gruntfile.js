@@ -79,12 +79,10 @@ module.exports = function (grunt) {
                 files: 'cri/source/less/*.less',
                 tasks: ['less:production']
             },
-            /*
             redeploy:{
                 files: 'api/**',
                 tasks: "tomcat_redeploy"
             },
-            */
             zip:{
                 files: 'cri/source/cri/*.*',
                 tasks: "zip:cri"
