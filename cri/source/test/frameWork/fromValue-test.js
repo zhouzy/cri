@@ -21,4 +21,5 @@ QUnit.test("formValue",function(assert){
     assert.ok(formValue.timeInput instanceof Date);
     assert.equal(formValue.timeInput,yesterday);
     assert.equal(formValue.selectBox,'3');
+    $form.formReset();
 });

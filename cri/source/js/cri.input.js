@@ -134,6 +134,7 @@
             }
             if(this.$input.is("input")){
                 this.$input.val(value);
+                this.$input.change();
             }else{
                 if(this.$element.is("select")){
                     this.$element.val(value);
@@ -143,7 +144,7 @@
                     this.$element.val(value);
                     this.$input.text(value);
                 }
-                this.$element.trigger("change");
+                this.$element.change();
             }
         },
 

@@ -1610,6 +1610,7 @@
             }
             if(this.$input.is("input")){
                 this.$input.val(value);
+                this.$input.change();
             }else{
                 if(this.$element.is("select")){
                     this.$element.val(value);
@@ -1619,7 +1620,7 @@
                     this.$element.val(value);
                     this.$input.text(value);
                 }
-                this.$element.trigger("change");
+                this.$element.change();
             }
         },
 
@@ -1673,6 +1674,7 @@
         return o;
     };
 }(window);
+
 /*=====================================================================================
  * easy-bootstrap-marquee v1.0
  *
@@ -4194,15 +4196,19 @@
             if(that.options.validateOnBlur){
                 if(!$element.is(INPUTSELECTOR)){
                     $element.find(INPUTSELECTOR).each(function(){
-                        if($(this).is('[role=timeInput]')){
-                            $(this).on("change",function(){
-                                that._validateInput($(this));
-                            });
-                        }else{
+                        $(this).on("change",function(){
+                            that._validateInput($(this));
+                        });
+                        if(!$(this).is('[role=timeInput]')){
                             $(this).on("blur",function(){
                                 that._validateInput($(this));
                             });
                         }
+                    });
+                    $element.find("select").each(function(){
+                        $(this).on("change",function(){
+                            that._validateInput($(this));
+                        });
                     });
                 }else{
                     $element.on("blur",function(){
@@ -4256,7 +4262,7 @@
             var result = this._checkValidity($input),
                 valid = result.valid;
             if(!valid){
-                var offset = $input.is("[data-role=selectbox]") ? $input.siblings('span[role=readonly]').offset() : $input.offset(),
+                var offset = $input.is("[data-role=selectbox],[data-role=timeinput]") ? $input.siblings('span[role=readonly]').offset() : $input.offset(),
                     $errorMsg = $input.next(".input-warm");
 
                 if($errorMsg.length == 0){
@@ -4267,7 +4273,7 @@
                     $errorMsg.text(this.options.messages[result.key]);
                 }
                 if(offset.top <= (ERROR_MSG_HEIGHT)){
-                    var outerHeight = $input.is("[data-role=selectbox]") ? $input.siblings('span[role=readonly]').outerHeight() : $input.outerHeight();
+                    var outerHeight = $input.is("[data-role=selectbox],[data-role=timeinput]") ? $input.siblings('span[role=readonly]').outerHeight() : $input.outerHeight();
                     offset.top += outerHeight + ERROR_MSG_NARROW_HEIGHT;
                     $errorMsg.addClass("bottom-input");
                 }else{

@@ -17,7 +17,6 @@
 </head>
 <body style="padding:0;">
 <form style="background-color: #f2c027">
-    <input id="timeinput"  name="time" data-label="timeInput" role="date" required/>
     <select id="select"  name="select" data-label="selectBox" required>
         <option></option>
         <option value="red">f00</option>
@@ -28,13 +27,12 @@
     <input name="input" data-label="input" required role="url"/>
     <input id="email" name="email" data-label="email" role="email"/>
     <input id="url" name="url" data-label="url" role="url"/>
+    <input id="timeinput"  name="time" data-label="timeInput" role="date" required/>
     <input type="button" value="submit" id="btn"/>
 </form>
 <script>
     $(function(){
-        var validator = $("form").validator({
-            validateOnBlur:true
-        });
+
         $("#btn").click(function(){
             console.log($("form").formValue());
         });
@@ -51,6 +49,23 @@
                     validator.hideMessages();
                 },3000);
             }
+        });
+         var validator = $("form").validator({
+            rules:{
+                time:function($input){
+                    if($input.is('[name=time]')){
+                        var time = $input.data("timeInput").value();
+                        if(time.getTime() > new Date()){
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            },
+            messages:{
+                time:'不能超过当前时间'
+            },
+            validateOnBlur:true
         });
     });
 </script>
