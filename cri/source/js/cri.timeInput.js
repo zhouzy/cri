@@ -405,9 +405,11 @@
             this.$year.text(this.date.yyyy);
             this.$month.val(this.date.MM);
             this._refreshDaySelect();
-            this.$hour.val(this.date.HH);
-            this.$minute.val(this.date.mm);
-            this.$second.val(this.date.ss);
+            if(this.options.HMS) {
+                this.$hour.val(this.date.HH);
+                this.$minute.val(this.date.mm);
+                this.$second.val(this.date.ss);
+            }
         }
     };
 

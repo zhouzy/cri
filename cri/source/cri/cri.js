@@ -38,21 +38,25 @@
      * @returns {{}}
      */
     cri.getFormValue = function($form){
-        var o = {};
-        $("input[name],select[name],textarea[name]",$form).each(function(){
-            if($(this).is("[type=checkbox]")){
-                if($(this).prop("checked")) {
-                    o[this.name] = this.value;
-                }
-                else{
-                    return true;
-                }
-            }
-            if($(this).is("select")){
-                o[this.name] = $(this).val();
+        var o = {},
+            inputQuery = ":input:not(:button,[type=submit],[type=reset],[disabled])",
+            selectQuery = "select";
+        $(inputQuery,$form).each(function(){
+            var role = $(this).attr('data-role');
+            if(role && role == 'timeinput'){
+                this.name && (o[this.name] = $(this).data("timeInput").value());
             }
             else{
-                o[this.name] = this.value;
+                this.name && (o[this.name] = $(this).val());
+            }
+        });
+        $(selectQuery,$form).each(function(){
+            var role = $(this).attr('data-role');
+            if(role && role=='selectbox'){
+                this.name && (o[this.name] = $(this).data("selectBox").value());
+            }
+            else{
+                this.name && (o[this.name] = $(this).val());
             }
         });
         return o;
@@ -65,7 +69,23 @@
      */
     cri.setFormValue = function($form,o){
         for(var name in o){
-            $("[name=" + name + "]",$form).val(o[name]);
+            var $i = $("[name=" + name + "]",$form);
+            if($i.length){
+                switch($i.data('role')){
+                    case 'input':{
+                        $i.data('input').value(o[name]);
+                    }break;
+                    case 'timeinput':{
+                        $i.data('timeInput').value(o[name]);
+                    }break;
+                    case 'selectbox':{
+                        $i.data('selectBox').value(o[name]);
+                    }break;
+                    default:{
+                        $i.val(o[name]);
+                    }
+                }
+            }
         }
     };
 
@@ -3386,9 +3406,11 @@
             this.$year.text(this.date.yyyy);
             this.$month.val(this.date.MM);
             this._refreshDaySelect();
-            this.$hour.val(this.date.HH);
-            this.$minute.val(this.date.mm);
-            this.$second.val(this.date.ss);
+            if(this.options.HMS) {
+                this.$hour.val(this.date.HH);
+                this.$minute.val(this.date.mm);
+                this.$second.val(this.date.ss);
+            }
         }
     };
 
