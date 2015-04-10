@@ -4266,7 +4266,7 @@
                     $errorMsg = $input.next(".input-warm");
 
                 if($errorMsg.length == 0){
-                    $errorMsg = $('<span class="input-warm">' + this.options.messages[result.key] + '</span>');
+                    $errorMsg = $('<span class="input-warm" data-errorfor="' + $input.attr("name") + '">' + this.options.messages[result.key] + '</span>');
                     $input.after($errorMsg);
                 }
                 else{
@@ -4293,8 +4293,24 @@
             }
             return valid;
         },
-        hideMessages:function(){
-            $(".input-warm",this.$element).hide();
+
+        _hideMessage:function(name){
+            this.$element.find('[data-errorfor='+name+']').hide();
+        },
+
+        hideMessages:function(names){
+            if(names){
+                if(cri.isArray(names)){
+                    for(var i = 0,len=names.length;i<len;i++){
+                        this._hideMessage(names[i]);
+                    }
+                }
+                else{
+                    this._hideMessage(names);
+                }
+            }else{
+                $(".input-warm",this.$element).hide();
+            }
         }
     });
 

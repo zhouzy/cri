@@ -24,7 +24,6 @@
         <option value="blue">00f</option>
     </select>
     <input id="input" name="input" data-label="input" required role="url"/>
-    <input name="input" data-label="input" required role="url"/>
     <input id="email" name="email" data-label="email" role="email"/>
     <input id="url" name="url" data-label="url" role="url"/>
     <input id="timeinput"  name="time" data-label="timeInput" role="date" required/>
@@ -46,7 +45,7 @@
             handler:function(){
                 validator.validate();
                 setTimeout(function(){
-                    validator.hideMessages();
+                    validator.hideMessages('input');
                 },3000);
             }
         });
