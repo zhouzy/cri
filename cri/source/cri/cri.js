@@ -44,7 +44,7 @@
         $(inputQuery,$form).each(function(){
             var role = $(this).attr('data-role');
             if(role && role == 'timeinput'){
-                this.name && (o[this.name] = $(this).data("timeInput").value());
+                this.name && (o[this.name] = $(this).data("timeInput").getFormatValue());
             }
             else{
                 this.name && (o[this.name] = $(this).val());
@@ -3050,10 +3050,16 @@
         if(!this.options.HMS && this.options.format){
             this.options.format = this.options.format.replace(/\s*[Hh].*$/,"");
         }
+
+        this.date = this.options.value || new Date();
+
+        if(!(this.date instanceof Date)){
+            this.date = cri.string2Date(this.date)
+        }
+
         var $element = this.$element.attr("role","timeInput");
         $element.wrap('<div class="'+TIME_INPUT_GROUP+'"></div>');
         this.$timeInputGroup = $element.parent();
-        this.date = this.options.value || new Date();
         this._wrapInput();
         this._timeSelectView();
     };
@@ -3133,8 +3139,15 @@
     };
 
     /**
+     * 获取格式化后日期字符串
+     */
+    TimeInput.prototype.getFormatValue = function(){
+        return this.$element.val();
+    };
+
+    /**
      * 获取设置时间输入框的值
-     * @param value
+     * @param value String|Date
      * @returns {*|Date}
      */
     TimeInput.prototype.value = function(value){
@@ -3142,7 +3155,12 @@
             return this.date;
         }
         else{
-            this._setValue(value);
+            if(value instanceof Date){
+                this._setValue(value);
+            }
+            else{
+                this._setValue(cri.string2Date(value));
+            }
         }
     };
 

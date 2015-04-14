@@ -44,7 +44,7 @@
         $(inputQuery,$form).each(function(){
             var role = $(this).attr('data-role');
             if(role && role == 'timeinput'){
-                this.name && (o[this.name] = $(this).data("timeInput").value());
+                this.name && (o[this.name] = $(this).data("timeInput").getFormatValue());
             }
             else{
                 this.name && (o[this.name] = $(this).val());
