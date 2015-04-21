@@ -813,7 +813,13 @@
                     $tr = $('<tr></tr>').data("rowid",id);
 
                 if(op.checkBox){
-                    $tr.append($("<td></td>").addClass("line-checkbox").append('<input type="checkbox"/>'));
+                    if(row.check){
+                        $tr.addClass("selected");
+                        $tr.append($("<td></td>").addClass("line-checkbox").append('<input type="checkbox" checked/>'));
+                        this._selectedId.push(id);
+                    }else{
+                        $tr.append($("<td></td>").addClass("line-checkbox").append('<input type="checkbox"/>'));
+                    }
                 }
 
                 if(op.rowNum){
