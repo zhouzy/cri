@@ -120,6 +120,9 @@
         _init:function () {
             this._getData();
             this._createTree();
+            if(this.options.onLoad && typeof(this.options.onLoad) === 'function'){
+                this.options.onLoad.call(this);
+            }
         },
 
         /**

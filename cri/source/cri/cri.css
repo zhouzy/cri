@@ -239,7 +239,7 @@ table {
   left: 0;
   right: 0;
   bottom: 0;
-  overflow: hidden;
+  overflow: auto;
 }
 .content-loader iframe {
   width: 100%;

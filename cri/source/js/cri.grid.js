@@ -144,7 +144,6 @@
                         var width = +$col.width() + px;
                         var tableWidth = $("table",that.$gridhead).width();
                         dragStartX = e.pageX;
-                        console.log(width);
                         if(width >= _cellMinW){
                             $("table",that.$gridbody).width(tableWidth + px);
                             $("table",that.$gridhead).width(tableWidth + px);
@@ -334,7 +333,7 @@
                     var $content = $('<div></div>').addClass('td-content');
                     var column = columns[j],
                         text   = row[column.field]==null ? "" : row[column.field],
-                        _text  = ("" + text).replace(/<.\w+\s*[^<]+>/g,"");
+                        _text  = ("" + text).replace(/(<([^a\/]).*?>)|(<\/[^a].*?>)/g,"");
                     $content.prop("title",_text).text(_text);
                     $td.append(_text);
                     $tr.append($td);

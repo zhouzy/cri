@@ -32,31 +32,31 @@
 
     cri.Class = Class;
 
-    cri.isArray = function(o){
-        return Object.prototype.toString.call(o) === '[object Array]';
-    };
-
     /**
      * 获取表单值
      * @param $form
      * @returns {{}}
      */
     cri.getFormValue = function($form){
-        var o = {};
-        $("input[name],select[name],textarea[name]",$form).each(function(){
-            if($(this).is("[type=checkbox]")){
-                if($(this).prop("checked")) {
-                    o[this.name] = this.value;
-                }
-                else{
-                    return true;
-                }
-            }
-            if($(this).is("select")){
-                o[this.name] = $(this).val();
+        var o = {},
+            inputQuery = ":input:not(:button,[type=submit],[type=reset],[disabled])",
+            selectQuery = "select";
+        $(inputQuery,$form).each(function(){
+            var role = $(this).attr('data-role');
+            if(role && role == 'timeinput'){
+                this.name && (o[this.name] = $(this).data("timeInput").getFormatValue());
             }
             else{
-                o[this.name] = this.value;
+                this.name && (o[this.name] = $(this).val());
+            }
+        });
+        $(selectQuery,$form).each(function(){
+            var role = $(this).attr('data-role');
+            if(role && role=='selectbox'){
+                this.name && (o[this.name] = $(this).data("selectBox").value());
+            }
+            else{
+                this.name && (o[this.name] = $(this).val());
             }
         });
         return o;
@@ -69,70 +69,24 @@
      */
     cri.setFormValue = function($form,o){
         for(var name in o){
-            $("[name=" + name + "]",$form).val(o[name]);
+            var $i = $("[name=" + name + "]",$form);
+            if($i.length){
+                switch($i.data('role')){
+                    case 'input':{
+                        $i.data('input').value(o[name]);
+                    }break;
+                    case 'timeinput':{
+                        $i.data('timeInput').value(o[name]);
+                    }break;
+                    case 'selectbox':{
+                        $i.data('selectBox').value(o[name]);
+                    }break;
+                    default:{
+                        $i.val(o[name]);
+                    }
+                }
+            }
         }
-    };
-
-    /**
-     * 拓展 jquery formValue 方法
-     *
-     * @param o
-     * @returns {{}}
-     */
-    $.fn.formValue = function(o){
-        if(arguments.length>0){
-            cri.setFormValue($(this),o);
-        }
-        else{
-            return cri.getFormValue($(this));
-        }
-    };
-
-    /**
-     * 重置form
-     */
-    $.fn.formReset = function(param){
-        var param = param || {},
-            $this = $(this),
-            inputQuery = ":input:not(:button,[type=submit],[type=reset],[disabled])",
-            selectQuery = "select";
-        $(inputQuery,$this).each(function(){
-            var role = $(this).attr('data-role');
-            var value = this.name ? param[this.name] : '';
-            value = value || '';
-            if(role){
-                if(role=='input'){
-                    $(this).data("input").value(value);
-                }
-                else if(role == 'timeinput'){
-                    value = value || new Date();
-                    $(this).data("timeInput").value(value);
-                }
-            }
-            else{
-                $(this).val(value);
-            }
-        });
-        $(selectQuery,$this).each(function(){
-            var role = $(this).attr('data-role');
-            var value = this.name ? param[this.name] : '';
-            value = value || '';
-            if(role && role=='selectbox'){
-                if(value != ''){
-                    $(this).data("selectBox").value(value);
-                }
-                else{
-                    $(this).data("selectBox").select(0);
-                }
-            }
-            else{
-                if(value != ''){
-                    $(this).val(value);
-                }else{
-                    this.selectedIndex = 0;
-                }
-            }
-        });
     };
 
     /**
@@ -155,7 +109,7 @@
      * ss/SS/s/S 秒
      */
     cri.formatDate = function(date,formatStr){
-        var str    = formatStr,
+        var str    = formatStr || 'yyyy-MM-dd',
             year   = date.getFullYear(),
             month  = date.getMonth()+1,
             day    = date.getDate(),
@@ -213,6 +167,7 @@
             ww:myDate.getDay()
         };
     };
+
     /**
      * 字符串转成日期类型
      * 日期时间格式 YYYY/MM/dd HH:mm:ss  YYYY-MM-dd HH:mm:ss
@@ -232,19 +187,43 @@
         }
     };
 
+    /**
+     * 将json格式字符串转换成对象
+     * @param json
+     * @returns {*}
+     *
+     * {{deprecated}}
+     */
     cri.parseJSON = function(json){
         return json ? (new Function("return " + json))(): {};
     };
 
-    cri.isNum = function(s)
-    {
-        if (s!=null && s!="")
-        {
+    /**
+     * 判断是否为数组
+     * @param o
+     * @returns {boolean}
+     */
+    cri.isArray = function(o){
+        return Object.prototype.toString.call(o) === '[object Array]';
+    };
+
+    /**
+     * 判断是否为数字
+     * @param s
+     * @returns {boolean}
+     */
+    cri.isNum = function(s){
+        if (s!=null && s!=""){
             return !isNaN(s);
         }
         return false;
     };
 
+    /**
+     * 判断是否为电话号码
+     * @param s
+     * @returns {boolean}
+     */
     cri.isPhoneNo = function(s){
         return /((\d{11})|^((\d{7,8})|(\d{4}|\d{3})-(\d{7,8})|(\d{4}|\d{3})-(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1})|(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1}))$)/.test(s);
     };
@@ -277,7 +256,149 @@
                 return -1;
             };
         }
+        JSON || (window['JSON'] = {
+            parse:function(jsonStr){
+                return cri.parseJSON(jsonStr);
+            },
+            stringify:function(obj){
+                return obj.toSource();
+            }
+        });
     }();
+
+
+    /**
+     * 拓展jQuery对象方法
+     */
+    !function(jQuery){
+        /**
+         * 获取元素的绝对高度像素值
+         * 当父元素隐藏，或者父元素高度未设置时，返回null
+         * 如果调用方法时，传入了value，则使用该value，不再去获取元素CSS高度及height属性
+         * @param value 设定高度(String,Number,百分比)
+         * @returns {*} 绝对高度值，类型为Number或者为Null
+         * @private
+         */
+        $.fn._getHeightPixelValue = function(value){
+            var $this       = $(this),
+                styleHeight = $this[0].style.height,
+                propHeight  = $this[0].height,
+                calHeight   = value || styleHeight || propHeight;
+            if(calHeight){
+                //百分比
+                if(/\d*%/.test(calHeight)){
+                    var $parent = $this.parent();
+                    if($parent.is(":visible") && $parent.css('height')!='0px'){
+                        return Math.floor($this.parent().height() * parseInt(calHeight) / 100);
+                    }
+                    else{
+                        return null;
+                    }
+                }
+                else{
+                    return parseInt(calHeight);
+                }
+            }
+            else{
+                return null;
+            }
+        };
+
+        /**
+         * 获取元素的绝对宽度像素值
+         * 当父元素隐藏，或者父元素宽度未设置时，返回null
+         * 如果调用方法时，传入了value，则使用该value，不再去获取元素CSS宽度及width属性
+         * @param value 设定宽度(String,Number,百分比)
+         * @returns {*} 绝对宽度值，类型为Number或者为Null
+         * @private
+         */
+        $.fn._getWidthPixelValue = function(value){
+            var $this       = $(this),
+                styleWidth = $this[0].style.width,
+                propWidth  = $this[0].width,
+                calWidth   = value || styleWidth || propWidth;
+            if(calWidth){
+                //百分比
+                if(/\d*%/.test(calWidth)){
+                    var $parent = $this.parent();
+                    if($parent.is(":visible") && $parent.css('width')!='0px'){
+                        return Math.floor($this.parent().width() * parseInt(calWidth) / 100);
+                    }
+                    else{
+                        return null;
+                    }
+                }
+                else{
+                    return parseInt(calWidth);
+                }
+            }
+            else{
+                return null;
+            }
+        };
+
+        /**
+         * 拓展 jquery formValue 方法
+         *
+         * @param o
+         * @returns {{}}
+         */
+        $.fn.formValue = function(o){
+            if(arguments.length>0){
+                cri.setFormValue($(this),o);
+            }
+            else{
+                return cri.getFormValue($(this));
+            }
+        };
+
+        /**
+         * 重置form
+         */
+        $.fn.formReset = function(param){
+            var $this = $(this),
+                inputQuery = ":input:not(:button,[type=submit],[type=reset],[disabled])",
+                selectQuery = "select";
+            param = param || {};
+            $(inputQuery,$this).each(function(){
+                var role = $(this).attr('data-role');
+                var value = this.name ? param[this.name] : '';
+                value = value || '';
+                if(role){
+                    if(role=='input'){
+                        $(this).data("input").value(value);
+                    }
+                    else if(role == 'timeinput'){
+                        value = value || new Date();
+                        $(this).data("timeInput").value(value);
+                    }
+                }
+                else{
+                    $(this).val(value);
+                }
+            });
+            $(selectQuery,$this).each(function(){
+                var role = $(this).attr('data-role');
+                var value = this.name ? param[this.name] : '';
+                value = value || '';
+                if(role && role=='selectbox'){
+                    if(value != ''){
+                        $(this).data("selectBox").value(value);
+                    }
+                    else{
+                        $(this).data("selectBox").select(0);
+                    }
+                }
+                else{
+                    if(value != ''){
+                        $(this).val(value);
+                    }else{
+                        this.selectedIndex = 0;
+                    }
+                }
+            });
+        };
+    }(jQuery);
 }(window);
 
 
@@ -334,13 +455,46 @@
         $warpper.after($element).remove();
     };
 
+    /**
+     *
+     * @private
+     */
+    Widgets.prototype._getHeightPixelValue = function($d,value){
+        var styleHeight = $d[0].style.height,
+            propHeight  = $d[0].height,
+            calHeight   = value || styleHeight || propHeight;
+
+        if(calHeight){
+            var arr = ("" + calHeight).split("%");
+            if(arr.length>1){
+                /**
+                 * 当 parent 为隐藏元素，则不能获取到parent高度,或者 parent 未设置高度,此时返回 null
+                 */
+                var $parent = $d.parent();
+                if($parent.is(":visible") && $parent.style.height){
+                    calHeight = Math.floor($d.parent().height() * arr[0] / 100);
+                }
+                else{
+                    return null;
+                }
+                calHeight = (""+calHeight).split("px")[0];
+            }
+            if(calHeight){
+                return parseInt(calHeight);
+            }
+        }
+        else{
+            return null;
+        }
+    };
+
     cri.Widgets = Widgets;
 }(window);
 /**
  * Author zhouzy
  * Date   2014/9/18
  * grid 组件
- * dependens Pager
+ * include Pager
  */
 !function(window){
 
@@ -359,36 +513,6 @@
         _cellMinW     = 5;  //单元格最小宽度
 
     /**
-     * 计算表格高度
-     * 1.若初始化时，定义了高度属性
-     * 2.若设置了高度属性(height)
-     * 3.若设置了高度样式
-     * 4.都未定义 默认auto
-     * @param $ele
-     * @param height 初始化时指定的高度
-     * @private
-     */
-    function _getElementHeight($ele,height){
-        var styleHeight = $ele[0].style.height,
-            propHeight  = $ele[0].height,
-            calHeight   = height || styleHeight || propHeight;
-
-        if(calHeight){
-            var arr = ("" + calHeight).split("%");
-            if(arr.length>1){
-                calHeight = Math.floor($ele.parent().height() * arr[0] / 100);
-            }
-            calHeight = (""+calHeight).split("px")[0];
-            if(calHeight){
-                return parseInt(calHeight);
-            }
-        }
-        else{
-            return null;
-        }
-    }
-
-    /**
      * 获取Grid每列信息
      * @param $table        原始 table jquery对象
      * @param optionColumns 使用 options.columns 初始化列属性
@@ -405,13 +529,12 @@
                     fieldArr += "{title:\'" + title + "\'," + data + "},";
                 }
                 else{
-                    fieldArr  += "{title:\'" + title + "\'},";
+                    fieldArr += "{title:\'" + title + "\'},";
                 }
             });
             fieldArr += "]";
             fieldArr = fieldArr.replace(/\},\]/g, "}]").replace(/\],\]/g, "]]");
-
-            return (new Function("return " + fieldArr))();
+            return cri.parseJSON(fieldArr);
         }());
 
         $.map(columns,function(column){
@@ -443,11 +566,10 @@
         pageSize:10,
 
         onChange:null,   //行点击时触发
-        onDblClick:null, //双击行时触发
         onSelected:null, //当选择一行或者多行时触发
+        onDblClick:null, //双击行时触发
         onLoad:null,     //构造表格结束时触发
-        ajaxDone:null,   //当AJAX请求成功后触发
-        ajaxError:null   //当AJAX请求失败后触发
+        ajaxDone:null   //当AJAX请求成功后触发
     };
 
     var Grid = cri.Widgets.extend(function(element,options){
@@ -467,14 +589,18 @@
     });
 
     $.extend(Grid.prototype,{
+        /**
+         * 监听用户事件
+         * @private
+         */
         _eventListen:function(){
-            var that = this;
-            var op = this.options;
-            var dragStartX = 0;
-            var clickTimer = null;
+            var that       = this,
+                op         = this.options,
+                dragStartX = 0,
+                clickTimer = null;
 
             this.$gridbody
-                .on("scroll",function(e){
+                .on("scroll",function(){
                     $(".grid-head-wrap",that.$gridhead).scrollLeft($(this).scrollLeft());
                 })
                 .on('click', "tr", function(e){
@@ -510,7 +636,6 @@
                         var width = +$col.width() + px;
                         var tableWidth = $("table",that.$gridhead).width();
                         dragStartX = e.pageX;
-                        console.log(width);
                         if(width >= _cellMinW){
                             $("table",that.$gridbody).width(tableWidth + px);
                             $("table",that.$gridhead).width(tableWidth + px);
@@ -540,6 +665,10 @@
                 });
         },
 
+        /**
+         * 初始化组件HTML结构
+         * @private
+         */
         _init:function() {
             this._columns = _getColumnsDef(this.$element,this.options.columns);
             this._createGrid();
@@ -551,10 +680,18 @@
             this._colsWidth();
         },
 
+        /**
+         * 初始化表格HTML结构
+         * @private
+         */
         _createGrid:function(){
-            var height = _getElementHeight(this.$element,this.options.height);
-            var $grid = $("<div></div>").addClass("grid").addClass(this._gridClassName);
-            $grid.attr("style",this.$element.attr("style")).show().css("height",height);
+            var height = this.$element._getHeightPixelValue(this.options.height);
+            var width  = this.$element._getWidthPixelValue(this.options.width);
+            var $grid  = $("<div></div>").addClass("grid").addClass(this._gridClassName);
+            height && (height-=2);//减去border
+            width && (width-=2);
+            $grid.attr("style",this.$element.attr("style"))
+                .css({width:width,height:height,display:'block'});
             this.$element.wrap($grid);
             this.$element.hide();
             this.$grid = this.$element.parent();
@@ -563,6 +700,12 @@
             this._createGridView(this.$grid,height);
         },
 
+        /**
+         * 初始化表格 View HTML 结构
+         * @param $parent
+         * @param height
+         * @private
+         */
         _createGridView:function($parent,height){
             this.$gridview = $("<div></div>").addClass("grid-view");
             this.$gridhead = $("<div></div>").addClass("grid-head");
@@ -578,6 +721,11 @@
             this.$grid.append(this.$gridbody);
         },
 
+        /**
+         * 初始化表格标题 HTML 结构
+         * @param $grid
+         * @private
+         */
         _createTitle:function($grid){
             if(this.options.title){
                 this.$title = $('<div class="title"><span>' + this.options.title + '</span></div>');
@@ -585,6 +733,11 @@
             }
         },
 
+        /**
+         * 初始化表格头 HTML 结构
+         * @param $parent
+         * @private
+         */
         _createHead:function($parent){
             var $headWrap = $("<div></div>").addClass("grid-head-wrap"),
                 $table    = $("<table></table>"),
@@ -613,8 +766,8 @@
                     if(key == 'title'){
                         $tdContent.prop('title',value).append(value);
                     }
-                    else if(key !== 'field' && key !== 'width'){
-                        $td.css(key,value);
+                    else if(key == 'style'){
+                        $td.css(value);
                     }
                 }
                 $td.append($tdContent);
@@ -625,6 +778,12 @@
             $parent.html($headWrap.html($table));
         },
 
+        /**
+         * 初始化表格数据部分 HTML 结构
+         * @param gridBodyHeight
+         * @returns {*|HTMLElement}
+         * @private
+         */
         _createBody:function(gridBodyHeight){
             var $gridbody = $('<div class="grid-body loading"></div>'),
                 $loadingIcon = $('<i class="fa fa-spinner fa-spin"></i>').addClass("loadingIcon");
@@ -666,7 +825,7 @@
                     var $content = $('<div></div>').addClass('td-content');
                     var column = columns[j],
                         text   = row[column.field]==null ? "" : row[column.field],
-                        _text  = ("" + text).replace(/<.\w+\s*[^<]+>/g,"");
+                        _text  = ("" + text).replace(/(<([^a\/]).*?>)|(<\/[^a].*?>)/g,"");
                     $content.prop("title",_text).text(_text);
                     $td.append(_text);
                     $tr.append($td);
@@ -690,25 +849,31 @@
             }
         },
 
+        /**
+         * 生成 cols HTML 结构
+         * @param parentWidth
+         * @returns {*|HTMLElement}
+         * @private
+         */
         _createColGroup:function(parentWidth){
-            var $colgroup = $("<colgroup></colgroup>"),
-                op        = this.options,
-                columns   = this._columns,
-                width     = 0;
-            op.checkBox && $colgroup.append($("<col/>").width(30)) && (width+=30);
-            op.rowNum   && $colgroup.append($("<col/>").width(25)) && (width+=20);
-            /**
-             * 当表格列宽总长度小于table宽度，设置最后一列宽度为auto,避免checkBox与rowNum列自动计算宽度
-             */
+            var $cols   = [],
+                op      = this.options,
+                columns = this._columns;
+            op.checkBox && $cols.push($("<col/>").width(30));
+            op.rowNum   && $cols.push($("<col/>").width(25));
             for(var i = 0,len = columns.length; i<len; i++){
                 var $col = $("<col/>");
-                var columnWidth = columns[i]._width || 'auto';
-                $col.width(columnWidth);
-                $colgroup.append($col);
+                columns[i]._width && $col.width(columns[i]._width);
+                $cols.push($col);
             }
-            return $colgroup;
+            return $("<colgroup></colgroup>").append($cols);
         },
 
+        /**
+         * 生成工具栏 HTML 结构
+         * @param $parent
+         * @private
+         */
         _createToolbar:function($parent){
             if(this.options.toolbar) {
                 this.toolbar = new cri.ToolBar($parent, {
@@ -717,6 +882,10 @@
             }
         },
 
+        /**
+         * 生成翻页 HTML 结构
+         * @private
+         */
         _createPage:function(){
             var op = this.options;
             var grid = this;
@@ -735,6 +904,11 @@
             }
         },
 
+        /**
+         * 获取数据
+         * @returns {boolean}
+         * @private
+         */
         _getData:function(){
             var result = true,
                 op     = this.options,
@@ -754,9 +928,10 @@
                     that._rows = data.rows || [];
                     op.total = data.total || 0;
                     that.pager && that.pager.update(op.page,op.pageSize,op.total,that._rows.length);
+                    $('input[type=checkbox]',that.$gridhead).prop("checked",false);
                     that._refreshBody(that.$gridbody);
                 },
-                error: function(XMLHttpRequest, textStatus, errorThrown){
+                error: function(){
                     that._rows = [];
                     op.total = 0;
                     that.pager && that.pager.update(op.page,op.pageSize,op.total,that._rows.length);
@@ -821,10 +996,21 @@
             });
         },
 
+        /**
+         * 根据 rowid 获取某一行的数据
+         * @param rowid
+         * @returns {*}
+         * @private
+         */
         _getRowDataById:function(rowid){
             return this._rows[parseInt(rowid)];
         },
 
+        /**
+         * 当用户双击某一行触发
+         * @param e
+         * @private
+         */
         _onDblClickRow:function(e){
             var that  = this,
                 op    = this.options,
@@ -840,6 +1026,10 @@
             op.onDblClick && op.onDblClick.call(that,that._getRowDataById(rowid));
         },
 
+        /**
+         * 根据 param 重新加载表格
+         * @param param
+         */
         reload:function(param){
             param && (this.options.param = param);
             this.options.page = 1;
@@ -847,6 +1037,10 @@
             this._getData();
         },
 
+        /**
+         * 根据 param 指定的数据加载表格
+         * @param param
+         */
         loadData:function(param){
             if(param.push){
                 this._rows = param;
@@ -854,6 +1048,10 @@
             }
         },
 
+        /**
+         * 获取用户选择的数据
+         * @returns {Array}
+         */
         getSelected:function(){
             var selected = [],
                 selectedId = this._selectedId;
@@ -867,6 +1065,7 @@
 
     cri.Grid = Grid;
 }(window);
+
 /**
  * Author zhouzy
  * Date   2014/9/18
@@ -951,6 +1150,112 @@
         return o;
     };
 }(window);
+/**
+ * Author zhouzy
+ * Date   2015/4/8
+ *
+ * ContentLoader
+ * ���ڼ���HTML
+ */
+!function(window){
+
+    "use strict";
+
+    var cri = window.cri,
+        $   = window.jQuery;
+
+    var CONTENT_LOADER = 'content-loader';
+    var _defaultOptions = {
+        content:null,
+        isIframe:false,
+        onReady:null
+    };
+
+    var ContentLoader = cri.Widgets.extend(function($element,options){
+        this.options = _defaultOptions;
+        cri.Widgets.apply(this,arguments);
+        this.$content.attr('data-role','content-loader');
+    });
+
+    $.extend(ContentLoader.prototype,{
+
+        _init:function(){
+            this._createBody();
+        },
+
+        _createBody:function(){
+            this.$content = $('<div class="' + CONTENT_LOADER + '"></div>');
+            this.$element.append(this.$content);
+            this._load();
+        },
+
+        _load:function(){
+            var iframe = true,
+                that = this;
+            //jQuery
+            if(this.options.content instanceof jQuery){
+                iframe = false;
+            }
+            //HTML
+            else if(/^<\w+>.*/g.test(this.options.content)){
+                iframe = false;
+            }
+            if(iframe){
+                if(this.options.isIframe){
+                    var iframeNode = document.createElement("iframe");
+                    var shame = +new Date();
+                    iframeNode.src = this.options.content;
+                    iframeNode.id = 'id_' + shame;
+                    iframeNode.name = 'name_' + shame;
+                    if (iframeNode.attachEvent){
+                        iframeNode.attachEvent("onload", function(){
+                            that.options.callback && that.options.callback.call();
+                        });
+                    }
+                    else {
+                        iframeNode.onload = function(){
+                            that.options.onReady && that.options.onReady.call();
+                        };
+                    }
+                    this.$content.append(iframeNode);
+                }
+                else{
+                    this.$content.load(this.options.content,function(){
+                        that.options.onReady && that.options.onReady.call();
+                    });
+                }
+            }
+            else{
+                this.$content.append(this.options.content);
+                this.options.onReady && this.options.onReady.call();
+            }
+        },
+        _destroy:function(){
+            this.$content.remove();
+        },
+
+        getContent:function(){
+            return this.$content;
+        },
+
+        show:function(){
+            this.$content.show();
+        },
+
+        hide:function(){
+            this.$content.hide();
+        },
+
+        reload:function(c,onReady){
+            c && (this.options.content = c);
+            onReady && (this.options.onReady = onReady);
+            this._destroy();
+            this._load();
+        }
+    });
+    cri.ContentLoader = ContentLoader;
+}(window);
+
 /**
  * Author zhouzy
  * Date   2014/9/23
@@ -1189,7 +1494,6 @@
         readonly:false,
         onFocus:null,
         onBlur:null,
-        onClick:null,
         enable:true,
         required:false
     };
@@ -1306,6 +1610,7 @@
             }
             if(this.$input.is("input")){
                 this.$input.val(value);
+                this.$input.change();
             }else{
                 if(this.$element.is("select")){
                     this.$element.val(value);
@@ -1315,7 +1620,7 @@
                     this.$element.val(value);
                     this.$input.text(value);
                 }
-                this.$element.trigger("change");
+                this.$element.change();
             }
         },
 
@@ -1369,6 +1674,7 @@
         return o;
     };
 }(window);
+
 /*=====================================================================================
  * easy-bootstrap-marquee v1.0
  *
@@ -2117,11 +2423,10 @@
         TABPAGE_TABS      = "tabPage-header-tabs",
         TABPAGE_TAB       = "tabPage-header-tab",
         TABPAGE_TAB_CLOSE = "tabPage-header-tab-close",
-        TABPAGE_BODY      = "tabPage-body",
         TAB_WIDTH         = 150;
 
     var _defaultOptions = {
-        onFouce:null,
+        onFocus:null,
         onCloseTab:null
     };
 
@@ -2142,14 +2447,14 @@
 
         _create:function(){
             this.$tabPageGroup = this.$element.addClass(TABPAGE_GROUP);
-            var bodys = [];
+            var contents = [];
             this.$element.children().each(function(){
-                bodys.push($(this).detach());
+                contents.push($(this).detach());
             });
             this._createHeader();
-            if(bodys.length>0){
-                for(var i=0; i<bodys.length; i++){
-                    this.addTab(bodys[i],(bodys[i].data("title")|| ""),bodys[i].data("close"));
+            if(contents.length>0){
+                for(var i=0; i<contents.length; i++){
+                    this.addTab(contents[i],(contents[i].data("title")|| ""),contents[i].data("close"));
                 }
             }
         },
@@ -2230,7 +2535,7 @@
             }
         },
 
-        _leftrightBtn:function(){
+        _leftRightBtn:function(){
             var $tabs = this.$tabs;
             var tabsW = $tabs.width();
             var tabpageHeaderW = this.$pageHeader.width();
@@ -2257,36 +2562,35 @@
          * @param title : tab name
          * @param closeAble: 是否在该tab上提供关闭按钮
          */
-        addTab:function(content,title,closeAble,iframe,callback){
-
+        addTab:function(content,title,closeAble,isIframe,callBack){
             title = title || 'New Tab';
-
             if(closeAble == undefined || closeAble == null || closeAble == "null"){
                 closeAble = true;
             }
-
             var that = this,
                 $tabs = this.$tabs,
-                $tab = $('<li class="' + TABPAGE_TAB + '">' + title + '</li>').data("for",this._pageBodyQueue.length).click(function(){
-                    that.focusTab($(this));
-                }),
+                $tab = $('<li class="' + TABPAGE_TAB + '">' + title + '</li>')
+                    .data("for",this._pageBodyQueue.length)
+                    .click(function(){
+                        that.focusTab($(this));
+                    }
+                ),
                 $closeBtn = $('<i class="fa fa-close ' + TABPAGE_TAB_CLOSE + '"></i>').click(function(){
                     that._closeTab($tab);
                 });
             closeAble && $tab.append($closeBtn);
             $tabs.append($tab);
-
-            var tabPageBody = new TabPageBody(this.$tabPageGroup,{
+            var tabPageBody = new cri.ContentLoader(this.$tabPageGroup,{
                 content:content,
-                iframe:iframe,
-                callback:callback
+                isIframe:isIframe,
+                onReady:callBack
             });
 
             this._pageBodyQueue.push(tabPageBody);
             $tabs.width(this._pageBodyQueue.length*TAB_WIDTH);
             this._offsetL();
             this.focusTab($tab);
-            this._leftrightBtn();
+            this._leftRightBtn();
             return tabPageBody;
         },
 
@@ -2296,7 +2600,7 @@
             index != null && this._pageBodyQueue[index].hide();
             $tab.addClass("selected");
             this._pageBodyQueue[$tab.data("for")].show();
-            this.options.onFouce && this.options.onFouce.call(this,$tab.data("for"));
+            this.options.onFocus && this.options.onFocus.call(this,$tab.data("for"));
         },
 
         closeTab:function(index){
@@ -2329,91 +2633,6 @@
                 }
             });
             return re;
-        }
-    });
-
-    var TabPageBody = function($parent,options){
-        this.$parent = $parent;
-        this.options = $.extend({
-            content:null,
-            iframe:true,
-            callback:null
-        },options);
-        this.$body = null;
-        this._init();
-    };
-
-    $.extend(TabPageBody.prototype,{
-        _init:function(){
-            this._createBody();
-        },
-        _createBody:function(){
-            this.$body = $('<div class="' + TABPAGE_BODY + '"></div>');
-            this.$parent.append(this.$body);
-            this._load();
-        },
-        _load:function(){
-            var iframe = true,
-                that = this;
-            //jQuery
-            if(this.options.content instanceof jQuery){
-                iframe = false;
-            }
-            //HTML
-            else if(/^<\w+>.*/g.test(this.options.content)){
-                iframe = false;
-            }
-            if(iframe){
-                if(this.options.iframe){
-                    var iframeNode = document.createElement("iframe");
-                    var shame = +new Date();
-                    iframeNode.src = this.options.content;
-                    iframeNode.id = 'id_' + shame;
-                    iframeNode.name = 'name_' + shame;
-                    if (iframeNode.attachEvent){
-                        iframeNode.attachEvent("onload", function(){
-                            that.options.callback && that.options.callback.call();
-                        });
-                    }
-                    else {
-                        iframeNode.onload = function(){
-                            that.options.callback && that.options.callback.call();
-                        };
-                    }
-                    this.$body.append(iframeNode);
-                }
-                else{
-                    this.$body.load(this.options.content,function(){
-                        that.options.callback && that.options.callback.call();
-                    });
-                }
-            }
-            else{
-                this.$body.append(this.options.content);
-                this.options.callback && this.options.callback.call();
-            }
-        },
-        _destroy:function(){
-            this.$body.remove();
-        },
-
-        getContent:function(){
-            return this.$body;
-        },
-
-        show:function(){
-            this.$body.show();
-        },
-
-        hide:function(){
-            this.$body.hide();
-        },
-
-        reload:function(c,callback){
-            c && (this.options.content = c);
-            callback && (this.options.callback = callback);
-            this.$body.empty();
-            this._load();
         }
     });
 
@@ -2831,10 +3050,16 @@
         if(!this.options.HMS && this.options.format){
             this.options.format = this.options.format.replace(/\s*[Hh].*$/,"");
         }
+
+        this.date = this.options.value || new Date();
+
+        if(!(this.date instanceof Date)){
+            this.date = cri.string2Date(this.date)
+        }
+
         var $element = this.$element.attr("role","timeInput");
         $element.wrap('<div class="'+TIME_INPUT_GROUP+'"></div>');
         this.$timeInputGroup = $element.parent();
-        this.date = this.options.value || new Date();
         this._wrapInput();
         this._timeSelectView();
     };
@@ -2873,6 +3098,7 @@
             onChange:function(){
                 that.date = this.getDate();
                 that.input.value(cri.formatDate(that.date,that.options.format));
+                that.options.change && that.options.change.call(that);
             }
         });
     };
@@ -2886,6 +3112,18 @@
         this.input.value(cri.formatDate(value,this.options.format));
         this.selectView.setDate(value);
     };
+
+    /**
+     * 销毁组件
+     * @private
+     */
+    TimeInput.prototype._destroy = function(){
+        this.selectView._destroy();
+        this.$timeInputGroup.replaceWith(this.$element);
+        this.input = null;
+        this.selectView = null;
+    };
+
     /**
      * 使输入框不能用
      */
@@ -2900,22 +3138,38 @@
         this.input.enable();
     };
 
+    /**
+     * 获取格式化后日期字符串
+     */
+    TimeInput.prototype.getFormatValue = function(){
+        return this.$element.val();
+    };
+
+    /**
+     * 获取设置时间输入框的值
+     * @param value String|Date
+     * @returns {*|Date}
+     */
     TimeInput.prototype.value = function(value){
         if(value == undefined){
             return this.date;
         }
         else{
-            this._setValue(value);
+            if(value instanceof Date){
+                this._setValue(value);
+            }
+            else{
+                this._setValue(cri.string2Date(value));
+            }
         }
     };
 
-    TimeInput.prototype._destroy = function(){
-        this.selectView._destroy();
-        this.$timeInputGroup.replaceWith(this.$element);
-        this.input = null;
-        this.selectView = null;
-    };
-
+    /**
+     * 时间输入框下拉面板
+     * @param $parent
+     * @param options
+     * @constructor
+     */
     var TimeSelectView = function($parent,options){
         this.$parent = $parent;
         this.$timeBox = null;
@@ -2953,6 +3207,11 @@
             $("body").append($timeBox.css({top:top,left:left}));
         },
 
+        /**
+         * 年份选择
+         * @returns {*|jQuery|HTMLElement}
+         * @private
+         */
         _yearSelect : function(){
             var that = this;
             var date = this.date;
@@ -2960,7 +3219,7 @@
             var $minusBtn   = $('<i class="eb_toLastYear eb_yearButton fa fa-minus"></i>');
             var $plusBtn    = $('<i class="eb_toNextYear eb_yearButton fa fa-plus"></i>');
             var $year       = $('<span class="eb_year">' + date.yyyy + '</span>');
-
+            this.$year = $year;
             $minusBtn.on("click",function(){
                 $year.html(--that.date.yyyy);
                 that._change();
@@ -2973,38 +3232,47 @@
             return $yearSelect;
         },
 
+        /**
+         * 月份选择
+         * @returns {*|jQuery|HTMLElement}
+         * @private
+         */
         _monthSelect:function(){
             var that = this,
                 date = this.date,
                 $select = $('<select class="eb_monthSelect">');
-
+            this.$month = $select;
             $.each([1,2,3,4,5,6,7,8,9,10,11,12],function(index,value){
                 value < 10 && (value = "0" + value);
                 $select.append('<option value="' + index + '">' + value + '</option>');
             });
             $select.val(date.MM);
-
             $select.on("change",function(){
-                date.MM = $select.val();
+                that.date.MM = $select.val();
                 that._refreshDaySelect();
                 that._change();
             });
-
             return $select;
         },
 
+        /**
+         * 日期选择
+         * @returns {*|jQuery|HTMLElement}
+         * @private
+         */
         _daySelect:function(){
             var $daySelect = this.$daySelect = $('<table></table>'),
                 $week = $('<tr class="week"></tr>'),
                 week = {"Sunday":"日","Monday":"一","Tuesday":"二","Wednesday":"三",Thursday:"四","Friday":"五","Saturday":"六"},
                 that = this;
+            this.$day = $daySelect;
+
             for(var day in week){
                 var $day = $('<th>' + week[day] + '</th>');
                 day == "Sunday" && $day.addClass("eb_red");
                 day == "Saturday" && $day.addClass("red");
                 $week.append($day);
             }
-            $daySelect.append($week);
             for(var i=0; i<6; i++){
                 var $tr = $('<tr class="days"></tr>');
                 for(var j=0; j<7;j++){
@@ -3045,13 +3313,20 @@
             }
         },
 
+        /**
+         * 时间选择
+         * @returns {*|jQuery|HTMLElement}
+         * @private
+         */
         _hmsSelect:function(){
             var $hmsBar      = $('<div class="eb_HMSBar">'),
                 $hourInput   = $('<input class="eb_HMSInput eb_Hour"/>').val(this.date.HH),
                 $minuteInput = $('<input class="eb_HMSInput eb_minute"/>').val(this.date.mm),
                 $secondInput = $('<input class="eb_HMSInput eb_second"/>').val(this.date.ss),
                 that         = this;
-
+            this.$hour = $hourInput;
+            this.$minute = $minuteInput;
+            this.$second = $secondInput;
             $hourInput.on("change",_handleNumF(0,23));
             $minuteInput.on("change",_handleNumF(0,59));
             $secondInput.on("change",_handleNumF(0,59));
@@ -3109,10 +3384,17 @@
             this.$timeBox.css({top:top,left:left});
         },
 
+        /**
+         * 销毁时间选择面板
+         * @private
+         */
         _destroy : function(){
             this.$timeBox.remove();
         },
 
+        /**
+         * 展开收缩时间选择面板
+         */
         toggle:function(){
             var that = this;
             this._setPosition();
@@ -3126,13 +3408,29 @@
             }
         },
 
+        /**
+         * 获取时间选择面板中保存的日期
+         * @returns {Date}
+         */
         getDate:function(){
             var date = this.date;
             return new Date(date.yyyy,date.MM,date.dd,date.HH,date.mm,date.ss);
         },
 
+        /**
+         * 设置时间选择面板各个选择项的值
+         * @param date
+         */
         setDate:function(date){
             this.date = cri.date2Json(date);
+            this.$year.text(this.date.yyyy);
+            this.$month.val(this.date.MM);
+            this._refreshDaySelect();
+            if(this.options.HMS) {
+                this.$hour.val(this.date.HH);
+                this.$minute.val(this.date.mm);
+                this.$second.val(this.date.ss);
+            }
         }
     };
 
@@ -3234,15 +3532,16 @@
     var fileIcons = {"file":"icon fa fa-file","folderOpen":"icon fa fa-folder-open","folderClose":"icon fa fa-folder"};
 
     var _defaultOptions = {
-        url:"",
         title:null,
+        toolbar:null,
+        url:null,
         param:null,
-        rows:[],
-        onSelected:null,
-        onDblClick:null,
-        page:true,
         async:false,
-        asyncUrl:null
+        asyncUrl:null,
+        page:true,
+
+        onSelected:null,
+        onDblClick:null
     };
 
     /**
@@ -3302,81 +3601,36 @@
         this.$treebody = null;
         this.selectedRow = null;
         this.toolbar = null;
+        this.rows = null;
         this._className = "tree";
         cri.Widgets.apply(this,arguments);
         this.$element.attr('data-role','tree');
     });
 
     $.extend(Tree.prototype,{
-        _init:function () {
-            this._getData();
-            this._createTree();
-        },
 
         _eventListen:function(){
-            var that = this;
+            var that = this,
+                op   = that.options;
             this.$treebody
                 .on('click',"div.li-content",function(e){
-                    that._setSelected(e);
+                    that._select(e);
                     that._fold(e);
+                    op.onSelected && op.onSelected.call(that,that.selectedRow);
                     return false;
                 })
                 .on('dblclick', "div.li-content", function(e){
-                    that._onDblClickRow(e);
+                    that._select(e);
+                    op.onDblClick && op.onDblClick.call(that,that.selectedRow);
+                    return false;
                 });
         },
 
-        /**
-         * 展开、收缩子节点
-         * @param e
-         * @private
-         */
-        _fold:function(e){
-            var op = this.options,
-                item = $(e.target).closest("div"),
-                id = item.data('uid'),
-                $li = $(e.target).closest("li"),
-                $icon = $("i",item);
-
-            $icon.is(".fa-folder")?
-                $icon.removeClass("fa-folder").addClass("fa-folder-open"):
-                $icon.removeClass("fa-folder-open").addClass("fa-folder");
-
-            this._getDataById(id);
-
-            if(op.async){
-                var pa = {};
-                $.each(op.selectedRow,function(index,data){index != "childrenList" && (pa[index] = data);});
-                op.selectedRow.childrenList || $.ajax({
-                    type: "get",
-                    url: op.asyncUrl,
-                    success: function(data){
-                        op.selectedRow.childrenList = data.rows;
-                        this._appendChildren($li,data.rows);
-                    },
-                    data:pa,
-                    dataType:"JSON",
-                    async:false
-                });
-            }
-            else{
-                this._expand($li);
-            }
-        },
-
-        /**
-         * 收缩、展开后代节点
-         * @param $li
-         * @private
-         */
-        _expand:function($li){
-            var $ul = $li.children("ul");
-            if($ul.length){
-                $ul.children("li").each(function(){
-                    $(this).animate({
-                        height:"toggle"
-                    },500);
-                });
+        _init:function () {
+            this._getData();
+            this._createTree();
+            if(this.options.onLoad && typeof(this.options.onLoad) === 'function'){
+                this.options.onLoad.call(this);
             }
         },
 
@@ -3390,8 +3644,8 @@
             $.ajax({
                 type: "get",
                 url: this.options.url,
-                success:function(data, textStatus){
-                    tree.options.rows = data.rows;
+                success:function(data){
+                    tree.rows = data.rows;
                 },
                 data:this.options.param,
                 dataType:"JSON",
@@ -3406,8 +3660,8 @@
          */
         _createTree:function(){
             var op      = this.options,
-                height  = _getElementHeight(this.$element,op.height),
-                width   = _getElementWidth(this.$element,op.width),
+                height  = this.$element._getHeightPixelValue(op.height),
+                width   = this.$element._getWidthPixelValue(op.width),
                 $tree   = $("<div></div>").addClass(this._className).width(width),
 
                 $treeview = this.$treeview = $("<div></div>").addClass("tree-view"),
@@ -3425,7 +3679,7 @@
             this.$tree = this.$element.parent();
             this._createTitle(this.$tree);
             this._createToolbar(this.$tree);
-            this._eachNode($treebody,op.rows,"show",0,0);
+            this._eachNode($treebody,this.rows,"show",0,0);
             this.$tree.append($treeview);
         },
 
@@ -3438,8 +3692,10 @@
          */
         _appendChildren:function($li,children){
             var $ul    = $("<ul></ul>"),
-                indent = $(i,$li).attr("marginLeft");
-            this._eachNode($ul,children,"show",0,indent);
+                uid    = $(".li-content",$li).data('uid') * 1000,
+                indent = +($('i',$li).css("marginLeft").split('px')[0]);
+            indent += _iconWidth;
+            this._eachNode($ul,children,"show",uid,indent);
             $li.append($ul);
         },
 
@@ -3468,7 +3724,8 @@
                 $icon.attr("class",fileIcons[row.iconType]);
                 $ul.append($li.append($content.append($icon,$text)));
                 isShow == "hide" && $li.hide();
-                if(row.hasChildren){
+
+                if(row.hasChildren && row.children && row.children.length){
                     var $parent = $("<ul></ul>");
                     $li.append($parent);
                     indent += _iconWidth;
@@ -3503,6 +3760,7 @@
                     node.iconType = "folderOpen";
                 }
                 else{
+                    node.state = "close";
                     node.iconType = "folderClose";
                 }
             }
@@ -3523,26 +3781,68 @@
             }
         },
 
-        _setSelected:function(e){
-            var item = $(e.target).closest("div")
-                ,id = item.data('uid')
-                ,op = this.options;
-            this._getDataById(id);
-            if(op.onSelected){
-                op.onSelected(op.selectedRow);
+        /**
+         * 展开、收缩子节点
+         * @param e
+         * @private
+         */
+        _fold:function(e){
+            var op = this.options,
+                that = this,
+                item = $(e.target).closest("div"),
+                $li = $(e.target).closest("li"),
+                $icon = $("i",item);
+
+            $icon.is(".fa-folder")?
+                $icon.removeClass("fa-folder").addClass("fa-folder-open"):
+                $icon.removeClass("fa-folder-open").addClass("fa-folder");
+
+            if(!that.selectedRow.children && op.async){
+                var pa = {};
+                $.each(that.selectedRow,function(index,data){
+                    index != "children" && (pa[index] = data);
+                });
+                that.selectedRow.children || $.ajax({
+                    type: "get",
+                    url: op.asyncUrl,
+                    success: function(data){
+                        that.selectedRow.children = data.rows;
+                        that._appendChildren($li,data.rows);
+                    },
+                    data:pa,
+                    dataType:"JSON",
+                    async:false
+                });
+            }
+            else{
+                this._expand($li);
             }
         },
 
-        _clickToolbar:function(e){
-            var toolbar = $(e.target)
-                ,index = toolbar.data('toolbar');
-            this.options.toolbar[index].handler();
+        /**
+         * 收缩、展开后代节点
+         * @param $li
+         * @private
+         */
+        _expand:function($li){
+            var $ul = $li.children("ul");
+            if($ul.length){
+                $ul.children("li").each(function(){
+                    $(this).animate({
+                        height:"toggle"
+                    },500);
+                });
+            }
+        },
+
+        _select:function(e){
+            var item = $(e.target).closest("div"),
+                uid = item.data('uid');
+            this.selectedRow = this._getDataById(uid);
         },
 
         _getDataById:function(id){
-            var op = this.options
-                ,rowdata = null;
-
+            var row = null;
             !function getRow(data){
                 var arr = [];
                 while(id >= 1){
@@ -3552,26 +3852,14 @@
                 }
                 for(var i = arr.length - 1; i >= 0 ; i--){
                     var k = arr[i] - 1;
-                    data[k]&&(rowdata = data[k])&&(data = data[k].children);
+                    data[k]&&(row = data[k])&&(data = data[k].children);
                 }
-            }(op.rows);
-
-            op.selectedRow = rowdata;
-        },
-
-        _onDblClickRow:function(e){
-            var item = $(e.target).closest("div")
-                ,id = item.data('uid')
-                ,op = this.options;
-            this._getDataById(id);
-            if(op.onDblClick){
-                op.onDblClick(op.selectedRow);
-            }
-            return false;
+            }(this.rows);
+            return row;
         },
 
         getSelected:function(){
-            return this.options.selectedRow;
+            return this.selectedRow;
         },
 
         reload:function(param){
@@ -3580,7 +3868,7 @@
         }
     });
 
-    $.fn.tree = function (option,param) {
+    $.fn.tree = function (option) {
         var tree = null;
         this.each(function () {
             var $this   = $(this),
@@ -3591,6 +3879,7 @@
     };
 
 }(window);
+
 /**
  * Author zhouzy
  * Date   2014/9/23
@@ -3810,7 +4099,12 @@
 
     var INPUTSELECTOR = ":input:not(:button,[type=submit],[type=reset],[disabled])",
         CHECKBOXSELECTOR = ":checkbox:not([disabled],[readonly])",
-        NUMBERINPUTSELECTOR = "[type=num],[type=range]";
+        NUMBERINPUTSELECTOR = "[type=num],[type=range]",
+
+        ERROR_MSG_HEIGHT = 23,//验证消息框高度
+        ERROR_MSG_NARROW_HEIGHT = 5;//验证消息框箭头高度
+
+
 
     var emailRegExp = /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))$/i,
         urlRegExp = /^(https?|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i;
@@ -3909,7 +4203,6 @@
     });
 
     $.extend(Validator.prototype,{
-        _init: function(element, options){},
         _eventListen:function(){
             /**
              * 如果是表单,在提交时验证
@@ -3925,15 +4218,19 @@
             if(that.options.validateOnBlur){
                 if(!$element.is(INPUTSELECTOR)){
                     $element.find(INPUTSELECTOR).each(function(){
-                        if($(this).is('[role=timeInput]')){
-                            $(this).on("change",function(){
-                                that._validateInput($(this));
-                            });
-                        }else{
+                        $(this).on("change",function(){
+                            that._validateInput($(this));
+                        });
+                        if(!$(this).is('[role=timeInput]')){
                             $(this).on("blur",function(){
                                 that._validateInput($(this));
                             });
                         }
+                    });
+                    $element.find("select").each(function(){
+                        $(this).on("change",function(){
+                            that._validateInput($(this));
+                        });
                     });
                 }else{
                     $element.on("blur",function(){
@@ -3987,25 +4284,55 @@
             var result = this._checkValidity($input),
                 valid = result.valid;
             if(!valid){
-                var $errormsg = $input.next(".input-warm");
-                if($errormsg.length == 0){
-                    $input.after($('<span class="input-warm">' + this.options.messages[result.key] + '</span>'));
+                var offset = $input.is("[data-role=selectbox],[data-role=timeinput]") ? $input.siblings('span[role=readonly]').offset() : $input.offset(),
+                    $errorMsg = $input.next(".input-warm");
+
+                if($errorMsg.length == 0){
+                    $errorMsg = $('<span class="input-warm" data-errorfor="' + $input.attr("name") + '">' + this.options.messages[result.key] + '</span>');
+                    $input.after($errorMsg);
                 }
                 else{
-                    $errormsg.text(this.options.messages[result.key]);
+                    $errorMsg.text(this.options.messages[result.key]);
                 }
+                if(offset.top <= (ERROR_MSG_HEIGHT)){
+                    var outerHeight = $input.is("[data-role=selectbox],[data-role=timeinput]") ? $input.siblings('span[role=readonly]').outerHeight() : $input.outerHeight();
+                    offset.top += outerHeight + ERROR_MSG_NARROW_HEIGHT;
+                    $errorMsg.addClass("bottom-input");
+                }else{
+                    offset.top -= (ERROR_MSG_HEIGHT);
+                }
+                $errorMsg.css(offset).show();
                 if($input.is("[readonly=readonly]")){
                     $input.closest(".input-group").one("click",function(){
-                        $input.next(".input-warm").remove();
+                        $input.next(".input-warm").hide();
                     })
                 }
                 $input.one("focus",function(){
-                    $input.next(".input-warm").remove();
+                    $input.next(".input-warm").hide();
                 });
             }else{
-                $input.next(".input-warm").remove();
+                $input.next(".input-warm").hide();
             }
             return valid;
+        },
+
+        _hideMessage:function(name){
+            this.$element.find('[data-errorfor='+name+']').hide();
+        },
+
+        hideMessages:function(names){
+            if(names){
+                if(cri.isArray(names)){
+                    for(var i = 0,len=names.length;i<len;i++){
+                        this._hideMessage(names[i]);
+                    }
+                }
+                else{
+                    this._hideMessage(names);
+                }
+            }else{
+                $(".input-warm",this.$element).hide();
+            }
         }
     });
 
@@ -4025,6 +4352,7 @@
     };
 
 }(window);
+
 /**
  * Author zhouzy
  * Date   2014/10/14
@@ -4092,6 +4420,7 @@
         title:"",
         actions:["Close","Minimize","Maximize"],//Colse:关闭,Minimize:最下化,Maximize:最大化
         content:null,
+        isIframe:false,
         visible:true,
         modal:false,//模态窗口
         width:600,
@@ -4100,6 +4429,7 @@
         center:true,//初始时是否居中
         resizable:true,
         dragable:true,
+
         onReady:null,//当窗口初始化完成时触发
         onOpen:null,//窗口打开时触发
         onClose:null,//窗口关闭时触发
@@ -4111,6 +4441,7 @@
     var Window = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
         this.windowStatus = "normal";
+        this.contentLoader = null;
         cri.Widgets.apply(this,arguments);
         this.windowStack.push(this);
         this.toFront();
@@ -4350,77 +4681,6 @@
         },
 
         /**
-         * 由最小化打开窗口
-         */
-        open:function(){
-            this._setStyleByStatus("normal");
-            $(".window-content",this.$window).show();
-            this.windowStatus = "normal";
-            this.options.onOpen && this.options.onOpen.call(this);
-        },
-
-        /**
-         * 关闭当前窗口
-         * 销毁当前窗口
-         */
-        close : function(){
-            this.options.onClose && this.options.onClose.call(this);
-            this._destroy();
-            if(this.windowStack.length){
-                this.windowStack[this.windowStack.length-1].toFront();
-            }
-            else{
-                $(".overlay").hide();
-            }
-        },
-
-        /**
-         * 最大化窗口
-         * 最大化后 复原、关闭
-         */
-        maximize:function(){
-            this._setStyleByStatus("maximize");
-            this._setButtons("maximize");
-            this.windowStatus = "maximize";
-            this.options.onMaxmize && this.options.onMaxmize.call(this);
-        },
-
-        /**
-         * 最小化窗口
-         * 依次排放到左下侧
-         * 模态窗口没有最小化按钮
-         */
-        minimize : function(){
-            this._setButtons("minimize");
-            $(".window-content",this.$window).hide();
-            var left = $(".mini-window").size() * MINI_WINDOW_WIDTH;
-            this._setStyleByStatus("minimize");
-            this.$window.css("left",left);
-            this.windowStatus = "minimize";
-            this.options.onMinimize && this.options.onMinimize.call(this);
-        },
-
-        /**
-         * 复原窗口到初始(缩放、移动窗口会改变初始位置尺寸信息)尺寸、位置
-         */
-        resume : function(){
-            this._setButtons("normal");
-            this._setStyleByStatus("normal");
-            $(".window-content",this.$window).show();
-            if(this.windowStatus == "minimize"){
-                var i = 0;
-                this.windowStatus = "normal";
-                $.each(Window.prototype.windowStack,function(index,wnd){
-                    if(wnd.windowStatus == "minimize"){
-                        wnd._moveLeft(i++);
-                    }
-                });
-            }
-            this.windowStatus = "normal";
-            this.options.onResume && this.options.onResume.call(this);
-        },
-
-        /**
          * 根据窗口的状态设置窗口样式
          * @private
          */
@@ -4482,6 +4742,77 @@
         },
 
         /**
+         * 由最小化打开窗口
+         */
+        open:function(){
+            this._setStyleByStatus("normal");
+            $(".window-content",this.$window).show();
+            this.windowStatus = "normal";
+            this.options.onOpen && this.options.onOpen.call(this);
+        },
+
+        /**
+         * 销毁当前窗口
+         */
+        close : function(){
+            this.options.onClose && this.options.onClose.call(this);
+            this._destroy();
+            if(this.windowStack.length){
+                this.windowStack[this.windowStack.length-1].toFront();
+            }
+            else{
+                $(".overlay").hide();
+            }
+        },
+
+        /**
+         * 最大化窗口
+         * 最大化后 复原、关闭
+         */
+        maximize:function(){
+            this._setStyleByStatus("maximize");
+            this._setButtons("maximize");
+            this.windowStatus = "maximize";
+            this.options.onMaxmize && this.options.onMaxmize.call(this);
+        },
+
+        /**
+         * 最小化窗口
+         * 依次排放到左下侧
+         * 模态窗口没有最小化按钮
+         */
+        minimize : function(){
+            this._setButtons("minimize");
+            $(".window-content",this.$window).hide();
+            var left = $(".mini-window").size() * MINI_WINDOW_WIDTH;
+            this._setStyleByStatus("minimize");
+            this.$window.css("left",left);
+            this.windowStatus = "minimize";
+            this.options.onMinimize && this.options.onMinimize.call(this);
+        },
+
+        /**
+         * 复原窗口到初始(缩放、移动窗口会改变初始位置尺寸信息)尺寸、位置
+         */
+        resume : function(){
+            this._setButtons("normal");
+            this._setStyleByStatus("normal");
+            $(".window-content",this.$window).show();
+            if(this.windowStatus == "minimize"){
+                var i = 0;
+                this.windowStatus = "normal";
+                $.each(Window.prototype.windowStack,function(index,wnd){
+                    if(wnd.windowStatus == "minimize"){
+                        wnd._moveLeft(i++);
+                    }
+                });
+            }
+            this.windowStatus = "normal";
+            this.options.onResume && this.options.onResume.call(this);
+        },
+
+
+        /**
          * 把当前窗口顶至最前
          */
         toFront:function(){
@@ -4514,16 +4845,19 @@
             if(content){
                 $element.empty();
                 $element.addClass("loading").html($loadingIcon);
-                $element.load(content,function(response,status){
-                    $element.removeClass("loading");
-                    $loadingIcon.remove();
-                    op.onReady && op.onReady.call(that,that.$window);
+                this.contentLoader = new cri.ContentLoader($element,{
+                    content:content,
+                    isIframe:op.isIframe,
+                    onReady:function(){
+                        $element.removeClass("loading");
+                        $loadingIcon.remove();
+                        op.onReady && op.onReady.call(that,that.$window);
+                    }
                 });
             }else{
                 op.onReady && op.onReady.call(that,that.$window);
             }
         }
-
     });
 
     cri.Window = Window;
