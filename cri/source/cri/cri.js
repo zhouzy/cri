@@ -521,24 +521,15 @@
      */
     function _getColumnsDef($table,optionColumns){
         var columns = optionColumns || (function(){
-            var fieldArr = "[";
+            var columns = [];
             $("tr th,td", $table).each(function(){
-                var data  = $(this).data("options"),
-                    title = $(this).html();
-                if(data){
-                    fieldArr += "{title:\'" + title + "\'," + data + "},";
-                }
-                else{
-                    fieldArr += "{title:\'" + title + "\'},";
-                }
+                columns.push($.extend({title:$(this).html()},cri.parseJSON($(this).data("options"))));
             });
-            fieldArr += "]";
-            fieldArr = fieldArr.replace(/\},\]/g, "}]").replace(/\],\]/g, "]]");
-            return cri.parseJSON(fieldArr);
+            return columns;
         }());
 
         $.map(columns,function(column){
-            if(column.field && column.width){
+            if(column.title && column.width){
                 column._width = column.width;
             }
             return column;
@@ -770,6 +761,7 @@
                         $td.css(value);
                     }
                 }
+
                 $td.append($tdContent);
                 i < (len - 1) && $td.append($dragLine);
                 $tr.append($td);
@@ -803,38 +795,38 @@
                 lineNum  = 1 + op.pageSize * (op.page - 1),
                 columns  = this._columns,
                 rows     = this._rows;
-
             this._selectedId = [];
-
             $table.append($("colgroup",this.$gridhead).clone());
-
             for(var i = 0,len = rows.length; i<len; i++){
                 var row = rows[i],
                     $tr = $('<tr></tr>').data("rowid",id);
-
                 if(op.checkBox){
+                    var $checkBoxTd = $('<td class="line-checkbox"></td>');
                     if(row.check){
+                        $tr.append($checkBoxTd.append('<input type="checkbox" checked/>'));
                         $tr.addClass("selected");
-                        $tr.append($("<td></td>").addClass("line-checkbox").append('<input type="checkbox" checked/>'));
                         this._selectedId.push(id);
                     }else{
-                        $tr.append($("<td></td>").addClass("line-checkbox").append('<input type="checkbox"/>'));
+                        $tr.append($checkBoxTd.append('<input type="checkbox"/>'));
                     }
                 }
-
                 if(op.rowNum){
                     $tr.append($("<td></td>").addClass("line-number").append(lineNum));
                 }
-
                 for(var j = 0,length = columns.length; j<length;j++){
-                    var $td = $('<td></td>');
-                    var $content = $('<div></div>').addClass('td-content');
-                    var column = columns[j],
+                    var $td = $('<td></td>'),
+                        $content = $('<div></div>').addClass('td-content'),
+                        column = columns[j],
                         text   = row[column.field]==null ? "" : row[column.field],
                         _text  = ("" + text).replace(/(<([^a\/]).*?>)|(<\/[^a].*?>)/g,"");
-                    $content.prop("title",_text).text(_text);
-                    $td.append(_text);
-                    $tr.append($td);
+                    if(column['button']){
+                        var button = column.button;
+                        $content.append('<button></button>');
+                        $('button',$content).button(button);
+                    }else{
+                        $content.prop("title",_text).append(_text);
+                    }
+                    $tr.append($td.append($content));
                 }
                 lineNum++;id++;
                 $table.append($tr);

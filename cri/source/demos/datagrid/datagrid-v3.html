@@ -18,20 +18,26 @@
             margin:5px auto;
             height:800px;
         }
+        .grid .td-content .button{
+            height: 20px;
+            line-height: 20px;
+            width: 20px;
+            min-width: 20px;
+            padding: 0;
+            text-align: center;
+            border-radius:10px;
+        }
+
+        .grid .td-content .button i{
+            margin:0;
+            height: 20px;
+            line-height: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="content">
-    <table id="grid" style="height:50%;width:800px">
-        <tr>
-            <td data-options="field:'propA',width:100">propA</td>
-            <td data-options="field:'propB'">propB</td>
-            <td data-options="field:'propC'">propC</td>
-            <td data-options="field:'propD',width:100">propD</td>
-            <td data-options="field:'propE',width:100">propE</td>
-            <td data-options="field:'propF',width:100">propF</td>
-        </tr>
-    </table>
+    <table id="grid" style="height:50%;width:800px"></table>
     </div>
     <script type="text/javascript">
         var grid = $("#grid").datagrid({
@@ -39,7 +45,7 @@
             rowNum:true,
             title:"hello grid",
             checkBox:true,
-            width:600,
+            width:400,
             toolbar:[{
                 text:"button",
                 handler:function(){
@@ -48,6 +54,40 @@
                     },
                 iconCls:"fa fa-circle-o"
             },{text:"按钮"}],
+            columns:[{
+                title:'propA',
+                field:'propA',
+                width:100
+            },{
+                title:'propB',
+                field:'propB',
+                width:100
+            },{
+                title:'propC',
+                field:'propC',
+                width:100
+            },{
+                title:'propD',
+                field:'propD',
+                width:100
+            },{
+                title:'propE',
+                field:'propE',
+                width:100
+            },{
+                title:'propF',
+                field:'propF',
+                width:100
+            },{
+                title:'操作',
+                width:100,
+                button:{
+                    iconCls:'fa fa-phone',
+                    handler:function(){
+                        alert('点击');
+                    }
+                }
+            }],
             pageSize:4,
             onClick:function(){
                 var rows = grid.getSelected();

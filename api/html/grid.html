@@ -76,11 +76,18 @@
     <p>可设置width,指定列的宽度,未设置该值,该列宽度为auto</p>
     <p>可设置title,指定列的title属性</p>
     <p>可设置style,个性化某一列的样式</p>
+    <p>可设置Button对象，生成按钮</p>
     <pre class="code"><code>
         columns:[
             {field:'fieldNameA',width:100,style:{color:'red',text-align:'center'}},
             {field:'fieldNameB',width:200,title:'这个是fieldNameB'},
-            {field:'fieldNameC',width:200}
+            {field:'fieldNameC',width:200},
+            {title:'按钮栏',width:200,button:{
+                iconCls:'fa fa-phone',
+                handler:function(){
+                    alert('点击');
+                }
+            }}
         ]
     </code></pre>
 </div>
