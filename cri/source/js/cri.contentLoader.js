@@ -66,6 +66,7 @@
                         };
                     }
                     this.$content.append(iframeNode);
+                    this.$content.css("overflow","hidden");
                 }
                 else{
                     this.$content.load(this.options.content,function(){

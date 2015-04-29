@@ -1,7 +1,6 @@
 @import "lib.less";
 @import "theme-default.less";
 
-@window-head-height:35px;
 .window{
     background-color: @color-window-bg;
     color: @color-window-font;
@@ -10,13 +9,12 @@
     z-index: 10001;
     border: solid 1px @color-window-border;
     min-width: 140px;
+	min-height: 35px;
     top:5px;
     left:5px;
-    padding-top:@window-head-height;
     .rounded-corners(4px);
     .box-shadow(1px,1px,7px,1px,darken(@color-window-bg,40%));
     .window-head{
-        margin-top:-@window-head-height;
         position:relative;
         height:24px;
         line-height:24px;
@@ -64,7 +62,6 @@
     }
     .window-content{
         background:@color-window-bg;
-        height:100%;
         overflow: auto;
     }
     .window-resizer{
@@ -158,7 +155,7 @@
     bottom:2px !important;
     top:auto !important;
     width:140px !important;
-    height:0px !important;
+    height:0 !important;
 }
 .maxi-window{
     bottom:2px !important;
@@ -170,7 +167,7 @@
 }
 .overlay{
     background-color:darken(@color-window-bg,80%);
-    position: absolute;
+    position:fixed;
     z-index: 10000;
     left:0;
     right:0;

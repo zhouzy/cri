@@ -523,7 +523,8 @@
         var columns = optionColumns || (function(){
             var columns = [];
             $("tr th,td", $table).each(function(){
-                columns.push($.extend({title:$(this).html()},cri.parseJSON($(this).data("options"))));
+                var options = '{' + $(this).data("options") + '}';
+                columns.push($.extend({title:$(this).html()},cri.parseJSON(options)));
             });
             return columns;
         }());
@@ -1216,6 +1217,7 @@
                         };
                     }
                     this.$content.append(iframeNode);
+                    this.$content.css("overflow","hidden");
                 }
                 else{
                     this.$content.load(this.options.content,function(){
@@ -2478,30 +2480,16 @@
         _offsetL:function(){
             var left = this.$tabs.position().left,
                 width = this.$tabs.width(),
-                containerWidth = this.$tabsWrap.width(),
-                viewWidth = width + left - this.$tabs.css("marginLeft").split("px")[0];
-            if(viewWidth > containerWidth){
-                if(viewWidth%150>0){
-                    this.$tabs.animate({left:"-="+(viewWidth%150)+"px"});
-                }else{
-                    this.$tabs.animate({left:"-=150px"});
-                }
+                containerWidth = this.$tabsWrap.width();
+            if(width+left > containerWidth){
+                this.$tabs.animate({left:"-=150px"});
             }
         },
 
         _offsetR:function(){
-            var left  = this.$tabs.position().left,
-                width = this.$tabs.width(),
-                containerWidth = this.$tabsWrap.width();
-            if(left <= 0){
-                var viewWidth = width + left - this.$tabs.css("marginLeft").split("px")[0];
-                var right = containerWidth-viewWidth;
-                if(right > 0){
-                    this.$tabs.animate({left:"+="+(right%150)+"px"});
-                }
-                else{
-                    this.$tabs.animate({left:"+=150px"});
-                }
+            var left  = this.$tabs.position().left;
+            if(left < 0){
+                this.$tabs.animate({left:"+=150px"});
             }
         },
 
@@ -2530,13 +2518,17 @@
                     }
                     index >= 0 && this.focusTab(this._getTab(index));
                 }
+                this._offsetR();
+                this._leftRightBtn();
             }
         },
 
         _leftRightBtn:function(){
             var $tabs = this.$tabs;
-            var tabsW = $tabs.width();
+            var tabsW = this._pageBodyQueue.length * TAB_WIDTH;
             var tabpageHeaderW = this.$pageHeader.width();
+
+            $tabs.width(this._pageBodyQueue.length*TAB_WIDTH);
 
             if(tabsW > tabpageHeaderW){
                 this.$leftBtn.show();
@@ -2554,13 +2546,7 @@
             return $('li:eq('+index+')',this.$tabs);
         },
 
-        /**
-         * 增加Tab
-         * @param content : html字符串、url、jquery对象
-         * @param title : tab name
-         * @param closeAble: 是否在该tab上提供关闭按钮
-         */
-        addTab:function(content,title,closeAble,isIframe,callBack){
+        addNewTab:function(content,title,closeAble,isIframe,callBack){
             title = title || 'New Tab';
             if(closeAble == undefined || closeAble == null || closeAble == "null"){
                 closeAble = true;
@@ -2585,11 +2571,41 @@
             });
 
             this._pageBodyQueue.push(tabPageBody);
-            $tabs.width(this._pageBodyQueue.length*TAB_WIDTH);
-            this._offsetL();
-            this.focusTab($tab);
+
             this._leftRightBtn();
+            this.focusTab($tab);
+            this._offsetL();
             return tabPageBody;
+        },
+
+        /**
+         * 增加Tab
+         * @param content : html字符串、url、jquery对象
+         * @param title : tab name
+         * @param closeAble: 是否在该tab上提供关闭按钮
+         */
+        addTab:function(content,title,closeAble,isIframe,callBack){
+            var index = this.getIndexByContent(content);
+            if(index>-1){
+                this.select(index);
+                return this.getTabBody(index);
+            }else{
+                return this.addNewTab(content,title,closeAble,isIframe,callBack);
+            }
+        },
+
+        /**
+         * 根据content判断是否已经打开该TAB
+         * @param content
+         */
+        getIndexByContent:function(content){
+            var _pageBodyQueue = this._pageBodyQueue;
+            for(var i= 0,len=_pageBodyQueue.length;i<len;i++){
+                if(content == _pageBodyQueue[i].options.content){
+                    return i;
+                }
+            }
+            return -1;
         },
 
         focusTab:function($tab){
@@ -2650,6 +2666,7 @@
         return o;
     };
 }(window);
+
 
 /*=====================================================================================
  * easy-bootstrap-textarea v2.0
@@ -4448,7 +4465,8 @@
 
     $.extend(Window.prototype,{
 
-        windowStack : [],
+        windowStack : [],//窗口栈
+        mask:null,//遮罩
 
         _initOptions:function(options) {
             this.options = $.extend(true,{}, this.options, options);
@@ -4538,9 +4556,11 @@
         _init : function(){
             var op = this.options;
             op.width = parseWidth(op.width,$(window).width()) - WINDOW_BORDER*2;
-            op.height = parseHeight(op.height,$(window).height()) - WINDOW_PADDING - WINDOW_BORDER*2;
+            op.height = parseHeight(op.height,$(window).height()) - WINDOW_BORDER*2;
+
             this._createBody();
             this._createHead();
+
             op.resizable && this._createResizeHandler();
             $("body").append(this.$window);
             this.$element.show();
@@ -4578,9 +4598,10 @@
             this.$window = $window;
             if(op.center){
                 op.position.left = (viewWidth - op.width - 2*WINDOW_BORDER) / 2;
-                op.position.top  = (viewHeight - op.height - WINDOW_PADDING - 2*WINDOW_BORDER) / 2;
+                op.position.top  = (viewHeight - op.height - 2*WINDOW_BORDER) / 2;
             }
             this._setPosition({top:op.position.top,left:op.position.left,width:op.width,height:op.height});
+            $windowBody.height(op.height-35);
             $window.append($windowBody);
             $windowBody.append($element);
             $("body").append(this.$window);
@@ -4637,18 +4658,30 @@
         },
 
         /**
-         * 设置模态窗口背景遮罩
+         * 模态窗口显示遮罩
+         * @param z
          * @private
          */
-        _overlay : function(zIndex){
-            var $overlay = $(".overlay");
-            if($overlay.length == 0){
-                $overlay = $("<div></div>").addClass("overlay").css("zIndex",zIndex);
-                $("body").append($overlay);
+        _showMask : function(z){
+            var $mask = Window.prototype.mask;
+            if($mask){
+                $mask.css("zIndex",z).show();
+                $('body').css('overflow','hidden');
             }
             else{
-                $overlay.css("zIndex",zIndex).show();
+                $mask = Window.prototype.mask = $("<div></div>").addClass("overlay").css("zIndex",z);
+                $("body").append($mask).css('overflow','hidden');
             }
+        },
+
+        /**
+         * 隐藏遮罩
+         * @private
+         */
+        _hideMask : function(){
+            var $mask = Window.prototype.mask;
+            $mask && $mask.hide();
+            $('body').css('overflow','auto');
         },
 
         /**
@@ -4759,7 +4792,7 @@
                 this.windowStack[this.windowStack.length-1].toFront();
             }
             else{
-                $(".overlay").hide();
+                this._hideMask();
             }
         },
 
@@ -4814,7 +4847,7 @@
          * 把当前窗口顶至最前
          */
         toFront:function(){
-            $(".overlay").hide();
+            this._hideMask();
             var stack = this.windowStack;
             var index = stack.indexOf(this);
             stack.splice(index,1);
@@ -4826,7 +4859,7 @@
                         j<i?stack[j].$window.css('zIndex',ZINDEX+j):
                             stack[j].$window.css('zIndex',ZINDEX+j+1);
                     }
-                    this._overlay(ZINDEX+i);
+                    this._showMask(ZINDEX+i);
                     break;
                 }
                 else{

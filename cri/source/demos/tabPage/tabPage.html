@@ -30,7 +30,8 @@
     var tabPage = $("#tabPage").tabPage();
     var i = 0;
     $("#button").click(function(){
-        tabPage.addTab("../datagrid/datagrid-v3.html","window",true,true);
+        i++;
+        tabPage.addNewTab("../datagrid/datagrid-v3.html","window"+i,true,true);
     });
     !function(){
         /*

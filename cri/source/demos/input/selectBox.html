@@ -16,11 +16,18 @@
     </style>
 </head>
 <body style="padding:50px;height:1000px;">
-<select id="selectInWnd" name="select">
-</select>
+<select id="selectInWnd" name="select"></select>
 <script type="text/javascript">
+
+    var data=[{value:1,text:"text01"},{value:2,text:"text02"},{value:3,text:"text04"},{value:5,text:"text05"}];
+    var options = [];
+    var $select = $("#selectInWnd");
+    for(var i=0;i<data.length;i++){
+        options.push('<option value="'+data[i].value+'">' + data[i].text + '</option>');
+    }
+    $select.append(options);
+    $("#selectInWnd").selectBox();
     $("#selectInWnd").selectBox({
-        data:[{value:1,text:"text01"},{value:2,text:"text02"},{value:3,text:"text04"},{value:5,text:"text05"}],
         change:function(){
             console.log($('body').formValue().select);
         }

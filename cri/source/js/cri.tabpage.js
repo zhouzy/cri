@@ -77,30 +77,16 @@
         _offsetL:function(){
             var left = this.$tabs.position().left,
                 width = this.$tabs.width(),
-                containerWidth = this.$tabsWrap.width(),
-                viewWidth = width + left - this.$tabs.css("marginLeft").split("px")[0];
-            if(viewWidth > containerWidth){
-                if(viewWidth%150>0){
-                    this.$tabs.animate({left:"-="+(viewWidth%150)+"px"});
-                }else{
-                    this.$tabs.animate({left:"-=150px"});
-                }
+                containerWidth = this.$tabsWrap.width();
+            if(width+left > containerWidth){
+                this.$tabs.animate({left:"-=150px"});
             }
         },
 
         _offsetR:function(){
-            var left  = this.$tabs.position().left,
-                width = this.$tabs.width(),
-                containerWidth = this.$tabsWrap.width();
-            if(left <= 0){
-                var viewWidth = width + left - this.$tabs.css("marginLeft").split("px")[0];
-                var right = containerWidth-viewWidth;
-                if(right > 0){
-                    this.$tabs.animate({left:"+="+(right%150)+"px"});
-                }
-                else{
-                    this.$tabs.animate({left:"+=150px"});
-                }
+            var left  = this.$tabs.position().left;
+            if(left < 0){
+                this.$tabs.animate({left:"+=150px"});
             }
         },
 
@@ -129,13 +115,17 @@
                     }
                     index >= 0 && this.focusTab(this._getTab(index));
                 }
+                this._offsetR();
+                this._leftRightBtn();
             }
         },
 
         _leftRightBtn:function(){
             var $tabs = this.$tabs;
-            var tabsW = $tabs.width();
+            var tabsW = this._pageBodyQueue.length * TAB_WIDTH;
             var tabpageHeaderW = this.$pageHeader.width();
+
+            $tabs.width(this._pageBodyQueue.length*TAB_WIDTH);
 
             if(tabsW > tabpageHeaderW){
                 this.$leftBtn.show();
@@ -153,13 +143,7 @@
             return $('li:eq('+index+')',this.$tabs);
         },
 
-        /**
-         * 增加Tab
-         * @param content : html字符串、url、jquery对象
-         * @param title : tab name
-         * @param closeAble: 是否在该tab上提供关闭按钮
-         */
-        addTab:function(content,title,closeAble,isIframe,callBack){
+        addNewTab:function(content,title,closeAble,isIframe,callBack){
             title = title || 'New Tab';
             if(closeAble == undefined || closeAble == null || closeAble == "null"){
                 closeAble = true;
@@ -184,11 +168,41 @@
             });
 
             this._pageBodyQueue.push(tabPageBody);
-            $tabs.width(this._pageBodyQueue.length*TAB_WIDTH);
-            this._offsetL();
-            this.focusTab($tab);
+
             this._leftRightBtn();
+            this.focusTab($tab);
+            this._offsetL();
             return tabPageBody;
+        },
+
+        /**
+         * 增加Tab
+         * @param content : html字符串、url、jquery对象
+         * @param title : tab name
+         * @param closeAble: 是否在该tab上提供关闭按钮
+         */
+        addTab:function(content,title,closeAble,isIframe,callBack){
+            var index = this.getIndexByContent(content);
+            if(index>-1){
+                this.select(index);
+                return this.getTabBody(index);
+            }else{
+                return this.addNewTab(content,title,closeAble,isIframe,callBack);
+            }
+        },
+
+        /**
+         * 根据content判断是否已经打开该TAB
+         * @param content
+         */
+        getIndexByContent:function(content){
+            var _pageBodyQueue = this._pageBodyQueue;
+            for(var i= 0,len=_pageBodyQueue.length;i<len;i++){
+                if(content == _pageBodyQueue[i].options.content){
+                    return i;
+                }
+            }
+            return -1;
         },
 
         focusTab:function($tab){

@@ -12,7 +12,8 @@
 	height:400px;
 	.tabPage-header{
 		position:absolute;
-		width:100%;
+		left: 0;
+		right: 0;
 		background:#444;
 		height:35px;
 		color: #bebebe;
@@ -40,14 +41,15 @@
 			border-left:1px solid #8c8c8c;
 		}
 		&.shift{
-			.tabPage-header-tabs-wrap{
-				margin:0 25px;
-			}
+			padding:0 25px;
 		}
 		.tabPage-header-tabs-wrap{
 			overflow:hidden;
+			position:relative;
+			height:100%;
 			.tabPage-header-tabs{
-				position:relative;
+				position:absolute;
+				left:0;
 				font-size:0;
 				.tabPage-header-tab{
 					position:relative;

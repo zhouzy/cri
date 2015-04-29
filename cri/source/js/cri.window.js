@@ -95,7 +95,8 @@
 
     $.extend(Window.prototype,{
 
-        windowStack : [],
+        windowStack : [],//窗口栈
+        mask:null,//遮罩
 
         _initOptions:function(options) {
             this.options = $.extend(true,{}, this.options, options);
@@ -185,9 +186,11 @@
         _init : function(){
             var op = this.options;
             op.width = parseWidth(op.width,$(window).width()) - WINDOW_BORDER*2;
-            op.height = parseHeight(op.height,$(window).height()) - WINDOW_PADDING - WINDOW_BORDER*2;
+            op.height = parseHeight(op.height,$(window).height()) - WINDOW_BORDER*2;
+
             this._createBody();
             this._createHead();
+
             op.resizable && this._createResizeHandler();
             $("body").append(this.$window);
             this.$element.show();
@@ -225,9 +228,10 @@
             this.$window = $window;
             if(op.center){
                 op.position.left = (viewWidth - op.width - 2*WINDOW_BORDER) / 2;
-                op.position.top  = (viewHeight - op.height - WINDOW_PADDING - 2*WINDOW_BORDER) / 2;
+                op.position.top  = (viewHeight - op.height - 2*WINDOW_BORDER) / 2;
             }
             this._setPosition({top:op.position.top,left:op.position.left,width:op.width,height:op.height});
+            $windowBody.height(op.height-35);
             $window.append($windowBody);
             $windowBody.append($element);
             $("body").append(this.$window);
@@ -284,18 +288,30 @@
         },
 
         /**
-         * 设置模态窗口背景遮罩
+         * 模态窗口显示遮罩
+         * @param z
          * @private
          */
-        _overlay : function(zIndex){
-            var $overlay = $(".overlay");
-            if($overlay.length == 0){
-                $overlay = $("<div></div>").addClass("overlay").css("zIndex",zIndex);
-                $("body").append($overlay);
+        _showMask : function(z){
+            var $mask = Window.prototype.mask;
+            if($mask){
+                $mask.css("zIndex",z).show();
+                $('body').css('overflow','hidden');
             }
             else{
-                $overlay.css("zIndex",zIndex).show();
+                $mask = Window.prototype.mask = $("<div></div>").addClass("overlay").css("zIndex",z);
+                $("body").append($mask).css('overflow','hidden');
             }
+        },
+
+        /**
+         * 隐藏遮罩
+         * @private
+         */
+        _hideMask : function(){
+            var $mask = Window.prototype.mask;
+            $mask && $mask.hide();
+            $('body').css('overflow','auto');
         },
 
         /**
@@ -406,7 +422,7 @@
                 this.windowStack[this.windowStack.length-1].toFront();
             }
             else{
-                $(".overlay").hide();
+                this._hideMask();
             }
         },
 
@@ -461,7 +477,7 @@
          * 把当前窗口顶至最前
          */
         toFront:function(){
-            $(".overlay").hide();
+            this._hideMask();
             var stack = this.windowStack;
             var index = stack.indexOf(this);
             stack.splice(index,1);
@@ -473,7 +489,7 @@
                         j<i?stack[j].$window.css('zIndex',ZINDEX+j):
                             stack[j].$window.css('zIndex',ZINDEX+j+1);
                     }
-                    this._overlay(ZINDEX+i);
+                    this._showMask(ZINDEX+i);
                     break;
                 }
                 else{

@@ -72,7 +72,6 @@ figure,
 figcaption,
 footer,
 header,
-hgroup,
 menu,
 nav,
 output,
@@ -98,7 +97,6 @@ figcaption,
 figure,
 footer,
 header,
-hgroup,
 menu,
 nav,
 section {
@@ -235,7 +233,7 @@ table {
  */
 .content-loader {
   position: absolute;
-  top: 40px;
+  top: 35px;
   left: 0;
   right: 0;
   bottom: 0;
@@ -1062,7 +1060,8 @@ table {
 }
 .tabPage-group .tabPage-header {
   position: absolute;
-  width: 100%;
+  left: 0;
+  right: 0;
   background: #444;
   height: 35px;
   color: #bebebe;
@@ -1092,14 +1091,17 @@ table {
   right: 0;
   border-left: 1px solid #8c8c8c;
 }
-.tabPage-group .tabPage-header.shift .tabPage-header-tabs-wrap {
-  margin: 0 25px;
+.tabPage-group .tabPage-header.shift {
+  padding: 0 25px;
 }
 .tabPage-group .tabPage-header .tabPage-header-tabs-wrap {
   overflow: hidden;
+  position: relative;
+  height: 100%;
 }
 .tabPage-group .tabPage-header .tabPage-header-tabs-wrap .tabPage-header-tabs {
-  position: relative;
+  position: absolute;
+  left: 0;
   font-size: 0;
 }
 .tabPage-group .tabPage-header .tabPage-header-tabs-wrap .tabPage-header-tabs .tabPage-header-tab {
@@ -1720,9 +1722,9 @@ ul.toolbar li i {
   z-index: 10001;
   border: solid 1px #c8c8c8;
   min-width: 140px;
+  min-height: 35px;
   top: 5px;
   left: 5px;
-  padding-top: 35px;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   -ms-border-radius: 4px;
@@ -1733,7 +1735,6 @@ ul.toolbar li i {
   -webkit-box-shadow: 1px 1px 7px 1px #8a8a8a;
 }
 .window .window-head {
-  margin-top: -35px;
   position: relative;
   height: 24px;
   line-height: 24px;
@@ -1789,7 +1790,6 @@ ul.toolbar li i {
 }
 .window .window-content {
   background: #f0f0f0;
-  height: 100%;
   overflow: auto;
 }
 .window .window-resizer {
@@ -1878,7 +1878,7 @@ ul.toolbar li i {
   bottom: 2px !important;
   top: auto !important;
   width: 140px !important;
-  height: 0px !important;
+  height: 0 !important;
 }
 .maxi-window {
   bottom: 2px !important;
@@ -1890,7 +1890,7 @@ ul.toolbar li i {
 }
 .overlay {
   background-color: #242424;
-  position: absolute;
+  position: fixed;
   z-index: 10000;
   left: 0;
   right: 0;

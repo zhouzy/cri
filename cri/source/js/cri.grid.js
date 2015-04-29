@@ -31,7 +31,8 @@
         var columns = optionColumns || (function(){
             var columns = [];
             $("tr th,td", $table).each(function(){
-                columns.push($.extend({title:$(this).html()},cri.parseJSON($(this).data("options"))));
+                var options = '{' + $(this).data("options") + '}';
+                columns.push($.extend({title:$(this).html()},cri.parseJSON(options)));
             });
             return columns;
         }());
