@@ -1,23 +1,23 @@
 @import "lib.less";
 @import "theme-default.less";
 
-.eb_timeInputGroup {
+.timeInputGroup {
     position: relative;
     display: inline-block;
     line-height: 30px;
     height: 30px;
     vertical-align: middle;
     font-size:0;
-    .eb_focus {
+    .focus {
         border: 1px solid #383eab !important;
     }
 
-    .eb_red {
+    .red {
         color: red !important;
     }
 
 }
-.eb_timeBox {
+.timeBox {
     background:@color-timeinput-timebox-bg;
     border: 1px solid @color-timeinput-timebox-border;
     border-radius: 0 0 5px 5px;
@@ -28,7 +28,7 @@
     width: 240px;
     height: 190px;
     display: none;
-    .eb_titleBar {
+    .titleBar {
         top:0;
         left:0;
         height:25px;
@@ -39,7 +39,7 @@
         background:@color-timeinput-timebox-title-bg;
     }
 
-    .eb_yearSelecter {
+    .yearSelecter {
         height: 16px;
         width: 120px;
         line-height: 14px;
@@ -48,7 +48,7 @@
         left: 0;
         top: 5px;
     }
-    .eb_yearButton{
+    .yearButton{
         font-size:12px;
         width:12px;
         height:12px;
@@ -63,7 +63,7 @@
         }
     }
 
-    .eb_monthSelect {
+    .monthSelect {
         position: absolute;
         top: 3px;
         right: 40px;
@@ -75,11 +75,11 @@
         cursor: pointer;
     }
 
-    .eb_dateMouseover {
+    .dateMouseover {
         background: -webkit-linear-gradient(top, #eee, #fff 70%) !important;
         background: -moz-linear-gradient(top, #eee, #fff 70%) !important;
         background: -o-linear-gradient(top, #eee, #fff 70%) !important;
-        filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#eeeeee', EndColorStr='#ffffff', starty=0, finishy=70%);
+        filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#eeeeee', EndColorStr='#ffffff');
         border-top: 1px solid rgba(255, 255, 255, 0.8);
         padding-top: 0 !important;
         box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.3);
@@ -87,15 +87,14 @@
         font-weight: 400;
         text-shadow: 0 1px 0 rgba(255, 255, 255, 0) !important;
     }
-    .eb_year {
+    .year {
         display:inline-block;
         width:30px;
     }
     & > table {
         width: 210px;
-        margin: auto 15px;
+        margin: 3px 15px 0 15px;
         font-size: 12px;
-        margin-top: 3px;
         -moz-user-select: none;
         user-select: none;
         tr{
@@ -105,7 +104,6 @@
             }
         }
         th{
-            font-family: Microsoft YaHei;
             cursor: default;
         }
         td{
@@ -119,14 +117,14 @@
         background-color:@color-timeinput-timebox-day-selected;
         color:#fff;
     }
-    .eb_HMSBar {
+    .HMSBar {
         height: 20px;
         width: 100%;
         text-align: right;
         font-size: 12px;
         line-height: 20px;
     }
-    .eb_HMSInput {
+    .HMSInput {
         position: relative;
         right: 15px;
         width: 22px;

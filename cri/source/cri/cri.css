@@ -1202,7 +1202,7 @@ table {
     padding-left: 5px;
   }
 }
-.eb_timeInputGroup {
+.timeInputGroup {
   position: relative;
   display: inline-block;
   line-height: 30px;
@@ -1210,13 +1210,13 @@ table {
   vertical-align: middle;
   font-size: 0;
 }
-.eb_timeInputGroup .eb_focus {
+.timeInputGroup .focus {
   border: 1px solid #383eab !important;
 }
-.eb_timeInputGroup .eb_red {
+.timeInputGroup .red {
   color: red !important;
 }
-.eb_timeBox {
+.timeBox {
   background: #ffffff;
   border: 1px solid #c8c8c8;
   border-radius: 0 0 5px 5px;
@@ -1230,7 +1230,7 @@ table {
   height: 190px;
   display: none;
 }
-.eb_timeBox .eb_titleBar {
+.timeBox .titleBar {
   top: 0;
   left: 0;
   height: 25px;
@@ -1240,7 +1240,7 @@ table {
   font-weight: 600;
   background: #f5f7fa;
 }
-.eb_timeBox .eb_yearSelecter {
+.timeBox .yearSelecter {
   height: 16px;
   width: 120px;
   line-height: 14px;
@@ -1249,7 +1249,7 @@ table {
   left: 0;
   top: 5px;
 }
-.eb_timeBox .eb_yearButton {
+.timeBox .yearButton {
   font-size: 12px;
   width: 12px;
   height: 12px;
@@ -1263,11 +1263,11 @@ table {
   color: #555555;
   cursor: pointer;
 }
-.eb_timeBox .eb_yearButton:hover {
+.timeBox .yearButton:hover {
   color: #FFF;
   background: #4f7fe8;
 }
-.eb_timeBox .eb_monthSelect {
+.timeBox .monthSelect {
   position: absolute;
   top: 3px;
   right: 40px;
@@ -1282,11 +1282,11 @@ table {
   line-height: 20px;
   cursor: pointer;
 }
-.eb_timeBox .eb_dateMouseover {
+.timeBox .dateMouseover {
   background: -webkit-linear-gradient(top, #eeeeee, #ffffff 70%) !important;
   background: -moz-linear-gradient(top, #eeeeee, #ffffff 70%) !important;
   background: -o-linear-gradient(top, #eeeeee, #ffffff 70%) !important;
-  filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#eeeeee', EndColorStr='#ffffff', starty=0, finishy=70%);
+  filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#eeeeee', EndColorStr='#ffffff');
   border-top: 1px solid rgba(255, 255, 255, 0.8);
   padding-top: 0 !important;
   box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.3);
@@ -1294,45 +1294,43 @@ table {
   font-weight: 400;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0) !important;
 }
-.eb_timeBox .eb_year {
+.timeBox .year {
   display: inline-block;
   width: 30px;
 }
-.eb_timeBox > table {
+.timeBox > table {
   width: 210px;
-  margin: auto 15px;
+  margin: 3px 15px 0 15px;
   font-size: 12px;
-  margin-top: 3px;
   -moz-user-select: none;
   user-select: none;
 }
-.eb_timeBox > table tr {
+.timeBox > table tr {
   height: 20px;
 }
-.eb_timeBox > table tr > td:hover {
+.timeBox > table tr > td:hover {
   background: #97b7fc;
 }
-.eb_timeBox > table th {
-  font-family: Microsoft YaHei;
+.timeBox > table th {
   cursor: default;
 }
-.eb_timeBox > table td {
+.timeBox > table td {
   cursor: pointer;
   text-align: center;
   vertical-align: middle;
 }
-.eb_timeBox > table td.choosed {
+.timeBox > table td.choosed {
   background-color: #4f7fe8;
   color: #fff;
 }
-.eb_timeBox .eb_HMSBar {
+.timeBox .HMSBar {
   height: 20px;
   width: 100%;
   text-align: right;
   font-size: 12px;
   line-height: 20px;
 }
-.eb_timeBox .eb_HMSInput {
+.timeBox .HMSInput {
   position: relative;
   right: 15px;
   width: 22px;
@@ -1342,10 +1340,10 @@ table {
   text-indent: 3px;
   color: #666;
 }
-.eb_timeBox .eb_HMSInput.focus {
+.timeBox .HMSInput.focus {
   border: 1px solid #626dbb;
 }
-.eb_timeBox .timeInputOK {
+.timeBox .timeInputOK {
   width: 40px;
   height: 22px;
   line-height: 20px;
@@ -1362,13 +1360,13 @@ table {
   text-align: center;
   cursor: pointer;
 }
-.eb_timeBox .timeInputOK.mouseover {
+.timeBox .timeInputOK.mouseover {
   background: -webkit-linear-gradient(top, #3edc5f, #1e8934);
   background: -moz-linear-gradient(top, #3edc5f, #1e8934);
   background: -o-linear-gradient(top, #3edc5f, #1e8934);
   filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#3edc5f', EndColorStr='#1e8934');
 }
-.eb_timeBox .timeInputCancel {
+.timeBox .timeInputCancel {
   width: 40px;
   height: 22px;
   line-height: 20px;
@@ -1386,7 +1384,7 @@ table {
   cursor: pointer;
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
 }
-.eb_timeBox .timeInputCancel.mouseover {
+.timeBox .timeInputCancel.mouseover {
   background: -webkit-linear-gradient(top, #f72323, #941717);
   background: -moz-linear-gradient(top, #f72323, #941717);
   background: -o-linear-gradient(top, #f72323, #941717);
@@ -1718,7 +1716,7 @@ ul.toolbar li i {
   background-color: #f0f0f0;
   color: #666666;
   display: inline-block;
-  position: absolute;
+  position: fixed;
   z-index: 10001;
   border: solid 1px #c8c8c8;
   min-width: 140px;

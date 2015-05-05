@@ -3029,8 +3029,8 @@
     var cri = window.cri,
         $   = window.jQuery;
 
-    var TIME_INPUT_GROUP = "eb_timeInputGroup",
-        TIME_BOX         = "eb_timeBox",
+    var TIME_INPUT_GROUP = "timeInputGroup",
+        TIME_BOX         = "timeBox",
         TIME_INPUT_ICON  = "fa fa-table";
 
     /**
@@ -3206,7 +3206,7 @@
          */
         _create:function($parent){
             var $timeBox = this.$timeBox = $('<div class="' + TIME_BOX + '"></div>');
-            var $titleBar = $('<div class="eb_titleBar"></div>');
+            var $titleBar = $('<div class="titleBar"></div>');
             $titleBar.append(
                 this._yearSelect(),
                 this._monthSelect(),
@@ -3230,10 +3230,10 @@
         _yearSelect : function(){
             var that = this;
             var date = this.date;
-            var $yearSelect = $('<div class="eb_yearSelecter"></div>');
-            var $minusBtn   = $('<i class="eb_toLastYear eb_yearButton fa fa-minus"></i>');
-            var $plusBtn    = $('<i class="eb_toNextYear eb_yearButton fa fa-plus"></i>');
-            var $year       = $('<span class="eb_year">' + date.yyyy + '</span>');
+            var $yearSelect = $('<div class="yearSelecter"></div>');
+            var $minusBtn   = $('<i class="toLastYear yearButton fa fa-minus"></i>');
+            var $plusBtn    = $('<i class="toNextYear yearButton fa fa-plus"></i>');
+            var $year       = $('<span class="year">' + date.yyyy + '</span>');
             this.$year = $year;
             $minusBtn.on("click",function(){
                 $year.html(--that.date.yyyy);
@@ -3255,7 +3255,7 @@
         _monthSelect:function(){
             var that = this,
                 date = this.date,
-                $select = $('<select class="eb_monthSelect">');
+                $select = $('<select class="monthSelect">');
             this.$month = $select;
             $.each([1,2,3,4,5,6,7,8,9,10,11,12],function(index,value){
                 value < 10 && (value = "0" + value);
@@ -3284,7 +3284,7 @@
 
             for(var day in week){
                 var $day = $('<th>' + week[day] + '</th>');
-                day == "Sunday" && $day.addClass("eb_red");
+                day == "Sunday" && $day.addClass("red");
                 day == "Saturday" && $day.addClass("red");
                 $week.append($day);
             }
@@ -3334,10 +3334,10 @@
          * @private
          */
         _hmsSelect:function(){
-            var $hmsBar      = $('<div class="eb_HMSBar">'),
-                $hourInput   = $('<input class="eb_HMSInput eb_Hour"/>').val(this.date.HH),
-                $minuteInput = $('<input class="eb_HMSInput eb_minute"/>').val(this.date.mm),
-                $secondInput = $('<input class="eb_HMSInput eb_second"/>').val(this.date.ss),
+            var $hmsBar      = $('<div class="HMSBar">'),
+                $hourInput   = $('<input class="HMSInput Hour"/>').val(this.date.HH),
+                $minuteInput = $('<input class="HMSInput minute"/>').val(this.date.mm),
+                $secondInput = $('<input class="HMSInput second"/>').val(this.date.ss),
                 that         = this;
             this.$hour = $hourInput;
             this.$minute = $minuteInput;
@@ -3361,7 +3361,7 @@
                 };
             }
             $hmsBar.append($hourInput,":",$minuteInput,":",$secondInput);
-            $(".eb_HMSInput",$hmsBar).on("keydown",function(e){
+            $(".HMSInput",$hmsBar).on("keydown",function(e){
                 var keycode = e.keyCode || e.which || e.charCode;
                 if((keycode>=48 && keycode<=57) || keycode == 8){
                     return true;
