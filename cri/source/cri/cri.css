@@ -616,52 +616,6 @@ table {
   color: #fff;
   background-color: #4f7fe8;
 }
-.input-group .input-warm {
-  font-style: italic;
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  min-width: 140px;
-  height: 18px;
-  line-height: 18px;
-  padding-left: 5px;
-  background: #ff2d3e;
-  color: #ffffff;
-  font-size: 12px;
-  z-index: 30002;
-  opacity: .8;
-  filter: alpha(opacity=80);
-  -webkit-border-radius: 9px;
-  -moz-border-radius: 9px;
-  -ms-border-radius: 9px;
-  -o-border-radius: 9px;
-  border-radius: 9px;
-  border: 1px solid #c52332;
-  margin-left: 5px;
-}
-.input-group .input-warm:before {
-  content: " ";
-  display: inline-block;
-  position: absolute;
-  top: 18px;
-  left: 10px;
-  width: 0;
-  height: 0;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-top: 5px solid #ff2d3e;
-  border-bottom: none;
-}
-.input-group .input-warm.bottom-input:before {
-  top: -5px;
-  width: 0;
-  height: 0;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-bottom: 5px solid #ff2d3e;
-  border-top: none;
-}
 .input-group .input-layout {
   position: absolute;
   top: 0;
@@ -671,6 +625,69 @@ table {
   background: #f4f4f4;
   filter: alpha(opacity=50);
   opacity: .5;
+}
+.input-warm {
+  display: none;
+  position: absolute;
+  top: -24px;
+  left: 80px;
+  min-width: 140px;
+  height: 18px;
+  line-height: 18px;
+  padding-left: 5px;
+  background: #fef5ce;
+  font-size: 12px;
+  z-index: 30002;
+  opacity: .9;
+  filter: alpha(opacity=90);
+  -webkit-border-radius: 9px;
+  -moz-border-radius: 9px;
+  -ms-border-radius: 9px;
+  -o-border-radius: 9px;
+  border-radius: 9px;
+  border: 1px solid #f7ce3a;
+}
+.input-warm i {
+  margin: 0 5px;
+}
+.input-warm span {
+  font-style: italic;
+}
+.input-warm:before,
+.input-warm:after {
+  content: " ";
+  display: inline-block;
+  position: absolute;
+  top: 18px;
+  left: 10px;
+  width: 0;
+  height: 0;
+  border-width: 5px;
+  border-color: #f7ce3a transparent transparent;
+  border-style: solid dashed dashed;
+}
+.input-warm:after {
+  top: 17px;
+  border-color: #fef5ce transparent transparent;
+}
+.input-warm.bottom-input {
+  left: auto;
+  right: 0;
+  top: 28px;
+}
+.input-warm.bottom-input:before {
+  top: -10px;
+  width: 0;
+  height: 0;
+  border-color: transparent transparent #f7ce3a transparent ;
+  border-style: dashed dashed solid dashed ;
+}
+.input-warm.bottom-input:after {
+  top: -9px;
+  width: 0;
+  height: 0;
+  border-color: transparent transparent #fef5ce transparent;
+  border-style: dashed dashed solid dashed ;
 }
 
 .user-not-select {

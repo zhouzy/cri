@@ -99,7 +99,7 @@
             c && (this.options.content = c);
             onReady && (this.options.onReady = onReady);
             this._destroy();
-            this._load();
+            this._createBody();
         }
     });
     cri.ContentLoader = ContentLoader;

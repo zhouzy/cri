@@ -4,29 +4,29 @@
 @input-group-width:260px;
 @input-width:180px;
 .input-group{
-    display:inline-block;
-    word-spacing:-1px;
-    font-size: 0;
-    -webkit-text-size-adjust:none;
-    width:@input-group-width;
-    margin:2px 0;
-    vertical-align:middle;
-    position:relative;
-    height:26px;
-    line-height:26px;
-    input,.input-btn,label{
-        display:inline-block;
-        font-size:12px;
-        vertical-align:middle;
-    }
-    label{
-        width:@input-group-width - @input-width - 5px;
-        padding-right:5px;
-        height:26px;
-        line-height:26px;
-        text-align: right;
-        word-break: normal;
-        white-space: nowrap;
+	display:inline-block;
+	word-spacing:-1px;
+	font-size: 0;
+	-webkit-text-size-adjust:none;
+	width:@input-group-width;
+	margin:2px 0;
+	vertical-align:middle;
+	position:relative;
+	height:26px;
+	line-height:26px;
+	input,.input-btn,label{
+		display:inline-block;
+		font-size:12px;
+		vertical-align:middle;
+	}
+	label{
+		width:@input-group-width - @input-width - 5px;
+		padding-right:5px;
+		height:26px;
+		line-height:26px;
+		text-align: right;
+		word-break: normal;
+		white-space: nowrap;
 		&.required{
 			&:after{
 				content:'*';
@@ -37,114 +37,131 @@
 				margin-left:5px;
 			}
 		}
-    }
+	}
 
-    .input{
-        display:inline-block;
-        background:@color-input-bg;
-        padding:5px 8px;
-        color: @color-input-font;
-        width:@input-width - 8*2 - 1*2;
-        line-height:14px;
-        height:14px;
-        border-radius: 3px;
-        border:1px solid @color-input-border;
-        font-size:12px;
-    }
+	.input{
+		display:inline-block;
+		background:@color-input-bg;
+		padding:5px 8px;
+		color: @color-input-font;
+		width:@input-width - 8*2 - 1*2;
+		line-height:14px;
+		height:14px;
+		border-radius: 3px;
+		border:1px solid @color-input-border;
+		font-size:12px;
+	}
 
-    input{
-        .input;
-        &:focus {
-            border:1px solid @color-input-focus-border;
-            outline:0;
-            .box-shadow(0,0,6px,1px,@color-input-focus-border);
-        }
-    }
-
-    .readonly{
-        .input;
-        vertical-align:middle;
-        cursor:pointer;
-    }
-    .with-btn{
-        border-bottom-right-radius:0;
-        border-top-right-radius:0;
-        border-right-style:none;
-        width:@input-width - 8*2 - 1px - 20px;
-        &:focus{
-            border-right-style:none;
-        }
-    }
-    .input-btn{
-        border:1px solid @color-input-border;
-        background:#fff;
-        text-align:center;
-        line-height:24px;
-        height:24px;
-        width:18px;
-        border-bottom-right-radius:3px;
-        border-top-right-radius:3px;
-        cursor:pointer;
-        .user-not-select;
-        &:hover{
-            color:#fff;
-            background-color:lighten(@color-input-border,10%);
-        }
-        &:active{
-            color:#fff;
-            background-color:@color-input-btn-active-bg;
-        }
-    }
-    .input-warm{
-		font-style:italic;
-		display:none;
-        position:fixed;
-        top:0;
-        left:0;
-        min-width: 140px;
-        height: 18px;
-        line-height: 18px;
-        padding-left:5px;
-        background: @color-input-warm;
-        color: #ffffff;
-        font-size: 12px;
-        z-index:30002;
-		opacity: .8;
-		filter:alpha(opacity=80);
-		.rounded-corners(9px);
-		border:1px solid #c52332;
-		margin-left:5px;
-        &:before{
-            content:" ";
-            display:inline-block;
-            position:absolute;
-            top:18px;
-            left:10px;
-            width: 0;
-            height: 0;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            border-top: 5px solid @color-input-warm;
-			border-bottom:none;
-        }
-		&.bottom-input:before{
-			top:-5px;
-			width: 0;
-			height: 0;
-			border-left: 5px solid transparent;
-			border-right: 5px solid transparent;
-			border-bottom: 5px solid @color-input-warm;
-			border-top:none;
+	input{
+		.input;
+		&:focus {
+			border:1px solid @color-input-focus-border;
+			outline:0;
+			.box-shadow(0,0,6px,1px,@color-input-focus-border);
 		}
-    }
-    .input-layout{
-        position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 80px;
-        background: #f4f4f4;
-        filter: alpha(opacity=50);
-        opacity: .5;
-    }
+	}
+
+	.readonly{
+		.input;
+		vertical-align:middle;
+		cursor:pointer;
+	}
+	.with-btn{
+		border-bottom-right-radius:0;
+		border-top-right-radius:0;
+		border-right-style:none;
+		width:@input-width - 8*2 - 1px - 20px;
+		&:focus{
+			border-right-style:none;
+		}
+	}
+	.input-btn{
+		border:1px solid @color-input-border;
+		background:#fff;
+		text-align:center;
+		line-height:24px;
+		height:24px;
+		width:18px;
+		border-bottom-right-radius:3px;
+		border-top-right-radius:3px;
+		cursor:pointer;
+		.user-not-select;
+		&:hover{
+			color:#fff;
+			background-color:lighten(@color-input-border,10%);
+		}
+		&:active{
+			color:#fff;
+			background-color:@color-input-btn-active-bg;
+		}
+	}
+
+	.input-layout{
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 80px;
+		background: #f4f4f4;
+		filter: alpha(opacity=50);
+		opacity: .5;
+	}
+}
+.input-warm{
+	display:none;
+	position:absolute;
+	top:-24px;
+	left:80px;
+	min-width: 140px;
+	height: 18px;
+	line-height: 18px;
+	padding-left:5px;
+	background: @color-input-warm;
+	font-size:12px;
+	z-index:30002;
+	opacity: .9;
+	filter:alpha(opacity=90);
+	.rounded-corners(9px);
+	border:1px solid #f7ce3a;
+	i{
+		margin:0 5px;
+	}
+	span{
+		font-style:italic;
+	}
+	&:before,&:after{
+		content:" ";
+		display:inline-block;
+		position:absolute;
+		top:18px;
+		left:10px;
+		width: 0;
+		height: 0;
+		border-width:5px;
+		border-color: #f7ce3a transparent transparent;
+		border-style: solid dashed dashed;
+	}
+	&:after{
+		top:17px;
+		border-color: @color-input-warm transparent transparent;
+	}
+	&.bottom-input{
+		left:auto;
+		right:0;
+		top:28px;
+	}
+	&.bottom-input:before{
+		top:-10px;
+		width: 0;
+		height: 0;
+		border-color:transparent transparent #f7ce3a transparent ;
+		border-style:dashed dashed solid dashed ;
+	}
+	&.bottom-input:after{
+		top:-9px;
+		width: 0;
+		height: 0;
+		border-color:transparent transparent @color-input-warm transparent ;
+		border-style:dashed dashed solid dashed ;
+	}
 }

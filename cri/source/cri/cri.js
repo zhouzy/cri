@@ -1250,7 +1250,7 @@
             c && (this.options.content = c);
             onReady && (this.options.onReady = onReady);
             this._destroy();
-            this._load();
+            this._createBody();
         }
     });
     cri.ContentLoader = ContentLoader;
@@ -4113,8 +4113,7 @@
         $   = window.jQuery;
 
     var INPUTSELECTOR = ":input:not(:button,[type=submit],[type=reset],[disabled])",
-        CHECKBOXSELECTOR = ":checkbox:not([disabled],[readonly])",
-        NUMBERINPUTSELECTOR = "[type=num],[type=range]",
+        NUMBERINPUTSELECTOR = "[role=num],[role=range]",
 
         ERROR_MSG_HEIGHT = 23,//验证消息框高度
         ERROR_MSG_NARROW_HEIGHT = 5;//验证消息框箭头高度
@@ -4122,7 +4121,8 @@
 
 
     var emailRegExp = /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))$/i,
-        urlRegExp = /^(https?|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i;
+        urlRegExp = /^(https?|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i,
+        telRegExp = /((\d{11})|^((\d{7,8})|(\d{4}|\d{3})-(\d{7,8})|(\d{4}|\d{3})-(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1})|(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1}))$)/i;
 
     function patternMatcher(value, pattern) {
         if (typeof pattern === "string") {
@@ -4154,7 +4154,7 @@
             return !(hasAttribute(input, "required") && (value === "" || !value  || checkbox));
         },
         pattern: function(input) {
-            if (input.filter("[role=text],[role=email],[role=url],[role=tel],[role=search],[role=password]").filter("[pattern]").length && input.val() !== "") {
+            if (input.filter("[role=text]").filter("[pattern]").length && input.val() !== "") {
                 return patternMatcher(input.val(), input.attr("pattern"));
             }
             return true;
@@ -4182,28 +4182,26 @@
         url: function(input) {
             return matcher(input, "[role=url]", urlRegExp);
         },
-        date: function(input) {
-            if (input.filter("[role^=date]").length && input.val() !== ""){
-                return parseDate(input.val(), input.attr("format")) !== null;
-            }
-            return true;
-        },
         number: function(input) {
             if(input.filter(NUMBERINPUTSELECTOR).length && input.val()){
                 return cri.isNum(input.val());
             }
             return true;
+        },
+        tel: function(input){
+            return matcher(input, "[role=tel]", telRegExp);
         }
     };
 
     var Messages = {
-        required:"请输入",
+        required:"该值不能为空",
         min:"请输入大于的数字",
         max:"请输入小于的数字",
-        email:"请输入合法的邮箱地址",
-        url:"请输入合法的URL地址",
-        date:"请输入合法的日期",
-        number:"请输入数字"
+        email:"请输入有效的邮箱地址",
+        url:"请输入有效的URL地址",
+        number:"请输入数字",
+        tel:"请输入有效的号码",
+        pattern:"该值无效,请重新输入"
     };
 
     var _defaultOptions = {
@@ -4296,43 +4294,48 @@
          * @private
          */
         _validateInput:function($input){
-            var result = this._checkValidity($input),
+            var that = this,
+                result = this._checkValidity($input),
                 valid = result.valid;
             if(!valid){
-                var offset = $input.is("[data-role=selectbox],[data-role=timeinput]") ? $input.siblings('span[role=readonly]').offset() : $input.offset(),
-                    $errorMsg = $input.next(".input-warm");
-
-                if($errorMsg.length == 0){
-                    $errorMsg = $('<span class="input-warm" data-errorfor="' + $input.attr("name") + '">' + this.options.messages[result.key] + '</span>');
-                    $input.after($errorMsg);
-                }
-                else{
-                    $errorMsg.text(this.options.messages[result.key]);
-                }
-                if(offset.top <= (ERROR_MSG_HEIGHT)){
-                    var outerHeight = $input.is("[data-role=selectbox],[data-role=timeinput]") ? $input.siblings('span[role=readonly]').outerHeight() : $input.outerHeight();
-                    offset.top += outerHeight + ERROR_MSG_NARROW_HEIGHT;
-                    $errorMsg.addClass("bottom-input");
-                }else{
-                    offset.top -= (ERROR_MSG_HEIGHT);
-                }
-                $errorMsg.css(offset).show();
+                this._showMessage($input,this.options.messages[result.key]);
                 if($input.is("[readonly=readonly]")){
                     $input.closest(".input-group").one("click",function(){
-                        $input.next(".input-warm").hide();
+                        that._hideMessage($input.attr('name'));
                     })
                 }
                 $input.one("focus",function(){
-                    $input.next(".input-warm").hide();
+                    that._hideMessage($input.attr('name'));
                 });
             }else{
-                $input.next(".input-warm").hide();
+                this._hideMessage($input.attr('name'));
             }
             return valid;
         },
 
+        _showMessage:function($input,errorMsg){
+            errorMsg = $input.attr('error-msg')|| errorMsg || '请检查';
+            var isReadOnly = $input.is("[data-role=selectbox],[data-role=timeinput],[readonly=readonly]"),
+                offset = isReadOnly ? $input.siblings('span[role=readonly]').offset() : $input.offset(),
+                $errorMsg = $('.input-warm[data-errorfor=' + $input.attr("name") + ']');
+
+            if($errorMsg.length == 0){
+                $errorMsg = $('<div class="input-warm" data-errorfor="' + $input.attr("name") + '"><i class="fa fa-exclamation"></i><span>' + errorMsg + '</span></div>');
+                $input.after($errorMsg);
+            }
+            else{
+                $errorMsg.find("span").text(errorMsg);
+            }
+            if(offset.top <= (ERROR_MSG_HEIGHT)){
+                $errorMsg.addClass("bottom-input");
+            }else{
+                $errorMsg.removeClass("bottom-input");
+            }
+            $errorMsg.show();
+        },
+
         _hideMessage:function(name){
-            this.$element.find('[data-errorfor='+name+']').hide();
+            $('.input-warm[data-errorfor='+name+']').hide();
         },
 
         hideMessages:function(names){

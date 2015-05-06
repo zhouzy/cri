@@ -78,7 +78,7 @@ module.exports = function (grunt) {
             less: {
                 files: 'cri/source/less/*.less',
                 tasks: ['less:production']
-            },
+            }/*,
             redeploy:{
                 files: 'api/**',
                 tasks: "tomcat_redeploy"
@@ -87,6 +87,7 @@ module.exports = function (grunt) {
                 files: 'cri/source/cri/*.*',
                 tasks: "zip:cri"
             }
+            */
         }
     });
     // grunt 组件
