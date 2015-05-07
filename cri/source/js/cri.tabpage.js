@@ -78,15 +78,15 @@
             var left = this.$tabs.position().left,
                 width = this.$tabs.width(),
                 containerWidth = this.$tabsWrap.width();
-            if(width+left > containerWidth){
-                this.$tabs.animate({left:"-=150px"});
+            if(width+left > containerWidth && !this.$tabs.is(":animated")){
+                this.$tabs.animate({left:"-=150px"},500);
             }
         },
 
         _offsetR:function(){
             var left  = this.$tabs.position().left;
-            if(left < 0){
-                this.$tabs.animate({left:"+=150px"});
+            if(left < 0 && !this.$tabs.is(":animated")){
+                this.$tabs.animate({left:"+=150px"},500);
             }
         },
 
@@ -115,7 +115,6 @@
                     }
                     index >= 0 && this.focusTab(this._getTab(index));
                 }
-                this._offsetR();
                 this._leftRightBtn();
             }
         },
@@ -166,12 +165,9 @@
                 isIframe:isIframe,
                 onReady:callBack
             });
-
             this._pageBodyQueue.push(tabPageBody);
-
             this._leftRightBtn();
             this.focusTab($tab);
-            this._offsetL();
             return tabPageBody;
         },
 
@@ -207,9 +203,21 @@
 
         focusTab:function($tab){
             var $tabs = this.$tabs,
-                index = $(".selected",$tabs).removeClass("selected").data("for");
-            index != null && this._pageBodyQueue[index].hide();
+                index = $(".selected",$tabs).removeClass("selected").data("for"),
+                cIndex = $tab.data("for"),
+                tabLeft = cIndex * 150,
+                tabRight = (cIndex + 1) * 150;
+
+            if(this.$tabs.position().left + tabLeft < 0){
+                this.$tabs.stop();
+                this.$tabs.animate({left:0-tabLeft},1000);
+            }
+            if(this.$tabs.position().left + tabRight > this.$tabsWrap.width()){
+                this.$tabs.stop();
+                this.$tabs.animate({left:this.$tabsWrap.width()-tabRight},1000);
+            }
             $tab.addClass("selected");
+            index != null && this._pageBodyQueue[index].hide();
             this._pageBodyQueue[$tab.data("for")].show();
             this.options.onFocus && this.options.onFocus.call(this,$tab.data("for"));
         },

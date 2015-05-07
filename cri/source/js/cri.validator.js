@@ -14,7 +14,7 @@
         $   = window.jQuery;
 
     var INPUTSELECTOR = ":input:not(:button,[type=submit],[type=reset],[disabled])",
-        NUMBERINPUTSELECTOR = "[role=num],[role=range]",
+        NUMBERINPUTSELECTOR = "[role=number],[role=range]",
 
         ERROR_MSG_HEIGHT = 23,//验证消息框高度
         ERROR_MSG_NARROW_HEIGHT = 5;//验证消息框箭头高度
@@ -199,7 +199,15 @@
                 result = this._checkValidity($input),
                 valid = result.valid;
             if(!valid){
-                this._showMessage($input,this.options.messages[result.key]);
+                var errorMsg = this.options.messages[result.key];
+                if(result.key == 'min'){
+                    errorMsg = '请输入不小于'+ $input.attr('min') + '的数字';
+                }
+                if(result.key == 'max'){
+                    errorMsg = '请输入不大于'+ $input.attr('max') + '的数字';
+                }
+
+                this._showMessage($input,errorMsg);
                 if($input.is("[readonly=readonly]")){
                     $input.closest(".input-group").one("click",function(){
                         that._hideMessage($input.attr('name'));
