@@ -87,6 +87,7 @@
         this.options = _defaultOptions;
         this.windowStatus = "normal";
         this.contentLoader = null;
+        this.$elementPlaceHolder = null;//原始元素占位符
         cri.Widgets.apply(this,arguments);
         this.windowStack.push(this);
         this.toFront();
@@ -94,7 +95,6 @@
     });
 
     $.extend(Window.prototype,{
-
         windowStack : [],//窗口栈
         mask:null,//遮罩
 
@@ -224,6 +224,8 @@
                 $element   = this.$element,
                 $window    = $('<div class="window"></div>'),
                 $windowBody = $('<div class="window-content"></div>');
+            var $placeHolder = this.$elementPlaceHolder = $('<div style="display:none"></div>');
+            $element.after($placeHolder);
             $element.detach();
             this.$window = $window;
             if(op.center){
@@ -399,7 +401,12 @@
                 $wrapper = $element.parents(".window");
             var index = this.windowStack.indexOf(this);
             index>=0 && this.windowStack.splice(index,1);
-            $wrapper.after($element).remove();
+            this.$elementPlaceHolder.after($element);
+            this.$elementPlaceHolder.remove();
+            this.$elementPlaceHolder = null;
+            $wrapper.remove();
+            $element.hide();
+            $element.data("window",null);
         },
 
         /**

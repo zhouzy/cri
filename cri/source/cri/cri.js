@@ -1554,7 +1554,6 @@
             op.button && $input.after(this._button()) && $input.addClass(WITH_BTN);
 
             this.$input = $input;
-
         },
 
         /**
@@ -1852,6 +1851,111 @@
     cri.notification = new Notification();
 
 }(window);
+/**
+ * Author zhouzy
+ * Date   2014/9/18
+ * Input 组件
+ *
+ */
+!function(window){
+
+    "use strict";
+
+    var cri = window.cri,
+        $   = window.jQuery;
+
+    var INPUT_GROUP = "input-group",
+        INPUT_BTN   = "input-btn",
+        WITH_BTN    = "with-btn";
+
+    var _defaultOptions = {
+        label:null,
+        value:0,
+        readonly:false,
+        onFocus:null,
+        onBlur:null,
+        enable:true,
+        required:false
+    };
+
+    var NumberInput = cri.Input.extend(function(element,options){
+        this.options = _defaultOptions;
+        this.$inputGroup = null;
+        cri.Widgets.apply(this,arguments);
+        this.$element.attr('data-role','numberinput');
+    });
+
+    $.extend(NumberInput.prototype,{
+        _eventListen:function(){
+
+        },
+
+        _wrapInput:function() {
+            var that   = this,
+                op     = that.options,
+                $input = that.$element;
+
+            if (op.readonly) {
+                $input = this._readonlyInput($input);
+            }
+            else {
+                $input.on("focus", function () {
+                    that.options.onFocus && that.options.onFocus.call(that);
+                }).blur(function () {
+                    that.options.onBlur && that.options.onBlur.call(that);
+                });
+            }
+            this.$input = $input;
+            $input.addClass(WITH_BTN);
+            this._appendBtn();
+        },
+
+        _appendBtn:function(){
+            var that         = this,
+                $plusButton  = $('<i class="fa fa-sort-up plus-button"></i>'),
+                $minusButton = $('<i class="fa fa-sort-down minus-button"></i>'),
+                $Buttons     = $('<span class="plus-minus-button"></span>').append($minusButton,$plusButton);
+
+            $plusButton.click(function(){
+                var val = that.value();
+                if(cri.isNum(val)){
+                    that.value(+val + 1);
+                }
+                else{
+                    that.value(parseInt(val,10) + 1);
+                }
+            });
+            $minusButton.click(function(){
+                var val = that.value();
+                if(cri.isNum(val)){
+                    that.value(+val - 1);
+                }
+                else{
+                    that.value(parseInt(val,10) - 1);
+                }
+            });
+            this.$input.after($Buttons);
+        }
+
+    });
+    cri.NumberInput = NumberInput;
+
+    $.fn.numberInput = function(option) {
+        var o = null;
+        this.each(function () {
+            var $this   = $(this),
+                input   = $this.data('numberinput'),
+                options = typeof option == 'object' && option,
+                role    = $this.attr("role");
+            if(input != null){
+                input._destroy();
+            }
+            $this.data('numberinput', (o = new NumberInput(this, options)));
+        });
+        return o;
+    };
+}(window);
+
 /**
  * Author zhouzy
  * Date   2014/9/18
@@ -3300,7 +3404,7 @@
                 var $tr = $('<tr class="days"></tr>');
                 for(var j=0; j<7;j++){
                     var $td = $("<td></td>").on("click",function(){
-                        var day = $(this).text();
+                        var day = $(this).find(".day-content").text();
                         if(day && day!=that.date.dd){
                             $('td.choosed',$daySelect).removeClass("choosed");
                             that.date.dd = +day;
@@ -3331,7 +3435,7 @@
                     cols = Math.floor(i/7),
                     $td = $('tr.days:eq("'+cols+'") td:eq("' + rows + '")',this.$daySelect),
                     day = i- shift + 1;
-                $td.text(day);
+                $td.append('<div class="day-content">' + day + '</div>');
                 day == this.date.dd && $td.addClass("choosed");
             }
         },
@@ -3665,7 +3769,7 @@
         _getData:function(){
             var tree = this;
             $.ajax({
-                type: "get",
+                type: "post",
                 url: this.options.url,
                 success:function(data){
                     tree.rows = data.rows;
@@ -4476,6 +4580,7 @@
         this.options = _defaultOptions;
         this.windowStatus = "normal";
         this.contentLoader = null;
+        this.$elementPlaceHolder = null;//原始元素占位符
         cri.Widgets.apply(this,arguments);
         this.windowStack.push(this);
         this.toFront();
@@ -4483,7 +4588,6 @@
     });
 
     $.extend(Window.prototype,{
-
         windowStack : [],//窗口栈
         mask:null,//遮罩
 
@@ -4613,6 +4717,8 @@
                 $element   = this.$element,
                 $window    = $('<div class="window"></div>'),
                 $windowBody = $('<div class="window-content"></div>');
+            var $placeHolder = this.$elementPlaceHolder = $('<div style="display:none"></div>');
+            $element.after($placeHolder);
             $element.detach();
             this.$window = $window;
             if(op.center){
@@ -4788,7 +4894,12 @@
                 $wrapper = $element.parents(".window");
             var index = this.windowStack.indexOf(this);
             index>=0 && this.windowStack.splice(index,1);
-            $wrapper.after($element).remove();
+            this.$elementPlaceHolder.after($element);
+            this.$elementPlaceHolder.remove();
+            this.$elementPlaceHolder = null;
+            $wrapper.remove();
+            $element.hide();
+            $element.data("window",null);
         },
 
         /**

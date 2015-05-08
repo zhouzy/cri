@@ -274,7 +274,7 @@
                 var $tr = $('<tr class="days"></tr>');
                 for(var j=0; j<7;j++){
                     var $td = $("<td></td>").on("click",function(){
-                        var day = $(this).text();
+                        var day = $(this).find(".day-content").text();
                         if(day && day!=that.date.dd){
                             $('td.choosed',$daySelect).removeClass("choosed");
                             that.date.dd = +day;
@@ -305,7 +305,7 @@
                     cols = Math.floor(i/7),
                     $td = $('tr.days:eq("'+cols+'") td:eq("' + rows + '")',this.$daySelect),
                     day = i- shift + 1;
-                $td.text(day);
+                $td.append('<div class="day-content">' + day + '</div>');
                 day == this.date.dd && $td.addClass("choosed");
             }
         },

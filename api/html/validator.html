@@ -66,13 +66,22 @@
     <p>进行验证</p>
     <p>说明：请在标签上，通过添加属性，指定验证类型，内置的验证类型如下：</p>
     <pre class="code"><code>
-        1.required ([required])
-        2.email ([role=email])
-        3.url ([role=url])
-        4.date ([role=date])
-        5.pattern (在[role=text]|[role=email]|[role=url]|[role=tel]|[role=search]|[role=password]类型中根据[pattern]值进行正则验证)
-        6.min(在[role=number]类型的输入框中根据[min='number']指定的值进行验证，当输入框中的值小于min指定的值，验证通过)
-        7.max(在[role=number]类型的输入框中根据[max='number']指定的值进行验证，当输入框中的值大于max指定的值，验证通过)
+        1.必填:required ([required])
+        <input required/>
+        2.邮箱地址:email ([role=email])
+        <input role="email"/>
+        3.网络地址:url ([role=url])
+        <input role="url"/>
+        4.电话号码:tel ([role=tel])
+        <input role="tel"/>
+        5.自定义正则表达式验证:pattern (在[role=text]类型中根据[pattern]值进行正则验证,可以通过[error-msg]指定该处的错误提示信息)
+        <input data-label="身份证号"  role="text" pattern="/(^\d{15}$)|(^\d{17}([0-9]|X)$)/" error-msg="请输入有效的身份证号">
+        6.最小值:min(在[role=range]|[role=number]类型的输入框中根据[min='number']指定的值进行验证，当输入框中的值小于min指定的值，验证通过)
+        <input role="range" min="1"/>
+        7.最大值:max(在[role=number]|[role=number]类型的输入框中根据[max='number']指定的值进行验证，当输入框中的值大于max指定的值，验证通过)
+        <input role="range" max="100" min="1"/>
+        8.数字输入:(在[role=number]类型的输入框中只能输入数字)
+        <input role="number" max="100" min="1"/>
     </code></pre>
 </div>
 <h3 class="item-head">

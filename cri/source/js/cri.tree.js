@@ -133,7 +133,7 @@
         _getData:function(){
             var tree = this;
             $.ajax({
-                type: "get",
+                type: "post",
                 url: this.options.url,
                 success:function(data){
                     tree.rows = data.rows;

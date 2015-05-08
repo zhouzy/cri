@@ -78,7 +78,6 @@
             op.button && $input.after(this._button()) && $input.addClass(WITH_BTN);
 
             this.$input = $input;
-
         },
 
         /**

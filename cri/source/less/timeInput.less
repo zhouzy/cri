@@ -26,7 +26,7 @@
     left: 80px;
     z-index: 20004;
     width: 240px;
-    height: 190px;
+    height: 230px;
     display: none;
     .titleBar {
         top:0;
@@ -98,9 +98,14 @@
         -moz-user-select: none;
         user-select: none;
         tr{
-            height: 20px;
+            height: 30px;
             &>td:hover{
-                background:@color-timeinput-timebox-day-hover;
+                .day-content{
+					background:@color-timeinput-timebox-day-hover;
+					background-clip: content-box;
+					font-size:14px;
+					color:#fff;
+				}
             }
         }
         th{
@@ -110,12 +115,23 @@
             cursor: pointer;
             text-align: center;
             vertical-align: middle;
+			.day-content{
+				width:28px;
+				height:28px;
+				line-height:28px;
+				text-align:center;
+				.rounded-corners(14px);
+			}
         }
     }
 
     & > table td.choosed {
-        background-color:@color-timeinput-timebox-day-selected;
-        color:#fff;
+		.day-content{
+			color:#fff;
+			background-color:@color-timeinput-timebox-day-selected;
+			background-clip: content-box;
+		}
+
     }
     .HMSBar {
         height: 20px;

@@ -516,7 +516,8 @@ table {
 }
 .input-group input,
 .input-group .input-btn,
-.input-group label {
+.input-group label,
+.input-group .plus-minus-button {
   display: inline-block;
   font-size: 12px;
   vertical-align: middle;
@@ -592,7 +593,9 @@ table {
 .input-group .with-btn:focus {
   border-right-style: none;
 }
-.input-group .input-btn {
+.input-group .input-btn,
+.input-group .plus-minus-button {
+  display: inline-block;
   border: 1px solid #c8c8c8;
   background: #fff;
   text-align: center;
@@ -608,13 +611,53 @@ table {
   -khtml-user-select: none;
   user-select: none;
 }
-.input-group .input-btn:hover {
+.input-group .input-btn:hover,
+.input-group .plus-minus-button:hover {
   color: #fff;
   background-color: #e2e2e2;
 }
-.input-group .input-btn:active {
+.input-group .input-btn:active,
+.input-group .plus-minus-button:active {
   color: #fff;
   background-color: #4f7fe8;
+}
+.input-group .plus-minus-button {
+  position: relative;
+}
+.input-group .plus-minus-button:hover {
+  color: #666666;
+  background-color: #fff;
+}
+.input-group .plus-minus-button:active {
+  color: #666666;
+  background-color: #fff;
+}
+.input-group .plus-minus-button i {
+  position: absolute;
+  display: inline-block;
+  width: 18px;
+  height: 12px;
+  line-height: 20px;
+}
+.input-group .plus-minus-button i:hover {
+  color: #fff;
+  background-color: #e2e2e2;
+}
+.input-group .plus-minus-button i:active {
+  color: #fff;
+  background-color: #4f7fe8;
+}
+.input-group .plus-minus-button .plus-button {
+  top: 0;
+  left: 0;
+  right: 0;
+  border-bottom: 1px solid #c8c8c8;
+}
+.input-group .plus-minus-button .minus-button {
+  line-height: 6px;
+  top: 12px;
+  left: 0;
+  right: 0;
 }
 .input-group .input-layout {
   position: absolute;
@@ -1244,7 +1287,7 @@ table {
   left: 80px;
   z-index: 20004;
   width: 240px;
-  height: 190px;
+  height: 230px;
   display: none;
 }
 .timeBox .titleBar {
@@ -1323,10 +1366,13 @@ table {
   user-select: none;
 }
 .timeBox > table tr {
-  height: 20px;
+  height: 30px;
 }
-.timeBox > table tr > td:hover {
+.timeBox > table tr > td:hover .day-content {
   background: #97b7fc;
+  background-clip: content-box;
+  font-size: 14px;
+  color: #fff;
 }
 .timeBox > table th {
   cursor: default;
@@ -1336,9 +1382,21 @@ table {
   text-align: center;
   vertical-align: middle;
 }
-.timeBox > table td.choosed {
-  background-color: #4f7fe8;
+.timeBox > table td .day-content {
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  -webkit-border-radius: 14px;
+  -moz-border-radius: 14px;
+  -ms-border-radius: 14px;
+  -o-border-radius: 14px;
+  border-radius: 14px;
+}
+.timeBox > table td.choosed .day-content {
   color: #fff;
+  background-color: #4f7fe8;
+  background-clip: content-box;
 }
 .timeBox .HMSBar {
   height: 20px;

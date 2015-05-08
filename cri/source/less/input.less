@@ -14,7 +14,7 @@
 	position:relative;
 	height:26px;
 	line-height:26px;
-	input,.input-btn,label{
+	input,.input-btn,label,.plus-minus-button{
 		display:inline-block;
 		font-size:12px;
 		vertical-align:middle;
@@ -75,7 +75,8 @@
 			border-right-style:none;
 		}
 	}
-	.input-btn{
+	.input-btn,.plus-minus-button{
+		display:inline-block;
 		border:1px solid @color-input-border;
 		background:#fff;
 		text-align:center;
@@ -93,6 +94,44 @@
 		&:active{
 			color:#fff;
 			background-color:@color-input-btn-active-bg;
+		}
+	}
+	.plus-minus-button{
+		position:relative;
+		&:hover{
+			color:@color-input-font;
+			background-color:#fff;
+		}
+		&:active{
+			color:@color-input-font;
+			background-color:#fff;
+		}
+		i{
+			position:absolute;
+			display:inline-block;
+			width:18px;
+			height:12px;
+			line-height:20px;
+			&:hover{
+				color:#fff;
+				background-color:lighten(@color-input-border,10%);
+			}
+			&:active{
+				color:#fff;
+				background-color:@color-input-btn-active-bg;
+			}
+		}
+		.plus-button{
+			top:0;
+			left:0;
+			right:0;
+			border-bottom:1px solid @color-input-border;
+		}
+		.minus-button{
+			line-height:6px;
+			top:12px;
+			left:0;
+			right:0;
 		}
 	}
 
