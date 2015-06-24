@@ -507,7 +507,6 @@ table {
   word-spacing: -1px;
   font-size: 0;
   -webkit-text-size-adjust: none;
-  width: 260px;
   margin: 2px 0;
   vertical-align: middle;
   position: relative;
@@ -1027,7 +1026,8 @@ table {
   font-size: 12px;
   width: 178px;
   border: 1px solid #c8c8c8;
-  max-height: 200px;
+  max-height: 300px;
+  padding: 0 4px;
   overflow: auto;
   overflow-x: hidden;
   -webkit-border-radius: 3px;
@@ -1046,8 +1046,8 @@ table {
 }
 .options li {
   display: inline-block;
-  margin: 3px 4px 0 4px;
-  width: 170px;
+  margin: 3px 0;
+  width: 100%;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   -ms-border-radius: 3px;

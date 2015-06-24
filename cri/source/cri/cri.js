@@ -1113,9 +1113,10 @@
 
             $e.wrap('<div class="'+ BUTTON + '"></div>');
             var $button = this.$button = $e.parent(),
-                $icon = $('<i class="' + op.iconCls + '"></i>'),
-                text = op.text || $e.text() || $e.val();
-            $button.append($icon, text);
+                $icon = $('<span class="icon"><i class="' + op.iconCls + '"></i></span>'),
+                text = op.text || $e.text() || $e.val(),
+                buttonText = '<span class="text">'+text+'</span>';
+            $button.append($icon, buttonText);
 
             if(!op.enable){
                 this.disable();
@@ -1578,7 +1579,7 @@
                 $icon = null,
                 that  = this;
             if(op.button){
-                $icon = $('<i class="' + INPUT_BTN + " " + op.button.iconCls + '"></i>').on("click",function(){
+                $icon = $('<span class="'+INPUT_BTN+'"><i class="' + op.button.iconCls + '"></i></span>').on("click",function(){
                     op.button.handler.call(that);
                 });
             }
@@ -2422,9 +2423,12 @@
          * @private
          */
         _setPosition:function(){
-            var left = this.$parent.offset().left + 80;
+            var labelWidth = this.$parent.find('label').outerWidth();
+            var left = this.$parent.offset().left + labelWidth;
             var top = this.$parent.offset().top + 28;
-            this.$options.css({top:top,left:left});
+            //magic number 10 为 options padding+border宽度
+            var width = this.$parent.find('.input-group').outerWidth()-10-labelWidth;
+            this.$options.css({top:top,left:left,width:width});
         },
 
         /**
@@ -3328,10 +3332,7 @@
                 $timeBox.append(this._hmsSelect());
             }
 
-            var left = $parent.offset().left + 80;
-            var top = $parent.offset().top + 28;
-
-            $("body").append($timeBox.css({top:top,left:left}));
+            $("body").append($timeBox);
         },
 
         /**
@@ -3506,7 +3507,7 @@
          * @private
          */
         _setPosition:function(){
-            var left = this.$parent.offset().left + 80;
+            var left = this.$parent.offset().left + this.$parent.find('label').outerWidth();
             var top = this.$parent.offset().top + 28;
             this.$timeBox.css({top:top,left:left});
         },
@@ -4234,7 +4235,8 @@
 
     var emailRegExp = /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))$/i,
         urlRegExp = /^(https?|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i,
-        telRegExp = /((\d{11})|^((\d{7,8})|(\d{4}|\d{3})-(\d{7,8})|(\d{4}|\d{3})-(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1})|(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1}))$)/i;
+        telRegExp = /((\d{11})|^((\d{7,8})|(\d{4}|\d{3})-(\d{7,8})|(\d{4}|\d{3})-(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1})|(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1}))$)/i,
+        ipRegExp = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])(\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])){3}$/i;
 
     function patternMatcher(value, pattern) {
         if (typeof pattern === "string") {
@@ -4302,6 +4304,9 @@
         },
         tel: function(input){
             return matcher(input, "[role=tel]", telRegExp);
+        },
+        ip: function(input){
+            return matcher(input, "[role=ip]", ipRegExp);
         }
     };
 
@@ -4313,7 +4318,8 @@
         url:"请输入有效的URL地址",
         number:"请输入数字",
         tel:"请输入有效的号码",
-        pattern:"该值无效,请重新输入"
+        pattern:"该值无效,请重新输入",
+        ip:'请输入有效IP地址'
     };
 
     var _defaultOptions = {

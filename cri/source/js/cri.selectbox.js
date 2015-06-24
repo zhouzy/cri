@@ -280,9 +280,12 @@
          * @private
          */
         _setPosition:function(){
-            var left = this.$parent.offset().left + 80;
+            var labelWidth = this.$parent.find('label').outerWidth();
+            var left = this.$parent.offset().left + labelWidth;
             var top = this.$parent.offset().top + 28;
-            this.$options.css({top:top,left:left});
+            //magic number 10 为 options padding+border宽度
+            var width = this.$parent.find('.input-group').outerWidth()-10-labelWidth;
+            this.$options.css({top:top,left:left,width:width});
         },
 
         /**

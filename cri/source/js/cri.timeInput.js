@@ -198,10 +198,7 @@
                 $timeBox.append(this._hmsSelect());
             }
 
-            var left = $parent.offset().left + 80;
-            var top = $parent.offset().top + 28;
-
-            $("body").append($timeBox.css({top:top,left:left}));
+            $("body").append($timeBox);
         },
 
         /**
@@ -376,7 +373,7 @@
          * @private
          */
         _setPosition:function(){
-            var left = this.$parent.offset().left + 80;
+            var left = this.$parent.offset().left + this.$parent.find('label').outerWidth();
             var top = this.$parent.offset().top + 28;
             this.$timeBox.css({top:top,left:left});
         },

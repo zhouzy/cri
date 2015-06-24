@@ -46,9 +46,10 @@
 
             $e.wrap('<div class="'+ BUTTON + '"></div>');
             var $button = this.$button = $e.parent(),
-                $icon = $('<i class="' + op.iconCls + '"></i>'),
-                text = op.text || $e.text() || $e.val();
-            $button.append($icon, text);
+                $icon = $('<span class="icon"><i class="' + op.iconCls + '"></i></span>'),
+                text = op.text || $e.text() || $e.val(),
+                buttonText = '<span class="text">'+text+'</span>';
+            $button.append($icon, buttonText);
 
             if(!op.enable){
                 this.disable();

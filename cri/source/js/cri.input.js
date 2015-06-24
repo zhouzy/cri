@@ -102,7 +102,7 @@
                 $icon = null,
                 that  = this;
             if(op.button){
-                $icon = $('<i class="' + INPUT_BTN + " " + op.button.iconCls + '"></i>').on("click",function(){
+                $icon = $('<span class="'+INPUT_BTN+'"><i class="' + op.button.iconCls + '"></i></span>').on("click",function(){
                     op.button.handler.call(that);
                 });
             }
