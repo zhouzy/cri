@@ -32,7 +32,7 @@
         this._value = null;
         this._text = null;
         cri.Widgets.apply(this,arguments);
-        this.$element.attr('data-role','selectbox');
+        this.$element.attr('data-role','selectBox');
     });
 
     $.extend(SelectBox.prototype,{
@@ -134,6 +134,18 @@
                     return data[i].text;
                 }
             }
+        },
+
+        /**
+         * @param: errorMsg 异常提示
+         * @private
+         */
+        _showValidateMsg: function(errorMsg){
+            this.input._showValidateMsg(errorMsg);
+        },
+
+        _hideValidateMsg: function(){
+            this.input._hideValidateMsg();
         },
 
         /**

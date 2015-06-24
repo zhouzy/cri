@@ -24,6 +24,7 @@
 
     var INPUT_GROUP = "input-group",
         INPUT_BTN   = "input-btn",
+        ERROR_MSG_HEIGHT = 23,//验证消息框高度
         WITH_BTN    = "with-btn";
 
     var Input = cri.Widgets.extend(function(element,options){
@@ -149,6 +150,39 @@
 
         _getValue:function(){
             return this.$element.val();
+        },
+
+        /**
+         * @param: errorMsg 异常提示
+         * @private
+         */
+        _showValidateMsg: function(errorMsg){
+            this.$input.addClass("failure");
+            var offset = this.$input.offset();
+            if(!this.$errorMsg){
+                this.$errorMsg = $('<div class="input-warm"><i class="fa fa-exclamation"></i><span>' + errorMsg + '</span></div>');
+                this.$input.after(this.$errorMsg);
+            }
+            else{
+                this.$errorMsg.find("span").text(errorMsg);
+            }
+            if(offset.top <= (ERROR_MSG_HEIGHT)){
+                this.$errorMsg.addClass("bottom-input");
+            }
+            else{
+                this.$errorMsg.removeClass("bottom-input");
+            }
+            this.$errorMsg.show();
+
+            $('html,body').is(':animated') || $('html,body').animate({
+                scrollTop: this.$input.offset().top
+            },300);
+
+        },
+
+        _hideValidateMsg: function(){
+            this.$input.removeClass("failure");
+            this.$errorMsg && this.$errorMsg.hide();
         },
 
         /**

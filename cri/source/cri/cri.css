@@ -522,7 +522,7 @@ table {
   vertical-align: middle;
 }
 .input-group label {
-  width: 75px;
+  width: 95px;
   padding-right: 5px;
   height: 26px;
   line-height: 26px;
@@ -543,24 +543,50 @@ table {
   background: #ffffff;
   padding: 5px 8px;
   color: #666666;
-  width: 162px;
+  width: 182px;
   line-height: 14px;
   height: 14px;
   border-radius: 3px;
   border: 1px solid #c8c8c8;
   font-size: 12px;
 }
+.input-group .input.failure {
+  border: 1px solid #ff5656;
+  box-shadow: 0 0 4px 0 #ff6a6a;
+  -moz-box-shadow: 0 0 4px 0 #ff6a6a;
+  -webkit-box-shadow: 0 0 4px 0 #ff6a6a;
+}
+.input-group .input.with-btn {
+  width: 162px;
+  padding-right: 28px;
+}
+.input-group .input.with-btn:focus {
+  border-right-style: none;
+}
 .input-group input {
   display: inline-block;
   background: #ffffff;
   padding: 5px 8px;
   color: #666666;
-  width: 162px;
+  width: 182px;
   line-height: 14px;
   height: 14px;
   border-radius: 3px;
   border: 1px solid #c8c8c8;
   font-size: 12px;
+}
+.input-group input.failure {
+  border: 1px solid #ff5656;
+  box-shadow: 0 0 4px 0 #ff6a6a;
+  -moz-box-shadow: 0 0 4px 0 #ff6a6a;
+  -webkit-box-shadow: 0 0 4px 0 #ff6a6a;
+}
+.input-group input.with-btn {
+  width: 162px;
+  padding-right: 28px;
+}
+.input-group input.with-btn:focus {
+  border-right-style: none;
 }
 .input-group input:focus {
   border: 1px solid #97b7fc;
@@ -574,7 +600,7 @@ table {
   background: #ffffff;
   padding: 5px 8px;
   color: #666666;
-  width: 162px;
+  width: 182px;
   line-height: 14px;
   height: 14px;
   border-radius: 3px;
@@ -583,19 +609,26 @@ table {
   vertical-align: middle;
   cursor: pointer;
 }
-.input-group .with-btn {
-  border-bottom-right-radius: 0;
-  border-top-right-radius: 0;
-  border-right-style: none;
-  width: 143px;
+.input-group .readonly.failure {
+  border: 1px solid #ff5656;
+  box-shadow: 0 0 4px 0 #ff6a6a;
+  -moz-box-shadow: 0 0 4px 0 #ff6a6a;
+  -webkit-box-shadow: 0 0 4px 0 #ff6a6a;
 }
-.input-group .with-btn:focus {
+.input-group .readonly.with-btn {
+  width: 162px;
+  padding-right: 28px;
+}
+.input-group .readonly.with-btn:focus {
   border-right-style: none;
 }
 .input-group .input-btn,
 .input-group .plus-minus-button {
   display: inline-block;
-  border: 1px solid #c8c8c8;
+  position: absolute;
+  right: 1px;
+  top: 1px;
+  border-left: 1px solid #c8c8c8;
   background: #fff;
   text-align: center;
   line-height: 24px;
@@ -619,6 +652,14 @@ table {
 .input-group .plus-minus-button:active {
   color: #fff;
   background-color: #4f7fe8;
+}
+.input-group .input-btn.failure,
+.input-group .plus-minus-button.failure {
+  border-color: #ff5656;
+  border-left-color: #c8c8c8;
+  box-shadow: 1px 0 6px 0 #ff5656;
+  -moz-box-shadow: 1px 0 6px 0 #ff5656;
+  -webkit-box-shadow: 1px 0 6px 0 #ff5656;
 }
 .input-group .plus-minus-button {
   position: relative;
@@ -672,7 +713,7 @@ table {
   display: none;
   position: absolute;
   top: -24px;
-  left: 80px;
+  left: 100px;
   min-width: 140px;
   height: 18px;
   line-height: 18px;

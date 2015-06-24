@@ -1501,6 +1501,7 @@
 
     var INPUT_GROUP = "input-group",
         INPUT_BTN   = "input-btn",
+        ERROR_MSG_HEIGHT = 23,//验证消息框高度
         WITH_BTN    = "with-btn";
 
     var Input = cri.Widgets.extend(function(element,options){
@@ -1626,6 +1627,39 @@
 
         _getValue:function(){
             return this.$element.val();
+        },
+
+        /**
+         * @param: errorMsg 异常提示
+         * @private
+         */
+        _showValidateMsg: function(errorMsg){
+            this.$input.addClass("failure");
+            var offset = this.$input.offset();
+            if(!this.$errorMsg){
+                this.$errorMsg = $('<div class="input-warm"><i class="fa fa-exclamation"></i><span>' + errorMsg + '</span></div>');
+                this.$input.after(this.$errorMsg);
+            }
+            else{
+                this.$errorMsg.find("span").text(errorMsg);
+            }
+            if(offset.top <= (ERROR_MSG_HEIGHT)){
+                this.$errorMsg.addClass("bottom-input");
+            }
+            else{
+                this.$errorMsg.removeClass("bottom-input");
+            }
+            this.$errorMsg.show();
+
+            $('html,body').is(':animated') || $('html,body').animate({
+                scrollTop: this.$input.offset().top
+            },300);
+
+        },
+
+        _hideValidateMsg: function(){
+            this.$input.removeClass("failure");
+            this.$errorMsg && this.$errorMsg.hide();
         },
 
         /**
@@ -1883,7 +1917,7 @@
         this.options = _defaultOptions;
         this.$inputGroup = null;
         cri.Widgets.apply(this,arguments);
-        this.$element.attr('data-role','numberinput');
+        this.$element.attr('data-role','numberInput');
     });
 
     $.extend(NumberInput.prototype,{
@@ -1945,13 +1979,13 @@
         var o = null;
         this.each(function () {
             var $this   = $(this),
-                input   = $this.data('numberinput'),
+                input   = $this.data('numberInput'),
                 options = typeof option == 'object' && option,
                 role    = $this.attr("role");
             if(input != null){
                 input._destroy();
             }
-            $this.data('numberinput', (o = new NumberInput(this, options)));
+            $this.data('numberInput', (o = new NumberInput(this, options)));
         });
         return o;
     };
@@ -2175,7 +2209,7 @@
         this._value = null;
         this._text = null;
         cri.Widgets.apply(this,arguments);
-        this.$element.attr('data-role','selectbox');
+        this.$element.attr('data-role','selectBox');
     });
 
     $.extend(SelectBox.prototype,{
@@ -2277,6 +2311,18 @@
                     return data[i].text;
                 }
             }
+        },
+
+        /**
+         * @param: errorMsg 异常提示
+         * @private
+         */
+        _showValidateMsg: function(errorMsg){
+            this.input._showValidateMsg(errorMsg);
+        },
+
+        _hideValidateMsg: function(){
+            this.input._hideValidateMsg();
         },
 
         /**
@@ -3174,7 +3220,7 @@
         this.input = null;
         this.selectView = null;
         cri.Widgets.apply(this,arguments);
-        this.$element.attr('data-role','timeinput');
+        this.$element.attr('data-role','timeInput');
     });
 
     TimeInput.prototype._init = function(){
@@ -3293,6 +3339,18 @@
                 this._setValue(cri.string2Date(value));
             }
         }
+    };
+
+    /**
+     * @param: errorMsg 异常提示
+     * @private
+     */
+    TimeInput.prototype._showValidateMsg=function(errorMsg){
+        this.input._showValidateMsg(errorMsg);
+    };
+
+    TimeInput.prototype._hideValidateMsg=function(){
+        this.input._hideValidateMsg();
     };
 
     /**
@@ -4441,27 +4499,18 @@
 
         _showMessage:function($input,errorMsg){
             errorMsg = $input.attr('error-msg')|| errorMsg || '请检查';
-            var isReadOnly = $input.is("[data-role=selectbox],[data-role=timeinput],[readonly=readonly]"),
-                offset = isReadOnly ? $input.siblings('span[role=readonly]').offset() : $input.offset(),
-                $errorMsg = $('.input-warm[data-errorfor=' + $input.attr("name") + ']');
-
-            if($errorMsg.length == 0){
-                $errorMsg = $('<div class="input-warm" data-errorfor="' + $input.attr("name") + '"><i class="fa fa-exclamation"></i><span>' + errorMsg + '</span></div>');
-                $input.after($errorMsg);
+            var widget = $input.data($input.data("role"));
+            if(widget){
+                widget._showValidateMsg(errorMsg)
             }
-            else{
-                $errorMsg.find("span").text(errorMsg);
-            }
-            if(offset.top <= (ERROR_MSG_HEIGHT)){
-                $errorMsg.addClass("bottom-input");
-            }else{
-                $errorMsg.removeClass("bottom-input");
-            }
-            $errorMsg.show();
         },
 
         _hideMessage:function(name){
-            $('.input-warm[data-errorfor='+name+']').hide();
+            var $input = $('input[name='+name+'],select[name='+name+']');
+            var widget = $input.data($input.data("role"));
+            if(widget){
+                widget._hideValidateMsg()
+            }
         },
 
         hideMessages:function(names){

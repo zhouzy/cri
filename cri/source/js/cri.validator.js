@@ -229,27 +229,18 @@
 
         _showMessage:function($input,errorMsg){
             errorMsg = $input.attr('error-msg')|| errorMsg || '请检查';
-            var isReadOnly = $input.is("[data-role=selectbox],[data-role=timeinput],[readonly=readonly]"),
-                offset = isReadOnly ? $input.siblings('span[role=readonly]').offset() : $input.offset(),
-                $errorMsg = $('.input-warm[data-errorfor=' + $input.attr("name") + ']');
-
-            if($errorMsg.length == 0){
-                $errorMsg = $('<div class="input-warm" data-errorfor="' + $input.attr("name") + '"><i class="fa fa-exclamation"></i><span>' + errorMsg + '</span></div>');
-                $input.after($errorMsg);
+            var widget = $input.data($input.data("role"));
+            if(widget){
+                widget._showValidateMsg(errorMsg)
             }
-            else{
-                $errorMsg.find("span").text(errorMsg);
-            }
-            if(offset.top <= (ERROR_MSG_HEIGHT)){
-                $errorMsg.addClass("bottom-input");
-            }else{
-                $errorMsg.removeClass("bottom-input");
-            }
-            $errorMsg.show();
         },
 
         _hideMessage:function(name){
-            $('.input-warm[data-errorfor='+name+']').hide();
+            var $input = $('input[name='+name+'],select[name='+name+']');
+            var widget = $input.data($input.data("role"));
+            if(widget){
+                widget._hideValidateMsg()
+            }
         },
 
         hideMessages:function(names){

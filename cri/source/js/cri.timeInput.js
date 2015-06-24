@@ -40,7 +40,7 @@
         this.input = null;
         this.selectView = null;
         cri.Widgets.apply(this,arguments);
-        this.$element.attr('data-role','timeinput');
+        this.$element.attr('data-role','timeInput');
     });
 
     TimeInput.prototype._init = function(){
@@ -159,6 +159,18 @@
                 this._setValue(cri.string2Date(value));
             }
         }
+    };
+
+    /**
+     * @param: errorMsg 异常提示
+     * @private
+     */
+    TimeInput.prototype._showValidateMsg=function(errorMsg){
+        this.input._showValidateMsg(errorMsg);
+    };
+
+    TimeInput.prototype._hideValidateMsg=function(){
+        this.input._hideValidateMsg();
     };
 
     /**

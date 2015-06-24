@@ -29,7 +29,7 @@
         this.options = _defaultOptions;
         this.$inputGroup = null;
         cri.Widgets.apply(this,arguments);
-        this.$element.attr('data-role','numberinput');
+        this.$element.attr('data-role','numberInput');
     });
 
     $.extend(NumberInput.prototype,{
@@ -91,13 +91,13 @@
         var o = null;
         this.each(function () {
             var $this   = $(this),
-                input   = $this.data('numberinput'),
+                input   = $this.data('numberInput'),
                 options = typeof option == 'object' && option,
                 role    = $this.attr("role");
             if(input != null){
                 input._destroy();
             }
-            $this.data('numberinput', (o = new NumberInput(this, options)));
+            $this.data('numberInput', (o = new NumberInput(this, options)));
         });
         return o;
     };
