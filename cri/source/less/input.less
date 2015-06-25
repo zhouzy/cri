@@ -78,19 +78,22 @@
 		cursor:pointer;
 	}
 
-	.input-btn,.plus-minus-button{
+	.button,.plus-minus-button{
 		display:inline-block;
 		position:absolute;
 		right:1px;
 		top:1px;
+		border-style:none;
 		border-left:1px solid @color-input-border;
 		background:#fff;
 		text-align:center;
 		line-height:24px;
 		height:24px;
 		width:18px;
-		border-bottom-right-radius:3px;
-		border-top-right-radius:3px;
+		min-width:18px;
+		margin:0;
+		padding:0;
+		border-radius:0 3px 3px 0;
 		cursor:pointer;
 		.user-not-select;
 		&:hover{

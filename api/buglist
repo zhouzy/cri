@@ -34,8 +34,8 @@ Window
 7.不能设置窗口是否能拖动（fixed）
 8.第一个窗口为非模态窗口，再生成一个模态窗口，关闭模态窗口，遮罩不消失(fixed)
 9.IE下背景透明(fixed)
-10.点击窗口的按钮，窗口未置顶
-11.多个窗口，卡死
+10.点击窗口的按钮，窗口未置顶(fixed)
+11.多个窗口，卡死(fixed)
 
 Input
 1.重复初始化(fixed)
@@ -67,12 +67,12 @@ Validator
 1.错误提示 'undefined' (fixed)
 2.timeInput 未触发validator(validateOnBlur=true) validate方法(fixed)
 3.关闭验证提示信息(fixed)
-4.出现异常时,改变输入框的border
+4.出现异常时,改变输入框的border(fixed)
 
 FromValue
 1.SelectBox 不能取到值 (fixed)
 
 Button
 1.button disable掉，仍然触发handler(fixed)
-2.修改icon图标
-3.当图标为旋转时,样式异常
+2.修改icon图标(fixed)
+3.当图标为旋转时,样式异常(fixed)

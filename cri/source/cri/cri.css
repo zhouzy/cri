@@ -220,7 +220,7 @@ table {
   box-shadow: none;
   border-color: #c8c8c8;
 }
-.button i {
+.button .icon {
   font-size: 1.2em;
   margin-right: 5px;
 }
@@ -622,20 +622,23 @@ table {
 .input-group .readonly.with-btn:focus {
   border-right-style: none;
 }
-.input-group .input-btn,
+.input-group .button,
 .input-group .plus-minus-button {
   display: inline-block;
   position: absolute;
   right: 1px;
   top: 1px;
+  border-style: none;
   border-left: 1px solid #c8c8c8;
   background: #fff;
   text-align: center;
   line-height: 24px;
   height: 24px;
   width: 18px;
-  border-bottom-right-radius: 3px;
-  border-top-right-radius: 3px;
+  min-width: 18px;
+  margin: 0;
+  padding: 0;
+  border-radius: 0 3px 3px 0;
   cursor: pointer;
   -moz-user-select: none;
   -webkit-user-select: none;
@@ -643,17 +646,17 @@ table {
   -khtml-user-select: none;
   user-select: none;
 }
-.input-group .input-btn:hover,
+.input-group .button:hover,
 .input-group .plus-minus-button:hover {
   color: #fff;
   background-color: #e2e2e2;
 }
-.input-group .input-btn:active,
+.input-group .button:active,
 .input-group .plus-minus-button:active {
   color: #fff;
   background-color: #4f7fe8;
 }
-.input-group .input-btn.failure,
+.input-group .button.failure,
 .input-group .plus-minus-button.failure {
   border-color: #ff5656;
   border-left-color: #c8c8c8;

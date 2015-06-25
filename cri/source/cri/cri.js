@@ -1109,18 +1109,34 @@
 
         _create:function(){
             var op = this.options,
-                $e = this.$element.hide();
+                iconCls = op.iconCls || '',
+                $e = this.$element.hide(),
+                text = op.text || $e.text() || $e.val() || '',
+                $icon = '<span class="icon"><i class="' + iconCls + '"></i></span>',
+                buttonText = '<span class="text">'+text+'</span>';
 
             $e.wrap('<div class="'+ BUTTON + '"></div>');
-            var $button = this.$button = $e.parent(),
-                $icon = $('<span class="icon"><i class="' + op.iconCls + '"></i></span>'),
-                text = op.text || $e.text() || $e.val(),
-                buttonText = '<span class="text">'+text+'</span>';
-            $button.append($icon, buttonText);
-
+            this.$button = $e.parent();
+            this.$button.append($icon, buttonText);
             if(!op.enable){
                 this.disable();
             }
+        },
+
+        /**
+         * 设置按钮文本值
+         * @param text
+         */
+        text:function(text){
+            this.$button.find('text').text(text);
+        },
+
+        /**
+         * 设置按钮图标
+         * @param className
+         */
+        iconCls:function(className){
+            this.$button.find('.icon i').attr('class',className);
         },
 
         enable:function(){
@@ -1500,13 +1516,13 @@
     };
 
     var INPUT_GROUP = "input-group",
-        INPUT_BTN   = "input-btn",
         ERROR_MSG_HEIGHT = 23,//验证消息框高度
         WITH_BTN    = "with-btn";
 
     var Input = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
         this.$inputGroup = null;
+        this.button = null;
         cri.Widgets.apply(this,arguments);
         this.$element.attr('data-role','input');
     });
@@ -1553,7 +1569,12 @@
                 });
             }
 
-            op.button && $input.after(this._button()) && $input.addClass(WITH_BTN);
+            if(op.button){
+                var $button = $('<button></button>');
+                $input.after($button);
+                this._button($button);
+                $input.addClass(WITH_BTN);
+            }
 
             this.$input = $input;
         },
@@ -1575,16 +1596,8 @@
             return $input;
         },
 
-        _button:function(){
-            var op    = this.options,
-                $icon = null,
-                that  = this;
-            if(op.button){
-                $icon = $('<span class="'+INPUT_BTN+'"><i class="' + op.button.iconCls + '"></i></span>').on("click",function(){
-                    op.button.handler.call(that);
-                });
-            }
-            return $icon;
+        _button:function($button){
+            this.button = $button.button(this.options.button);
         },
 
         _label:function(){
@@ -1660,6 +1673,13 @@
         _hideValidateMsg: function(){
             this.$input.removeClass("failure");
             this.$errorMsg && this.$errorMsg.hide();
+        },
+
+        /**
+         * 返回input的button对象
+         */
+        getButton:function(){
+            return this.button;
         },
 
         /**

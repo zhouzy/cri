@@ -42,18 +42,34 @@
 
         _create:function(){
             var op = this.options,
-                $e = this.$element.hide();
+                iconCls = op.iconCls || '',
+                $e = this.$element.hide(),
+                text = op.text || $e.text() || $e.val() || '',
+                $icon = '<span class="icon"><i class="' + iconCls + '"></i></span>',
+                buttonText = '<span class="text">'+text+'</span>';
 
             $e.wrap('<div class="'+ BUTTON + '"></div>');
-            var $button = this.$button = $e.parent(),
-                $icon = $('<span class="icon"><i class="' + op.iconCls + '"></i></span>'),
-                text = op.text || $e.text() || $e.val(),
-                buttonText = '<span class="text">'+text+'</span>';
-            $button.append($icon, buttonText);
-
+            this.$button = $e.parent();
+            this.$button.append($icon, buttonText);
             if(!op.enable){
                 this.disable();
             }
+        },
+
+        /**
+         * 设置按钮文本值
+         * @param text
+         */
+        text:function(text){
+            this.$button.find('text').text(text);
+        },
+
+        /**
+         * 设置按钮图标
+         * @param className
+         */
+        iconCls:function(className){
+            this.$button.find('.icon i').attr('class',className);
         },
 
         enable:function(){
