@@ -68,6 +68,7 @@
             if(op.readonly){
                 $input = this._readonlyInput($input);
             }
+
             else{
                 $input.on("focus",function(){
                     that.options.onFocus && that.options.onFocus.call(that);
@@ -135,7 +136,16 @@
             }else{
                 if(this.$element.is("select")){
                     this.$element.val(value);
-                    this.$input.text(this.$element.find("option:selected").text());
+                    if(this.$element.attr("multiple")){
+                        var text = [];
+                        this.$element.find("option:selected").each(function(){
+                            text.push($(this).text());
+                        });
+                        this.$input.text(text.join(","));
+                    }
+                    else{
+                        this.$input.text(this.$element.find("option:selected").text());
+                    }
                 }
                 else{
                     this.$element.val(value);

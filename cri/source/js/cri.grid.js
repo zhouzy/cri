@@ -20,6 +20,11 @@
         _gridHeadH    = 31, //表格头高度
         _cellMinW     = 5;  //单元格最小宽度
 
+    function _getPlainText(text){
+        text = ("" + text).replace(/(<.*?>)|(<\/.*?>)/g,"");
+        return text;
+    }
+
     /**
      * 获取Grid每列信息
      * @param $table        原始 table jquery对象
@@ -64,6 +69,7 @@
         pagination:true,
         page:1,
         pageSize:10,
+        filter:true,
 
         onChange:null,   //行点击时触发
         onSelected:null, //当选择一行或者多行时触发
@@ -257,7 +263,8 @@
             }
 
             for(var i = 0,len = columns.length; i<len; i++){
-                var $td        = $('<td></td>'),
+                var that = this,
+                    $td        = $('<td></td>'),
                     $dragLine  = $('<div></div>').addClass('drag-line').data('drag',i),
                     $tdContent = $('<div></div>').addClass('td-content grid-header-text'),
                     column     = columns[i];
@@ -265,6 +272,14 @@
                     var value = column[key];
                     if(key == 'title'){
                         $tdContent.prop('title',value).append(value);
+                        if(op.filter){
+                            var $filterIcon = $('<span data-for="'+column.field+'" class="fa fa-filter filter-icon"></span>');
+                            $filterIcon.click(function(e){
+                                var key = $(e.target).data('for');
+                                that._toggle(that.$grid.find('ul[data-for='+key+']'));
+                            });
+                            $tdContent.append($filterIcon);
+                        }
                     }
                     else if(key == 'style'){
                         $td.css(value);
@@ -297,13 +312,13 @@
          * 刷新Grid Body数据行
          * @private
          */
-        _refreshBody:function(){
+        _refreshBody:function(rows){
             var $table   = $('<table></table>'),
                 op       = this.options,
                 id       = 0,
                 lineNum  = 1 + op.pageSize * (op.page - 1),
-                columns  = this._columns,
-                rows     = this._rows;
+                columns  = this._columns;
+            rows = rows || this._rows;
             this._selectedId = [];
             $table.append($("colgroup",this.$gridhead).clone());
             for(var i = 0,len = rows.length; i<len; i++){
@@ -390,6 +405,127 @@
         },
 
         /**
+         * 初始化表头过滤器
+         * @returns {{}}
+         * @private
+         */
+        _initFilter:function(){
+            var rows = this._rows;
+            var column = this._columns;
+            var keysMap = {};
+            this._filters = this._filters || {};
+
+            for(var i in column){
+                var field = column[i].field;
+                var keys = {};
+                for(var j in rows){
+                    var row = rows[j];
+                    var value = row[field];
+                    if(keys[value] == undefined){
+                        keys[value] = true;
+                    }
+                }
+                keysMap[field] = keys;
+            }
+            this._createFilterLists(keysMap);
+        },
+
+        _createFilterLists:function(keysMap){
+            var that =this;
+            for(var key in keysMap){
+                var gridHeadOffset = this.$grid.offset();
+                var filterIconOffset = this.$gridhead.find('span[data-for='+key+'].filter-icon').offset();
+                var offset = {
+                    left:filterIconOffset.left-gridHeadOffset.left+10,
+                    top:filterIconOffset.top-gridHeadOffset.top
+                };
+                var $ul = that.$grid.find('ul[data-for='+key+']');
+                $ul.length ? $ul.empty() : ($ul=$('<ul class="grid-filter" data-for="'+key+'"></ul>'));
+
+                var $all = $('<input type="checkbox" name="all"/>').click(function(e){
+                    var $ul = $(e.target).closest('ul');
+                    if($(e.target).prop('checked')){
+                        $ul.find('input[type=checkbox]').prop("checked",true);
+                    }
+                    else{
+                        $ul.find('input[type=checkbox]').prop("checked",false);
+                    }
+                });
+                $ul.append($('<li></li>').append($all,'全部'));
+
+                var map = keysMap[key];
+                for(var i in map){
+                    var plainText = _getPlainText(i);
+                    var $checkbox = $('<input type="checkbox" name="'+plainText+'"/>').data("value",i);
+                    $ul.append($('<li class="filter-value"></li>').append($checkbox,plainText));
+                }
+                var $footer = $('<li class="footer"><button class="cancel">过滤</button></li>');
+                $ul.append($footer);
+                $ul.css(offset);
+                $footer.find('button').button({
+                    handler:(function($ul){
+                        return function(){
+                            var field = $ul.attr('data-for');
+                            var values = [];
+                            $ul.find('li.filter-value input[type=checkbox]').each(function(){
+                                if($(this).prop('checked')){
+                                    values.push($(this).data('value'));
+                                }
+                            });
+                            that._filters[field] = values;
+                            that._filter();
+                            that._toggle($ul);
+                        }
+                    }($ul))
+                });
+                this.$grid.append($ul);
+            }
+
+        },
+
+        /**
+         * 显示隐藏过滤器下拉选择框
+         * @param $filterList
+         * @private
+         */
+        _toggle:function($filterList){
+            if($filterList.is(":hidden")){
+                $filterList.slideDown(200, function(){
+                    $(document).mouseup(function(e) {
+                        var _con = $filterList;
+                        if (!_con.is(e.target) && _con.has(e.target).length === 0) {
+                            $filterList.slideUp(200);
+                        }
+                    });
+                });
+            }
+            else{
+                $filterList.slideUp(200);
+            }
+        },
+
+        _filter:function(){
+            var filters = this._filters;
+            var rows = this._rows;
+
+            for(var field in filters){
+                var values = filters[field];
+                for(var i in values){
+                    var value = values[i];
+                    var tempRows = [];
+                    for(var j in rows){
+                        if(rows[j][field] == value){
+                            tempRows.push(rows[j]);
+                        }
+                    }
+                    rows = tempRows;
+                }
+            }
+            console.dir(rows);
+            this._refreshBody(rows);
+        },
+
+        /**
          * 生成翻页 HTML 结构
          * @private
          */
@@ -436,13 +572,16 @@
                     op.total = data.total || 0;
                     that.pager && that.pager.update(op.page,op.pageSize,op.total,that._rows.length);
                     $('input[type=checkbox]',that.$gridhead).prop("checked",false);
-                    that._refreshBody(that.$gridbody);
+                    that._refreshBody();
+                    if(op.filter){
+                        that._initFilter();
+                    }
                 },
                 error: function(){
                     that._rows = [];
                     op.total = 0;
                     that.pager && that.pager.update(op.page,op.pageSize,op.total,that._rows.length);
-                    that._refreshBody(that.$gridbody);
+                    that._refreshBody();
                 },
                 data:op.param,
                 dataType:"JSON",

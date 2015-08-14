@@ -232,10 +232,8 @@
 
         _hideMessage:function(name){
             var $input = $('input[name='+name+'],select[name='+name+']');
-            var widget = $input.data($input.data("role"));
-            if(widget){
-                widget._hideValidateMsg()
-            }
+            var widget = $input.data("role") && $input.data($input.data("role"));
+            widget && typeof(widget._hideValidateMsg) == 'function' && widget._hideValidateMsg();
         },
 
         hideMessages:function(names){

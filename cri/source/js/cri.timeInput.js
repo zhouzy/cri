@@ -166,11 +166,11 @@
      * @private
      */
     TimeInput.prototype._showValidateMsg=function(errorMsg){
-        this.input._showValidateMsg(errorMsg);
+        this.input && this.input._showValidateMsg(errorMsg);
     };
 
     TimeInput.prototype._hideValidateMsg=function(){
-        this.input._hideValidateMsg();
+        this.input && this.input._hideValidateMsg();
     };
 
     /**
@@ -325,39 +325,35 @@
          * @private
          */
         _hmsSelect:function(){
-            var $hmsBar      = $('<div class="HMSBar">'),
-                $hourInput   = $('<input class="HMSInput Hour"/>').val(this.date.HH),
-                $minuteInput = $('<input class="HMSInput minute"/>').val(this.date.mm),
-                $secondInput = $('<input class="HMSInput second"/>').val(this.date.ss),
-                that         = this;
-            this.$hour = $hourInput;
-            this.$minute = $minuteInput;
-            this.$second = $secondInput;
-            $hourInput.on("change",_handleNumF(0,23));
-            $minuteInput.on("change",_handleNumF(0,59));
-            $secondInput.on("change",_handleNumF(0,59));
-            function _handleNumF(min,max){
-                return function(){
-                    var value = +$(this).val();
-                    if(value>max){
-                        $(this).val(max);
-                    }
-                    else if(value<min){
-                        $(this).val(min);
-                    }
-                    that.date.HH = +$hourInput.val();
-                    that.date.mm = +$minuteInput.val();
-                    that.date.ss = +$secondInput.val();
+            var that = this,
+                $hmsBar = $('<div class="HMSBar"></div>'),
+                $hour = $('<input class="hour"/>'),
+                $minute = $('<input class="minute"/>'),
+                $second = $('<input class="second"/>');
+            $hmsBar.append($hour,':',$minute,':',$second);
+
+            this.hour = $hour.numberInput({
+                min:0,
+                max:23,
+                onChange:function(){
+                    that.date.HH = this.value();
                     that._change();
-                };
-            }
-            $hmsBar.append($hourInput,":",$minuteInput,":",$secondInput);
-            $(".HMSInput",$hmsBar).on("keydown",function(e){
-                var keycode = e.keyCode || e.which || e.charCode;
-                if((keycode>=48 && keycode<=57) || keycode == 8){
-                    return true;
-                }else{
-                    return false;
+                }
+            });
+            this.minute = $minute.numberInput({
+                min:0,
+                max:23,
+                onChange:function(){
+                    that.date.mm = this.value();
+                    that._change();
+                }
+            });
+            this.second = $second.numberInput({
+                min:0,
+                max:59,
+                onChange:function(){
+                    that.date.ss = this.value();
+                    that._change();
                 }
             });
             return $hmsBar;
@@ -432,10 +428,10 @@
             this.$year.text(this.date.yyyy);
             this.$month.val(this.date.MM);
             this._refreshDaySelect();
-            if(this.options.HMS) {
-                this.$hour.val(this.date.HH);
-                this.$minute.val(this.date.mm);
-                this.$second.val(this.date.ss);
+            if(this.options.HMS){
+                this.hour.value(this.date.HH);
+                this.minute.value(this.date.mm);
+                this.second.value(this.date.ss);
             }
         }
     };

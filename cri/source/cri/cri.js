@@ -43,7 +43,7 @@
             selectQuery = "select";
         $(inputQuery,$form).each(function(){
             var role = $(this).attr('data-role');
-            if(role && role == 'timeinput'){
+            if(role && role == 'timeInput'){
                 this.name && (o[this.name] = $(this).data("timeInput").getFormatValue());
             }
             else{
@@ -52,7 +52,7 @@
         });
         $(selectQuery,$form).each(function(){
             var role = $(this).attr('data-role');
-            if(role && role=='selectbox'){
+            if(role && role=='selectBox'){
                 this.name && (o[this.name] = $(this).data("selectBox").value());
             }
             else{
@@ -75,10 +75,10 @@
                     case 'input':{
                         $i.data('input').value(o[name]);
                     }break;
-                    case 'timeinput':{
+                    case 'timeInput':{
                         $i.data('timeInput').value(o[name]);
                     }break;
-                    case 'selectbox':{
+                    case 'selectBox':{
                         $i.data('selectBox').value(o[name]);
                     }break;
                     default:{
@@ -368,7 +368,7 @@
                     if(role=='input'){
                         $(this).data("input").value(value);
                     }
-                    else if(role == 'timeinput'){
+                    else if(role == 'timeInput'){
                         value = value || new Date();
                         $(this).data("timeInput").value(value);
                     }
@@ -381,7 +381,7 @@
                 var role = $(this).attr('data-role');
                 var value = this.name ? param[this.name] : '';
                 value = value || '';
-                if(role && role=='selectbox'){
+                if(role && role=='selectBox'){
                     if(value != ''){
                         $(this).data("selectBox").value(value);
                     }
@@ -512,6 +512,11 @@
         _gridHeadH    = 31, //表格头高度
         _cellMinW     = 5;  //单元格最小宽度
 
+    function _getPlainText(text){
+        text = ("" + text).replace(/(<.*?>)|(<\/.*?>)/g,"");
+        return text;
+    }
+
     /**
      * 获取Grid每列信息
      * @param $table        原始 table jquery对象
@@ -556,6 +561,7 @@
         pagination:true,
         page:1,
         pageSize:10,
+        filter:true,
 
         onChange:null,   //行点击时触发
         onSelected:null, //当选择一行或者多行时触发
@@ -749,7 +755,8 @@
             }
 
             for(var i = 0,len = columns.length; i<len; i++){
-                var $td        = $('<td></td>'),
+                var that = this,
+                    $td        = $('<td></td>'),
                     $dragLine  = $('<div></div>').addClass('drag-line').data('drag',i),
                     $tdContent = $('<div></div>').addClass('td-content grid-header-text'),
                     column     = columns[i];
@@ -757,6 +764,14 @@
                     var value = column[key];
                     if(key == 'title'){
                         $tdContent.prop('title',value).append(value);
+                        if(op.filter){
+                            var $filterIcon = $('<span data-for="'+column.field+'" class="fa fa-filter filter-icon"></span>');
+                            $filterIcon.click(function(e){
+                                var key = $(e.target).data('for');
+                                that._toggle(that.$grid.find('ul[data-for='+key+']'));
+                            });
+                            $tdContent.append($filterIcon);
+                        }
                     }
                     else if(key == 'style'){
                         $td.css(value);
@@ -789,13 +804,13 @@
          * 刷新Grid Body数据行
          * @private
          */
-        _refreshBody:function(){
+        _refreshBody:function(rows){
             var $table   = $('<table></table>'),
                 op       = this.options,
                 id       = 0,
                 lineNum  = 1 + op.pageSize * (op.page - 1),
-                columns  = this._columns,
-                rows     = this._rows;
+                columns  = this._columns;
+            rows = rows || this._rows;
             this._selectedId = [];
             $table.append($("colgroup",this.$gridhead).clone());
             for(var i = 0,len = rows.length; i<len; i++){
@@ -882,6 +897,127 @@
         },
 
         /**
+         * 初始化表头过滤器
+         * @returns {{}}
+         * @private
+         */
+        _initFilter:function(){
+            var rows = this._rows;
+            var column = this._columns;
+            var keysMap = {};
+            this._filters = this._filters || {};
+
+            for(var i in column){
+                var field = column[i].field;
+                var keys = {};
+                for(var j in rows){
+                    var row = rows[j];
+                    var value = row[field];
+                    if(keys[value] == undefined){
+                        keys[value] = true;
+                    }
+                }
+                keysMap[field] = keys;
+            }
+            this._createFilterLists(keysMap);
+        },
+
+        _createFilterLists:function(keysMap){
+            var that =this;
+            for(var key in keysMap){
+                var gridHeadOffset = this.$grid.offset();
+                var filterIconOffset = this.$gridhead.find('span[data-for='+key+'].filter-icon').offset();
+                var offset = {
+                    left:filterIconOffset.left-gridHeadOffset.left+10,
+                    top:filterIconOffset.top-gridHeadOffset.top
+                };
+                var $ul = that.$grid.find('ul[data-for='+key+']');
+                $ul.length ? $ul.empty() : ($ul=$('<ul class="grid-filter" data-for="'+key+'"></ul>'));
+
+                var $all = $('<input type="checkbox" name="all"/>').click(function(e){
+                    var $ul = $(e.target).closest('ul');
+                    if($(e.target).prop('checked')){
+                        $ul.find('input[type=checkbox]').prop("checked",true);
+                    }
+                    else{
+                        $ul.find('input[type=checkbox]').prop("checked",false);
+                    }
+                });
+                $ul.append($('<li></li>').append($all,'全部'));
+
+                var map = keysMap[key];
+                for(var i in map){
+                    var plainText = _getPlainText(i);
+                    var $checkbox = $('<input type="checkbox" name="'+plainText+'"/>').data("value",i);
+                    $ul.append($('<li class="filter-value"></li>').append($checkbox,plainText));
+                }
+                var $footer = $('<li class="footer"><button class="cancel">过滤</button></li>');
+                $ul.append($footer);
+                $ul.css(offset);
+                $footer.find('button').button({
+                    handler:(function($ul){
+                        return function(){
+                            var field = $ul.attr('data-for');
+                            var values = [];
+                            $ul.find('li.filter-value input[type=checkbox]').each(function(){
+                                if($(this).prop('checked')){
+                                    values.push($(this).data('value'));
+                                }
+                            });
+                            that._filters[field] = values;
+                            that._filter();
+                            that._toggle($ul);
+                        }
+                    }($ul))
+                });
+                this.$grid.append($ul);
+            }
+
+        },
+
+        /**
+         * 显示隐藏过滤器下拉选择框
+         * @param $filterList
+         * @private
+         */
+        _toggle:function($filterList){
+            if($filterList.is(":hidden")){
+                $filterList.slideDown(200, function(){
+                    $(document).mouseup(function(e) {
+                        var _con = $filterList;
+                        if (!_con.is(e.target) && _con.has(e.target).length === 0) {
+                            $filterList.slideUp(200);
+                        }
+                    });
+                });
+            }
+            else{
+                $filterList.slideUp(200);
+            }
+        },
+
+        _filter:function(){
+            var filters = this._filters;
+            var rows = this._rows;
+
+            for(var field in filters){
+                var values = filters[field];
+                for(var i in values){
+                    var value = values[i];
+                    var tempRows = [];
+                    for(var j in rows){
+                        if(rows[j][field] == value){
+                            tempRows.push(rows[j]);
+                        }
+                    }
+                    rows = tempRows;
+                }
+            }
+            console.dir(rows);
+            this._refreshBody(rows);
+        },
+
+        /**
          * 生成翻页 HTML 结构
          * @private
          */
@@ -928,13 +1064,16 @@
                     op.total = data.total || 0;
                     that.pager && that.pager.update(op.page,op.pageSize,op.total,that._rows.length);
                     $('input[type=checkbox]',that.$gridhead).prop("checked",false);
-                    that._refreshBody(that.$gridbody);
+                    that._refreshBody();
+                    if(op.filter){
+                        that._initFilter();
+                    }
                 },
                 error: function(){
                     that._rows = [];
                     op.total = 0;
                     that.pager && that.pager.update(op.page,op.pageSize,op.total,that._rows.length);
-                    that._refreshBody(that.$gridbody);
+                    that._refreshBody();
                 },
                 data:op.param,
                 dataType:"JSON",
@@ -1561,6 +1700,7 @@
             if(op.readonly){
                 $input = this._readonlyInput($input);
             }
+
             else{
                 $input.on("focus",function(){
                     that.options.onFocus && that.options.onFocus.call(that);
@@ -1628,7 +1768,16 @@
             }else{
                 if(this.$element.is("select")){
                     this.$element.val(value);
-                    this.$input.text(this.$element.find("option:selected").text());
+                    if(this.$element.attr("multiple")){
+                        var text = [];
+                        this.$element.find("option:selected").each(function(){
+                            text.push($(this).text());
+                        });
+                        this.$input.text(text.join(","));
+                    }
+                    else{
+                        this.$input.text(this.$element.find("option:selected").text());
+                    }
                 }
                 else{
                     this.$element.val(value);
@@ -1930,7 +2079,9 @@
         onFocus:null,
         onBlur:null,
         enable:true,
-        required:false
+        required:false,
+        max:null,
+        min:null
     };
 
     var NumberInput = cri.Input.extend(function(element,options){
@@ -1949,7 +2100,6 @@
             var that   = this,
                 op     = that.options,
                 $input = that.$element;
-
             if (op.readonly) {
                 $input = this._readonlyInput($input);
             }
@@ -1958,6 +2108,27 @@
                     that.options.onFocus && that.options.onFocus.call(that);
                 }).blur(function () {
                     that.options.onBlur && that.options.onBlur.call(that);
+                    if(that.options.min != null){
+                        var val = that.$element.val();
+                        if(val == "" || val < that.options.min){
+                            that.value(that.options.min);
+                        }
+                    }
+                    if(that.options.max != null){
+                        var val = that.$element.val();
+                        if(val == "" || val > that.options.max){
+                            that.value(that.options.max);
+                        }
+                    }
+                }).on("change",function(){
+                    that.options.onChange && that.options.onChange.call(that);
+                }).on("keydown",function(e){
+                    var keycode = e.keyCode || e.which || e.charCode;
+                    if((keycode>=48 && keycode<=57) || keycode == 8){
+                        return true;
+                    }else{
+                        return false;
+                    }
                 });
             }
             this.$input = $input;
@@ -1990,8 +2161,21 @@
                 }
             });
             this.$input.after($Buttons);
+        },
+        value:function(value){
+            if(arguments.length>0){
+                if(this.options.max != null && value > this.options.max){
+                    value = this.options.max
+                }
+                if(this.options.min != null && value < this.options.min){
+                    value = this.options.min
+                }
+                this._setValue(value)
+            }
+            else{
+                return this._getValue();
+            }
         }
-
     });
     cri.NumberInput = NumberInput;
 
@@ -2218,7 +2402,8 @@
         data:null,  //Array [{value:"",text:""},{value:"",text:""}]
         change:null, //Function: call back after select option
         value:null,
-        enable:true
+        enable:true,
+        multiple:false
     };
 
     var SelectBox = cri.Widgets.extend(function(element,options){
@@ -2243,6 +2428,7 @@
 
         _create:function(){
             this.$element.hide();
+            this.options.multiple && this.$element.attr('multiple','multiple');
             this.$element.wrap('<span class="' + SELECTBOX_GROUP + '"></span>');
             this.$selectBoxGroup = this.$element.parent();
             this._createInput();
@@ -2269,8 +2455,12 @@
             var that = this;
             this.listView = new ListView(this.$selectBoxGroup,{
                 data:that._data(),
-                onChange:function(value){
-                    that.value(value);
+                multiple:that.options.multiple,
+                onChange:function(value,text){
+                    that._value = value;
+                    that._text  = text;
+                    that.input.value(value);
+                    that.options.change && that.options.change.call(that);
                 }
             });
         },
@@ -2338,11 +2528,15 @@
          * @private
          */
         _showValidateMsg: function(errorMsg){
-            this.input._showValidateMsg(errorMsg);
+            this.input && this.input._showValidateMsg(errorMsg);
         },
 
+        /**
+         * 隐藏errorMsg 异常异常
+         * @private
+         */
         _hideValidateMsg: function(){
-            this.input._hideValidateMsg();
+            this.input && this.input._hideValidateMsg();
         },
 
         /**
@@ -2377,11 +2571,7 @@
          */
         value:function(value){
             if(arguments.length>0){
-                if(value == this._value){
-                    return ;
-                }
                 this._value = value;
-                this._text  = this._getTextByValue(value);
                 this.input.value(this._value);
                 this.listView.select(this._value);
                 this.options.change && this.options.change.call(this);
@@ -2436,13 +2626,14 @@
     var ListView = function($parent,options){
         this.options = $.extend({
             data:[],
-            onChange:null
+            onChange:null,
+            multiple:false
         },options);
         this.value = options.value || null;//下拉框初始值
+        this.text = null;
         this.$options = null;
         this.$parent = $parent;
         this._init();
-        this.text = null;
     };
 
     ListView.prototype = {
@@ -2452,13 +2643,38 @@
          * @private
          */
         _init:function(){
-            var data = this.options.data;
-            var $options = this.$options = $('<ul class="' + OPTIONS + '"></ul>');
+            var that = this,
+                data = this.options.data,
+                $options = this.$options = $('<ul class="' + OPTIONS + '"></ul>'),
+                selectedQuery = "."+SELECTED;
             if(data){
                 for(var i = 0,len = data.length; i<len; i++){
                     $options.append(this._createOption(data[i]));
                 }
             }
+            $options.find('li').on('click',function(){
+                var $this = $(this);
+                var texts = [];
+                var values = [];
+                if(that.options.multiple){
+                    $this.toggleClass(SELECTED);
+                }
+                else if(!$this.is(selectedQuery)){
+                    $options.find(selectedQuery).removeClass(SELECTED);
+                    $this.addClass(SELECTED);
+                    that.toggle();
+                }
+                else{
+                    return false;
+                }
+                $options.find('li'+selectedQuery).each(function(){
+                    values.push(this.getAttribute("data-value"));
+                    texts.push(this.innerHTML);
+                });
+                that.value = values;
+                that.text = texts;
+                that._change();
+            });
             $('body').append($options.hide());
         },
 
@@ -2468,20 +2684,7 @@
          * @private
          */
         _createOption:function(option){
-            var $li = $('<li></li>').text(option.text),
-                that = this;
-            $li.on("click",function(){
-                if(!$li.is("." + SELECTED)){
-                    $("li."+SELECTED,that.$options).removeClass(SELECTED);
-                    $li.addClass(SELECTED);
-                    that.text = option.text;
-                    that.value = option.value;
-                    that._change();
-                }
-                that.toggle();
-            });
-            that.value == option.value && $li.addClass(SELECTED);
-            return $li;
+            return $('<li data-value="'+option.value+'">'+option.text+'</li>');
         },
 
         /**
@@ -2520,17 +2723,18 @@
             this.options.onChange && this.options.onChange.call(this,this.value,this.text);
         },
 
+        /**
+         * 根据值设置下拉面板的选择项
+         * @param value []
+         */
         select:function(value){
             var data = this.options.data;
             var $options = this.$options;
+            value = cri.isArray(value) || [value];
             if(data){
-                for(var i = 0,len = data.length; i<len; i++){
-                    if(value == data[i].value){
-                        this.value = value;
-                        $options.children().removeClass(SELECTED);
-                        $options.children().eq(i).addClass(SELECTED);
-                        return ;
-                    }
+                $options.children().removeClass(SELECTED);
+                for (var i in value){
+                    $options.find('li[data-value='+value[i]+']').addClass(SELECTED);
                 }
             }
         },
@@ -3366,11 +3570,11 @@
      * @private
      */
     TimeInput.prototype._showValidateMsg=function(errorMsg){
-        this.input._showValidateMsg(errorMsg);
+        this.input && this.input._showValidateMsg(errorMsg);
     };
 
     TimeInput.prototype._hideValidateMsg=function(){
-        this.input._hideValidateMsg();
+        this.input && this.input._hideValidateMsg();
     };
 
     /**
@@ -3525,39 +3729,35 @@
          * @private
          */
         _hmsSelect:function(){
-            var $hmsBar      = $('<div class="HMSBar">'),
-                $hourInput   = $('<input class="HMSInput Hour"/>').val(this.date.HH),
-                $minuteInput = $('<input class="HMSInput minute"/>').val(this.date.mm),
-                $secondInput = $('<input class="HMSInput second"/>').val(this.date.ss),
-                that         = this;
-            this.$hour = $hourInput;
-            this.$minute = $minuteInput;
-            this.$second = $secondInput;
-            $hourInput.on("change",_handleNumF(0,23));
-            $minuteInput.on("change",_handleNumF(0,59));
-            $secondInput.on("change",_handleNumF(0,59));
-            function _handleNumF(min,max){
-                return function(){
-                    var value = +$(this).val();
-                    if(value>max){
-                        $(this).val(max);
-                    }
-                    else if(value<min){
-                        $(this).val(min);
-                    }
-                    that.date.HH = +$hourInput.val();
-                    that.date.mm = +$minuteInput.val();
-                    that.date.ss = +$secondInput.val();
+            var that = this,
+                $hmsBar = $('<div class="HMSBar"></div>'),
+                $hour = $('<input class="hour"/>'),
+                $minute = $('<input class="minute"/>'),
+                $second = $('<input class="second"/>');
+            $hmsBar.append($hour,':',$minute,':',$second);
+
+            this.hour = $hour.numberInput({
+                min:0,
+                max:23,
+                onChange:function(){
+                    that.date.HH = this.value();
                     that._change();
-                };
-            }
-            $hmsBar.append($hourInput,":",$minuteInput,":",$secondInput);
-            $(".HMSInput",$hmsBar).on("keydown",function(e){
-                var keycode = e.keyCode || e.which || e.charCode;
-                if((keycode>=48 && keycode<=57) || keycode == 8){
-                    return true;
-                }else{
-                    return false;
+                }
+            });
+            this.minute = $minute.numberInput({
+                min:0,
+                max:23,
+                onChange:function(){
+                    that.date.mm = this.value();
+                    that._change();
+                }
+            });
+            this.second = $second.numberInput({
+                min:0,
+                max:59,
+                onChange:function(){
+                    that.date.ss = this.value();
+                    that._change();
                 }
             });
             return $hmsBar;
@@ -3632,10 +3832,10 @@
             this.$year.text(this.date.yyyy);
             this.$month.val(this.date.MM);
             this._refreshDaySelect();
-            if(this.options.HMS) {
-                this.$hour.val(this.date.HH);
-                this.$minute.val(this.date.mm);
-                this.$second.val(this.date.ss);
+            if(this.options.HMS){
+                this.hour.value(this.date.HH);
+                this.minute.value(this.date.mm);
+                this.second.value(this.date.ss);
             }
         }
     };
@@ -4522,10 +4722,8 @@
 
         _hideMessage:function(name){
             var $input = $('input[name='+name+'],select[name='+name+']');
-            var widget = $input.data($input.data("role"));
-            if(widget){
-                widget._hideValidateMsg()
-            }
+            var widget = $input.data("role") && $input.data($input.data("role"));
+            widget && typeof(widget._hideValidateMsg) == 'function' && widget._hideValidateMsg();
         },
 
         hideMessages:function(names){

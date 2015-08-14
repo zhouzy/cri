@@ -43,7 +43,7 @@
             selectQuery = "select";
         $(inputQuery,$form).each(function(){
             var role = $(this).attr('data-role');
-            if(role && role == 'timeinput'){
+            if(role && role == 'timeInput'){
                 this.name && (o[this.name] = $(this).data("timeInput").getFormatValue());
             }
             else{
@@ -52,7 +52,7 @@
         });
         $(selectQuery,$form).each(function(){
             var role = $(this).attr('data-role');
-            if(role && role=='selectbox'){
+            if(role && role=='selectBox'){
                 this.name && (o[this.name] = $(this).data("selectBox").value());
             }
             else{
@@ -75,10 +75,10 @@
                     case 'input':{
                         $i.data('input').value(o[name]);
                     }break;
-                    case 'timeinput':{
+                    case 'timeInput':{
                         $i.data('timeInput').value(o[name]);
                     }break;
-                    case 'selectbox':{
+                    case 'selectBox':{
                         $i.data('selectBox').value(o[name]);
                     }break;
                     default:{
@@ -368,7 +368,7 @@
                     if(role=='input'){
                         $(this).data("input").value(value);
                     }
-                    else if(role == 'timeinput'){
+                    else if(role == 'timeInput'){
                         value = value || new Date();
                         $(this).data("timeInput").value(value);
                     }
@@ -381,7 +381,7 @@
                 var role = $(this).attr('data-role');
                 var value = this.name ? param[this.name] : '';
                 value = value || '';
-                if(role && role=='selectbox'){
+                if(role && role=='selectBox'){
                     if(value != ''){
                         $(this).data("selectBox").value(value);
                     }

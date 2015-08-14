@@ -333,6 +333,7 @@ table {
   color: #666666;
   border: 1px solid #c8c8c8;
   background: #f0f0f0;
+  position: relative;
 }
 .grid .title {
   padding-left: 4px;
@@ -380,11 +381,22 @@ table {
   vertical-align: middle;
 }
 .grid table td .td-content {
+  position: relative;
   display: inline-block;
   height: 24px;
   line-height: 24px;
   width: 100%;
   vertical-align: top;
+}
+.grid table td .td-content .filter-icon {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  margin-top: -6px;
+  color: #888;
+}
+.grid table td .td-content .filter-icon:hover {
+  color: #000;
 }
 .grid .grid-view {
   overflow-x: hidden;
@@ -458,6 +470,32 @@ table {
   position: absolute;
   top: 50%;
   left: 50%;
+}
+.grid .grid-filter {
+  background: #fff;
+  display: none;
+  position: absolute;
+  border: 1px solid #c8c8c8;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+  padding: 5px;
+  min-width: 100px;
+  z-index: 99999;
+  margin-left: -110px;
+  margin-top: 20px;
+}
+.grid .grid-filter li {
+  margin-bottom: 5px;
+  height: 20px;
+  line-height: 20px;
+}
+.grid .grid-filter li.footer {
+  height: 35px;
+  line-height: 35px;
+  text-align: center;
 }
 
 .user-not-select {
@@ -665,7 +703,7 @@ table {
   -webkit-box-shadow: 1px 0 6px 0 #ff5656;
 }
 .input-group .plus-minus-button {
-  position: relative;
+  top: 1px;
 }
 .input-group .plus-minus-button:hover {
   color: #666666;
@@ -1321,8 +1359,8 @@ table {
   color: red !important;
 }
 .timeBox {
-  background: #ffffff;
   border: 1px solid #c8c8c8;
+  background: #f5f7fa;
   border-radius: 0 0 5px 5px;
   box-shadow: 0 2px 2px 0 #cccccc;
   -moz-box-shadow: 0 2px 2px 0 #cccccc;
@@ -1331,7 +1369,7 @@ table {
   left: 80px;
   z-index: 20004;
   width: 240px;
-  height: 230px;
+  height: 240px;
   display: none;
 }
 .timeBox .titleBar {
@@ -1342,7 +1380,6 @@ table {
   font-size: 13px;
   text-align: center;
   font-weight: 600;
-  background: #f5f7fa;
 }
 .timeBox .yearSelecter {
   height: 16px;
@@ -1403,9 +1440,11 @@ table {
   width: 30px;
 }
 .timeBox > table {
-  width: 210px;
-  margin: 3px 15px 0 15px;
+  background: #ffffff;
+  width: 100%;
   font-size: 12px;
+  border-top: 1px solid #c8c8c8;
+  border-bottom: 1px solid #c8c8c8;
   -moz-user-select: none;
   user-select: none;
 }
@@ -1443,11 +1482,52 @@ table {
   background-clip: content-box;
 }
 .timeBox .HMSBar {
-  height: 20px;
+  height: 30px;
   width: 100%;
   text-align: right;
   font-size: 12px;
+}
+.timeBox .HMSBar .input-group {
+  width: 50px;
+  margin-right: 5px;
+  height: 20px;
   line-height: 20px;
+}
+.timeBox .HMSBar .input-group label {
+  display: none;
+}
+.timeBox .HMSBar .input-group input {
+  width: 15px;
+  padding: 0 25px 0 5px;
+  height: 18px;
+  line-height: 18px;
+}
+.timeBox .HMSBar .input-group .plus-minus-button {
+  top: 1px;
+  height: 18px;
+  line-height: 18px;
+  border-left-style: none;
+  width: 14px;
+  min-width: 14px;
+}
+.timeBox .HMSBar .input-group .plus-minus-button i {
+  position: absolute;
+  display: inline-block;
+  width: 14px;
+  height: 9px;
+}
+.timeBox .HMSBar .input-group .plus-minus-button .plus-button {
+  top: 0;
+  left: 0;
+  right: 0;
+  border-bottom-style: none;
+  line-height: 14px;
+}
+.timeBox .HMSBar .input-group .plus-minus-button .minus-button {
+  top: 9px;
+  left: 0;
+  right: 0;
+  line-height: 2px;
 }
 .timeBox .HMSInput {
   position: relative;

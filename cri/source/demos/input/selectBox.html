@@ -46,8 +46,12 @@
 </head>
 <body style="padding:50px;height:1000px;">
 <select id="selectInWnd" name="select"></select>
+<select multiple id="multiple">
+    <option value="1">m1</option>
+    <option value="2">m2</option>
+    <option value="3">m3</option>
+</select>
 <script type="text/javascript">
-
     var data=[{value:1,text:"text01"},{value:2,text:"text02"},{value:3,text:"text04"},{value:5,text:"text05"}];
     var options = [];
     var $select = $("#selectInWnd");
@@ -55,12 +59,14 @@
         options.push('<option value="'+data[i].value+'">' + data[i].text + '</option>');
     }
     $select.append(options);
-    $("#selectInWnd").selectBox();
-    $("#selectInWnd").selectBox({
+    var select = $("#selectInWnd").selectBox({
+        multiple:true,
         change:function(){
             console.log($('body').formValue().select);
         }
     });
+    select.value(1);
+
 </script>
 </body>
 </html>
