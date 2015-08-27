@@ -8,41 +8,7 @@
     <link href="../../cri/cri.css" type="text/css" rel="stylesheet"/>
     <script src="../../../libs/jquery/jquery-1.9.1.js" type="text/javascript"></script>
     <script src="../../cri/cri.js" type="text/javascript"></script>
-    <style>
-        html{
-            font-family:Georgia,"Times New Roman","Microsoft YaHei","微软雅黑",STXihei,"华文细黑",serif;
-            font-size:12px;
-        }
-        .input-group label {
-            width: 100px;
-        }
-        .input-group input {
-            width: 260px;
-        }
-        .input-group span.readonly {
-            width: 260px;
-            text-align: left;
-        }
-        .input-group span.readonly.with-btn {
-            width: 240px;
-        }
-        .input-warm {
-            display: inline-block;
-            text-align: left;
-            position: absolute;
-            left: 390px;
-            top: 4px;
-            background: none;
-            font-style: normal;
-            border-style: none;
-        }
-        .input-warm:before {
-            content: none;
-        }
-        .input-warm:after {
-            content: none;
-        }
-    </style>
+
 </head>
 <body style="padding:50px;height:1000px;">
 <select id="selectInWnd" name="select"></select>
@@ -52,7 +18,7 @@
     <option value="3">m3</option>
 </select>
 <script type="text/javascript">
-    var data=[{value:1,text:"text01"},{value:2,text:"text02"},{value:3,text:"text04"},{value:5,text:"text05"}];
+    var data=[{value:1,text:"text01"},{value:2,text:"text02"},{value:3,text:"text04"},{value:5,text:"text05"},{value:6,text:"text05"},{value:7,text:"text05"}];
     var options = [];
     var $select = $("#selectInWnd");
     for(var i=0;i<data.length;i++){

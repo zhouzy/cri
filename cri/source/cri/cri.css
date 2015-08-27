@@ -644,6 +644,7 @@ table {
   border-radius: 3px;
   border: 1px solid #c8c8c8;
   font-size: 12px;
+  overflow: hidden;
   vertical-align: middle;
   cursor: pointer;
 }

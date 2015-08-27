@@ -41,7 +41,11 @@
     $("select").val("2");
     $("input[name=timeInput]").timeInput();
     $("select[name=select1]").selectBox({multiple:true});
-    $("select[name=select1]").selectBox({multiple:true});
+    $("select[name=select]").selectBox({
+        change:function(){
+            console.log($('form').formValue());
+        }
+    });
 
     console.log($('form').formValue());
     var date = new Date(2014,10,23);

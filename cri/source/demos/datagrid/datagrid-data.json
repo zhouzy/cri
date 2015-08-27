@@ -3,8 +3,8 @@
     "rows":[
         {"propA":"<a href=\"javascript:click()\">����</a>","propB":456,"propC":789,"propD":"ABC","propE":"DEF","propF":"GHT"},
         {"propA":"<span >...</span>","propB":456,"propC":789,"propD":"ABC","propE":"DEF","propF":"GHT"},
-        {"propA":"0","propB":456,"propC":789,"propD":"ABC","propE":"DEF","propF":"GHT"},
-        {"propA":123,"propB":4565,"propC":789,"propD":"ABC","propE":"DEF","propF":"GHT"},
+        {"propA":"0","propB":456,"propC":789,"propD":"ABC","propE":null,"propF":"GHT"},
+        {"propA":null,"propB":4565,"propC":789,"propD":"ABC","propE":"DEF","propF":"GHT"},
         {"propA":123,"propB":4561,"propC":789,"propD":"ABC","propE":"DEF","propF":"GHT"},
         {"propA":123,"propB":4562,"propC":789,"propD":"ABC","propE":"DEF","propF":"GHT"},
         {"propA":123,"propB":4563,"propC":789,"propD":"ABC","propE":"DEF","propF":"GHT"},

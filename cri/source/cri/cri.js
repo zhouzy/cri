@@ -71,7 +71,7 @@
         for(var name in o){
             var $i = $("[name=" + name + "]",$form);
             if($i.length){
-                switch($i.data('role')){
+                switch($i.attr('data-role')){
                     case 'input':{
                         $i.data('input').value(o[name]);
                     }break;
@@ -767,8 +767,14 @@
                         if(op.filter){
                             var $filterIcon = $('<span data-for="'+column.field+'" class="fa fa-filter filter-icon"></span>');
                             $filterIcon.click(function(e){
+                                var gridHeadOffset = that.$grid.offset();
+                                var iconOffset = $(this).offset();
+                                var offset = {
+                                    left:iconOffset.left-gridHeadOffset.left+10,
+                                    top:iconOffset.top-gridHeadOffset.top
+                                };
                                 var key = $(e.target).data('for');
-                                that._toggle(that.$grid.find('ul[data-for='+key+']'));
+                                that._toggle(that.$grid.find('ul[data-for='+key+']'),offset);
                             });
                             $tdContent.append($filterIcon);
                         }
@@ -948,6 +954,7 @@
                 var map = keysMap[key];
                 for(var i in map){
                     var plainText = _getPlainText(i);
+                    plainText=='null' && (plainText = '');
                     var $checkbox = $('<input type="checkbox" name="'+plainText+'"/>').data("value",i);
                     $ul.append($('<li class="filter-value"></li>').append($checkbox,plainText));
                 }
@@ -980,9 +987,10 @@
          * @param $filterList
          * @private
          */
-        _toggle:function($filterList){
+        _toggle:function($filterList,offset){
+            var that = this;
             if($filterList.is(":hidden")){
-                $filterList.slideDown(200, function(){
+                $filterList.css(offset).slideDown(200, function(){
                     $(document).mouseup(function(e) {
                         var _con = $filterList;
                         if (!_con.is(e.target) && _con.has(e.target).length === 0) {
@@ -1002,18 +1010,17 @@
 
             for(var field in filters){
                 var values = filters[field];
+                var tempRows = [];
                 for(var i in values){
                     var value = values[i];
-                    var tempRows = [];
                     for(var j in rows){
-                        if(rows[j][field] == value){
+                        if(("" + rows[j][field]) == value){
                             tempRows.push(rows[j]);
                         }
                     }
-                    rows = tempRows;
                 }
+                rows = tempRows;
             }
-            console.dir(rows);
             this._refreshBody(rows);
         },
 
@@ -2457,9 +2464,16 @@
                 data:that._data(),
                 multiple:that.options.multiple,
                 onChange:function(value,text){
-                    that._value = value;
-                    that._text  = text;
-                    that.input.value(value);
+                    if(that.options.multiple) {
+                        that._value = value;
+                        that._text  = text;
+                        that.input.value(value);
+                    }
+                    else{
+                        that._value = value[0];
+                        that._text  = text;
+                        that.input.value(value[0]);
+                    }
                     that.options.change && that.options.change.call(that);
                 }
             });
@@ -2571,6 +2585,9 @@
          */
         value:function(value){
             if(arguments.length>0){
+                if(this.options.multiple && !cri.isArray(value)){
+                    value = value.split(',');
+                }
                 this._value = value;
                 this.input.value(this._value);
                 this.listView.select(this._value);

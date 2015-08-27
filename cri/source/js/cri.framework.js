@@ -71,7 +71,7 @@
         for(var name in o){
             var $i = $("[name=" + name + "]",$form);
             if($i.length){
-                switch($i.data('role')){
+                switch($i.attr('data-role')){
                     case 'input':{
                         $i.data('input').value(o[name]);
                     }break;
