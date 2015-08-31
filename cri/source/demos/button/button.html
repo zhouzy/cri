@@ -18,19 +18,22 @@
 <body style="padding:50px;">
 <a id="ok">button</a>
 <script>
+    function create(){
+        var $check = $('<input name="check" type="checkbox"/>');
+        var $button = $('<button>点击</button>');
+        $button.click(function(){
+            $check.prop('checked',true);
+        });
+        $('body').append($button);
+        $('body').append($check);
+    }
     $("#ok").button({
-        iconCls:"fa fa-times",
-        handler:function(){
-            console.log("button click");
-        }
-    });
-    $("#ok").button({
-        iconCls:"fa fa-times",
-        handler:function(){
-            console.log("button click");
-        },
-        enable:false
-    });
+            iconCls:"fa fa-times",
+            handler:function(){
+                console.log("button click");
+            }
+        });
+    create();
 </script>
 </body>
 </html>

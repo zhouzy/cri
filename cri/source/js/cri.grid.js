@@ -485,9 +485,15 @@
                         }
                     }($ul))
                 });
-                this.$grid.append($ul);
-            }
 
+                this.$grid.append($ul);
+
+                $ul.find('li.filter-value input[type=checkbox]').click(function($all){
+                    return function(){
+                        $all.prop('checked',false)
+                    };
+                }($all));
+            }
         },
 
         /**
@@ -512,6 +518,10 @@
             }
         },
 
+        /**
+         * 执行过滤
+         * @private
+         */
         _filter:function(){
             var filters = this._filters;
             var rows = this._rows;
@@ -519,9 +529,9 @@
             for(var field in filters){
                 var values = filters[field];
                 var tempRows = [];
-                for(var i in values){
+                for(var i= 0,len=values.length; i<len; i++){
                     var value = values[i];
-                    for(var j in rows){
+                    for(var j=0,jLen = rows.length;j<jLen;j++){
                         if(("" + rows[j][field]) == value){
                             tempRows.push(rows[j]);
                         }
