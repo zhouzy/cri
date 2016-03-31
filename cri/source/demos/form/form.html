@@ -10,7 +10,7 @@
 </head>
 <body>
 <form>
-    <input name="inputA" value="helloA"/>
+    <input name="inputA" required/>
 
     <input type="checkbox" name="checkBoxA" value="checkBoxA" checked/>
     <input type="checkbox" name="checkBoxB" value="checkBoxB"/>
@@ -19,7 +19,7 @@
     <input type="radio" name="radio" value="radioB" checked/>
     <input type="radio" name="radio" value="radioC"/>
 
-    <input name="timeInput"/>
+    <input name="timeInput" required/>
 
     <select name="select1" multiple required>
         <option value="1">selectA</option>
@@ -32,13 +32,19 @@
         <option value="2">selectB</option>
         <option value="3">selectC</option>
     </select>
+
+    <div class="eb_textareaGrop">
+        <div class="input-warm" style="display: block;position: relative;width: 140px;"><i class="fa fa-exclamation"></i><span>该值不能为空</span></div>
+        <textarea ></textarea>
+        <div class="input-warm bottom-input" style="display: block;"><i class="fa fa-exclamation"></i><span>该值不能为空</span></div>
+    </div>
+
     <div id="arrtTest" data-role="timeInputTest"></div>
 </form>
 <script>
-    $('form').validator({
-        validateOnBlur:true
-    });
+
     $("select").val("2");
+    $('input[name=inputA]').input();
     $("input[name=timeInput]").timeInput();
     $("select[name=select1]").selectBox({multiple:true});
     $("select[name=select]").selectBox({
@@ -62,6 +68,9 @@
     $("#arrtTest").attr("data-role",'timeInputTest2');
     console.log("attr(data-role) = " + $("#arrtTest").attr('data-role'));
     console.log("data(role) = " + $("#arrtTest").data('role'));
+    $('form').validator({
+        validateOnBlur:true
+    });
 </script>
 </body>
 </html>

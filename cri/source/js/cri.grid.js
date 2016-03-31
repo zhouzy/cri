@@ -424,7 +424,7 @@
             for(var i in column){
                 var field = column[i].field;
                 var keys = {};
-                for(var j in rows){
+                for(var j=0,len=rows.length;j<len;j++){
                     var row = rows[j];
                     var value = row[field];
                     if(keys[value] == undefined){

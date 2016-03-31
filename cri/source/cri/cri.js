@@ -174,17 +174,7 @@
      * 日期格式 YYYY/MM/dd YYYY-MM-dd
      */
     cri.string2Date = function(d){
-        var dt = d.split(" "),
-            date = dt[0],
-            time = dt[1],
-            dateArr = date.split(/[\/,-]/);
-        if(time){
-            var timeArr = time.split(":");
-            return new Date(dateArr[0],--dateArr[1],dateArr[2],timeArr[0],timeArr[1],timeArr[2]);
-        }
-        else{
-            return new Date(dateArr[0],--dateArr[1],dateArr[2]);
-        }
+        return new Date(Date.parse(d.replace(/-/g,"/")));
     };
 
     /**
@@ -916,7 +906,7 @@
             for(var i in column){
                 var field = column[i].field;
                 var keys = {};
-                for(var j in rows){
+                for(var j=0,len=rows.length;j<len;j++){
                     var row = rows[j];
                     var value = row[field];
                     if(keys[value] == undefined){
@@ -2616,9 +2606,17 @@
         text:function(text){
             var data = this.options.data;
             if(arguments.length>0){
+                if(this.options.multiple && !cri.isArray(text)){
+                    text = text.split(',');
+                }
+                this._text = text;
+                this._value = [];
                 for(var i= 0,len = data.length;i<len;i++){
-                    if(data[i].text === text){
-                        this.value(data[i].value);
+                    for(var j= 0,len=text.length;j<len;j++){
+                        if(data[i].text === text[j]){
+                            this._value.push(data[i].value);
+                            break;
+                        }
                     }
                 }
             }
@@ -3766,6 +3764,7 @@
             this.hour = $hour.numberInput({
                 min:0,
                 max:23,
+                value:this.date.HH,
                 onChange:function(){
                     that.date.HH = this.value();
                     that._change();
@@ -3773,7 +3772,8 @@
             });
             this.minute = $minute.numberInput({
                 min:0,
-                max:23,
+                max:59,
+                value:this.date.mm,
                 onChange:function(){
                     that.date.mm = this.value();
                     that._change();
@@ -3782,6 +3782,7 @@
             this.second = $second.numberInput({
                 min:0,
                 max:59,
+                value:this.date.ss,
                 onChange:function(){
                     that.date.ss = this.value();
                     that._change();

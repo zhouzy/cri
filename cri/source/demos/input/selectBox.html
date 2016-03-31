@@ -26,11 +26,12 @@
     }
     $select.append(options);
     var select = $("#selectInWnd").selectBox({
-        multiple:true,
+        multiple:false,
         change:function(){
             console.log($('body').formValue().select);
         }
     });
+    console.log($("#selectInWnd").data("selectBox").text());
     select.value(1);
 
 </script>

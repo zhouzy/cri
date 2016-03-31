@@ -174,17 +174,7 @@
      * 日期格式 YYYY/MM/dd YYYY-MM-dd
      */
     cri.string2Date = function(d){
-        var dt = d.split(" "),
-            date = dt[0],
-            time = dt[1],
-            dateArr = date.split(/[\/,-]/);
-        if(time){
-            var timeArr = time.split(":");
-            return new Date(dateArr[0],--dateArr[1],dateArr[2],timeArr[0],timeArr[1],timeArr[2]);
-        }
-        else{
-            return new Date(dateArr[0],--dateArr[1],dateArr[2]);
-        }
+        return new Date(Date.parse(d.replace(/-/g,"/")));
     };
 
     /**

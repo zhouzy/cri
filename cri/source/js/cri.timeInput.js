@@ -335,6 +335,7 @@
             this.hour = $hour.numberInput({
                 min:0,
                 max:23,
+                value:this.date.HH,
                 onChange:function(){
                     that.date.HH = this.value();
                     that._change();
@@ -342,7 +343,8 @@
             });
             this.minute = $minute.numberInput({
                 min:0,
-                max:23,
+                max:59,
+                value:this.date.mm,
                 onChange:function(){
                     that.date.mm = this.value();
                     that._change();
@@ -351,6 +353,7 @@
             this.second = $second.numberInput({
                 min:0,
                 max:59,
+                value:this.date.ss,
                 onChange:function(){
                     that.date.ss = this.value();
                     that._change();

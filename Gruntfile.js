@@ -28,12 +28,14 @@ module.exports = function (grunt) {
             js:{
                 files:[{
                     src: [
-                        'cri/source/js/velocity.js',
-                        'cri/source/js/velocity.ui.js',
-                        'cri/source/js/cri.framework.js',
-                        'cri/source/js/cri.widgets.js',
+                        //'cri/source/js/velocity.js',
+                        //'cri/source/js/velocity.ui.js',
+                        //'cri/source/js/cri.framework.js',
+                        //'cri/source/js/cri.widgets.js',
+                        //'cri/source/js/cri.grid.js',
+                        //'cri/source/js/*.js'
                         'cri/source/js/cri.grid.js',
-                        'cri/source/js/*.js'
+
                     ],
                     dest:'cri/source/cri/cri.js'
                 }]
