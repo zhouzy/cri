@@ -19,21 +19,17 @@
 </select>
 <script type="text/javascript">
     var data=[{value:1,text:"text01"},{value:2,text:"text02"},{value:3,text:"text04"},{value:5,text:"text05"},{value:6,text:"text05"},{value:7,text:"text05"}];
+    var data2=[{value:1,text:"2text01"},{value:2,text:"2text02"},{value:3,text:"2text04"},{value:5,text:"2text05"},{value:6,text:"2text05"},{value:7,text:"2text05"}];
     var options = [];
     var $select = $("#selectInWnd");
-    for(var i=0;i<data.length;i++){
-        options.push('<option value="'+data[i].value+'">' + data[i].text + '</option>');
-    }
-    $select.append(options);
-    var select = $("#selectInWnd").selectBox({
-        multiple:false,
-        change:function(){
-            console.log($('body').formValue().select);
-        }
-    });
+    var select = $("#selectInWnd").selectBox({});
+    $select.data('selectBox').setOptions(data);
+    select.select(3);
+    window.setTimeout(function(){
+        $select.data('selectBox').setOptions(data2);
+        select.value(2);
+    },3000);
     console.log($("#selectInWnd").data("selectBox").text());
-    select.value(1);
-
 </script>
 </body>
 </html>

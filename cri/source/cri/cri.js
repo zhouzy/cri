@@ -551,7 +551,7 @@
         pagination:true,
         page:1,
         pageSize:10,
-        filter:true,
+        filter:false,
 
         onChange:null,   //行点击时触发
         onSelected:null, //当选择一行或者多行时触发
@@ -598,7 +598,10 @@
                     clickTimer = window.setTimeout(function(){
                         $("input[type=checkbox]",that.$gridhead).prop("checked",false);
                         that._setSelected(e);
-                        that.options.onChange && that.options.onChange.call(that);
+                        var item  = $(e.target).closest("tr"),
+                            rowId = item.data('rowid'),
+                            row = that._getRowDataById(rowId);
+                        that.options.onChange && that.options.onChange.call(that,row);
                     },300);
                 })
                 .on('dblclick', "tr", function(e){
@@ -797,6 +800,7 @@
         },
 
         /**
+         *
          * 刷新Grid Body数据行
          * @private
          */

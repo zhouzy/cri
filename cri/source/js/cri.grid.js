@@ -69,27 +69,27 @@
         pagination:true,
         page:1,
         pageSize:10,
-        filter:true,
+        filter:false,
 
         onChange:null,   //行点击时触发
         onSelected:null, //当选择一行或者多行时触发
         onDblClick:null, //双击行时触发
         onLoad:null,     //构造表格结束时触发
-        ajaxDone:null   //当AJAX请求成功后触发
+        ajaxDone:null    //当AJAX请求成功后触发
     };
 
     var Grid = cri.Widgets.extend(function(element,options){
-        this.options     = _defaultOptions;
-        this.$element    = $(element);
-        this.$grid       = null;
-        this.$gridhead   = null;
-        this.$gridbody   = null;
-        this.toolbar     = null;
-        this.pager       = null;
-        this.$title      = null;
-        this._rows       = null;
-        this._columns    = [];
-        this._selectedId = [];
+        this.options        = _defaultOptions;
+        this.$element       = $(element);
+        this.$grid          = null;
+        this.$gridhead      = null;
+        this.$gridbody      = null;
+        this.toolbar        = null;
+        this.pager          = null;
+        this.$title         = null;
+        this._rows          = null;
+        this._columns       = [];
+        this._selectedId    = [];
         this._gridClassName = this._gridClassName || "datagrid";
         cri.Widgets.apply(this,arguments);
     });
@@ -116,7 +116,10 @@
                     clickTimer = window.setTimeout(function(){
                         $("input[type=checkbox]",that.$gridhead).prop("checked",false);
                         that._setSelected(e);
-                        that.options.onChange && that.options.onChange.call(that);
+                        var item  = $(e.target).closest("tr"),
+                            rowId = item.data('rowid'),
+                            row = that._getRowDataById(rowId);
+                        that.options.onChange && that.options.onChange.call(that,row);
                     },300);
                 })
                 .on('dblclick', "tr", function(e){
@@ -246,7 +249,7 @@
          */
         _createHead:function($parent){
             var $headWrap = $("<div></div>").addClass("grid-head-wrap"),
-                $table    = $("<table></table>"),
+                $table    = $('<table class="table"></table>'),
                 $tr       = $("<tr></tr>"),
                 op        = this.options,
                 columns   = this._columns;
@@ -307,7 +310,7 @@
          * @private
          */
         _createBody:function(gridBodyHeight){
-            var $gridbody = $('<div class="grid-body loading"></div>'),
+            var $gridbody    = $('<div class="grid-body loading"></div>'),
                 $loadingIcon = $('<i class="fa fa-spinner fa-spin"></i>').addClass("loadingIcon");
             gridBodyHeight && $gridbody.height(gridBodyHeight);
             $gridbody.append($loadingIcon);
@@ -315,11 +318,12 @@
         },
 
         /**
+         *
          * 刷新Grid Body数据行
          * @private
          */
         _refreshBody:function(rows){
-            var $table   = $('<table></table>'),
+            var $table   = $('<table class="table"></table>'),
                 op       = this.options,
                 id       = 0,
                 lineNum  = 1 + op.pageSize * (op.page - 1),
