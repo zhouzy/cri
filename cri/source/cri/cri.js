@@ -557,21 +557,21 @@
         onSelected:null, //当选择一行或者多行时触发
         onDblClick:null, //双击行时触发
         onLoad:null,     //构造表格结束时触发
-        ajaxDone:null   //当AJAX请求成功后触发
+        ajaxDone:null    //当AJAX请求成功后触发
     };
 
     var Grid = cri.Widgets.extend(function(element,options){
-        this.options     = _defaultOptions;
-        this.$element    = $(element);
-        this.$grid       = null;
-        this.$gridhead   = null;
-        this.$gridbody   = null;
-        this.toolbar     = null;
-        this.pager       = null;
-        this.$title      = null;
-        this._rows       = null;
-        this._columns    = [];
-        this._selectedId = [];
+        this.options        = _defaultOptions;
+        this.$element       = $(element);
+        this.$grid          = null;
+        this.$gridhead      = null;
+        this.$gridbody      = null;
+        this.toolbar        = null;
+        this.pager          = null;
+        this.$title         = null;
+        this._rows          = null;
+        this._columns       = [];
+        this._selectedId    = [];
         this._gridClassName = this._gridClassName || "datagrid";
         cri.Widgets.apply(this,arguments);
     });
@@ -731,7 +731,7 @@
          */
         _createHead:function($parent){
             var $headWrap = $("<div></div>").addClass("grid-head-wrap"),
-                $table    = $("<table></table>"),
+                $table    = $('<table class="table table-bordered"></table>'),
                 $tr       = $("<tr></tr>"),
                 op        = this.options,
                 columns   = this._columns;
@@ -792,7 +792,7 @@
          * @private
          */
         _createBody:function(gridBodyHeight){
-            var $gridbody = $('<div class="grid-body loading"></div>'),
+            var $gridbody    = $('<div class="grid-body loading"></div>'),
                 $loadingIcon = $('<i class="fa fa-spinner fa-spin"></i>').addClass("loadingIcon");
             gridBodyHeight && $gridbody.height(gridBodyHeight);
             $gridbody.append($loadingIcon);
@@ -805,7 +805,7 @@
          * @private
          */
         _refreshBody:function(rows){
-            var $table   = $('<table></table>'),
+            var $table   = $('<table class="table table-striped table-hover table-bordered"></table>'),
                 op       = this.options,
                 id       = 0,
                 lineNum  = 1 + op.pageSize * (op.page - 1),
@@ -848,10 +848,7 @@
                 $table.append($tr);
             }
             this.$gridbody.removeClass("loading").html($table);
-            /**
-             *fixed IE8 do not support nth-child selector;
-             */
-            $("tr:nth-child(odd)",$table).css("background","#FFF");
+
             /**
              * 根据gird-body纵向滚动条宽度决定headWrap rightPadding
              * 当grid-body为空时，在IE下不能取到clientWidth
@@ -1235,7 +1232,7 @@
         enable:true
     };
 
-    var BUTTON = "button";
+    var BUTTON = "btn btn-default";
 
     var Button = cri.Widgets.extend(function(element,options){
         this.options     = _defaultOptions;
@@ -1302,7 +1299,7 @@
 
     cri.Button = Button;
 
-    $.fn.button = function(option) {
+    $.fn.btn = function(option) {
         var o = null;
         this.each(function () {
             var $this   = $(this),
@@ -1665,7 +1662,7 @@
         required:false
     };
 
-    var INPUT_GROUP = "input-group",
+    var INPUT_GROUP = "form-group",
         ERROR_MSG_HEIGHT = 23,//验证消息框高度
         WITH_BTN    = "with-btn";
 
@@ -1674,7 +1671,7 @@
         this.$inputGroup = null;
         this.button = null;
         cri.Widgets.apply(this,arguments);
-        this.$element.attr('data-role','input');
+        this.$element.data('role','input');
     });
 
     $.extend(Input.prototype,{
@@ -1699,7 +1696,7 @@
             $element.wrap('<div class="'+ INPUT_GROUP + '"></div>');
             this.$inputGroup = $element.parent();
             this._wrapInput();
-            this.$input.before(this._label());
+            this._label();
             this.options.enable || this.disable();
         },
 
@@ -1707,48 +1704,38 @@
             var that = this,
                 op   = that.options,
                 $input = this.$element;
+            $input.addClass('form-control').on("focus",function(){
+                that.options.onFocus && that.options.onFocus.call(that);
+            }).blur(function(){
+                that.options.onBlur && that.options.onBlur.call(that);
+            });
 
             if(op.readonly){
-                $input = this._readonlyInput($input);
-            }
-
-            else{
-                $input.on("focus",function(){
-                    that.options.onFocus && that.options.onFocus.call(that);
-                }).blur(function(){
-                    that.options.onBlur && that.options.onBlur.call(that);
-                });
+                $input.prop('readonly',true);
             }
 
             if(op.button){
-                var $button = $('<button></button>');
-                $input.after($button);
-                this._button($button);
-                $input.addClass(WITH_BTN);
+                $input.wrap('<div class="input-group"></div>');
+                var $inputGroup = $input.parent();
+                var $inputGroupBtn = $('<span class="input-group-btn"></span>');
+                $inputGroup.append($inputGroupBtn);
+                this._button($inputGroupBtn);
             }
 
             this.$input = $input;
         },
 
-        /**
-         * 返回包装 readonly input
-         * @param $element
-         * @private
-         */
-        _readonlyInput:function($element){
+        _button:function($p){
             var that = this,
-                $input = $('<span class="readonly" role="readonly"></span>');
-            $input.on("click",function(){
-                that.options.onFocus && that.options.onFocus.call(that);
-            }).blur(function(){
-                that.options.onBlur && that.options.onBlur.call(that);
+                btOpt = this.options.button,
+                tx = btOpt.text || '',
+                $i = $('<i class="'+btOpt.iconCls+'">'+tx+'</i>'),
+                $btn = $('<button type="button" class="btn btn-xs btn-fab-mini"></button>');
+            $btn.append($i);
+            this.button = $p.append($btn);
+            $btn.click(function(){
+                btOpt.handler && btOpt.handler.call();
             });
-            this.$element.attr("readonly",true).hide().after($input);
-            return $input;
-        },
-
-        _button:function($button){
-            this.button = $button.button(this.options.button);
         },
 
         _label:function(){
@@ -1756,12 +1743,21 @@
                 this.$element.data("label") ||
                 this.$element.attr("title") ||
                 this.$element.attr("name") ||
-                "";
-            var $label = $('<label></label>').text(label);
-            if(this.options.required){
-                $label.addClass('required');
+                "",
+                $input = this.$element;
+            if(label.length){
+                var $label = $('<label class="control-label col-sm-4"></label>').text(label);
+                if(this.options.required){
+                    $label.addClass('required');
+                }
+                this.$inputGroup.prepend($label);
+                if($input.parent().is('.input-group')){
+                    $input.parent().wrap('<div class="col-sm-8"></div>');
+                }
+                else{
+                    $input.wrap('<div class="col-sm-8"></div>');
+                }
             }
-            return $label;
         },
 
         _destroy:function(){
@@ -1807,31 +1803,19 @@
          * @private
          */
         _showValidateMsg: function(errorMsg){
-            this.$input.addClass("failure");
-            var offset = this.$input.offset();
+            this.$inputGroup.addClass("has-error");
             if(!this.$errorMsg){
-                this.$errorMsg = $('<div class="input-warm"><i class="fa fa-exclamation"></i><span>' + errorMsg + '</span></div>');
+                this.$errorMsg = $('<span class="help-block">' + errorMsg + '</span>');
                 this.$input.after(this.$errorMsg);
             }
             else{
-                this.$errorMsg.find("span").text(errorMsg);
-            }
-            if(offset.top <= (ERROR_MSG_HEIGHT)){
-                this.$errorMsg.addClass("bottom-input");
-            }
-            else{
-                this.$errorMsg.removeClass("bottom-input");
+                this.$errorMsg.text(errorMsg);
             }
             this.$errorMsg.show();
-
-            $('html,body').is(':animated') || $('html,body').animate({
-                scrollTop: this.$input.offset().top
-            },300);
-
         },
 
         _hideValidateMsg: function(){
-            this.$input.removeClass("failure");
+            this.$inputGroup.removeClass("has-error");
             this.$errorMsg && this.$errorMsg.hide();
         },
 
@@ -2114,6 +2098,7 @@
             if (op.readonly) {
                 $input = this._readonlyInput($input);
             }
+
             else {
                 $input.on("focus", function () {
                     that.options.onFocus && that.options.onFocus.call(that);
@@ -2143,15 +2128,15 @@
                 });
             }
             this.$input = $input;
-            $input.addClass(WITH_BTN);
-            this._appendBtn();
+            $input.wrap('<div class="input-group input-group-sm"></div>');
+            this.$input.parent().append(this._appendBtn());
         },
 
         _appendBtn:function(){
             var that         = this,
-                $plusButton  = $('<i class="fa fa-sort-up plus-button"></i>'),
-                $minusButton = $('<i class="fa fa-sort-down minus-button"></i>'),
-                $Buttons     = $('<span class="plus-minus-button"></span>').append($minusButton,$plusButton);
+                $plusButton  = $('<button class="btn btn-xs top"><i class="fa fa-sort-up plus-button"></i></button>'),
+                $minusButton = $('<button class="btn btn-xs bottom"><i class="fa fa-sort-down minus-button"></i></button>'),
+                $Buttons     = $('<div class="input-group-btn btn-group-vertical"></div>').append($plusButton,$minusButton);
 
             $plusButton.click(function(){
                 var val = that.value();
@@ -2228,7 +2213,6 @@
         page:1,      //当前页数
         pageSize:10, //每页条数
         total:0,     //总条数
-        rowsLen:0,   //实际数据length
         onPage:null,  //当用户点击翻页按钮时触发
         onUpdate:null //更新翻页信息结束触发
     };
@@ -2237,11 +2221,8 @@
         PREVPAGE  = "prev-page",
         NEXTPAGE  = "next-page",
         LASTPAGE  = "last-page",
-        PAGENUMBER    = "pager-number",
-        PAGENAV       = "pager-nav",
-        PAGEINFO      = "pager-info",
-        STATEDISABLED = "state-disabled",
-        STATEDSTATE   = "state-selected";
+        STATEDISABLED = "disabled",
+        ACTIVE   = "active";
 
     var Pager = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
@@ -2252,9 +2233,10 @@
     $.extend(Pager.prototype,{
         _eventListen:function(){
             var that = this;
-            this.$pager.on("click","a:not('."+STATEDISABLED+"')",function(e){
-                var $a = $(e.target).closest("a");
-                var page = $a.data("page");
+            this.$pager.find('li').off('click');
+            this.$pager.find('li:not(.'+STATEDISABLED+')').on("click",function(e){
+                var $li = $(e.target).closest("li");
+                var page = $li.data("page");
                 that._page(page);
             });
         },
@@ -2264,30 +2246,23 @@
         },
 
         _createPager:function($parent){
-            var $pager = this.$pager = $("<div></div>").addClass("pager");
-            $pager.append(this._createPagerBtn()).append(this._createPagerInfo());
-            $parent.append($pager);
-        },
+            var $pager   = this.$pager = $("<ul></ul>").addClass("pagination"),
+                op       = this.options,
+                pageSize = op.pageSize || 10,
+                total    = op.total || 0,
+                page     = parseInt(op.page) || 1,
+                lastPage = Math.ceil(total / pageSize),
 
-        _createPagerBtn: function(){
-            var op        = this.options,
-                pageSize  = op.pageSize || 10,
-                total     = op.total || 0,
-                page      = parseInt(op.page) || 1,
-                lastPage  = Math.ceil(total / pageSize);
+                $firstPage  = $('<li></li>').addClass(FIRSTPAGE).append('<a href="#"><span class="fa fa-angle-double-left"></span></a>'),
+                $prevPage   = $('<li></li>').addClass(PREVPAGE).append('<a href="#"><span class="fa fa-angle-left"></span></a>'),
+                $nextPage   = $('<li></li>').addClass(NEXTPAGE).append('<a href="#"><span class="fa fa-angle-right"></span></a>'),
+                $lastPage   = $('<li></li>').addClass(LASTPAGE).append('<a href="#"><span class="fa fa-angle-double-right"></span></a>');
 
-            var $pagerBtn   = $("<div></div>").addClass(PAGENAV),
-                $firstPage  = $('<a></a>').addClass(FIRSTPAGE).append('<span class="fa fa-angle-double-left"></span>'),
-                $prevPage   = $('<a></a>').addClass(PREVPAGE).append('<span class="fa fa-angle-left"></span>'),
-                $nextPage   = $('<a></a>').addClass(NEXTPAGE).append('<span class="fa fa-angle-right"></span>'),
-                $lastPage   = $('<a></a>').addClass(LASTPAGE).append('<span class="fa fa-angle-double-right"></span>'),
-                $numberPage = $("<ul></ul>").addClass(PAGENUMBER);
-
+            lastPage = lastPage>0?lastPage:page;
             this._fourBtn($firstPage,$prevPage,$nextPage,$lastPage,page,lastPage);
-            this._numberPage($numberPage,page,lastPage);
-
-            $pagerBtn.append($firstPage).append($prevPage).append($numberPage).append($nextPage).append($lastPage);
-            return $pagerBtn;
+            $pager.append($firstPage,$prevPage,$nextPage,$lastPage);
+            $prevPage.after(this._numberPage(page,lastPage));
+            $parent.append($pager);
         },
 
         _updatePagerBtn:function(){
@@ -2297,16 +2272,16 @@
                 page     = parseInt(op.page) || 1,
                 lastPage = Math.ceil(total / pageSize),
 
-                $pagerBtn   = $("." + PAGENAV,this.$pager),
-                $firstPage  = $("." + FIRSTPAGE,$pagerBtn),
-                $prevPage   = $("." + PREVPAGE,$pagerBtn),
-                $nextPage   = $("." + NEXTPAGE,$pagerBtn),
-                $lastPage   = $("." + LASTPAGE,$pagerBtn),
-                $numberPage = $("." + PAGENUMBER,$pagerBtn);
+                $firstPage  = $("." + FIRSTPAGE,this.$pager),
+                $prevPage   = $("." + PREVPAGE,this.$pager),
+                $nextPage   = $("." + NEXTPAGE,this.$pager),
+                $lastPage   = $("." + LASTPAGE,this.$pager),
+
+                $numberPage = $(".number",this.$pager);
 
             this._fourBtn($firstPage,$prevPage,$nextPage,$lastPage,page,lastPage);
-            $numberPage.empty();
-            this._numberPage($numberPage,page,lastPage);
+            $numberPage.remove();
+            $prevPage.after(this._numberPage(page,lastPage));
         },
 
         _fourBtn:function($firstPage,$prevPage,$nextPage,$lastPage,page,lastPage){
@@ -2330,45 +2305,18 @@
             }
         },
 
-        _numberPage:function($numberPage,page,lastPage){
+        _numberPage:function(page,lastPage){
             var start = page > 2 ? page-2:1,
-                end   = start + 5;
-
-            for(var i=start; i<end; i++){
-                if(i>0 && i<= lastPage){
-                    var $li = $("<li></li>"),
-                        $a  = $("<a></a>").data("page",i).text(i);
-                    i != page ?
-                        $a.addClass("pager-num"):
-                        $a.addClass(STATEDSTATE);
-                    $numberPage.append($li.append($a));
-                }
+                end   = start + 4,
+                numberPage = [];
+            start = lastPage > 4 ? (end > lastPage ? lastPage - 4:start):start;
+            for(var i=start; i<=end && i<=lastPage; i++){
+                var $li = $('<li class="number"></li>').data("page",i),
+                    $a  = $('<a href="javascript:void(0);"></a>').text(i);
+                i != page ? $li.addClass("pager-num"): $li.addClass(ACTIVE);
+                numberPage.push($li.append($a));
             }
-        },
-
-        _updatePagerInfo:function(){
-            var op       = this.options,
-                pageSize = op.pageSize || 10,
-                total    = op.total || 0,
-                page     = parseInt(op.page) || 1,
-                numStart = (page-1) * pageSize + 1,
-                numEnd   = (page-1) * pageSize + op.rowsLen,
-
-                $pager     = this.$pager,
-                $pagerInfo = $("."+PAGEINFO,$pager);
-
-            $pagerInfo.text(numStart + ' - ' + numEnd + ' of ' + total + ' items');
-        },
-
-        _createPagerInfo:function(){
-            var op  = this.options,
-                pageSize  = op.pageSize || 10,
-                total     = op.total || 0,
-                page      = parseInt(op.page) || 1,
-                numStart  = (page-1) * pageSize + 1,
-                numEnd    = (page-1) * pageSize + op.rowsLen;
-
-            return $("<div></div>").addClass(PAGEINFO).text(numStart + ' - ' + numEnd + ' of ' + total + ' items');
+            return numberPage;
         },
 
         _page:function(page){
@@ -2377,14 +2325,13 @@
             this.options.onPage.call(this,op.page,op.pageSize);
         },
 
-        update:function(page,pageSize,total,rowsLen){
+        update:function(page,pageSize,total){
             var op = this.options;
-            op.total = total;
-            op.rowsLen = rowsLen;
-            op.page = page;
-            op.pageSize = pageSize;
+            op.total = total || op.total;
+            op.page = page || op.page;
+            op.pageSize = pageSize || op.pageSize;
             this._updatePagerBtn();
-            this._updatePagerInfo();
+            this._eventListen();
             op.onUpdate && op.onUpdate(this);
         }
     });
@@ -3435,7 +3382,7 @@
  * Author zhouzy
  * Date   2014/9/18
  * TimeInput 组件
- *
+ * 依赖Input组件
  */
 !function(window){
 
@@ -3487,10 +3434,8 @@
             this.date = cri.string2Date(this.date)
         }
 
-        var $element = this.$element.attr("role","timeInput");
-        $element.wrap('<div class="'+TIME_INPUT_GROUP+'"></div>');
-        this.$timeInputGroup = $element.parent();
         this._wrapInput();
+        this.$timeInputGroup = this.$element.closest('.input-group').addClass(TIME_INPUT_GROUP);
         this._timeSelectView();
     };
 
@@ -3509,10 +3454,11 @@
             readonly:true,
             value:cri.formatDate(value,this.options.format),
             button:button,
-            enable:this.options.enable,
-            onFocus:function(){
-                that.selectView.toggle();
-            }});
+            enable:this.options.enable
+        });
+        this.$element.click(function(){
+            that.selectView.toggle();
+        });
     };
 
     /**
@@ -3632,17 +3578,16 @@
          * @private
          */
         _create:function($parent){
-            var $timeBox = this.$timeBox = $('<div class="' + TIME_BOX + '"></div>');
-            var $titleBar = $('<div class="titleBar"></div>');
+            var $timeBox = this.$timeBox = $('<div class="container-fluid ' + TIME_BOX + '"></div>');
+            var $titleBar = $('<div class="titleBar form-inline"></div>');
+            var $row = $('<div class="row"></div>');
             $titleBar.append(
                 this._yearSelect(),
-                this._monthSelect(),
-                '<span style="position:absolute;top:5px;right:23px;">月</span>');
-            $timeBox.append($titleBar,this._daySelect());
+                this._monthSelect());
+            $timeBox.append($row.append($titleBar),this._daySelect());
             if(this.options.HMS == true){
-                $timeBox.append(this._hmsSelect());
+                $timeBox.append($('<div class="row"></div>').append(this._hmsSelect()));
             }
-
             $("body").append($timeBox);
         },
 
@@ -3654,20 +3599,22 @@
         _yearSelect : function(){
             var that = this;
             var date = this.date;
-            var $yearSelect = $('<div class="yearSelecter"></div>');
-            var $minusBtn   = $('<i class="toLastYear yearButton fa fa-minus"></i>');
-            var $plusBtn    = $('<i class="toNextYear yearButton fa fa-plus"></i>');
-            var $year       = $('<span class="year">' + date.yyyy + '</span>');
+            var $yearSelect = $('<div class="year_Selecter col-sm-8"></div>');
+            var $minusBtn   = $('<span class="input-group-btn"><button class="btn btn-default" type="button">-</button></span>');
+            var $plusBtn    = $('<span class="input-group-btn"><button class="btn btn-default" type="button">+</button></span>');
+            var $year       = $('<input class="form-control" readonly/>').val(date.yyyy + '年');
             this.$year = $year;
+            var $yearInputGroup = $('<div class="input-group input-group-sm"></div>');
             $minusBtn.on("click",function(){
-                $year.html(--that.date.yyyy);
+                $year.val(--that.date.yyyy + '年');
                 that._change();
             });
             $plusBtn.on("click",function(){
-                $year.html(++that.date.yyyy);
+                $year.val(++that.date.yyyy + '年');
                 that._change();
             });
-            $yearSelect.append($minusBtn,$year,'年',$plusBtn);
+            $yearInputGroup.append($minusBtn,$year,$plusBtn);
+            $yearSelect.append($yearInputGroup);
             return $yearSelect;
         },
 
@@ -3679,19 +3626,21 @@
         _monthSelect:function(){
             var that = this,
                 date = this.date,
-                $select = $('<select class="monthSelect">');
+                $select = $('<select class="form-control month_Select">');
+            var $selectWrap = $('<div class="col-sm-4"></div>');
+            var $inputGroup = $('<div class="input-group-sm"></div>');
+
             this.$month = $select;
             $.each([1,2,3,4,5,6,7,8,9,10,11,12],function(index,value){
                 value < 10 && (value = "0" + value);
                 $select.append('<option value="' + index + '">' + value + '</option>');
             });
-            $select.val(date.MM);
-            $select.on("change",function(){
+            $select.val(date.MM).on("change",function(){
                 that.date.MM = $select.val();
                 that._refreshDaySelect();
                 that._change();
             });
-            return $select;
+            return $selectWrap.append($inputGroup.append($select,'<span class="control-label">月</span>'));
         },
 
         /**
@@ -3759,11 +3708,13 @@
          */
         _hmsSelect:function(){
             var that = this,
-                $hmsBar = $('<div class="HMSBar"></div>'),
-                $hour = $('<input class="hour"/>'),
-                $minute = $('<input class="minute"/>'),
-                $second = $('<input class="second"/>');
-            $hmsBar.append($hour,':',$minute,':',$second);
+                $hmsBar = $('<div class="HMSBar form-inline"></div>'),
+                $hour   = $('<input class="form-control hour"/>'),
+                $minute = $('<input class="form-control minute"/>'),
+                $second = $('<input class="form-control second"/>');
+            $hmsBar.append($('<div class="col-sm-4"></div>').append($hour));
+            $hmsBar.append($('<div class="col-sm-4"></div>').append($minute));
+            $hmsBar.append($('<div class="col-sm-4"></div>').append($second));
 
             this.hour = $hour.numberInput({
                 min:0,
@@ -3774,6 +3725,7 @@
                     that._change();
                 }
             });
+            $hour.before('<span class="input-group-addon">时</span>');
             this.minute = $minute.numberInput({
                 min:0,
                 max:59,
@@ -3783,6 +3735,7 @@
                     that._change();
                 }
             });
+            $minute.before('<span class="input-group-addon">分</span>');
             this.second = $second.numberInput({
                 min:0,
                 max:59,
@@ -3792,6 +3745,7 @@
                     that._change();
                 }
             });
+            $second.before('<span class="input-group-addon">秒</span>');
             return $hmsBar;
         },
 
@@ -3800,25 +3754,12 @@
         },
 
         /**
-         * 当在非本元素范围内点击，收缩下拉框
-         * @private
-         */
-        _clickBlank:function(){
-            var that = this;
-            $(document).mouseup(function(e) {
-                var _con = that.$timeBox;
-                if (!_con.is(e.target) && _con.has(e.target).length === 0) {
-                    that.$timeBox.slideUp(200);
-                }
-            });
-        },
-        /**
          * 设置position显示时在屏幕中的位置
          * @private
          */
         _setPosition:function(){
             var left = this.$parent.offset().left + this.$parent.find('label').outerWidth();
-            var top = this.$parent.offset().top + 28;
+            var top = this.$parent.offset().top + 34;
             this.$timeBox.css({top:top,left:left});
         },
 
@@ -3837,8 +3778,15 @@
             var that = this;
             this._setPosition();
             if(this.$timeBox.is(":hidden")){
+                var cb = function(e){
+                    var _con = that.$timeBox;
+                    if (!_con.is(e.target) && _con.has(e.target).length === 0) {
+                        that.$timeBox.slideUp(200);
+                        $(document).off('mouseup',cb);
+                    }
+                };
                 this.$timeBox.slideDown(200,function(){
-                    that._clickBlank();
+                    $(document).on('mouseup',cb);
                 });
             }
             else{
@@ -4693,11 +4641,12 @@
         },
 
         /**
-         * 验证表单或者输入框
+         * 验证表单或者输入框,
+         * 如果传入值，则验证指定的对象
          */
-        validate:function(){
+        validate:function($e){
             var that = this,
-                $element = this.$element,
+                $element = $e || this.$element,
                 result = true;
             if(!$element.is(INPUTSELECTOR)){
                 $element.find(INPUTSELECTOR).each(function(){
@@ -4739,23 +4688,47 @@
                     that._hideMessage($input.attr('name'));
                 });
             }else{
-                this._hideMessage($input.attr('name'));
+                this._hideMessage($input);
             }
             return valid;
         },
 
         _showMessage:function($input,errorMsg){
-            errorMsg = $input.attr('error-msg')|| errorMsg || '请检查';
-            var widget = $input.data($input.data("role"));
-            if(widget){
-                widget._showValidateMsg(errorMsg)
+            errorMsg = errorMsg || $input.attr('error-msg') || '请检查';
+            var role = $input.data("role");
+            if(role){
+                var widget = $input.data($input.data("role"));
+                if(widget){
+                    widget._showValidateMsg(errorMsg)
+                }
+            }
+            else{
+                $input.closest('.form-group').addClass('has-error');
+                var _$helpBlock = $input.next();
+                if(_$helpBlock.is('.help-block')){
+                    _$helpBlock.text(errorMsg);
+                }
+                else{
+                    _$helpBlock = $('<span class="help-block">' + errorMsg + '</span>');
+                    $input.after(_$helpBlock);
+                }
+                _$helpBlock.show();
             }
         },
 
-        _hideMessage:function(name){
-            var $input = $('input[name='+name+'],select[name='+name+']');
-            var widget = $input.data("role") && $input.data($input.data("role"));
-            widget && typeof(widget._hideValidateMsg) == 'function' && widget._hideValidateMsg();
+        _hideMessage:function($input){
+            var role = $input.data("role");
+            if(role){
+                var widget = $input.data($input.data("role"));
+                widget && typeof(widget._hideValidateMsg) == 'function' && widget._hideValidateMsg();
+            }
+            else{
+                $input.closest('.form-group').removeClass('.has-error');
+                var _$helpBlock = $input.next();
+                if(_$helpBlock.is('.help-block')){
+                    _$helpBlock.hide();
+                }
+            }
         },
 
         hideMessages:function(names){

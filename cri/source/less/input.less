@@ -3,7 +3,7 @@
 
 @input-group-width:300px;
 @input-width:200px;
-.input-group{
+.input-group-back{
 	display:inline-block;
 	word-spacing:-1px;
 	font-size: 0;
@@ -218,4 +218,26 @@
 		border-color:transparent transparent @color-input-warm transparent ;
 		border-style:dashed dashed solid dashed ;
 	}
+}
+.input-group-btn.btn-group-vertical{
+    height:30px;
+    &>.btn.btn-xs{
+        height:15px;
+        padding:0 5px;
+        &.top{
+            margin-left:0;
+            .fa{
+                position:relative;
+                top:4px;
+            }
+        }
+        &.bottom{
+            margin-top:0;
+            border-bottom-left-radius: 0;
+            .fa{
+                position:relative;
+                top:-7px;
+            }
+        }
+    }
 }

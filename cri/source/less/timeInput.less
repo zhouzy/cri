@@ -1,22 +1,6 @@
 @import "lib.less";
 @import "theme-default.less";
 
-.timeInputGroup {
-    position: relative;
-    display: inline-block;
-    line-height: 30px;
-    height: 30px;
-    vertical-align: middle;
-    font-size:0;
-    .focus {
-        border: 1px solid #383eab !important;
-    }
-
-    .red {
-        color: red !important;
-    }
-
-}
 .timeBox {
     border: 1px solid @color-timeinput-timebox-border;
     background:@color-timeinput-timebox-title-bg;
@@ -25,8 +9,7 @@
     position: absolute;
     left: 80px;
     z-index: 20004;
-    width: 240px;
-    height: 240px;
+    width: 280px;
     display: none;
     .titleBar {
         top:0;
@@ -61,7 +44,12 @@
             background:@color-timeinput-timebox-icon-hover;
         }
     }
-
+    input{
+        text-align:center;
+    }
+    .input-group-btn .btn{
+        margin-bottom:0;
+    }
     .monthSelect {
         position: absolute;
         top: 3px;
@@ -87,15 +75,15 @@
         text-shadow: 0 1px 0 rgba(255, 255, 255, 0) !important;
     }
     .year {
-        display:inline-block;
-        width:30px;
+        //display:inline-block;
+        //width:30px;
     }
     & > table {
-        background:@color-timeinput-timebox-bg;
+        //background:@color-timeinput-timebox-bg;
         width: 100%;
         font-size: 12px;
-        border-top:1px solid @color-border;
-        border-bottom:1px solid @color-border;
+        //border-top:1px solid @color-border;
+        //border-bottom:1px solid @color-border;
         -moz-user-select: none;
         user-select: none;
         tr{
@@ -135,112 +123,26 @@
 
     }
     .HMSBar {
-        height: 30px;
+        height: 35px;
         width: 100%;
         text-align: right;
         font-size: 12px;
-        .input-group{
-            width:50px;
-            margin-right:5px;
-            height:20px;
-            line-height:20px;
-            label{
-                display:none;
+        .col-sm-4{
+            padding-left:5px;
+            padding-right:5px;
+            &:first-child{
+                padding-left:15px;
             }
-            input{
-                width:15px;
-                padding:0 25px 0 5px;
-                height:18px;
-                line-height:18px;
-            }
-            .plus-minus-button{
-                top:1px;
-                height:18px;
-                line-height:18px;
-                border-left-style:none;
-                width:14px;
-                min-width:14px;
-                i{
-                    position:absolute;
-                    display:inline-block;
-                    width:14px;
-                    height:9px;
-                }
-                .plus-button{
-                    top:0;
-                    left:0;
-                    right:0;
-                    border-bottom-style:none;
-                    line-height:14px;
-                }
-                .minus-button{
-                    top:9px;
-                    left:0;
-                    right:0;
-                    line-height:2px;
-                }
+            &:last-child{
+                padding-right:15px;
             }
         }
-    }
-    .HMSInput {
-        position: relative;
-        right: 15px;
-        width: 22px;
-        height: 14px;
-        font-size:12px;
-        border: 1px solid #aaa;
-        text-indent: 3px;
-        color: #666;
-        &.focus{
-            border: 1px solid #626dbb;
+        .input-group-addon{
+            padding-left:2px;
+            padding-right:2px;
         }
     }
-    .timeInputOK {
-        width: 40px;
-        height: 22px;
-        line-height: 20px;
-        background: -webkit-linear-gradient(top, #3b52ff, #202973);
-        background: -moz-linear-gradient(top, #3b52ff, #202973);
-        background: -o-linear-gradient(top, #3b52ff, #202973);
-        filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#3b52ff', EndColorStr='#202973');
-        position: absolute;
-        top: 189px;
-        left: 150px;
-        color: white;
-        font-size: 11px;
-        border-radius: 10px 0 0 10px;
-        text-align: center;
-        cursor: pointer;
-        &.mouseover{
-            background: -webkit-linear-gradient(top, #3edc5f, #1e8934);
-            background: -moz-linear-gradient(top, #3edc5f, #1e8934);
-            background: -o-linear-gradient(top, #3edc5f, #1e8934);
-            filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#3edc5f', EndColorStr='#1e8934');
-        }
-    }
-
-    .timeInputCancel {
-        width: 40px;
-        height: 22px;
-        line-height: 20px;
-        background: -webkit-linear-gradient(top, #3b52ff, #202973);
-        background: -moz-linear-gradient(top, #3b52ff, #202973);
-        background: -o-linear-gradient(top, #3b52ff, #202973);
-        filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#3b52ff', EndColorStr='#202973');
-        position: absolute;
-        top: 189px;
-        left: 190px;
-        color: white;
-        font-size: 11px;
-        border-radius: 0 10px 10px 0;
-        text-align: center;
-        cursor: pointer;
-        text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
-        &.mouseover{
-            background: -webkit-linear-gradient(top, #f72323, #941717);
-            background: -moz-linear-gradient(top, #f72323, #941717);
-            background: -o-linear-gradient(top, #f72323, #941717);
-            filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#f72323', EndColorStr='#941717');
-        }
-    }
+}
+.input-group .input-group-btn{
+    padding:0 3px;
 }

@@ -18,7 +18,7 @@
         enable:true
     };
 
-    var BUTTON = "button";
+    var BUTTON = "btn btn-default";
 
     var Button = cri.Widgets.extend(function(element,options){
         this.options     = _defaultOptions;
@@ -85,7 +85,7 @@
 
     cri.Button = Button;
 
-    $.fn.button = function(option) {
+    $.fn.btn = function(option) {
         var o = null;
         this.each(function () {
             var $this   = $(this),

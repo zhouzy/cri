@@ -249,7 +249,7 @@
          */
         _createHead:function($parent){
             var $headWrap = $("<div></div>").addClass("grid-head-wrap"),
-                $table    = $('<table class="table"></table>'),
+                $table    = $('<table class="table table-bordered"></table>'),
                 $tr       = $("<tr></tr>"),
                 op        = this.options,
                 columns   = this._columns;
@@ -323,7 +323,7 @@
          * @private
          */
         _refreshBody:function(rows){
-            var $table   = $('<table class="table"></table>'),
+            var $table   = $('<table class="table table-striped table-hover table-bordered"></table>'),
                 op       = this.options,
                 id       = 0,
                 lineNum  = 1 + op.pageSize * (op.page - 1),
@@ -366,10 +366,7 @@
                 $table.append($tr);
             }
             this.$gridbody.removeClass("loading").html($table);
-            /**
-             *fixed IE8 do not support nth-child selector;
-             */
-            $("tr:nth-child(odd)",$table).css("background","#FFF");
+
             /**
              * 根据gird-body纵向滚动条宽度决定headWrap rightPadding
              * 当grid-body为空时，在IE下不能取到clientWidth

@@ -20,7 +20,6 @@
         page:1,      //当前页数
         pageSize:10, //每页条数
         total:0,     //总条数
-        rowsLen:0,   //实际数据length
         onPage:null,  //当用户点击翻页按钮时触发
         onUpdate:null //更新翻页信息结束触发
     };
@@ -29,11 +28,8 @@
         PREVPAGE  = "prev-page",
         NEXTPAGE  = "next-page",
         LASTPAGE  = "last-page",
-        PAGENUMBER    = "pager-number",
-        PAGENAV       = "pager-nav",
-        PAGEINFO      = "pager-info",
-        STATEDISABLED = "state-disabled",
-        STATEDSTATE   = "state-selected";
+        STATEDISABLED = "disabled",
+        ACTIVE   = "active";
 
     var Pager = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
@@ -44,9 +40,10 @@
     $.extend(Pager.prototype,{
         _eventListen:function(){
             var that = this;
-            this.$pager.on("click","a:not('."+STATEDISABLED+"')",function(e){
-                var $a = $(e.target).closest("a");
-                var page = $a.data("page");
+            this.$pager.find('li').off('click');
+            this.$pager.find('li:not(.'+STATEDISABLED+')').on("click",function(e){
+                var $li = $(e.target).closest("li");
+                var page = $li.data("page");
                 that._page(page);
             });
         },
@@ -56,30 +53,23 @@
         },
 
         _createPager:function($parent){
-            var $pager = this.$pager = $("<div></div>").addClass("pager");
-            $pager.append(this._createPagerBtn()).append(this._createPagerInfo());
-            $parent.append($pager);
-        },
+            var $pager   = this.$pager = $("<ul></ul>").addClass("pagination"),
+                op       = this.options,
+                pageSize = op.pageSize || 10,
+                total    = op.total || 0,
+                page     = parseInt(op.page) || 1,
+                lastPage = Math.ceil(total / pageSize),
 
-        _createPagerBtn: function(){
-            var op        = this.options,
-                pageSize  = op.pageSize || 10,
-                total     = op.total || 0,
-                page      = parseInt(op.page) || 1,
-                lastPage  = Math.ceil(total / pageSize);
+                $firstPage  = $('<li></li>').addClass(FIRSTPAGE).append('<a href="#"><span class="fa fa-angle-double-left"></span></a>'),
+                $prevPage   = $('<li></li>').addClass(PREVPAGE).append('<a href="#"><span class="fa fa-angle-left"></span></a>'),
+                $nextPage   = $('<li></li>').addClass(NEXTPAGE).append('<a href="#"><span class="fa fa-angle-right"></span></a>'),
+                $lastPage   = $('<li></li>').addClass(LASTPAGE).append('<a href="#"><span class="fa fa-angle-double-right"></span></a>');
 
-            var $pagerBtn   = $("<div></div>").addClass(PAGENAV),
-                $firstPage  = $('<a></a>').addClass(FIRSTPAGE).append('<span class="fa fa-angle-double-left"></span>'),
-                $prevPage   = $('<a></a>').addClass(PREVPAGE).append('<span class="fa fa-angle-left"></span>'),
-                $nextPage   = $('<a></a>').addClass(NEXTPAGE).append('<span class="fa fa-angle-right"></span>'),
-                $lastPage   = $('<a></a>').addClass(LASTPAGE).append('<span class="fa fa-angle-double-right"></span>'),
-                $numberPage = $("<ul></ul>").addClass(PAGENUMBER);
-
+            lastPage = lastPage>0?lastPage:page;
             this._fourBtn($firstPage,$prevPage,$nextPage,$lastPage,page,lastPage);
-            this._numberPage($numberPage,page,lastPage);
-
-            $pagerBtn.append($firstPage).append($prevPage).append($numberPage).append($nextPage).append($lastPage);
-            return $pagerBtn;
+            $pager.append($firstPage,$prevPage,$nextPage,$lastPage);
+            $prevPage.after(this._numberPage(page,lastPage));
+            $parent.append($pager);
         },
 
         _updatePagerBtn:function(){
@@ -89,16 +79,16 @@
                 page     = parseInt(op.page) || 1,
                 lastPage = Math.ceil(total / pageSize),
 
-                $pagerBtn   = $("." + PAGENAV,this.$pager),
-                $firstPage  = $("." + FIRSTPAGE,$pagerBtn),
-                $prevPage   = $("." + PREVPAGE,$pagerBtn),
-                $nextPage   = $("." + NEXTPAGE,$pagerBtn),
-                $lastPage   = $("." + LASTPAGE,$pagerBtn),
-                $numberPage = $("." + PAGENUMBER,$pagerBtn);
+                $firstPage  = $("." + FIRSTPAGE,this.$pager),
+                $prevPage   = $("." + PREVPAGE,this.$pager),
+                $nextPage   = $("." + NEXTPAGE,this.$pager),
+                $lastPage   = $("." + LASTPAGE,this.$pager),
+
+                $numberPage = $(".number",this.$pager);
 
             this._fourBtn($firstPage,$prevPage,$nextPage,$lastPage,page,lastPage);
-            $numberPage.empty();
-            this._numberPage($numberPage,page,lastPage);
+            $numberPage.remove();
+            $prevPage.after(this._numberPage(page,lastPage));
         },
 
         _fourBtn:function($firstPage,$prevPage,$nextPage,$lastPage,page,lastPage){
@@ -122,45 +112,18 @@
             }
         },
 
-        _numberPage:function($numberPage,page,lastPage){
+        _numberPage:function(page,lastPage){
             var start = page > 2 ? page-2:1,
-                end   = start + 5;
-
-            for(var i=start; i<end; i++){
-                if(i>0 && i<= lastPage){
-                    var $li = $("<li></li>"),
-                        $a  = $("<a></a>").data("page",i).text(i);
-                    i != page ?
-                        $a.addClass("pager-num"):
-                        $a.addClass(STATEDSTATE);
-                    $numberPage.append($li.append($a));
-                }
+                end   = start + 4,
+                numberPage = [];
+            start = lastPage > 4 ? (end > lastPage ? lastPage - 4:start):start;
+            for(var i=start; i<=end && i<=lastPage; i++){
+                var $li = $('<li class="number"></li>').data("page",i),
+                    $a  = $('<a href="javascript:void(0);"></a>').text(i);
+                i != page ? $li.addClass("pager-num"): $li.addClass(ACTIVE);
+                numberPage.push($li.append($a));
             }
-        },
-
-        _updatePagerInfo:function(){
-            var op       = this.options,
-                pageSize = op.pageSize || 10,
-                total    = op.total || 0,
-                page     = parseInt(op.page) || 1,
-                numStart = (page-1) * pageSize + 1,
-                numEnd   = (page-1) * pageSize + op.rowsLen,
-
-                $pager     = this.$pager,
-                $pagerInfo = $("."+PAGEINFO,$pager);
-
-            $pagerInfo.text(numStart + ' - ' + numEnd + ' of ' + total + ' items');
-        },
-
-        _createPagerInfo:function(){
-            var op  = this.options,
-                pageSize  = op.pageSize || 10,
-                total     = op.total || 0,
-                page      = parseInt(op.page) || 1,
-                numStart  = (page-1) * pageSize + 1,
-                numEnd    = (page-1) * pageSize + op.rowsLen;
-
-            return $("<div></div>").addClass(PAGEINFO).text(numStart + ' - ' + numEnd + ' of ' + total + ' items');
+            return numberPage;
         },
 
         _page:function(page){
@@ -169,14 +132,13 @@
             this.options.onPage.call(this,op.page,op.pageSize);
         },
 
-        update:function(page,pageSize,total,rowsLen){
+        update:function(page,pageSize,total){
             var op = this.options;
-            op.total = total;
-            op.rowsLen = rowsLen;
-            op.page = page;
-            op.pageSize = pageSize;
+            op.total = total || op.total;
+            op.page = page || op.page;
+            op.pageSize = pageSize || op.pageSize;
             this._updatePagerBtn();
-            this._updatePagerInfo();
+            this._eventListen();
             op.onUpdate && op.onUpdate(this);
         }
     });

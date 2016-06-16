@@ -46,6 +46,7 @@
             if (op.readonly) {
                 $input = this._readonlyInput($input);
             }
+
             else {
                 $input.on("focus", function () {
                     that.options.onFocus && that.options.onFocus.call(that);
@@ -75,15 +76,15 @@
                 });
             }
             this.$input = $input;
-            $input.addClass(WITH_BTN);
-            this._appendBtn();
+            $input.wrap('<div class="input-group input-group-sm"></div>');
+            this.$input.parent().append(this._appendBtn());
         },
 
         _appendBtn:function(){
             var that         = this,
-                $plusButton  = $('<i class="fa fa-sort-up plus-button"></i>'),
-                $minusButton = $('<i class="fa fa-sort-down minus-button"></i>'),
-                $Buttons     = $('<span class="plus-minus-button"></span>').append($minusButton,$plusButton);
+                $plusButton  = $('<button class="btn btn-xs top"><i class="fa fa-sort-up plus-button"></i></button>'),
+                $minusButton = $('<button class="btn btn-xs bottom"><i class="fa fa-sort-down minus-button"></i></button>'),
+                $Buttons     = $('<div class="input-group-btn btn-group-vertical"></div>').append($plusButton,$minusButton);
 
             $plusButton.click(function(){
                 var val = that.value();

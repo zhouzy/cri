@@ -1,130 +1,3 @@
-/**
- * Eric Meyer's Reset CSS v2.0 (http://meyerweb.com/eric/tools/css/reset/)
- * http://cssreset.com
- */
-html,
-body,
-div,
-span,
-applet,
-object,
-iframe,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-blockquote,
-pre,
-a,
-abbr,
-acronym,
-address,
-big,
-cite,
-code,
-del,
-dfn,
-em,
-img,
-ins,
-kbd,
-q,
-s,
-samp,
-small,
-strike,
-strong,
-sub,
-sup,
-tt,
-var,
-b,
-u,
-i,
-center,
-dl,
-dt,
-dd,
-ol,
-ul,
-li,
-fieldset,
-form,
-label,
-legend,
-table,
-caption,
-tbody,
-tfoot,
-thead,
-tr,
-th,
-td,
-article,
-aside,
-canvas,
-details,
-embed,
-figure,
-figcaption,
-footer,
-header,
-menu,
-nav,
-output,
-ruby,
-section,
-summary,
-time,
-mark,
-audio,
-video {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  font-size: 100%;
-  font: inherit;
-  vertical-align: baseline;
-}
-/* HTML5 display-role reset for older browsers */
-article,
-aside,
-details,
-figcaption,
-figure,
-footer,
-header,
-menu,
-nav,
-section {
-  display: block;
-}
-body {
-  line-height: 1;
-}
-ol,
-ul {
-  list-style: none;
-}
-blockquote,
-q {
-  quotes: none;
-}
-blockquote:before,
-blockquote:after,
-q:before,
-q:after {
-  content: '';
-  content: none;
-}
-table {
-  border-collapse: collapse;
-  border-spacing: 0;
-}
-
 .user-not-select {
   -moz-user-select: none;
   -webkit-user-select: none;
@@ -331,8 +204,6 @@ table {
 }
 .grid {
   color: #666666;
-  border: 1px solid #c8c8c8;
-  background: #f0f0f0;
   position: relative;
 }
 .grid .title {
@@ -347,15 +218,9 @@ table {
   width: 100%;
   position: relative;
   margin: 0;
-  border-collapse: separate;
-  border-spacing: 0;
-  empty-cells: show;
   border-width: 0;
-  outline: 0;
-  height: 100%;
   display: table;
   table-layout: fixed;
-  word-wrap: break-word;
 }
 .grid table td {
   line-height: 24px;
@@ -402,21 +267,16 @@ table {
   overflow-x: hidden;
 }
 .grid .grid-head {
-  height: 30px;
-  border-bottom: 1px solid #c8c8c8;
   -moz-user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
   -khtml-user-select: none;
   user-select: none;
+  border-bottom: 1px solid #c8c8c8;
   cursor: pointer;
 }
 .grid .grid-head .grid-head-wrap {
   overflow: hidden;
-}
-.grid .grid-head td {
-  position: relative;
-  border-right: 1px solid #d5d5d5;
 }
 .grid .grid-head td.line-number div:before {
   content: "#";
@@ -443,13 +303,6 @@ table {
 }
 .grid .grid-body table {
   height: auto;
-}
-.grid .grid-body tr:hover td {
-  color: #FFF;
-  background: #97b7fc;
-}
-.grid .grid-body tr:nth-child(odd) {
-  background: #FFF;
 }
 .grid .grid-body tr.selected td {
   color: #FFF;
@@ -540,7 +393,7 @@ table {
     padding-left: 5px;
   }
 }
-.input-group {
+.input-group-back {
   display: inline-block;
   word-spacing: -1px;
   font-size: 0;
@@ -551,15 +404,15 @@ table {
   height: 26px;
   line-height: 26px;
 }
-.input-group input,
-.input-group .input-btn,
-.input-group label,
-.input-group .plus-minus-button {
+.input-group-back input,
+.input-group-back .input-btn,
+.input-group-back label,
+.input-group-back .plus-minus-button {
   display: inline-block;
   font-size: 12px;
   vertical-align: middle;
 }
-.input-group label {
+.input-group-back label {
   width: 95px;
   padding-right: 5px;
   height: 26px;
@@ -568,7 +421,7 @@ table {
   word-break: normal;
   white-space: nowrap;
 }
-.input-group label.required:after {
+.input-group-back label.required:after {
   content: '*';
   color: red;
   display: inline-block;
@@ -576,7 +429,7 @@ table {
   line-height: 26px;
   margin-left: 5px;
 }
-.input-group .input {
+.input-group-back .input {
   display: inline-block;
   background: #ffffff;
   padding: 5px 8px;
@@ -588,20 +441,20 @@ table {
   border: 1px solid #c8c8c8;
   font-size: 12px;
 }
-.input-group .input.failure {
+.input-group-back .input.failure {
   border: 1px solid #ff5656;
   box-shadow: 0 0 4px 0 #ff6a6a;
   -moz-box-shadow: 0 0 4px 0 #ff6a6a;
   -webkit-box-shadow: 0 0 4px 0 #ff6a6a;
 }
-.input-group .input.with-btn {
+.input-group-back .input.with-btn {
   width: 162px;
   padding-right: 28px;
 }
-.input-group .input.with-btn:focus {
+.input-group-back .input.with-btn:focus {
   border-right-style: none;
 }
-.input-group input {
+.input-group-back input {
   display: inline-block;
   background: #ffffff;
   padding: 5px 8px;
@@ -613,27 +466,27 @@ table {
   border: 1px solid #c8c8c8;
   font-size: 12px;
 }
-.input-group input.failure {
+.input-group-back input.failure {
   border: 1px solid #ff5656;
   box-shadow: 0 0 4px 0 #ff6a6a;
   -moz-box-shadow: 0 0 4px 0 #ff6a6a;
   -webkit-box-shadow: 0 0 4px 0 #ff6a6a;
 }
-.input-group input.with-btn {
+.input-group-back input.with-btn {
   width: 162px;
   padding-right: 28px;
 }
-.input-group input.with-btn:focus {
+.input-group-back input.with-btn:focus {
   border-right-style: none;
 }
-.input-group input:focus {
+.input-group-back input:focus {
   border: 1px solid #97b7fc;
   outline: 0;
   box-shadow: 0 0 6px 1px #97b7fc;
   -moz-box-shadow: 0 0 6px 1px #97b7fc;
   -webkit-box-shadow: 0 0 6px 1px #97b7fc;
 }
-.input-group .readonly {
+.input-group-back .readonly {
   display: inline-block;
   background: #ffffff;
   padding: 5px 8px;
@@ -648,21 +501,21 @@ table {
   vertical-align: middle;
   cursor: pointer;
 }
-.input-group .readonly.failure {
+.input-group-back .readonly.failure {
   border: 1px solid #ff5656;
   box-shadow: 0 0 4px 0 #ff6a6a;
   -moz-box-shadow: 0 0 4px 0 #ff6a6a;
   -webkit-box-shadow: 0 0 4px 0 #ff6a6a;
 }
-.input-group .readonly.with-btn {
+.input-group-back .readonly.with-btn {
   width: 162px;
   padding-right: 28px;
 }
-.input-group .readonly.with-btn:focus {
+.input-group-back .readonly.with-btn:focus {
   border-right-style: none;
 }
-.input-group .button,
-.input-group .plus-minus-button {
+.input-group-back .button,
+.input-group-back .plus-minus-button {
   display: inline-block;
   position: absolute;
   right: 1px;
@@ -685,63 +538,63 @@ table {
   -khtml-user-select: none;
   user-select: none;
 }
-.input-group .button:hover,
-.input-group .plus-minus-button:hover {
+.input-group-back .button:hover,
+.input-group-back .plus-minus-button:hover {
   color: #fff;
   background-color: #e2e2e2;
 }
-.input-group .button:active,
-.input-group .plus-minus-button:active {
+.input-group-back .button:active,
+.input-group-back .plus-minus-button:active {
   color: #fff;
   background-color: #4f7fe8;
 }
-.input-group .button.failure,
-.input-group .plus-minus-button.failure {
+.input-group-back .button.failure,
+.input-group-back .plus-minus-button.failure {
   border-color: #ff5656;
   border-left-color: #c8c8c8;
   box-shadow: 1px 0 6px 0 #ff5656;
   -moz-box-shadow: 1px 0 6px 0 #ff5656;
   -webkit-box-shadow: 1px 0 6px 0 #ff5656;
 }
-.input-group .plus-minus-button {
+.input-group-back .plus-minus-button {
   top: 1px;
 }
-.input-group .plus-minus-button:hover {
+.input-group-back .plus-minus-button:hover {
   color: #666666;
   background-color: #fff;
 }
-.input-group .plus-minus-button:active {
+.input-group-back .plus-minus-button:active {
   color: #666666;
   background-color: #fff;
 }
-.input-group .plus-minus-button i {
+.input-group-back .plus-minus-button i {
   position: absolute;
   display: inline-block;
   width: 18px;
   height: 12px;
   line-height: 20px;
 }
-.input-group .plus-minus-button i:hover {
+.input-group-back .plus-minus-button i:hover {
   color: #fff;
   background-color: #e2e2e2;
 }
-.input-group .plus-minus-button i:active {
+.input-group-back .plus-minus-button i:active {
   color: #fff;
   background-color: #4f7fe8;
 }
-.input-group .plus-minus-button .plus-button {
+.input-group-back .plus-minus-button .plus-button {
   top: 0;
   left: 0;
   right: 0;
   border-bottom: 1px solid #c8c8c8;
 }
-.input-group .plus-minus-button .minus-button {
+.input-group-back .plus-minus-button .minus-button {
   line-height: 6px;
   top: 12px;
   left: 0;
   right: 0;
 }
-.input-group .input-layout {
+.input-group-back .input-layout {
   position: absolute;
   top: 0;
   right: 0;
@@ -813,6 +666,28 @@ table {
   height: 0;
   border-color: transparent transparent #fef5ce transparent;
   border-style: dashed dashed solid dashed ;
+}
+.input-group-btn.btn-group-vertical {
+  height: 30px;
+}
+.input-group-btn.btn-group-vertical > .btn.btn-xs {
+  height: 15px;
+  padding: 0 5px;
+}
+.input-group-btn.btn-group-vertical > .btn.btn-xs.top {
+  margin-left: 0;
+}
+.input-group-btn.btn-group-vertical > .btn.btn-xs.top .fa {
+  position: relative;
+  top: 4px;
+}
+.input-group-btn.btn-group-vertical > .btn.btn-xs.bottom {
+  margin-top: 0;
+  border-bottom-left-radius: 0;
+}
+.input-group-btn.btn-group-vertical > .btn.btn-xs.bottom .fa {
+  position: relative;
+  top: -7px;
 }
 
 .user-not-select {
@@ -1345,20 +1220,6 @@ table {
     padding-left: 5px;
   }
 }
-.timeInputGroup {
-  position: relative;
-  display: inline-block;
-  line-height: 30px;
-  height: 30px;
-  vertical-align: middle;
-  font-size: 0;
-}
-.timeInputGroup .focus {
-  border: 1px solid #383eab !important;
-}
-.timeInputGroup .red {
-  color: red !important;
-}
 .timeBox {
   border: 1px solid #c8c8c8;
   background: #f5f7fa;
@@ -1369,8 +1230,7 @@ table {
   position: absolute;
   left: 80px;
   z-index: 20004;
-  width: 240px;
-  height: 240px;
+  width: 280px;
   display: none;
 }
 .timeBox .titleBar {
@@ -1409,6 +1269,12 @@ table {
   color: #FFF;
   background: #4f7fe8;
 }
+.timeBox input {
+  text-align: center;
+}
+.timeBox .input-group-btn .btn {
+  margin-bottom: 0;
+}
 .timeBox .monthSelect {
   position: absolute;
   top: 3px;
@@ -1436,16 +1302,9 @@ table {
   font-weight: 400;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0) !important;
 }
-.timeBox .year {
-  display: inline-block;
-  width: 30px;
-}
 .timeBox > table {
-  background: #ffffff;
   width: 100%;
   font-size: 12px;
-  border-top: 1px solid #c8c8c8;
-  border-bottom: 1px solid #c8c8c8;
   -moz-user-select: none;
   user-select: none;
 }
@@ -1483,112 +1342,27 @@ table {
   background-clip: content-box;
 }
 .timeBox .HMSBar {
-  height: 30px;
+  height: 35px;
   width: 100%;
   text-align: right;
   font-size: 12px;
 }
-.timeBox .HMSBar .input-group {
-  width: 50px;
-  margin-right: 5px;
-  height: 20px;
-  line-height: 20px;
+.timeBox .HMSBar .col-sm-4 {
+  padding-left: 5px;
+  padding-right: 5px;
 }
-.timeBox .HMSBar .input-group label {
-  display: none;
+.timeBox .HMSBar .col-sm-4:first-child {
+  padding-left: 15px;
 }
-.timeBox .HMSBar .input-group input {
-  width: 15px;
-  padding: 0 25px 0 5px;
-  height: 18px;
-  line-height: 18px;
+.timeBox .HMSBar .col-sm-4:last-child {
+  padding-right: 15px;
 }
-.timeBox .HMSBar .input-group .plus-minus-button {
-  top: 1px;
-  height: 18px;
-  line-height: 18px;
-  border-left-style: none;
-  width: 14px;
-  min-width: 14px;
+.timeBox .HMSBar .input-group-addon {
+  padding-left: 2px;
+  padding-right: 2px;
 }
-.timeBox .HMSBar .input-group .plus-minus-button i {
-  position: absolute;
-  display: inline-block;
-  width: 14px;
-  height: 9px;
-}
-.timeBox .HMSBar .input-group .plus-minus-button .plus-button {
-  top: 0;
-  left: 0;
-  right: 0;
-  border-bottom-style: none;
-  line-height: 14px;
-}
-.timeBox .HMSBar .input-group .plus-minus-button .minus-button {
-  top: 9px;
-  left: 0;
-  right: 0;
-  line-height: 2px;
-}
-.timeBox .HMSInput {
-  position: relative;
-  right: 15px;
-  width: 22px;
-  height: 14px;
-  font-size: 12px;
-  border: 1px solid #aaa;
-  text-indent: 3px;
-  color: #666;
-}
-.timeBox .HMSInput.focus {
-  border: 1px solid #626dbb;
-}
-.timeBox .timeInputOK {
-  width: 40px;
-  height: 22px;
-  line-height: 20px;
-  background: -webkit-linear-gradient(top, #3b52ff, #202973);
-  background: -moz-linear-gradient(top, #3b52ff, #202973);
-  background: -o-linear-gradient(top, #3b52ff, #202973);
-  filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#3b52ff', EndColorStr='#202973');
-  position: absolute;
-  top: 189px;
-  left: 150px;
-  color: white;
-  font-size: 11px;
-  border-radius: 10px 0 0 10px;
-  text-align: center;
-  cursor: pointer;
-}
-.timeBox .timeInputOK.mouseover {
-  background: -webkit-linear-gradient(top, #3edc5f, #1e8934);
-  background: -moz-linear-gradient(top, #3edc5f, #1e8934);
-  background: -o-linear-gradient(top, #3edc5f, #1e8934);
-  filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#3edc5f', EndColorStr='#1e8934');
-}
-.timeBox .timeInputCancel {
-  width: 40px;
-  height: 22px;
-  line-height: 20px;
-  background: -webkit-linear-gradient(top, #3b52ff, #202973);
-  background: -moz-linear-gradient(top, #3b52ff, #202973);
-  background: -o-linear-gradient(top, #3b52ff, #202973);
-  filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#3b52ff', EndColorStr='#202973');
-  position: absolute;
-  top: 189px;
-  left: 190px;
-  color: white;
-  font-size: 11px;
-  border-radius: 0 10px 10px 0;
-  text-align: center;
-  cursor: pointer;
-  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
-}
-.timeBox .timeInputCancel.mouseover {
-  background: -webkit-linear-gradient(top, #f72323, #941717);
-  background: -moz-linear-gradient(top, #f72323, #941717);
-  background: -o-linear-gradient(top, #f72323, #941717);
-  filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#f72323', EndColorStr='#941717');
+.input-group .input-group-btn {
+  padding: 0 3px;
 }
 
 .user-not-select {
