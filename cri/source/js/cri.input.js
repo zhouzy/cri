@@ -81,7 +81,6 @@
                 $inputGroup.append($inputGroupBtn);
                 this._button($inputGroupBtn);
             }
-
             this.$input = $input;
         },
 
