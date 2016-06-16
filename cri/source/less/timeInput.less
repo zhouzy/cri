@@ -74,16 +74,10 @@
         font-weight: 400;
         text-shadow: 0 1px 0 rgba(255, 255, 255, 0) !important;
     }
-    .year {
-        //display:inline-block;
-        //width:30px;
-    }
+
     & > table {
-        //background:@color-timeinput-timebox-bg;
         width: 100%;
         font-size: 12px;
-        //border-top:1px solid @color-border;
-        //border-bottom:1px solid @color-border;
         -moz-user-select: none;
         user-select: none;
         tr{
@@ -136,13 +130,23 @@
             &:last-child{
                 padding-right:15px;
             }
+            input{
+                padding-left:0;
+                padding-right:0;
+            }
         }
         .input-group-addon{
             padding-left:2px;
             padding-right:2px;
         }
+        .input-group-btn.btn-group-vertical{
+            .top,.bottom{
+                width:20px;
+                padding:0;
+            }
+        }
+
     }
 }
 .input-group .input-group-btn{
-    padding:0 3px;
 }

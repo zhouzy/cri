@@ -441,17 +441,17 @@
     };
 
     $.fn.timeInput = function (option) {
-        var o = null;
+        var widget = null;
         this.each(function () {
             var $this = $(this),
                 options = typeof option == 'object' && option;
-            o = $this.data('timeInput');
-            if(o != null){
-                o._destroy();
+            widget = $this.data('widget');
+            if(widget != null){
+                widget._destroy();
             }
-            $this.data('timeInput', (o = new TimeInput(this, options)));
+            $this.data('widget', (widget = new TimeInput(this, options)));
         });
-        return o;
+        return widget;
     };
 
 }(window);

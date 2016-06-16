@@ -1257,17 +1257,15 @@
         _create:function(){
             var op = this.options,
                 iconCls = op.iconCls || '',
-                $e = this.$element.hide(),
-                text = op.text || $e.text() || $e.val() || '',
-                $icon = '<span class="icon"><i class="' + iconCls + '"></i></span>',
-                buttonText = '<span class="text">'+text+'</span>';
+                $e = this.$element,
+                $icon = '<span class="icon"><i class="' + iconCls + '"></i></span>';
 
-            $e.wrap('<div class="'+ BUTTON + '"></div>');
-            this.$button = $e.parent();
-            this.$button.append($icon, buttonText);
+            $e.addClass(BUTTON);
+            $e.prepend($icon);
             if(!op.enable){
                 this.disable();
             }
+            this.$button = $e;
         },
 
         /**
@@ -1275,7 +1273,12 @@
          * @param text
          */
         text:function(text){
-            this.$button.find('text').text(text);
+            var $icon = this.$button.find('span.icon').clone();
+            this.$button.empty();
+            if($icon.length){
+                this.$button.append($icon);
+            }
+            this.$button.append(text);
         },
 
         /**
@@ -1283,7 +1286,7 @@
          * @param className
          */
         iconCls:function(className){
-            this.$button.find('.icon i').attr('class',className);
+            this.$button.find('span.icon i').attr('class',className);
         },
 
         enable:function(){
@@ -1303,12 +1306,12 @@
         var o = null;
         this.each(function () {
             var $this   = $(this),
-                button  = $this.data('button'),
+                button  = $this.data('widget'),
                 options = typeof option == 'object' && option;
-            if(button != null){
+            if(button != null && button instanceof Button){
                 button._destroy();
             }
-            $this.data('button', (o = new Button(this, options)));
+            $this.data('widget', (o = new Button(this, options)));
         });
         return o;
     };
@@ -1662,9 +1665,8 @@
         required:false
     };
 
-    var INPUT_GROUP = "form-group",
-        ERROR_MSG_HEIGHT = 23,//验证消息框高度
-        WITH_BTN    = "with-btn";
+    var INPUT_GROUP    = "form-group",
+        INPUT_SELECTOR = ":input:not(:button,[type=submit],[type=reset],[disabled])";
 
     var Input = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
@@ -1676,7 +1678,12 @@
 
     $.extend(Input.prototype,{
         _eventListen:function(){
-
+            var that = this;
+            this.$element.on("focus",function(){
+                that.options.onFocus && that.options.onFocus.call(that);
+            }).blur(function(){
+                that.options.onBlur && that.options.onBlur.call(that);
+            });
         },
 
         _init:function(){
@@ -1704,11 +1711,7 @@
             var that = this,
                 op   = that.options,
                 $input = this.$element;
-            $input.addClass('form-control').on("focus",function(){
-                that.options.onFocus && that.options.onFocus.call(that);
-            }).blur(function(){
-                that.options.onBlur && that.options.onBlur.call(that);
-            });
+            $input.addClass('form-control');
 
             if(op.readonly){
                 $input.prop('readonly',true);
@@ -1721,20 +1724,18 @@
                 $inputGroup.append($inputGroupBtn);
                 this._button($inputGroupBtn);
             }
-
             this.$input = $input;
         },
 
         _button:function($p){
-            var that = this,
-                btOpt = this.options.button,
-                tx = btOpt.text || '',
-                $i = $('<i class="'+btOpt.iconCls+'">'+tx+'</i>'),
-                $btn = $('<button type="button" class="btn btn-xs btn-fab-mini"></button>');
+            var button = this.options.button,
+                text   = button.text || '',
+                $i     = $('<i class="' + button.iconCls + '">' + text + '</i>'),
+                $btn   = $('<button type="button" class="btn btn-fab-mini"></button>');
             $btn.append($i);
             this.button = $p.append($btn);
             $btn.click(function(){
-                btOpt.handler && btOpt.handler.call();
+                button.handler && button.handler.call();
             });
         },
 
@@ -1746,7 +1747,7 @@
                 "",
                 $input = this.$element;
             if(label.length){
-                var $label = $('<label class="control-label col-sm-4"></label>').text(label);
+                var $label = $('<label class="control-label col-sm-4">' + label + '</label>');
                 if(this.options.required){
                     $label.addClass('required');
                 }
@@ -1769,28 +1770,9 @@
             if(value == null){
                 return ;
             }
-            if(this.$input.is("input")){
+            if(this.$input.is(INPUT_SELECTOR)){
                 this.$input.val(value);
                 this.$input.change();
-            }else{
-                if(this.$element.is("select")){
-                    this.$element.val(value);
-                    if(this.$element.attr("multiple")){
-                        var text = [];
-                        this.$element.find("option:selected").each(function(){
-                            text.push($(this).text());
-                        });
-                        this.$input.text(text.join(","));
-                    }
-                    else{
-                        this.$input.text(this.$element.find("option:selected").text());
-                    }
-                }
-                else{
-                    this.$element.val(value);
-                    this.$input.text(value);
-                }
-                this.$element.change();
             }
         },
 
@@ -1820,27 +1802,17 @@
         },
 
         /**
-         * 返回input的button对象
-         */
-        getButton:function(){
-            return this.button;
-        },
-
-        /**
          * 使输入框不能用
          */
         disable:function(){
-            var $layout = $('<div class="input-layout"></div>');
-            if(this.$inputGroup.has(".input-layout").length == 0){
-                this.$inputGroup.append($layout);
-            }
+            this.$element.prop('disabled',true);
         },
 
         /**
          * 使输入框可用
          */
         enable:function(){
-            this.$inputGroup.children(".input-layout").remove();
+            this.$element.prop('disabled',false);
         },
 
         value:function(value){
@@ -1855,21 +1827,25 @@
     cri.Input = Input;
 
     $.fn.input = function(option) {
-        var o = null;
+        var widget = null;
         this.each(function () {
             var $this   = $(this),
-                input   = $this.data('input'),
                 options = typeof option == 'object' && option,
                 role    = $this.attr("role");
-            if(role == "timeInput"){
-                return input;
+            widget = $this.data('widget');
+
+            if(widget != null){
+                if(widget instanceof Input){
+                    widget._destroy();
+                }
+                else if(widget instanceof cri.TimeInput){
+                    widget = null;
+                    return ;
+                }
             }
-            if(input != null){
-                input._destroy();
-            }
-            $this.data('input', (o = new Input(this, options)));
+            $this.data('widget', (widget = new Input(this, options)));
         });
-        return o;
+        return widget;
     };
 }(window);
 
@@ -2076,7 +2052,8 @@
         enable:true,
         required:false,
         max:null,
-        min:null
+        min:null,
+        button:{}
     };
 
     var NumberInput = cri.Input.extend(function(element,options){
@@ -2088,56 +2065,42 @@
 
     $.extend(NumberInput.prototype,{
         _eventListen:function(){
-
+            var that = this,
+                op   = that.options;
+            this.$element.on("focus", function () {
+                op.onFocus && op.onFocus.call(that);
+            }).on('blur',function () {
+                op.onBlur && op.onBlur.call(that);
+                if(op.min != null){
+                    var val = that.$element.val();
+                    if(val == "" || val < op.min){
+                        that.value(that.options.min);
+                    }
+                }
+                if(that.options.max != null){
+                    var val = that.$element.val();
+                    if(val == "" || val > op.max){
+                        that.value(that.options.max);
+                    }
+                }
+            }).on("change",function(){
+                op.onChange && op.onChange.call(that);
+            }).on("keydown",function(e){
+                var keycode = e.keyCode || e.which || e.charCode;
+                if((keycode>=48 && keycode<=57) || keycode == 8){
+                    return true;
+                }
+                else{
+                    return false;
+                }
+            });
         },
 
-        _wrapInput:function() {
-            var that   = this,
-                op     = that.options,
-                $input = that.$element;
-            if (op.readonly) {
-                $input = this._readonlyInput($input);
-            }
-
-            else {
-                $input.on("focus", function () {
-                    that.options.onFocus && that.options.onFocus.call(that);
-                }).blur(function () {
-                    that.options.onBlur && that.options.onBlur.call(that);
-                    if(that.options.min != null){
-                        var val = that.$element.val();
-                        if(val == "" || val < that.options.min){
-                            that.value(that.options.min);
-                        }
-                    }
-                    if(that.options.max != null){
-                        var val = that.$element.val();
-                        if(val == "" || val > that.options.max){
-                            that.value(that.options.max);
-                        }
-                    }
-                }).on("change",function(){
-                    that.options.onChange && that.options.onChange.call(that);
-                }).on("keydown",function(e){
-                    var keycode = e.keyCode || e.which || e.charCode;
-                    if((keycode>=48 && keycode<=57) || keycode == 8){
-                        return true;
-                    }else{
-                        return false;
-                    }
-                });
-            }
-            this.$input = $input;
-            $input.wrap('<div class="input-group input-group-sm"></div>');
-            this.$input.parent().append(this._appendBtn());
-        },
-
-        _appendBtn:function(){
+        _button:function($p){
             var that         = this,
-                $plusButton  = $('<button class="btn btn-xs top"><i class="fa fa-sort-up plus-button"></i></button>'),
-                $minusButton = $('<button class="btn btn-xs bottom"><i class="fa fa-sort-down minus-button"></i></button>'),
-                $Buttons     = $('<div class="input-group-btn btn-group-vertical"></div>').append($plusButton,$minusButton);
-
+                $plusButton  = $('<a href="#" class="top"><i class="fa fa-sort-up plus-button"></i></a>'),
+                $minusButton = $('<a href="#" class="bottom"><i class="fa fa-sort-down minus-button"></i></a>');
+            $p.addClass('btn-group-vertical');
             $plusButton.click(function(){
                 var val = that.value();
                 if(cri.isNum(val)){
@@ -2156,7 +2119,7 @@
                     that.value(parseInt(val,10) - 1);
                 }
             });
-            this.$input.after($Buttons);
+            $p.append($plusButton,$minusButton);
         },
         value:function(value){
             if(arguments.length>0){
@@ -2176,18 +2139,18 @@
     cri.NumberInput = NumberInput;
 
     $.fn.numberInput = function(option) {
-        var o = null;
+        var widget;
         this.each(function () {
             var $this   = $(this),
-                input   = $this.data('numberInput'),
                 options = typeof option == 'object' && option,
                 role    = $this.attr("role");
-            if(input != null){
-                input._destroy();
+            widget = $this.data('widget');
+            if(widget != null && widget instanceof NumberInput){
+                widget._destroy();
             }
-            $this.data('numberInput', (o = new NumberInput(this, options)));
+            $this.data('widget', (widget = new NumberInput(this, options)));
         });
-        return o;
+        return widget;
     };
 }(window);
 
@@ -3821,17 +3784,17 @@
     };
 
     $.fn.timeInput = function (option) {
-        var o = null;
+        var widget = null;
         this.each(function () {
             var $this = $(this),
                 options = typeof option == 'object' && option;
-            o = $this.data('timeInput');
-            if(o != null){
-                o._destroy();
+            widget = $this.data('widget');
+            if(widget != null){
+                widget._destroy();
             }
-            $this.data('timeInput', (o = new TimeInput(this, options)));
+            $this.data('widget', (widget = new TimeInput(this, options)));
         });
-        return o;
+        return widget;
     };
 
 }(window);
