@@ -21,7 +21,8 @@
         data:null,  //Array [{value:"",text:""},{value:"",text:""}]
         change:null, //Function: call back after select option
         value:null,
-        enable:true
+        enable:true,
+        multiple:false
     };
 
     var SelectBox = cri.Widgets.extend(function(element,options){
@@ -46,6 +47,7 @@
 
         _create:function(){
             this.$element.hide();
+            this.options.multiple && this.$element.attr('multiple','multiple');
             this.$element.wrap('<span class="' + SELECTBOX_GROUP + '"></span>');
             this.$selectBoxGroup = this.$element.parent();
             this._createInput();
@@ -72,8 +74,19 @@
             var that = this;
             this.listView = new ListView(this.$selectBoxGroup,{
                 data:that._data(),
-                onChange:function(value){
-                    that.value(value);
+                multiple:that.options.multiple,
+                onChange:function(value,text){
+                    if(that.options.multiple) {
+                        that._value = value;
+                        that._text  = text;
+                        that.input.value(value);
+                    }
+                    else{
+                        that._value = value[0];
+                        that._text  = text;
+                        that.input.value(value[0]);
+                    }
+                    that.options.change && that.options.change.call(that);
                 }
             });
         },
@@ -141,11 +154,15 @@
          * @private
          */
         _showValidateMsg: function(errorMsg){
-            this.input._showValidateMsg(errorMsg);
+            this.input && this.input._showValidateMsg(errorMsg);
         },
 
+        /**
+         * 隐藏errorMsg 异常异常
+         * @private
+         */
         _hideValidateMsg: function(){
-            this.input._hideValidateMsg();
+            this.input && this.input._hideValidateMsg();
         },
 
         /**
@@ -180,11 +197,10 @@
          */
         value:function(value){
             if(arguments.length>0){
-                if(value == this._value){
-                    return ;
+                if(this.options.multiple && !cri.isArray(value)){
+                    value = value.split(',');
                 }
                 this._value = value;
-                this._text  = this._getTextByValue(value);
                 this.input.value(this._value);
                 this.listView.select(this._value);
                 this.options.change && this.options.change.call(this);
@@ -202,9 +218,17 @@
         text:function(text){
             var data = this.options.data;
             if(arguments.length>0){
+                if(this.options.multiple && !cri.isArray(text)){
+                    text = text.split(',');
+                }
+                this._text = text;
+                this._value = [];
                 for(var i= 0,len = data.length;i<len;i++){
-                    if(data[i].text === text){
-                        this.value(data[i].value);
+                    for(var j= 0,len=text.length;j<len;j++){
+                        if(data[i].text === text[j]){
+                            this._value.push(data[i].value);
+                            break;
+                        }
                     }
                 }
             }
@@ -239,13 +263,14 @@
     var ListView = function($parent,options){
         this.options = $.extend({
             data:[],
-            onChange:null
+            onChange:null,
+            multiple:false
         },options);
         this.value = options.value || null;//下拉框初始值
+        this.text = null;
         this.$options = null;
         this.$parent = $parent;
         this._init();
-        this.text = null;
     };
 
     ListView.prototype = {
@@ -255,13 +280,38 @@
          * @private
          */
         _init:function(){
-            var data = this.options.data;
-            var $options = this.$options = $('<ul class="' + OPTIONS + '"></ul>');
+            var that = this,
+                data = this.options.data,
+                $options = this.$options = $('<ul class="' + OPTIONS + '"></ul>'),
+                selectedQuery = "."+SELECTED;
             if(data){
                 for(var i = 0,len = data.length; i<len; i++){
                     $options.append(this._createOption(data[i]));
                 }
             }
+            $options.find('li').on('click',function(){
+                var $this = $(this);
+                var texts = [];
+                var values = [];
+                if(that.options.multiple){
+                    $this.toggleClass(SELECTED);
+                }
+                else if(!$this.is(selectedQuery)){
+                    $options.find(selectedQuery).removeClass(SELECTED);
+                    $this.addClass(SELECTED);
+                    that.toggle();
+                }
+                else{
+                    return false;
+                }
+                $options.find('li'+selectedQuery).each(function(){
+                    values.push(this.getAttribute("data-value"));
+                    texts.push(this.innerHTML);
+                });
+                that.value = values;
+                that.text = texts;
+                that._change();
+            });
             $('body').append($options.hide());
         },
 
@@ -271,20 +321,7 @@
          * @private
          */
         _createOption:function(option){
-            var $li = $('<li></li>').text(option.text),
-                that = this;
-            $li.on("click",function(){
-                if(!$li.is("." + SELECTED)){
-                    $("li."+SELECTED,that.$options).removeClass(SELECTED);
-                    $li.addClass(SELECTED);
-                    that.text = option.text;
-                    that.value = option.value;
-                    that._change();
-                }
-                that.toggle();
-            });
-            that.value == option.value && $li.addClass(SELECTED);
-            return $li;
+            return $('<li data-value="'+option.value+'">'+option.text+'</li>');
         },
 
         /**
@@ -323,17 +360,18 @@
             this.options.onChange && this.options.onChange.call(this,this.value,this.text);
         },
 
+        /**
+         * 根据值设置下拉面板的选择项
+         * @param value []
+         */
         select:function(value){
             var data = this.options.data;
             var $options = this.$options;
+            value = cri.isArray(value) || [value];
             if(data){
-                for(var i = 0,len = data.length; i<len; i++){
-                    if(value == data[i].value){
-                        this.value = value;
-                        $options.children().removeClass(SELECTED);
-                        $options.children().eq(i).addClass(SELECTED);
-                        return ;
-                    }
+                $options.children().removeClass(SELECTED);
+                for (var i in value){
+                    $options.find('li[data-value='+value[i]+']').addClass(SELECTED);
                 }
             }
         },
