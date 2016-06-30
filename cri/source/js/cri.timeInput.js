@@ -29,7 +29,7 @@
 
     var _defaultOptions = {
         value:null,
-        format:"yyyy/MM/dd hh:mm:ss",
+        format:"yyyy/MM/dd",
         HMS:false,
         enable:true
     };
@@ -44,10 +44,9 @@
     });
 
     TimeInput.prototype._init = function(){
-        if(!this.options.HMS && this.options.format){
-            this.options.format = this.options.format.replace(/\s*[Hh].*$/,"");
+        if(this.options.format && /hh|ss/.test(this.options.format)){
+            this.options.HMS = true;
         }
-
         this.date = this.options.value || new Date();
 
         if(!(this.date instanceof Date)){

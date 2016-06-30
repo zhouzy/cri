@@ -42,13 +42,7 @@
             inputQuery = ":input:not(:button,[type=submit],[type=reset],[disabled])",
             selectQuery = "select";
         $(inputQuery,$form).each(function(){
-            var role = $(this).attr('data-role');
-            if(role && role == 'timeInput'){
-                this.name && (o[this.name] = $(this).data("timeInput").getFormatValue());
-            }
-            else{
-                this.name && (o[this.name] = $(this).val());
-            }
+            this.name && (o[this.name] = $(this).val());
         });
         $(selectQuery,$form).each(function(){
             var role = $(this).attr('data-role');
@@ -1731,7 +1725,7 @@
             var button = this.options.button,
                 text   = button.text || '',
                 $i     = $('<i class="' + button.iconCls + '">' + text + '</i>'),
-                $btn   = $('<button type="button" class="btn btn-fab-mini"></button>');
+                $btn   = $('<button type="button" class="btn btn-fab-mini btn-xs"></button>');
             $btn.append($i);
             this.button = $p.append($btn);
             $btn.click(function(){
@@ -3372,7 +3366,7 @@
 
     var _defaultOptions = {
         value:null,
-        format:"yyyy/MM/dd hh:mm:ss",
+        format:"yyyy/MM/dd",
         HMS:false,
         enable:true
     };
@@ -3387,10 +3381,9 @@
     });
 
     TimeInput.prototype._init = function(){
-        if(!this.options.HMS && this.options.format){
-            this.options.format = this.options.format.replace(/\s*[Hh].*$/,"");
+        if(this.options.format && /hh|ss/.test(this.options.format)){
+            this.options.HMS = true;
         }
-
         this.date = this.options.value || new Date();
 
         if(!(this.date instanceof Date)){

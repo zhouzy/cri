@@ -88,7 +88,7 @@
             var button = this.options.button,
                 text   = button.text || '',
                 $i     = $('<i class="' + button.iconCls + '">' + text + '</i>'),
-                $btn   = $('<button type="button" class="btn btn-fab-mini"></button>');
+                $btn   = $('<button type="button" class="btn btn-fab-mini btn-xs"></button>');
             $btn.append($i);
             this.button = $p.append($btn);
             $btn.click(function(){
