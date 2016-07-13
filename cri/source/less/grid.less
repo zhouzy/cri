@@ -27,42 +27,48 @@
         display:table;
         table-layout:fixed;
         //word-wrap:break-word;
-        td{
-            line-height: 24px;
-            height: 24px;
-            padding:3px 4px;
-            overflow: hidden;
-            white-space: nowrap;
-            vertical-align: middle;
-            text-overflow: ellipsis;
-            .user-not-select;
-            &.line-number{
-                text-align:center;
-            }
-
-            &:last-child{
-                border-right: none;
-            }
-
-            input{
-                vertical-align:middle;
-            }
-
-            .td-content{
-                position:relative;
-                display:inline-block;
-                height:24px;
+        tr{
+            td{
                 line-height: 24px;
-                width:100%;
-                vertical-align: top;
-                .filter-icon{
-                    position:absolute;
-                    right:5px;
-                    top:50%;
-                    margin-top:-6px;
-                    color:#888;
-                    &:hover{
-                        color:#000;
+                height: 24px;
+                padding:3px 4px;
+                overflow: hidden;
+                white-space: nowrap;
+                vertical-align: middle;
+                text-overflow: ellipsis;
+                .user-not-select;
+                &:first-child{
+                    border-left-width:0;
+                }
+
+                &.line-number{
+                    text-align:center;
+                }
+
+                &:last-child{
+                    border-right: none;
+                }
+
+                input{
+                    vertical-align:middle;
+                }
+
+                .td-content{
+                    position:relative;
+                    display:inline-block;
+                    height:24px;
+                    line-height: 24px;
+                    width:100%;
+                    vertical-align: top;
+                    .filter-icon{
+                        position:absolute;
+                        right:5px;
+                        top:50%;
+                        margin-top:-6px;
+                        color:#888;
+                        &:hover{
+                            color:#000;
+                        }
                     }
                 }
             }
@@ -158,5 +164,9 @@
                 text-align:center;
             }
         }
+    }
+    .panel-footer{
+        padding:5px;
+        text-align:right;
     }
 }
