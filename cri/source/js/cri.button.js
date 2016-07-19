@@ -40,6 +40,13 @@
             this._create();
         },
 
+        _reInit:function(options){
+            this.options = $.extend(this.options,options);
+            this.text(this.options.text);
+            this.iconCls(this.options.iconCls);
+            this.options.enable ? this.enable() : this.disable();
+        },
+
         _create:function(){
             var op = this.options,
                 iconCls = op.iconCls || '',
@@ -59,12 +66,14 @@
          * @param text
          */
         text:function(text){
-            var $icon = this.$button.find('span.icon').clone();
-            this.$button.empty();
-            if($icon.length){
-                this.$button.append($icon);
+            if(text.length){
+                var $icon = this.$button.find('span.icon').clone();
+                this.$button.empty();
+                if($icon.length){
+                    this.$button.append($icon);
+                }
+                this.$button.append(text);
             }
-            this.$button.append(text);
         },
 
         /**
@@ -95,7 +104,9 @@
                 button  = $this.data('widget'),
                 options = typeof option == 'object' && option;
             if(button != null && button instanceof Button){
-                button._destroy();
+                button._reInit(option);
+                o = button;
+                return false;
             }
             $this.data('widget', (o = new Button(this, options)));
         });

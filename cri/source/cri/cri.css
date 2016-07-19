@@ -1306,6 +1306,18 @@
   -webkit-box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
+.window.modal-window {
+  background: rgba(220, 220, 220, 0.8);
+  z-index: 10000;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+}
+.window.modal-window .panel {
+  position: fixed;
+  z-index: 100001;
+}
 .window .window-head {
   position: relative;
   -moz-user-select: none;
@@ -1453,14 +1465,4 @@
   left: 0 !important;
   width: auto !important;
   height: auto !important;
-}
-.overlay {
-  background-color: #bdbdbd;
-  position: fixed;
-  z-index: 10000;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  top: 0;
-  opacity: .5;
 }

@@ -62,7 +62,7 @@
 
     var _defaultOptions = {
         title:"",
-        actions:["Close","Minimize","Maximize"],//Colse:关闭,Minimize:最下化,Maximize:最大化
+        actions:["Close","Maximize"],//Colse:关闭,Minimize:最下化,Maximize:最大化
         content:null,
         isIframe:false,
         visible:true,
@@ -90,10 +90,9 @@
         cri.Widgets.apply(this,arguments);
         this.windowStack.push(this);
         this.toFront();
-        this.$element.attr('data-role','treegrid');
+        this.$element.attr('data-role','window');
         if(!this.options.visible){
             this.$window.hide();
-            this._hideMask();
         }
     });
 
@@ -116,10 +115,10 @@
             var that = this;
             if(this.options.dragable){
                 this.$window.on("mousedown",".window-head",function(e){
-                    var left     = +that.$window.css("left").split("px")[0],
-                        top      = +that.$window.css("top").split("px")[0],
-                        width    = +that.$window.width(),
-                        height   = +that.$window.height(),
+                    var left     = +that._$panel.css("left").split("px")[0],
+                        top      = +that._$panel.css("top").split("px")[0],
+                        width    = +that._$panel.width(),
+                        height   = +that._$panel.height(),
                         startX   = e.pageX,
                         startY   = e.pageY;
                     $(document).on("mousemove",function(e){
@@ -145,10 +144,10 @@
                     that.toFront();
                 })
                 .on("mousedown",".window-resizer",function(e){
-                    var left     = +that.$window.css("left").split("px")[0],
-                        top      = +that.$window.css("top").split("px")[0],
-                        width    = +that.$window.width(),
-                        height   = +that.$window.height(),
+                    var left     = +that._$panel.css("left").split("px")[0],
+                        top      = +that._$panel.css("top").split("px")[0],
+                        width    = +that._$panel.width(),
+                        height   = +that._$panel.height(),
                         startX   = e.pageX,
                         startY   = e.pageY,
                         resizer  = /[ewsn]+$/.exec(this.className)[0];
@@ -190,58 +189,69 @@
             var op = this.options;
             op.width = parseWidth(op.width,$(window).width()) - WINDOW_BORDER*2;
             op.height = parseHeight(op.height,$(window).height()) - WINDOW_BORDER*2;
-
-            this._createBody();
-            this._createHead();
-
+            this._createWindow();
             op.resizable && this._createResizeHandler();
             $("body").append(this.$window);
-            this.$element.show();
-
             if(op.visible){
                 this.$window.show();
             }else{
                 this.$window.hide();
             }
-        },
-
-        /**
-         * 生成window 头部
-         * @private
-         */
-        _createHead : function(){
-            var $windowHead = $('<div class="' + WINDOW_HEAD + ' panel-heading"></div>');
-            $windowHead.append(this._createTitle()).append(this._createActions());
-            this.$window.prepend($windowHead);
-            this.$windowHead = $windowHead;
+            this.$element.show();
         },
 
         /**
          * 包装window 内容部分
          * @private
          */
-        _createBody : function(){
+        _createWindow : function(){
+            var op = this.options;
+            var $window = this.$window = $('<div class="window"></div>');
+            if(op.modal){
+                $window.addClass('modal-window');
+                this._$panel = $('<div class="panel panel-default"></div>');
+                $window.append(this._$panel);
+            }
+            else{
+                this._$panel = this.$window.addClass('panel panel-default');
+            }
+
+            this._createWindowHead();
+            this._createWindowBody();
+            this.load(this.options.content);
+        },
+
+        /**
+         * 生成window 头部
+         * @private
+         */
+        _createWindowHead : function(){
+            var $windowHead = $('<div class="' + WINDOW_HEAD + ' panel-heading"></div>');
+            $windowHead.append(this._createTitle()).append(this._createActions());
+            this._$panel.prepend($windowHead);
+            this.$windowHead = $windowHead;
+        },
+
+        /**
+         * 生成window内容区域
+         * @private
+         */
+        _createWindowBody : function(){
             var that         = this,
                 op           = this.options,
                 viewWidth    = $(window).width(),
                 viewHeight   = $(window).height(),
                 $element     = this.$element,
-                $window      = $('<div class="window panel panel-default"></div>'),
                 $windowBody  = $('<div class="window-content"></div>');
             var $placeHolder = this.$elementPlaceHolder = $('<div style="display:none"></div>');
             $element.after($placeHolder);
             $element.detach();
-            this.$window = $window;
             if(op.center){
                 op.position.left = (viewWidth - op.width - 2*WINDOW_BORDER) / 2;
                 op.position.top  = (viewHeight - op.height - 2*WINDOW_BORDER) / 2;
             }
             this._setPosition({top:op.position.top,left:op.position.left,width:op.width,height:op.height});
-            //$windowBody.height(op.height-35);
-            $window.append($windowBody);
-            $windowBody.append($element);
-            $("body").append(this.$window);
-            this.load(this.options.content);
+            this._$panel.append($windowBody.append($element));
         },
 
         /**
@@ -263,7 +273,7 @@
         _createActions : function(){
             var options = this.options,
                 $buttons = $("<div></div>").addClass("actions"),
-                defaultButtons = options.modal ? ["Maximize","Close"]:["Minimize","Maximize","Close"];
+                defaultButtons = options.modal ? ["Maximize","Close"]:["Maximize","Close"];
 
             for(var i = 0, len = defaultButtons.length; i<len; i++){
                 var defBtn = defaultButtons[i];
@@ -290,34 +300,7 @@
             $.each(resizer.split(" "),function(index,value){
                 resizerHandler.push('<div class="window-resizer window-resizer-' + value + '" style="display: block;"></div>');
             });
-            this.$window.append(resizerHandler.join(""));
-        },
-
-        /**
-         * 模态窗口显示遮罩
-         * @param z
-         * @private
-         */
-        _showMask : function(z){
-            var $mask = Window.prototype.mask;
-            if($mask){
-                $mask.css("zIndex",z).show();
-                $('body').css('overflow','hidden');
-            }
-            else{
-                $mask = Window.prototype.mask = $("<div></div>").addClass("overlay").css("zIndex",z);
-                $("body").append($mask).css('overflow','hidden');
-            }
-        },
-
-        /**
-         * 隐藏遮罩
-         * @private
-         */
-        _hideMask : function(){
-            var $mask = Window.prototype.mask;
-            $mask && $mask.hide();
-            $('body').css('overflow','auto');
+            this._$panel.append(resizerHandler.join(""));
         },
 
         /**
@@ -326,8 +309,7 @@
          * @private
          */
         _setPosition : function(position){
-            var $window = this.$window;
-            $window.css(position);
+            this._$panel.css(position);
             this.options.position = position;
         },
 
@@ -354,9 +336,10 @@
         _setStyleByStatus : function(status){
             var op    = this.options,
                 pos   = op.position,
-                KLASS = {minimize:"window mini-window panel panel-default",maximize:"window maxi-window panel panel-default",closed:"window panel panel-default",normal:"window panel panel-default"},
+                KLASS = {minimize:"mini-window",maximize:"maxi-window",closed:"",normal:""},
                 style = {width:op.width,height:op.height,left:pos.left,top:pos.top,bottom:"auto",right:"auto"};
-            this.$window.prop("class",KLASS[status]).css(style);
+            this.$window.removeClass('mini-window').removeClass('maxi-window').addClass(KLASS[status]);
+            this._$panel.css(style);
         },
 
         /**
@@ -418,22 +401,24 @@
          */
         open:function(){
             this._setStyleByStatus("normal");
-            this.$window.show();
             this.toFront();
             this.windowStatus = "normal";
+            this.$window.show();
             this.options.onOpen && this.options.onOpen.call(this);
         },
 
         /**
          * 销毁当前窗口
          */
-        close : function(){
+        close:function(){
             this.options.onClose && this.options.onClose.call(this);
+            this.$window.hide();
+            /*
             this._destroy();
-            this._hideMask();
             if(this.windowStack.length){
                 this.windowStack[this.windowStack.length-1].toFront();
             }
+            */
         },
 
         /**
@@ -487,7 +472,6 @@
          * 把当前窗口顶至最前
          */
         toFront:function(){
-            this._hideMask();
             var stack = this.windowStack;
             var index = stack.indexOf(this);
             stack.splice(index,1);
@@ -499,7 +483,6 @@
                         j<i?stack[j].$window.css('zIndex',ZINDEX+j):
                             stack[j].$window.css('zIndex',ZINDEX+j+1);
                     }
-                    this._showMask(ZINDEX+i);
                     break;
                 }
                 else{
