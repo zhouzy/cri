@@ -2,32 +2,24 @@
 @import "theme-default.less";
 
 .window{
-    background-color: @color-window-bg;
     color: @color-window-font;
     display: inline-block;
     position:fixed;
     z-index: 10001;
-    border: solid 1px @color-window-border;
     min-width: 140px;
 	min-height: 35px;
     top:5px;
     left:5px;
+    margin-bottom:0;
     .rounded-corners(4px);
-    .box-shadow(1px,1px,7px,1px,darken(@color-window-bg,40%));
+    -webkit-box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     .window-head{
         position:relative;
-        height:24px;
-        line-height:24px;
-        padding:5px 0;
-        font-size:1.2em;
-        background:@color-window-head-bg;
-        border-bottom: solid 1px @color-window-border;
         .user-not-select;
+        padding-right:200px;
         .title{
             display:inline-block;
-            position:absolute;
-            right:100px;
-            left:5px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -40,10 +32,10 @@
             .action{
                 display:inline-block;
                 cursor:pointer;
-                .rounded-corners(10px);
-                line-height: 20px;
-                height:20px;
-                width:20px;
+                .rounded-corners(15px);
+                line-height: 30px;
+                height:30px;
+                width:30px;
                 margin-right:2px;
                 text-align:center;
                 font-size: 10px;
@@ -61,8 +53,10 @@
         }
     }
     .window-content{
-        background:@color-window-bg;
         overflow: auto;
+        padding-top:46px;
+        margin-top:-46px;
+        height:100%;
     }
     .window-resizer{
         position: absolute;
@@ -166,14 +160,13 @@
     height:auto !important;
 }
 .overlay{
-    background-color:darken(@color-window-bg,80%);
+    background-color:darken(@color-window-bg,20%);
     position:fixed;
     z-index: 10000;
     left:0;
     right:0;
     bottom:0;
     top:0;
-    filter: alpha(opacity=50);
     opacity: .5;
 }
 

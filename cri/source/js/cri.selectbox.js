@@ -48,10 +48,10 @@
         _create:function(){
             this.$element.hide();
             this.options.multiple && this.$element.attr('multiple','multiple');
-            this.$element.wrap('<span class="' + SELECTBOX_GROUP + '"></span>');
-            this.$selectBoxGroup = this.$element.parent();
             this._createInput();
+            this.$selectBoxGroup = this.$element.parent('.form-group');
             this._createListView();
+            this.$selectBoxGroup.addClass(SELECTBOX_GROUP);
         },
 
         _createInput:function(){
@@ -282,7 +282,7 @@
         _init:function(){
             var that = this,
                 data = this.options.data,
-                $options = this.$options = $('<ul class="' + OPTIONS + '"></ul>'),
+                $options = this.$options = $('<ul class="list-group ' + OPTIONS + '"></ul>'),
                 selectedQuery = "."+SELECTED;
             if(data){
                 for(var i = 0,len = data.length; i<len; i++){
@@ -312,7 +312,7 @@
                 that.text = texts;
                 that._change();
             });
-            $('body').append($options.hide());
+            $('body').append($options);
         },
 
         /**
@@ -321,7 +321,7 @@
          * @private
          */
         _createOption:function(option){
-            return $('<li data-value="'+option.value+'">'+option.text+'</li>');
+            return $('<li class="list-group-item" data-value="'+option.value+'">'+option.text+'</li>');
         },
 
         /**
@@ -330,10 +330,10 @@
          */
         _setPosition:function(){
             var labelWidth = this.$parent.find('label').outerWidth();
-            var left = this.$parent.offset().left + labelWidth;
-            var top = this.$parent.offset().top + 28;
+            var left = this.$parent.offset().left + labelWidth + 15;
+            var top = this.$parent.offset().top + 34;
             //magic number 10 为 options padding+border宽度
-            var width = this.$parent.find('.input-group').outerWidth()-10-labelWidth;
+            var width = this.$parent.find('.input-group').outerWidth();
             this.$options.css({top:top,left:left,width:width});
         },
 
@@ -346,7 +346,7 @@
             $(document).mouseup(function(e) {
                 var _con = that.$options;
                 if (!_con.is(e.target) && _con.has(e.target).length === 0) {
-                    that.$options.slideUp(200);
+                    that.$options.removeClass('open');
                 }
             });
         },
@@ -382,13 +382,9 @@
         toggle:function(){
             var that = this;
             this._setPosition();
-            if(this.$options.is(":hidden")){
-                this.$options.slideDown(200, function(){
-                    that._clickBlank();
-                });
-            }
-            else{
-                this.$options.slideUp(200);
+            this.$options.toggleClass('open');
+            if(this.$options.is('open')){
+                that._clickBlank();
             }
         },
 

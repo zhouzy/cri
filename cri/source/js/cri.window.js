@@ -17,7 +17,6 @@
 
     var icons = {Minimize:"fa fa-minus",Maximize:"fa fa-expand","Close":"fa fa-close","Resume":"fa fa-compress"},
         MINI_WINDOW_WIDTH = 140+10,
-        WINDOW_PADDING = 35,
         WINDOW_BORDER  = 1,
         ZINDEX = 10000;
 
@@ -92,6 +91,10 @@
         this.windowStack.push(this);
         this.toFront();
         this.$element.attr('data-role','treegrid');
+        if(!this.options.visible){
+            this.$window.hide();
+            this._hideMask();
+        }
     });
 
     $.extend(Window.prototype,{
@@ -194,6 +197,7 @@
             op.resizable && this._createResizeHandler();
             $("body").append(this.$window);
             this.$element.show();
+
             if(op.visible){
                 this.$window.show();
             }else{
@@ -206,7 +210,7 @@
          * @private
          */
         _createHead : function(){
-            var $windowHead = $('<div class="' + WINDOW_HEAD + '"></div>');
+            var $windowHead = $('<div class="' + WINDOW_HEAD + ' panel-heading"></div>');
             $windowHead.append(this._createTitle()).append(this._createActions());
             this.$window.prepend($windowHead);
             this.$windowHead = $windowHead;
@@ -217,13 +221,13 @@
          * @private
          */
         _createBody : function(){
-            var that       = this,
-                op         = this.options,
-                viewWidth  = $(window).width(),
-                viewHeight = $(window).height(),
-                $element   = this.$element,
-                $window    = $('<div class="window"></div>'),
-                $windowBody = $('<div class="window-content"></div>');
+            var that         = this,
+                op           = this.options,
+                viewWidth    = $(window).width(),
+                viewHeight   = $(window).height(),
+                $element     = this.$element,
+                $window      = $('<div class="window panel panel-default"></div>'),
+                $windowBody  = $('<div class="window-content"></div>');
             var $placeHolder = this.$elementPlaceHolder = $('<div style="display:none"></div>');
             $element.after($placeHolder);
             $element.detach();
@@ -233,7 +237,7 @@
                 op.position.top  = (viewHeight - op.height - 2*WINDOW_BORDER) / 2;
             }
             this._setPosition({top:op.position.top,left:op.position.left,width:op.width,height:op.height});
-            $windowBody.height(op.height-35);
+            //$windowBody.height(op.height-35);
             $window.append($windowBody);
             $windowBody.append($element);
             $("body").append(this.$window);
@@ -350,7 +354,7 @@
         _setStyleByStatus : function(status){
             var op    = this.options,
                 pos   = op.position,
-                KLASS = {minimize:"window mini-window",maximize:"window maxi-window",closed:"window",normal:"window"},
+                KLASS = {minimize:"window mini-window panel panel-default",maximize:"window maxi-window panel panel-default",closed:"window panel panel-default",normal:"window panel panel-default"},
                 style = {width:op.width,height:op.height,left:pos.left,top:pos.top,bottom:"auto",right:"auto"};
             this.$window.prop("class",KLASS[status]).css(style);
         },
@@ -414,7 +418,8 @@
          */
         open:function(){
             this._setStyleByStatus("normal");
-            $(".window-content",this.$window).show();
+            this.$window.show();
+            this.toFront();
             this.windowStatus = "normal";
             this.options.onOpen && this.options.onOpen.call(this);
         },
@@ -425,11 +430,9 @@
         close : function(){
             this.options.onClose && this.options.onClose.call(this);
             this._destroy();
+            this._hideMask();
             if(this.windowStack.length){
                 this.windowStack[this.windowStack.length-1].toFront();
-            }
-            else{
-                this._hideMask();
             }
         },
 

@@ -1369,6 +1369,8 @@
                     iframeNode.src = this.options.content;
                     iframeNode.id = 'id_' + shame;
                     iframeNode.name = 'name_' + shame;
+                    iframeNode.frameBorder = 'no';
+
                     if (iframeNode.attachEvent){
                         iframeNode.attachEvent("onload", function(){
                             that.options.callback && that.options.callback.call();
@@ -1662,7 +1664,7 @@
     };
 
     var INPUT_GROUP    = "form-group",
-        INPUT_SELECTOR = ":input:not(:button,[type=submit],[type=reset],[disabled])";
+        INPUT_SELECTOR = "input:not(:button,[type=submit],[type=reset],[disabled])";
 
     var Input = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
@@ -1675,11 +1677,18 @@
     $.extend(Input.prototype,{
         _eventListen:function(){
             var that = this;
-            this.$element.on("focus",function(){
-                that.options.onFocus && that.options.onFocus.call(that);
-            }).blur(function(){
-                that.options.onBlur && that.options.onBlur.call(that);
-            });
+            if(this.$element.is(INPUT_SELECTOR)){
+                this.$element.on("focus",function(){
+                    that.options.onFocus && that.options.onFocus.call(that);
+                }).blur(function(){
+                    that.options.onBlur && that.options.onBlur.call(that);
+                });
+            }
+            else if(this.$element.is('select')){
+                this.$input.click(function(){
+                    that.options.onFocus && that.options.onFocus.call(that);
+                });
+            }
         },
 
         _init:function(){
@@ -1710,7 +1719,14 @@
             $input.addClass('form-control');
 
             if(op.readonly){
-                $input.prop('readonly',true);
+                if($input.is(INPUT_SELECTOR)){
+                    $input.prop('readonly',true);
+                }
+                else{
+                    var $static = $('<span class="form-control-static"></span>');
+                    this.$element.after($static);
+                    $input = $static;
+                }
             }
 
             if(op.button){
@@ -1727,7 +1743,7 @@
             var button = this.options.button,
                 text   = button.text || '',
                 $i     = $('<i class="' + button.iconCls + '">' + text + '</i>'),
-                $btn   = $('<button type="button" class="btn btn-fab-mini btn-xs"></button>');
+                $btn   = $('<button type="button" class="btn btn-fab-mini"></button>');
             $btn.append($i);
             this.button = $p.append($btn);
             $btn.click(function(){
@@ -1741,7 +1757,7 @@
                 this.$element.attr("title") ||
                 this.$element.attr("name") ||
                 "",
-                $input = this.$element;
+                $input = this.$input;
             if(label.length){
                 var $label = $('<label class="control-label col-sm-4">' + label + '</label>');
                 if(this.options.required){
@@ -1769,6 +1785,10 @@
             if(this.$input.is(INPUT_SELECTOR)){
                 this.$input.val(value);
                 this.$input.change();
+            }
+            else if(this.$element.is('select')){
+                this.$element.val(value);
+                this.$input.text(this.$element.find("option:selected").text());
             }
         },
 
@@ -2346,10 +2366,10 @@
         _create:function(){
             this.$element.hide();
             this.options.multiple && this.$element.attr('multiple','multiple');
-            this.$element.wrap('<span class="' + SELECTBOX_GROUP + '"></span>');
-            this.$selectBoxGroup = this.$element.parent();
             this._createInput();
+            this.$selectBoxGroup = this.$element.parent('.form-group');
             this._createListView();
+            this.$selectBoxGroup.addClass(SELECTBOX_GROUP);
         },
 
         _createInput:function(){
@@ -2580,7 +2600,7 @@
         _init:function(){
             var that = this,
                 data = this.options.data,
-                $options = this.$options = $('<ul class="' + OPTIONS + '"></ul>'),
+                $options = this.$options = $('<ul class="list-group ' + OPTIONS + '"></ul>'),
                 selectedQuery = "."+SELECTED;
             if(data){
                 for(var i = 0,len = data.length; i<len; i++){
@@ -2610,7 +2630,7 @@
                 that.text = texts;
                 that._change();
             });
-            $('body').append($options.hide());
+            $('body').append($options);
         },
 
         /**
@@ -2619,7 +2639,7 @@
          * @private
          */
         _createOption:function(option){
-            return $('<li data-value="'+option.value+'">'+option.text+'</li>');
+            return $('<li class="list-group-item" data-value="'+option.value+'">'+option.text+'</li>');
         },
 
         /**
@@ -2628,10 +2648,10 @@
          */
         _setPosition:function(){
             var labelWidth = this.$parent.find('label').outerWidth();
-            var left = this.$parent.offset().left + labelWidth;
-            var top = this.$parent.offset().top + 28;
+            var left = this.$parent.offset().left + labelWidth + 15;
+            var top = this.$parent.offset().top + 34;
             //magic number 10 为 options padding+border宽度
-            var width = this.$parent.find('.input-group').outerWidth()-10-labelWidth;
+            var width = this.$parent.find('.input-group').outerWidth();
             this.$options.css({top:top,left:left,width:width});
         },
 
@@ -2644,7 +2664,7 @@
             $(document).mouseup(function(e) {
                 var _con = that.$options;
                 if (!_con.is(e.target) && _con.has(e.target).length === 0) {
-                    that.$options.slideUp(200);
+                    that.$options.removeClass('open');
                 }
             });
         },
@@ -2680,13 +2700,9 @@
         toggle:function(){
             var that = this;
             this._setPosition();
-            if(this.$options.is(":hidden")){
-                this.$options.slideDown(200, function(){
-                    that._clickBlank();
-                });
-            }
-            else{
-                this.$options.slideUp(200);
+            this.$options.toggleClass('open');
+            if(this.$options.is('open')){
+                that._clickBlank();
             }
         },
 
@@ -4006,9 +4022,9 @@
             var op      = this.options,
                 height  = this.$element._getHeightPixelValue(op.height),
                 width   = this.$element._getWidthPixelValue(op.width),
-                $tree   = $("<div></div>").addClass(this._className).width(width),
+                $tree   = $("<div></div>").addClass(this._className).addClass('panel panel-default').width(width),
 
-                $treeview = this.$treeview = $("<div></div>").addClass("tree-view"),
+                $treeview = this.$treeview = $("<div></div>").addClass("tree-view panel-body"),
                 $treebody = this.$treebody = $("<ul></ul>").addClass("tree-body");
 
             $tree.attr("style",this.$element.attr("style")).show().height(height);
@@ -4112,7 +4128,7 @@
 
         _createTitle:function($parent){
             if(this.options.title){
-                this.$title = $('<div class="title"><span>' + this.options.title + '</span></div>');
+                this.$title = $('<div class="title panel-heading"><span>' + this.options.title + '</span></div>');
                 $parent.append(this.$title);
             }
         },
@@ -4741,7 +4757,6 @@
 
     var icons = {Minimize:"fa fa-minus",Maximize:"fa fa-expand","Close":"fa fa-close","Resume":"fa fa-compress"},
         MINI_WINDOW_WIDTH = 140+10,
-        WINDOW_PADDING = 35,
         WINDOW_BORDER  = 1,
         ZINDEX = 10000;
 
@@ -4816,6 +4831,10 @@
         this.windowStack.push(this);
         this.toFront();
         this.$element.attr('data-role','treegrid');
+        if(!this.options.visible){
+            this.$window.hide();
+            this._hideMask();
+        }
     });
 
     $.extend(Window.prototype,{
@@ -4918,6 +4937,7 @@
             op.resizable && this._createResizeHandler();
             $("body").append(this.$window);
             this.$element.show();
+
             if(op.visible){
                 this.$window.show();
             }else{
@@ -4930,7 +4950,7 @@
          * @private
          */
         _createHead : function(){
-            var $windowHead = $('<div class="' + WINDOW_HEAD + '"></div>');
+            var $windowHead = $('<div class="' + WINDOW_HEAD + ' panel-heading"></div>');
             $windowHead.append(this._createTitle()).append(this._createActions());
             this.$window.prepend($windowHead);
             this.$windowHead = $windowHead;
@@ -4941,13 +4961,13 @@
          * @private
          */
         _createBody : function(){
-            var that       = this,
-                op         = this.options,
-                viewWidth  = $(window).width(),
-                viewHeight = $(window).height(),
-                $element   = this.$element,
-                $window    = $('<div class="window"></div>'),
-                $windowBody = $('<div class="window-content"></div>');
+            var that         = this,
+                op           = this.options,
+                viewWidth    = $(window).width(),
+                viewHeight   = $(window).height(),
+                $element     = this.$element,
+                $window      = $('<div class="window panel panel-default"></div>'),
+                $windowBody  = $('<div class="window-content"></div>');
             var $placeHolder = this.$elementPlaceHolder = $('<div style="display:none"></div>');
             $element.after($placeHolder);
             $element.detach();
@@ -4957,7 +4977,7 @@
                 op.position.top  = (viewHeight - op.height - 2*WINDOW_BORDER) / 2;
             }
             this._setPosition({top:op.position.top,left:op.position.left,width:op.width,height:op.height});
-            $windowBody.height(op.height-35);
+            //$windowBody.height(op.height-35);
             $window.append($windowBody);
             $windowBody.append($element);
             $("body").append(this.$window);
@@ -5074,7 +5094,7 @@
         _setStyleByStatus : function(status){
             var op    = this.options,
                 pos   = op.position,
-                KLASS = {minimize:"window mini-window",maximize:"window maxi-window",closed:"window",normal:"window"},
+                KLASS = {minimize:"window mini-window panel panel-default",maximize:"window maxi-window panel panel-default",closed:"window panel panel-default",normal:"window panel panel-default"},
                 style = {width:op.width,height:op.height,left:pos.left,top:pos.top,bottom:"auto",right:"auto"};
             this.$window.prop("class",KLASS[status]).css(style);
         },
@@ -5138,7 +5158,8 @@
          */
         open:function(){
             this._setStyleByStatus("normal");
-            $(".window-content",this.$window).show();
+            this.$window.show();
+            this.toFront();
             this.windowStatus = "normal";
             this.options.onOpen && this.options.onOpen.call(this);
         },
@@ -5149,11 +5170,9 @@
         close : function(){
             this.options.onClose && this.options.onClose.call(this);
             this._destroy();
+            this._hideMask();
             if(this.windowStack.length){
                 this.windowStack[this.windowStack.length-1].toFront();
-            }
-            else{
-                this._hideMask();
             }
         },
 

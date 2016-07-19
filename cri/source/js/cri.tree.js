@@ -153,9 +153,9 @@
             var op      = this.options,
                 height  = this.$element._getHeightPixelValue(op.height),
                 width   = this.$element._getWidthPixelValue(op.width),
-                $tree   = $("<div></div>").addClass(this._className).width(width),
+                $tree   = $("<div></div>").addClass(this._className).addClass('panel panel-default').width(width),
 
-                $treeview = this.$treeview = $("<div></div>").addClass("tree-view"),
+                $treeview = this.$treeview = $("<div></div>").addClass("tree-view panel-body"),
                 $treebody = this.$treebody = $("<ul></ul>").addClass("tree-body");
 
             $tree.attr("style",this.$element.attr("style")).show().height(height);
@@ -259,7 +259,7 @@
 
         _createTitle:function($parent){
             if(this.options.title){
-                this.$title = $('<div class="title"><span>' + this.options.title + '</span></div>');
+                this.$title = $('<div class="title panel-heading"><span>' + this.options.title + '</span></div>');
                 $parent.append(this.$title);
             }
         },

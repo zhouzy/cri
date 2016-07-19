@@ -3,7 +3,7 @@
  * Date   2015/4/8
  *
  * ContentLoader
- * ÓÃÓÚ¼ÓÔØHTML
+ * ï¿½ï¿½ï¿½Ú¼ï¿½ï¿½ï¿½HTML
  */
 !function(window){
 
@@ -55,6 +55,8 @@
                     iframeNode.src = this.options.content;
                     iframeNode.id = 'id_' + shame;
                     iframeNode.name = 'name_' + shame;
+                    iframeNode.frameBorder = 'no';
+
                     if (iframeNode.attachEvent){
                         iframeNode.attachEvent("onload", function(){
                             that.options.callback && that.options.callback.call();

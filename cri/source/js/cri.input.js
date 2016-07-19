@@ -23,7 +23,7 @@
     };
 
     var INPUT_GROUP    = "form-group",
-        INPUT_SELECTOR = ":input:not(:button,[type=submit],[type=reset],[disabled])";
+        INPUT_SELECTOR = "input:not(:button,[type=submit],[type=reset],[disabled])";
 
     var Input = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
@@ -36,11 +36,18 @@
     $.extend(Input.prototype,{
         _eventListen:function(){
             var that = this;
-            this.$element.on("focus",function(){
-                that.options.onFocus && that.options.onFocus.call(that);
-            }).blur(function(){
-                that.options.onBlur && that.options.onBlur.call(that);
-            });
+            if(this.$element.is(INPUT_SELECTOR)){
+                this.$element.on("focus",function(){
+                    that.options.onFocus && that.options.onFocus.call(that);
+                }).blur(function(){
+                    that.options.onBlur && that.options.onBlur.call(that);
+                });
+            }
+            else if(this.$element.is('select')){
+                this.$input.click(function(){
+                    that.options.onFocus && that.options.onFocus.call(that);
+                });
+            }
         },
 
         _init:function(){
@@ -71,7 +78,14 @@
             $input.addClass('form-control');
 
             if(op.readonly){
-                $input.prop('readonly',true);
+                if($input.is(INPUT_SELECTOR)){
+                    $input.prop('readonly',true);
+                }
+                else{
+                    var $static = $('<span class="form-control-static"></span>');
+                    this.$element.after($static);
+                    $input = $static;
+                }
             }
 
             if(op.button){
@@ -88,7 +102,7 @@
             var button = this.options.button,
                 text   = button.text || '',
                 $i     = $('<i class="' + button.iconCls + '">' + text + '</i>'),
-                $btn   = $('<button type="button" class="btn btn-fab-mini btn-xs"></button>');
+                $btn   = $('<button type="button" class="btn btn-fab-mini"></button>');
             $btn.append($i);
             this.button = $p.append($btn);
             $btn.click(function(){
@@ -102,7 +116,7 @@
                 this.$element.attr("title") ||
                 this.$element.attr("name") ||
                 "",
-                $input = this.$element;
+                $input = this.$input;
             if(label.length){
                 var $label = $('<label class="control-label col-sm-4">' + label + '</label>');
                 if(this.options.required){
@@ -130,6 +144,10 @@
             if(this.$input.is(INPUT_SELECTOR)){
                 this.$input.val(value);
                 this.$input.change();
+            }
+            else if(this.$element.is('select')){
+                this.$element.val(value);
+                this.$input.text(this.$element.find("option:selected").text());
             }
         },
 
