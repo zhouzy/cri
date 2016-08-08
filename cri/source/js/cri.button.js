@@ -109,6 +109,7 @@
                 return false;
             }
             $this.data('widget', (o = new Button(this, options)));
+
         });
         return o;
     };
