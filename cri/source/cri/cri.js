@@ -4587,7 +4587,7 @@
             if(that.options.validateOnBlur){
                 if(!$element.is(INPUTSELECTOR)){
                     $element.find(INPUTSELECTOR).each(function(){
-                        $(this).on("change",function(){
+                        $(this).on("blur",function(){
                             that._validateInput($(this));
                         });
                         if(!$(this).is('[role=timeInput]')){
@@ -4666,11 +4666,11 @@
                 this._showMessage($input,errorMsg);
                 if($input.is("[readonly=readonly]")){
                     $input.closest(".input-group").one("click",function(){
-                        that._hideMessage($input.attr('name'));
-                    })
+                        that._hideMessage($input);
+                    });
                 }
                 $input.one("focus",function(){
-                    that._hideMessage($input.attr('name'));
+                    that._hideMessage($input);
                 });
             }else{
                 this._hideMessage($input);
@@ -4682,7 +4682,7 @@
             errorMsg = errorMsg || $input.attr('error-msg') || '请检查';
             var role = $input.data("role");
             if(role){
-                var widget = $input.data($input.data("role"));
+                var widget = $input.data('widget');
                 if(widget){
                     widget._showValidateMsg(errorMsg)
                 }

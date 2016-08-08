@@ -117,6 +117,7 @@
                 this.$element.attr("name") ||
                 "",
                 $input = this.$input;
+            label = "" + label;
             if(label.length){
                 var $label = $('<label class="control-label col-sm-4">' + label + '</label>');
                 if(this.options.required){

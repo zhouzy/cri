@@ -134,7 +134,9 @@
 
         update:function(page,pageSize,total){
             var op = this.options;
-            op.total = total || op.total;
+            if(total !== undefined || total !== null){
+                op.total = total;
+            }
             op.page = page || op.page;
             op.pageSize = pageSize || op.pageSize;
             this._updatePagerBtn();
