@@ -379,6 +379,12 @@
         _setPosition:function(){
             var left = this.$parent.offset().left + this.$parent.find('label').outerWidth();
             var top = this.$parent.offset().top + 34;
+            var scrollHeight = document.body.scrollHeight;
+            this.$timeBox.removeClass('top');
+            if(top + 250 > scrollHeight){
+                top = top - 34 - 250;
+                this.$timeBox.addClass('top');
+            }
             this.$timeBox.css({top:top,left:left});
         },
 
@@ -404,12 +410,17 @@
                         $(document).off('mouseup',cb);
                     }
                 };
-                this.$timeBox.slideDown(200,function(){
+                if(this.$timeBox.is('.top')){
+                    this.$timeBox.show();
                     $(document).on('mouseup',cb);
-                });
+                }else{
+                    this.$timeBox.slideDown(200,function(){
+                        $(document).on('mouseup',cb);
+                    });
+                }
             }
             else{
-                this.$timeBox.slideUp(200);
+                this.$timeBox.is('.top') ? this.$timeBox.hide() : this.$timeBox.slideUp(200);
             }
         },
 

@@ -1319,6 +1319,7 @@
                 return false;
             }
             $this.data('widget', (o = new Button(this, options)));
+
         });
         return o;
     };
@@ -1769,6 +1770,7 @@
                 this.$element.attr("name") ||
                 "",
                 $input = this.$input;
+            label = "" + label;
             if(label.length){
                 var $label = $('<label class="control-label col-sm-4">' + label + '</label>');
                 if(this.options.required){
@@ -2317,7 +2319,9 @@
 
         update:function(page,pageSize,total){
             var op = this.options;
-            op.total = total || op.total;
+            if(total !== undefined || total !== null){
+                op.total = total;
+            }
             op.page = page || op.page;
             op.pageSize = pageSize || op.pageSize;
             this._updatePagerBtn();
@@ -3745,6 +3749,12 @@
         _setPosition:function(){
             var left = this.$parent.offset().left + this.$parent.find('label').outerWidth();
             var top = this.$parent.offset().top + 34;
+            var scrollHeight = document.body.scrollHeight;
+            this.$timeBox.removeClass('top');
+            if(top + 250 > scrollHeight){
+                top = top - 34 - 250;
+                this.$timeBox.addClass('top');
+            }
             this.$timeBox.css({top:top,left:left});
         },
 
@@ -3770,11 +3780,18 @@
                         $(document).off('mouseup',cb);
                     }
                 };
-                this.$timeBox.slideDown(200,function(){
+                if(this.$timeBox.is('.top')){
+                    this.$timeBox.show();
                     $(document).on('mouseup',cb);
-                });
+                }else{
+                    this.$timeBox.slideDown(200,function(){
+                        $(document).on('mouseup',cb);
+                    });
+                }
             }
             else{
+                this.$timeBox.is('.top')?
+                this.$timeBox.hide():
                 this.$timeBox.slideUp(200);
             }
         },
@@ -4704,7 +4721,7 @@
         _hideMessage:function($input){
             var role = $input.data("role");
             if(role){
-                var widget = $input.data($input.data("role"));
+                var widget = $input.data('widget');
                 widget && typeof(widget._hideValidateMsg) == 'function' && widget._hideValidateMsg();
             }
             else{
@@ -4720,11 +4737,11 @@
             if(names){
                 if(cri.isArray(names)){
                     for(var i = 0,len=names.length;i<len;i++){
-                        this._hideMessage(names[i]);
+                        this._hideMessage($('[name='+names[i]+']'));
                     }
                 }
                 else{
-                    this._hideMessage(names);
+                    this._hideMessage($('[name='+names+']'));
                 }
             }else{
                 $(".input-warm",this.$element).hide();

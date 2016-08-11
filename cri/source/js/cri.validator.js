@@ -249,7 +249,7 @@
         _hideMessage:function($input){
             var role = $input.data("role");
             if(role){
-                var widget = $input.data($input.data("role"));
+                var widget = $input.data('widget');
                 widget && typeof(widget._hideValidateMsg) == 'function' && widget._hideValidateMsg();
             }
             else{
@@ -265,11 +265,11 @@
             if(names){
                 if(cri.isArray(names)){
                     for(var i = 0,len=names.length;i<len;i++){
-                        this._hideMessage(names[i]);
+                        this._hideMessage($('[name='+names[i]+']'));
                     }
                 }
                 else{
-                    this._hideMessage(names);
+                    this._hideMessage($('[name='+names+']'));
                 }
             }else{
                 $(".input-warm",this.$element).hide();
