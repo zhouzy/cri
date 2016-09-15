@@ -186,7 +186,7 @@
             if(this.options.onLoad && typeof(this.options.onLoad) === 'function'){
                 this.options.onLoad.call(this);
             }
-            this._colsWidth();
+            //this._colsWidth();
         },
 
         /**
@@ -196,7 +196,7 @@
         _createGrid:function(){
             var height = this.$element._getHeightPixelValue(this.options.height);
             var width  = this.$element._getWidthPixelValue(this.options.width);
-            var $grid  = $("<div></div>").addClass("grid").addClass(this._gridClassName);
+            var $grid  = $("<div></div>").addClass("grid").addClass(this._gridClassName).addClass('panel panel-default');
             height && (height-=2);//减去border
             width && (width-=2);
             $grid.attr("style",this.$element.attr("style"))
@@ -237,7 +237,7 @@
          */
         _createTitle:function($grid){
             if(this.options.title){
-                this.$title = $('<div class="title"><span>' + this.options.title + '</span></div>');
+                this.$title = $('<div class="panel-heading"><span>' + this.options.title + '</span></div>');
                 $grid.append(this.$title);
             }
         },
@@ -249,7 +249,7 @@
          */
         _createHead:function($parent){
             var $headWrap = $("<div></div>").addClass("grid-head-wrap"),
-                $table    = $('<table class="table"></table>'),
+                $table    = $('<table class="table table-bordered"></table>'),
                 $tr       = $("<tr></tr>"),
                 op        = this.options,
                 columns   = this._columns;
@@ -323,7 +323,7 @@
          * @private
          */
         _refreshBody:function(rows){
-            var $table   = $('<table class="table"></table>'),
+            var $table   = $('<table class="table table-striped table-hover table-bordered"></table>'),
                 op       = this.options,
                 id       = 0,
                 lineNum  = 1 + op.pageSize * (op.page - 1),
@@ -366,10 +366,7 @@
                 $table.append($tr);
             }
             this.$gridbody.removeClass("loading").html($table);
-            /**
-             *fixed IE8 do not support nth-child selector;
-             */
-            $("tr:nth-child(odd)",$table).css("background","#FFF");
+
             /**
              * 根据gird-body纵向滚动条宽度决定headWrap rightPadding
              * 当grid-body为空时，在IE下不能取到clientWidth
@@ -391,8 +388,8 @@
             var $cols   = [],
                 op      = this.options,
                 columns = this._columns;
-            op.checkBox && $cols.push($("<col/>").width(30));
-            op.rowNum   && $cols.push($("<col/>").width(25));
+            op.checkBox && $cols.push($("<col/>").css('width',30));
+            op.rowNum   && $cols.push($("<col/>").css('width',30));
             for(var i = 0,len = columns.length; i<len; i++){
                 var $col = $("<col/>");
                 columns[i]._width && $col.width(columns[i]._width);
@@ -554,7 +551,8 @@
             var op = this.options;
             var grid = this;
             if(this.options.pagination){
-                this.pager = new cri.Pager(this.$grid,{
+                this.$pager = $('<div class="panel-footer"></div>');
+                this.pager = new cri.Pager(this.$pager,{
                     page:op.page,
                     pageSize:op.pageSize,
                     total:0,
@@ -565,6 +563,7 @@
                         grid._getData();
                     }
                 });
+                this.$grid.append(this.$pager);
             }
         },
 

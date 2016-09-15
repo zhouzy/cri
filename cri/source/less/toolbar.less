@@ -1,39 +1,10 @@
 @import "lib.less";
 @import "theme-default.less";
-ul.toolbar {
-    border-bottom:1px solid @color-toolbar-border;
-    height:30px;
-    line-height:30px;
-    background:@color-toolbar-bg;
-    li{
-        color:@color-font;
-        text-align: center;
-        display:inline-block;
-        height:30px;
-        line-height:30px;
-        cursor: pointer;
-        list-style: none outside none;
-        min-width: 60px;
-        margin-right:10px;
-        padding:0 5px;
-        .user-not-select;
-        &:hover{
-            background:@color-toolbar-button-hover;
-            i{
-                color:@color-toolbar-button-hover-icon;
-            }
-        }
-        &:active{
-            -webkit-box-shadow: inset 0px 1px 1px @color-toolbar-button-active, 0px 1px 0px @color-toolbar-button-active;
-            -moz-box-shadow: inset 0px 1px 1px @color-toolbar-button-active, 0px 1px 0px @color-toolbar-button-active;
-            box-shadow: inset 0px 1px 1px @color-toolbar-button-active, 0px 1px 0px @color-toolbar-button-active;
-            color:@color-toolbar-button-active-icon;
-            .gradient-background(lighten(@color-toolbar-button-active,20%),darken(@color-toolbar-button-active,20%));
-            border-top-color:lighten(@color-toolbar-button-active,20%);
-            border-bottom-color:darken(@color-toolbar-button-active,20%);
-        }
+.toolbar {
+    padding:5px 15px;
+    .btn{
+        min-width:60px;
         i{
-            font-size:1.2em;
             margin-right:5px;
         }
     }

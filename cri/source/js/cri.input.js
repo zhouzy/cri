@@ -22,21 +22,32 @@
         required:false
     };
 
-    var INPUT_GROUP = "input-group",
-        ERROR_MSG_HEIGHT = 23,//验证消息框高度
-        WITH_BTN    = "with-btn";
+    var INPUT_GROUP    = "form-group",
+        INPUT_SELECTOR = "input:not(:button,[type=submit],[type=reset],[disabled])";
 
     var Input = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
         this.$inputGroup = null;
         this.button = null;
         cri.Widgets.apply(this,arguments);
-        this.$element.attr('data-role','input');
+        this.$element.data('role','input');
     });
 
     $.extend(Input.prototype,{
         _eventListen:function(){
-
+            var that = this;
+            if(this.$element.is(INPUT_SELECTOR)){
+                this.$element.on("focus",function(){
+                    that.options.onFocus && that.options.onFocus.call(that);
+                }).blur(function(){
+                    that.options.onBlur && that.options.onBlur.call(that);
+                });
+            }
+            else if(this.$element.is('select')){
+                this.$input.click(function(){
+                    that.options.onFocus && that.options.onFocus.call(that);
+                });
+            }
         },
 
         _init:function(){
@@ -56,7 +67,7 @@
             $element.wrap('<div class="'+ INPUT_GROUP + '"></div>');
             this.$inputGroup = $element.parent();
             this._wrapInput();
-            this.$input.before(this._label());
+            this._label();
             this.options.enable || this.disable();
         },
 
@@ -64,48 +75,39 @@
             var that = this,
                 op   = that.options,
                 $input = this.$element;
+            $input.addClass('form-control');
 
             if(op.readonly){
-                $input = this._readonlyInput($input);
-            }
-
-            else{
-                $input.on("focus",function(){
-                    that.options.onFocus && that.options.onFocus.call(that);
-                }).blur(function(){
-                    that.options.onBlur && that.options.onBlur.call(that);
-                });
+                if($input.is(INPUT_SELECTOR)){
+                    $input.prop('readonly',true);
+                }
+                else{
+                    var $static = $('<span class="form-control-static"></span>');
+                    this.$element.after($static);
+                    $input = $static;
+                }
             }
 
             if(op.button){
-                var $button = $('<button></button>');
-                $input.after($button);
-                this._button($button);
-                $input.addClass(WITH_BTN);
+                $input.wrap('<div class="input-group"></div>');
+                var $inputGroup = $input.parent();
+                var $inputGroupBtn = $('<span class="input-group-btn"></span>');
+                $inputGroup.append($inputGroupBtn);
+                this._button($inputGroupBtn);
             }
-
             this.$input = $input;
         },
 
-        /**
-         * 返回包装 readonly input
-         * @param $element
-         * @private
-         */
-        _readonlyInput:function($element){
-            var that = this,
-                $input = $('<span class="readonly" role="readonly"></span>');
-            $input.on("click",function(){
-                that.options.onFocus && that.options.onFocus.call(that);
-            }).blur(function(){
-                that.options.onBlur && that.options.onBlur.call(that);
+        _button:function($p){
+            var button = this.options.button,
+                text   = button.text || '',
+                $i     = $('<i class="' + button.iconCls + '">' + text + '</i>'),
+                $btn   = $('<button type="button" class="btn btn-fab-mini"></button>');
+            $btn.append($i);
+            this.button = $p.append($btn);
+            $btn.click(function(){
+                button.handler && button.handler.call();
             });
-            this.$element.attr("readonly",true).hide().after($input);
-            return $input;
-        },
-
-        _button:function($button){
-            this.button = $button.button(this.options.button);
         },
 
         _label:function(){
@@ -113,12 +115,22 @@
                 this.$element.data("label") ||
                 this.$element.attr("title") ||
                 this.$element.attr("name") ||
-                "";
-            var $label = $('<label></label>').text(label);
-            if(this.options.required){
-                $label.addClass('required');
+                "",
+                $input = this.$input;
+            label = "" + label;
+            if(label.length){
+                var $label = $('<label class="control-label col-sm-4">' + label + '</label>');
+                if(this.options.required){
+                    $label.addClass('required');
+                }
+                this.$inputGroup.prepend($label);
+                if($input.parent().is('.input-group')){
+                    $input.parent().wrap('<div class="col-sm-8"></div>');
+                }
+                else{
+                    $input.wrap('<div class="col-sm-8"></div>');
+                }
             }
-            return $label;
         },
 
         _destroy:function(){
@@ -130,28 +142,13 @@
             if(value == null){
                 return ;
             }
-            if(this.$input.is("input")){
+            if(this.$input.is(INPUT_SELECTOR)){
                 this.$input.val(value);
                 this.$input.change();
-            }else{
-                if(this.$element.is("select")){
-                    this.$element.val(value);
-                    if(this.$element.attr("multiple")){
-                        var text = [];
-                        this.$element.find("option:selected").each(function(){
-                            text.push($(this).text());
-                        });
-                        this.$input.text(text.join(","));
-                    }
-                    else{
-                        this.$input.text(this.$element.find("option:selected").text());
-                    }
-                }
-                else{
-                    this.$element.val(value);
-                    this.$input.text(value);
-                }
-                this.$element.change();
+            }
+            else if(this.$element.is('select')){
+                this.$element.val(value);
+                this.$input.text(this.$element.find("option:selected").text());
             }
         },
 
@@ -164,56 +161,34 @@
          * @private
          */
         _showValidateMsg: function(errorMsg){
-            this.$input.addClass("failure");
-            var offset = this.$input.offset();
+            this.$inputGroup.addClass("has-error");
             if(!this.$errorMsg){
-                this.$errorMsg = $('<div class="input-warm"><i class="fa fa-exclamation"></i><span>' + errorMsg + '</span></div>');
+                this.$errorMsg = $('<span class="help-block">' + errorMsg + '</span>');
                 this.$input.after(this.$errorMsg);
             }
             else{
-                this.$errorMsg.find("span").text(errorMsg);
-            }
-            if(offset.top <= (ERROR_MSG_HEIGHT)){
-                this.$errorMsg.addClass("bottom-input");
-            }
-            else{
-                this.$errorMsg.removeClass("bottom-input");
+                this.$errorMsg.text(errorMsg);
             }
             this.$errorMsg.show();
-
-            $('html,body').is(':animated') || $('html,body').animate({
-                scrollTop: this.$input.offset().top
-            },300);
-
         },
 
         _hideValidateMsg: function(){
-            this.$input.removeClass("failure");
+            this.$inputGroup.removeClass("has-error");
             this.$errorMsg && this.$errorMsg.hide();
-        },
-
-        /**
-         * 返回input的button对象
-         */
-        getButton:function(){
-            return this.button;
         },
 
         /**
          * 使输入框不能用
          */
         disable:function(){
-            var $layout = $('<div class="input-layout"></div>');
-            if(this.$inputGroup.has(".input-layout").length == 0){
-                this.$inputGroup.append($layout);
-            }
+            this.$element.prop('disabled',true);
         },
 
         /**
          * 使输入框可用
          */
         enable:function(){
-            this.$inputGroup.children(".input-layout").remove();
+            this.$element.prop('disabled',false);
         },
 
         value:function(value){
@@ -228,20 +203,24 @@
     cri.Input = Input;
 
     $.fn.input = function(option) {
-        var o = null;
+        var widget = null;
         this.each(function () {
             var $this   = $(this),
-                input   = $this.data('input'),
                 options = typeof option == 'object' && option,
                 role    = $this.attr("role");
-            if(role == "timeInput"){
-                return input;
+            widget = $this.data('widget');
+
+            if(widget != null){
+                if(widget instanceof Input){
+                    widget._destroy();
+                }
+                else if(widget instanceof cri.TimeInput){
+                    widget = null;
+                    return ;
+                }
             }
-            if(input != null){
-                input._destroy();
-            }
-            $this.data('input', (o = new Input(this, options)));
+            $this.data('widget', (widget = new Input(this, options)));
         });
-        return o;
+        return widget;
     };
 }(window);

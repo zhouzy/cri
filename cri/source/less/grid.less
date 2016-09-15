@@ -1,10 +1,9 @@
 @import "lib.less";
 @import "theme-default.less";
 
-.grid {
+.grid{
     color:@color-grid-font;
-    border:1px solid @color-grid-border;
-    background:@color-grid-bg;
+    //border:1px solid @color-grid-border;
     position:relative;
     .title{
         padding-left:4px;
@@ -18,51 +17,58 @@
         width:100%;
         position: relative;
         margin: 0;
-        border-collapse: separate;
-        border-spacing: 0;
-        empty-cells: show;
-        border-width: 0;
-        outline: 0;
-        height:100%;
+        border-width:0;
+        //border-collapse: separate;
+        //border-spacing: 0;
+        //empty-cells: show;
+        //border-width: 0;
+        //outline: 0;
+        //height:100%;
         display:table;
         table-layout:fixed;
-        word-wrap:break-word;
-        td{
-            line-height: 24px;
-            height: 24px;
-            padding:3px 4px;
-            overflow: hidden;
-            white-space: nowrap;
-            vertical-align: middle;
-            text-overflow: ellipsis;
-            .user-not-select;
-            &.line-number{
-                text-align:center;
-            }
-
-            &:last-child{
-                border-right: none;
-            }
-
-            input{
-                vertical-align:middle;
-            }
-
-            .td-content{
-                position:relative;
-                display:inline-block;
-                height:24px;
+        //word-wrap:break-word;
+        tr{
+            td{
                 line-height: 24px;
-                width:100%;
-                vertical-align: top;
-                .filter-icon{
-                    position:absolute;
-                    right:5px;
-                    top:50%;
-                    margin-top:-6px;
-                    color:#888;
-                    &:hover{
-                        color:#000;
+                height: 24px;
+                padding:3px 4px;
+                overflow: hidden;
+                white-space: nowrap;
+                vertical-align: middle;
+                text-overflow: ellipsis;
+                .user-not-select;
+                &:first-child{
+                    border-left-width:0;
+                }
+
+                &.line-number{
+                    text-align:center;
+                }
+
+                &:last-child{
+                    border-right: none;
+                }
+
+                input{
+                    vertical-align:middle;
+                }
+
+                .td-content{
+                    position:relative;
+                    display:inline-block;
+                    height:24px;
+                    line-height: 24px;
+                    width:100%;
+                    vertical-align: top;
+                    .filter-icon{
+                        position:absolute;
+                        right:5px;
+                        top:50%;
+                        margin-top:-6px;
+                        color:#888;
+                        &:hover{
+                            color:#000;
+                        }
                     }
                 }
             }
@@ -72,16 +78,16 @@
         overflow-x:hidden;
     }
     .grid-head{
-        height:30px;
-        border-bottom:1px solid @color-grid-border;
         .user-not-select;
+        border-bottom:1px solid @color-grid-border;
         cursor:pointer;
         .grid-head-wrap{
             overflow:hidden;
         }
         td{
-            position:relative;
-            border-right:1px solid lighten(@color-grid-border,5%);
+            //position:relative;
+            //z-index:-1;
+            //border-right:1px solid lighten(@color-grid-border,5%);
             &.line-number{
                 div{
                     &:before{
@@ -115,13 +121,6 @@
             height:auto;
         }
         tr{
-            &:hover td{
-                color:#FFF;
-                background:@color-grid-row-hover;
-            }
-            &:nth-child(odd){
-                background: #FFF;
-            }
             &.selected td{
                 color:#FFF;
                 background:@color-grid-row-selected;
@@ -165,5 +164,9 @@
                 text-align:center;
             }
         }
+    }
+    .panel-footer{
+        padding:5px;
+        text-align:right;
     }
 }

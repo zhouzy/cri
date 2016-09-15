@@ -132,7 +132,7 @@
             if(that.options.validateOnBlur){
                 if(!$element.is(INPUTSELECTOR)){
                     $element.find(INPUTSELECTOR).each(function(){
-                        $(this).on("change",function(){
+                        $(this).on("blur",function(){
                             that._validateInput($(this));
                         });
                         if(!$(this).is('[role=timeInput]')){
@@ -171,11 +171,12 @@
         },
 
         /**
-         * 验证表单或者输入框
+         * 验证表单或者输入框,
+         * 如果传入值，则验证指定的对象
          */
-        validate:function(){
+        validate:function($e){
             var that = this,
-                $element = this.$element,
+                $element = $e || this.$element,
                 result = true;
             if(!$element.is(INPUTSELECTOR)){
                 $element.find(INPUTSELECTOR).each(function(){
@@ -210,41 +211,65 @@
                 this._showMessage($input,errorMsg);
                 if($input.is("[readonly=readonly]")){
                     $input.closest(".input-group").one("click",function(){
-                        that._hideMessage($input.attr('name'));
-                    })
+                        that._hideMessage($input);
+                    });
                 }
                 $input.one("focus",function(){
-                    that._hideMessage($input.attr('name'));
+                    that._hideMessage($input);
                 });
             }else{
-                this._hideMessage($input.attr('name'));
+                this._hideMessage($input);
             }
             return valid;
         },
 
         _showMessage:function($input,errorMsg){
-            errorMsg = $input.attr('error-msg')|| errorMsg || '请检查';
-            var widget = $input.data($input.data("role"));
-            if(widget){
-                widget._showValidateMsg(errorMsg)
+            errorMsg = errorMsg || $input.attr('error-msg') || '请检查';
+            var role = $input.data("role");
+            if(role){
+                var widget = $input.data('widget');
+                if(widget){
+                    widget._showValidateMsg(errorMsg)
+                }
+            }
+            else{
+                $input.closest('.form-group').addClass('has-error');
+                var _$helpBlock = $input.next();
+                if(_$helpBlock.is('.help-block')){
+                    _$helpBlock.text(errorMsg);
+                }
+                else{
+                    _$helpBlock = $('<span class="help-block">' + errorMsg + '</span>');
+                    $input.after(_$helpBlock);
+                }
+                _$helpBlock.show();
             }
         },
 
-        _hideMessage:function(name){
-            var $input = $('input[name='+name+'],select[name='+name+']');
-            var widget = $input.data("role") && $input.data($input.data("role"));
-            widget && typeof(widget._hideValidateMsg) == 'function' && widget._hideValidateMsg();
+        _hideMessage:function($input){
+            var role = $input.data("role");
+            if(role){
+                var widget = $input.data('widget');
+                widget && typeof(widget._hideValidateMsg) == 'function' && widget._hideValidateMsg();
+            }
+            else{
+                $input.closest('.form-group').removeClass('.has-error');
+                var _$helpBlock = $input.next();
+                if(_$helpBlock.is('.help-block')){
+                    _$helpBlock.hide();
+                }
+            }
         },
 
         hideMessages:function(names){
             if(names){
                 if(cri.isArray(names)){
                     for(var i = 0,len=names.length;i<len;i++){
-                        this._hideMessage(names[i]);
+                        this._hideMessage($('[name='+names[i]+']'));
                     }
                 }
                 else{
-                    this._hideMessage(names);
+                    this._hideMessage($('[name='+names+']'));
                 }
             }else{
                 $(".input-warm",this.$element).hide();

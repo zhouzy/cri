@@ -3,219 +3,35 @@
 
 @input-group-width:300px;
 @input-width:200px;
-.input-group{
-	display:inline-block;
-	word-spacing:-1px;
-	font-size: 0;
-	-webkit-text-size-adjust:none;
-	margin:2px 0;
-	vertical-align:middle;
-	position:relative;
-	height:26px;
-	line-height:26px;
-	input,.input-btn,label,.plus-minus-button{
-		display:inline-block;
-		font-size:12px;
-		vertical-align:middle;
-	}
-	label{
-		width:@input-group-width - @input-width - 5px;
-		padding-right:5px;
-		height:26px;
-		line-height:26px;
-		text-align: right;
-		word-break: normal;
-		white-space: nowrap;
-		&.required{
-			&:after{
-				content:'*';
-				color:red;
-				display:inline-block;
-				height: 26px;
-				line-height: 26px;
-				margin-left:5px;
-			}
-		}
-	}
-
-	.input{
-		display:inline-block;
-		background:@color-input-bg;
-		padding:5px 8px;
-		color: @color-input-font;
-		width:@input-width - 8*2 - 1*2;
-		line-height:14px;
-		height:14px;
-		border-radius: 3px;
-		border:1px solid @color-input-border;
-		font-size:12px;
-		&.failure{
-			border:1px solid @color-input-failure-border;
-			.box-shadow(0,0,4px,0,lighten(@color-input-failure-border,4%));
-		}
-        &.with-btn{
-            width:@input-width - 8*2 - 1*2 - 20px;
-			padding-right:28px;
-            &:focus{
-                border-right-style:none;
-            }
+.input-group-btn.btn-group-vertical{
+    padding:0;
+    height:34px;
+    margin-left:-1px;
+    white-space: normal;
+    .top,.bottom{
+        display: inline-block;
+        height:17px;
+        width:38px;
+        padding:2px 13px;
+        font-size:12px;
+        border:1px solid #ccc;
+        border-left-width:0;
+        text-align:center;
+        color:#444;
+        i{
+            position:relative;
         }
-
-	}
-
-	input{
-		.input;
-		&:focus {
-			border:1px solid @color-input-focus-border;
-			outline:0;
-			.box-shadow(0,0,6px,1px,@color-input-focus-border);
-		}
-	}
-
-	.readonly{
-		.input;
-		overflow:hidden;
-		vertical-align:middle;
-		cursor:pointer;
-	}
-
-	.button,.plus-minus-button{
-		display:inline-block;
-		position:absolute;
-		right:1px;
-		top:1px;
-		border-style:none;
-		border-left:1px solid @color-input-border;
-		background:#fff;
-		text-align:center;
-		line-height:24px;
-		height:24px;
-		width:18px;
-		min-width:18px;
-		margin:0;
-		padding:0;
-		border-radius:0 3px 3px 0;
-		cursor:pointer;
-		.user-not-select;
-		&:hover{
-			color:#fff;
-			background-color:lighten(@color-input-border,10%);
-		}
-		&:active{
-			color:#fff;
-			background-color:@color-input-btn-active-bg;
-		}
-		&.failure{
-			border-color:@color-input-failure-border;
-			border-left-color:@color-input-border;
-			.box-shadow(1px,0,6px,0,@color-input-failure-border);
-		}
-	}
-	.plus-minus-button{
-		top:1px;
-		&:hover{
-			color:@color-input-font;
-			background-color:#fff;
-		}
-		&:active{
-			color:@color-input-font;
-			background-color:#fff;
-		}
-		i{
-			position:absolute;
-			display:inline-block;
-			width:18px;
-			height:12px;
-			line-height:20px;
-			&:hover{
-				color:#fff;
-				background-color:lighten(@color-input-border,10%);
-			}
-			&:active{
-				color:#fff;
-				background-color:@color-input-btn-active-bg;
-			}
-		}
-		.plus-button{
-			top:0;
-			left:0;
-			right:0;
-			border-bottom:1px solid @color-input-border;
-		}
-		.minus-button{
-			line-height:6px;
-			top:12px;
-			left:0;
-			right:0;
-		}
-	}
-
-	.input-layout{
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 80px;
-		background: #f4f4f4;
-		filter: alpha(opacity=50);
-		opacity: .5;
-	}
-}
-.input-warm{
-	display:none;
-	position:absolute;
-	top:-24px;
-	left:@input-group-width - @input-width;
-	min-width: 140px;
-	height: 18px;
-	line-height: 18px;
-	padding-left:5px;
-	background: @color-input-warm;
-	font-size:12px;
-	z-index:30002;
-	opacity: .9;
-	filter:alpha(opacity=90);
-	.rounded-corners(9px);
-	border:1px solid #f7ce3a;
-	i{
-		margin:0 5px;
-	}
-	span{
-		font-style:italic;
-	}
-	&:before,&:after{
-		content:" ";
-		display:inline-block;
-		position:absolute;
-		top:18px;
-		left:10px;
-		width: 0;
-		height: 0;
-		border-width:5px;
-		border-color: #f7ce3a transparent transparent;
-		border-style: solid dashed dashed;
-	}
-	&:after{
-		top:17px;
-		border-color: @color-input-warm transparent transparent;
-	}
-	&.bottom-input{
-		left:auto;
-		right:0;
-		top:28px;
-	}
-	&.bottom-input:before{
-		top:-10px;
-		width: 0;
-		height: 0;
-		border-color:transparent transparent #f7ce3a transparent ;
-		border-style:dashed dashed solid dashed ;
-	}
-	&.bottom-input:after{
-		top:-9px;
-		width: 0;
-		height: 0;
-		border-color:transparent transparent @color-input-warm transparent ;
-		border-style:dashed dashed solid dashed ;
-	}
+    }
+    .top{
+        border-top-right-radius: 4px;
+        i{
+            bottom:-1px;
+        }
+    }
+    .bottom{
+        border-bottom-right-radius: 4px;
+        i{
+            top:-4px;
+        }
+    }
 }

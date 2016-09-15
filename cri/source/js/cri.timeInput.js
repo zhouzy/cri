@@ -2,7 +2,7 @@
  * Author zhouzy
  * Date   2014/9/18
  * TimeInput 组件
- *
+ * 依赖Input组件
  */
 !function(window){
 
@@ -29,7 +29,7 @@
 
     var _defaultOptions = {
         value:null,
-        format:"yyyy/MM/dd hh:mm:ss",
+        format:"yyyy/MM/dd",
         HMS:false,
         enable:true
     };
@@ -44,20 +44,17 @@
     });
 
     TimeInput.prototype._init = function(){
-        if(!this.options.HMS && this.options.format){
-            this.options.format = this.options.format.replace(/\s*[Hh].*$/,"");
+        if(this.options.format && /hh|ss/.test(this.options.format)){
+            this.options.HMS = true;
         }
-
         this.date = this.options.value || new Date();
 
         if(!(this.date instanceof Date)){
             this.date = cri.string2Date(this.date)
         }
 
-        var $element = this.$element.attr("role","timeInput");
-        $element.wrap('<div class="'+TIME_INPUT_GROUP+'"></div>');
-        this.$timeInputGroup = $element.parent();
         this._wrapInput();
+        this.$timeInputGroup = this.$element.closest('.input-group').addClass(TIME_INPUT_GROUP);
         this._timeSelectView();
     };
 
@@ -76,10 +73,11 @@
             readonly:true,
             value:cri.formatDate(value,this.options.format),
             button:button,
-            enable:this.options.enable,
-            onFocus:function(){
-                that.selectView.toggle();
-            }});
+            enable:this.options.enable
+        });
+        this.$element.click(function(){
+            that.selectView.toggle();
+        });
     };
 
     /**
@@ -199,17 +197,16 @@
          * @private
          */
         _create:function($parent){
-            var $timeBox = this.$timeBox = $('<div class="' + TIME_BOX + '"></div>');
-            var $titleBar = $('<div class="titleBar"></div>');
+            var $timeBox = this.$timeBox = $('<div class="container-fluid ' + TIME_BOX + '"></div>');
+            var $titleBar = $('<div class="titleBar form-inline"></div>');
+            var $row = $('<div class="row"></div>');
             $titleBar.append(
                 this._yearSelect(),
-                this._monthSelect(),
-                '<span style="position:absolute;top:5px;right:23px;">月</span>');
-            $timeBox.append($titleBar,this._daySelect());
+                this._monthSelect());
+            $timeBox.append($row.append($titleBar),this._daySelect());
             if(this.options.HMS == true){
-                $timeBox.append(this._hmsSelect());
+                $timeBox.append($('<div class="row"></div>').append(this._hmsSelect()));
             }
-
             $("body").append($timeBox);
         },
 
@@ -221,20 +218,22 @@
         _yearSelect : function(){
             var that = this;
             var date = this.date;
-            var $yearSelect = $('<div class="yearSelecter"></div>');
-            var $minusBtn   = $('<i class="toLastYear yearButton fa fa-minus"></i>');
-            var $plusBtn    = $('<i class="toNextYear yearButton fa fa-plus"></i>');
-            var $year       = $('<span class="year">' + date.yyyy + '</span>');
+            var $yearSelect = $('<div class="year_Selecter col-sm-8"></div>');
+            var $minusBtn   = $('<span class="input-group-btn"><button class="btn btn-default" type="button">-</button></span>');
+            var $plusBtn    = $('<span class="input-group-btn"><button class="btn btn-default" type="button">+</button></span>');
+            var $year       = $('<input class="form-control" readonly/>').val(date.yyyy + '年');
             this.$year = $year;
+            var $yearInputGroup = $('<div class="input-group input-group-sm"></div>');
             $minusBtn.on("click",function(){
-                $year.html(--that.date.yyyy);
+                $year.val(--that.date.yyyy + '年');
                 that._change();
             });
             $plusBtn.on("click",function(){
-                $year.html(++that.date.yyyy);
+                $year.val(++that.date.yyyy + '年');
                 that._change();
             });
-            $yearSelect.append($minusBtn,$year,'年',$plusBtn);
+            $yearInputGroup.append($minusBtn,$year,$plusBtn);
+            $yearSelect.append($yearInputGroup);
             return $yearSelect;
         },
 
@@ -246,19 +245,21 @@
         _monthSelect:function(){
             var that = this,
                 date = this.date,
-                $select = $('<select class="monthSelect">');
+                $select = $('<select class="form-control month_Select">');
+            var $selectWrap = $('<div class="col-sm-4"></div>');
+            var $inputGroup = $('<div class="input-group-sm"></div>');
+
             this.$month = $select;
             $.each([1,2,3,4,5,6,7,8,9,10,11,12],function(index,value){
                 value < 10 && (value = "0" + value);
                 $select.append('<option value="' + index + '">' + value + '</option>');
             });
-            $select.val(date.MM);
-            $select.on("change",function(){
+            $select.val(date.MM).on("change",function(){
                 that.date.MM = $select.val();
                 that._refreshDaySelect();
                 that._change();
             });
-            return $select;
+            return $selectWrap.append($inputGroup.append($select,'<span class="control-label">月</span>'));
         },
 
         /**
@@ -326,11 +327,13 @@
          */
         _hmsSelect:function(){
             var that = this,
-                $hmsBar = $('<div class="HMSBar"></div>'),
-                $hour = $('<input class="hour"/>'),
-                $minute = $('<input class="minute"/>'),
-                $second = $('<input class="second"/>');
-            $hmsBar.append($hour,':',$minute,':',$second);
+                $hmsBar = $('<div class="HMSBar form-inline"></div>'),
+                $hour   = $('<input class="form-control hour"/>'),
+                $minute = $('<input class="form-control minute"/>'),
+                $second = $('<input class="form-control second"/>');
+            $hmsBar.append($('<div class="col-sm-4"></div>').append($hour));
+            $hmsBar.append($('<div class="col-sm-4"></div>').append($minute));
+            $hmsBar.append($('<div class="col-sm-4"></div>').append($second));
 
             this.hour = $hour.numberInput({
                 min:0,
@@ -341,6 +344,7 @@
                     that._change();
                 }
             });
+            $hour.before('<span class="input-group-addon">时</span>');
             this.minute = $minute.numberInput({
                 min:0,
                 max:59,
@@ -350,6 +354,7 @@
                     that._change();
                 }
             });
+            $minute.before('<span class="input-group-addon">分</span>');
             this.second = $second.numberInput({
                 min:0,
                 max:59,
@@ -359,6 +364,7 @@
                     that._change();
                 }
             });
+            $second.before('<span class="input-group-addon">秒</span>');
             return $hmsBar;
         },
 
@@ -367,25 +373,18 @@
         },
 
         /**
-         * 当在非本元素范围内点击，收缩下拉框
-         * @private
-         */
-        _clickBlank:function(){
-            var that = this;
-            $(document).mouseup(function(e) {
-                var _con = that.$timeBox;
-                if (!_con.is(e.target) && _con.has(e.target).length === 0) {
-                    that.$timeBox.slideUp(200);
-                }
-            });
-        },
-        /**
          * 设置position显示时在屏幕中的位置
          * @private
          */
         _setPosition:function(){
             var left = this.$parent.offset().left + this.$parent.find('label').outerWidth();
-            var top = this.$parent.offset().top + 28;
+            var top = this.$parent.offset().top + 34;
+            var scrollHeight = document.body.scrollHeight;
+            this.$timeBox.removeClass('top');
+            if(top + 250 > scrollHeight){
+                top = top - 34 - 250;
+                this.$timeBox.addClass('top');
+            }
             this.$timeBox.css({top:top,left:left});
         },
 
@@ -404,12 +403,24 @@
             var that = this;
             this._setPosition();
             if(this.$timeBox.is(":hidden")){
-                this.$timeBox.slideDown(200,function(){
-                    that._clickBlank();
-                });
+                var cb = function(e){
+                    var _con = that.$timeBox;
+                    if (!_con.is(e.target) && _con.has(e.target).length === 0) {
+                        that.$timeBox.slideUp(200);
+                        $(document).off('mouseup',cb);
+                    }
+                };
+                if(this.$timeBox.is('.top')){
+                    this.$timeBox.show();
+                    $(document).on('mouseup',cb);
+                }else{
+                    this.$timeBox.slideDown(200,function(){
+                        $(document).on('mouseup',cb);
+                    });
+                }
             }
             else{
-                this.$timeBox.slideUp(200);
+                this.$timeBox.is('.top') ? this.$timeBox.hide() : this.$timeBox.slideUp(200);
             }
         },
 
@@ -440,17 +451,17 @@
     };
 
     $.fn.timeInput = function (option) {
-        var o = null;
+        var widget = null;
         this.each(function () {
             var $this = $(this),
                 options = typeof option == 'object' && option;
-            o = $this.data('timeInput');
-            if(o != null){
-                o._destroy();
+            widget = $this.data('widget');
+            if(widget != null){
+                widget._destroy();
             }
-            $this.data('timeInput', (o = new TimeInput(this, options)));
+            $this.data('widget', (widget = new TimeInput(this, options)));
         });
-        return o;
+        return widget;
     };
 
 }(window);

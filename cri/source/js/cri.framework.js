@@ -42,13 +42,7 @@
             inputQuery = ":input:not(:button,[type=submit],[type=reset],[disabled])",
             selectQuery = "select";
         $(inputQuery,$form).each(function(){
-            var role = $(this).attr('data-role');
-            if(role && role == 'timeInput'){
-                this.name && (o[this.name] = $(this).data("timeInput").getFormatValue());
-            }
-            else{
-                this.name && (o[this.name] = $(this).val());
-            }
+            this.name && (o[this.name] = $(this).val());
         });
         $(selectQuery,$form).each(function(){
             var role = $(this).attr('data-role');

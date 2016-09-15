@@ -18,7 +18,7 @@
         enable:true
     };
 
-    var BUTTON = "button";
+    var BUTTON = "btn btn-default";
 
     var Button = cri.Widgets.extend(function(element,options){
         this.options     = _defaultOptions;
@@ -40,20 +40,25 @@
             this._create();
         },
 
+        _reInit:function(options){
+            this.options = $.extend(this.options,options);
+            this.text(this.options.text);
+            this.iconCls(this.options.iconCls);
+            this.options.enable ? this.enable() : this.disable();
+        },
+
         _create:function(){
             var op = this.options,
                 iconCls = op.iconCls || '',
-                $e = this.$element.hide(),
-                text = op.text || $e.text() || $e.val() || '',
-                $icon = '<span class="icon"><i class="' + iconCls + '"></i></span>',
-                buttonText = '<span class="text">'+text+'</span>';
+                $e = this.$element,
+                $icon = '<span class="icon"><i class="' + iconCls + '"></i></span>';
 
-            $e.wrap('<div class="'+ BUTTON + '"></div>');
-            this.$button = $e.parent();
-            this.$button.append($icon, buttonText);
+            $e.addClass(BUTTON);
+            $e.prepend($icon);
             if(!op.enable){
                 this.disable();
             }
+            this.$button = $e;
         },
 
         /**
@@ -61,7 +66,14 @@
          * @param text
          */
         text:function(text){
-            this.$button.find('text').text(text);
+            if(text.length){
+                var $icon = this.$button.find('span.icon').clone();
+                this.$button.empty();
+                if($icon.length){
+                    this.$button.append($icon);
+                }
+                this.$button.append(text);
+            }
         },
 
         /**
@@ -69,7 +81,7 @@
          * @param className
          */
         iconCls:function(className){
-            this.$button.find('.icon i').attr('class',className);
+            this.$button.find('span.icon i').attr('class',className);
         },
 
         enable:function(){
@@ -85,16 +97,19 @@
 
     cri.Button = Button;
 
-    $.fn.button = function(option) {
+    $.fn.btn = function(option) {
         var o = null;
         this.each(function () {
             var $this   = $(this),
-                button  = $this.data('button'),
+                button  = $this.data('widget'),
                 options = typeof option == 'object' && option;
-            if(button != null){
-                button._destroy();
+            if(button != null && button instanceof Button){
+                button._reInit(option);
+                o = button;
+                return false;
             }
-            $this.data('button', (o = new Button(this, options)));
+            $this.data('widget', (o = new Button(this, options)));
+
         });
         return o;
     };

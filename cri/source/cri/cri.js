@@ -42,13 +42,7 @@
             inputQuery = ":input:not(:button,[type=submit],[type=reset],[disabled])",
             selectQuery = "select";
         $(inputQuery,$form).each(function(){
-            var role = $(this).attr('data-role');
-            if(role && role == 'timeInput'){
-                this.name && (o[this.name] = $(this).data("timeInput").getFormatValue());
-            }
-            else{
-                this.name && (o[this.name] = $(this).val());
-            }
+            this.name && (o[this.name] = $(this).val());
         });
         $(selectQuery,$form).each(function(){
             var role = $(this).attr('data-role');
@@ -557,21 +551,21 @@
         onSelected:null, //当选择一行或者多行时触发
         onDblClick:null, //双击行时触发
         onLoad:null,     //构造表格结束时触发
-        ajaxDone:null   //当AJAX请求成功后触发
+        ajaxDone:null    //当AJAX请求成功后触发
     };
 
     var Grid = cri.Widgets.extend(function(element,options){
-        this.options     = _defaultOptions;
-        this.$element    = $(element);
-        this.$grid       = null;
-        this.$gridhead   = null;
-        this.$gridbody   = null;
-        this.toolbar     = null;
-        this.pager       = null;
-        this.$title      = null;
-        this._rows       = null;
-        this._columns    = [];
-        this._selectedId = [];
+        this.options        = _defaultOptions;
+        this.$element       = $(element);
+        this.$grid          = null;
+        this.$gridhead      = null;
+        this.$gridbody      = null;
+        this.toolbar        = null;
+        this.pager          = null;
+        this.$title         = null;
+        this._rows          = null;
+        this._columns       = [];
+        this._selectedId    = [];
         this._gridClassName = this._gridClassName || "datagrid";
         cri.Widgets.apply(this,arguments);
     });
@@ -668,7 +662,7 @@
             if(this.options.onLoad && typeof(this.options.onLoad) === 'function'){
                 this.options.onLoad.call(this);
             }
-            this._colsWidth();
+            //this._colsWidth();
         },
 
         /**
@@ -678,7 +672,7 @@
         _createGrid:function(){
             var height = this.$element._getHeightPixelValue(this.options.height);
             var width  = this.$element._getWidthPixelValue(this.options.width);
-            var $grid  = $("<div></div>").addClass("grid").addClass(this._gridClassName);
+            var $grid  = $("<div></div>").addClass("grid").addClass(this._gridClassName).addClass('panel panel-default');
             height && (height-=2);//减去border
             width && (width-=2);
             $grid.attr("style",this.$element.attr("style"))
@@ -719,7 +713,7 @@
          */
         _createTitle:function($grid){
             if(this.options.title){
-                this.$title = $('<div class="title"><span>' + this.options.title + '</span></div>');
+                this.$title = $('<div class="panel-heading"><span>' + this.options.title + '</span></div>');
                 $grid.append(this.$title);
             }
         },
@@ -731,7 +725,7 @@
          */
         _createHead:function($parent){
             var $headWrap = $("<div></div>").addClass("grid-head-wrap"),
-                $table    = $("<table></table>"),
+                $table    = $('<table class="table table-bordered"></table>'),
                 $tr       = $("<tr></tr>"),
                 op        = this.options,
                 columns   = this._columns;
@@ -792,7 +786,7 @@
          * @private
          */
         _createBody:function(gridBodyHeight){
-            var $gridbody = $('<div class="grid-body loading"></div>'),
+            var $gridbody    = $('<div class="grid-body loading"></div>'),
                 $loadingIcon = $('<i class="fa fa-spinner fa-spin"></i>').addClass("loadingIcon");
             gridBodyHeight && $gridbody.height(gridBodyHeight);
             $gridbody.append($loadingIcon);
@@ -805,7 +799,7 @@
          * @private
          */
         _refreshBody:function(rows){
-            var $table   = $('<table></table>'),
+            var $table   = $('<table class="table table-striped table-hover table-bordered"></table>'),
                 op       = this.options,
                 id       = 0,
                 lineNum  = 1 + op.pageSize * (op.page - 1),
@@ -848,10 +842,7 @@
                 $table.append($tr);
             }
             this.$gridbody.removeClass("loading").html($table);
-            /**
-             *fixed IE8 do not support nth-child selector;
-             */
-            $("tr:nth-child(odd)",$table).css("background","#FFF");
+
             /**
              * 根据gird-body纵向滚动条宽度决定headWrap rightPadding
              * 当grid-body为空时，在IE下不能取到clientWidth
@@ -873,8 +864,8 @@
             var $cols   = [],
                 op      = this.options,
                 columns = this._columns;
-            op.checkBox && $cols.push($("<col/>").width(30));
-            op.rowNum   && $cols.push($("<col/>").width(25));
+            op.checkBox && $cols.push($("<col/>").css('width',30));
+            op.rowNum   && $cols.push($("<col/>").css('width',30));
             for(var i = 0,len = columns.length; i<len; i++){
                 var $col = $("<col/>");
                 columns[i]._width && $col.width(columns[i]._width);
@@ -1036,7 +1027,8 @@
             var op = this.options;
             var grid = this;
             if(this.options.pagination){
-                this.pager = new cri.Pager(this.$grid,{
+                this.$pager = $('<div class="panel-footer"></div>');
+                this.pager = new cri.Pager(this.$pager,{
                     page:op.page,
                     pageSize:op.pageSize,
                     total:0,
@@ -1047,6 +1039,7 @@
                         grid._getData();
                     }
                 });
+                this.$grid.append(this.$pager);
             }
         },
 
@@ -1235,7 +1228,7 @@
         enable:true
     };
 
-    var BUTTON = "button";
+    var BUTTON = "btn btn-default";
 
     var Button = cri.Widgets.extend(function(element,options){
         this.options     = _defaultOptions;
@@ -1257,20 +1250,25 @@
             this._create();
         },
 
+        _reInit:function(options){
+            this.options = $.extend(this.options,options);
+            this.text(this.options.text);
+            this.iconCls(this.options.iconCls);
+            this.options.enable ? this.enable() : this.disable();
+        },
+
         _create:function(){
             var op = this.options,
                 iconCls = op.iconCls || '',
-                $e = this.$element.hide(),
-                text = op.text || $e.text() || $e.val() || '',
-                $icon = '<span class="icon"><i class="' + iconCls + '"></i></span>',
-                buttonText = '<span class="text">'+text+'</span>';
+                $e = this.$element,
+                $icon = '<span class="icon"><i class="' + iconCls + '"></i></span>';
 
-            $e.wrap('<div class="'+ BUTTON + '"></div>');
-            this.$button = $e.parent();
-            this.$button.append($icon, buttonText);
+            $e.addClass(BUTTON);
+            $e.prepend($icon);
             if(!op.enable){
                 this.disable();
             }
+            this.$button = $e;
         },
 
         /**
@@ -1278,7 +1276,14 @@
          * @param text
          */
         text:function(text){
-            this.$button.find('text').text(text);
+            if(text.length){
+                var $icon = this.$button.find('span.icon').clone();
+                this.$button.empty();
+                if($icon.length){
+                    this.$button.append($icon);
+                }
+                this.$button.append(text);
+            }
         },
 
         /**
@@ -1286,7 +1291,7 @@
          * @param className
          */
         iconCls:function(className){
-            this.$button.find('.icon i').attr('class',className);
+            this.$button.find('span.icon i').attr('class',className);
         },
 
         enable:function(){
@@ -1302,16 +1307,19 @@
 
     cri.Button = Button;
 
-    $.fn.button = function(option) {
+    $.fn.btn = function(option) {
         var o = null;
         this.each(function () {
             var $this   = $(this),
-                button  = $this.data('button'),
+                button  = $this.data('widget'),
                 options = typeof option == 'object' && option;
-            if(button != null){
-                button._destroy();
+            if(button != null && button instanceof Button){
+                button._reInit(option);
+                o = button;
+                return false;
             }
-            $this.data('button', (o = new Button(this, options)));
+            $this.data('widget', (o = new Button(this, options)));
+
         });
         return o;
     };
@@ -1373,6 +1381,8 @@
                     iframeNode.src = this.options.content;
                     iframeNode.id = 'id_' + shame;
                     iframeNode.name = 'name_' + shame;
+                    iframeNode.frameBorder = 'no';
+
                     if (iframeNode.attachEvent){
                         iframeNode.attachEvent("onload", function(){
                             that.options.callback && that.options.callback.call();
@@ -1665,21 +1675,32 @@
         required:false
     };
 
-    var INPUT_GROUP = "input-group",
-        ERROR_MSG_HEIGHT = 23,//验证消息框高度
-        WITH_BTN    = "with-btn";
+    var INPUT_GROUP    = "form-group",
+        INPUT_SELECTOR = "input:not(:button,[type=submit],[type=reset],[disabled])";
 
     var Input = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
         this.$inputGroup = null;
         this.button = null;
         cri.Widgets.apply(this,arguments);
-        this.$element.attr('data-role','input');
+        this.$element.data('role','input');
     });
 
     $.extend(Input.prototype,{
         _eventListen:function(){
-
+            var that = this;
+            if(this.$element.is(INPUT_SELECTOR)){
+                this.$element.on("focus",function(){
+                    that.options.onFocus && that.options.onFocus.call(that);
+                }).blur(function(){
+                    that.options.onBlur && that.options.onBlur.call(that);
+                });
+            }
+            else if(this.$element.is('select')){
+                this.$input.click(function(){
+                    that.options.onFocus && that.options.onFocus.call(that);
+                });
+            }
         },
 
         _init:function(){
@@ -1699,7 +1720,7 @@
             $element.wrap('<div class="'+ INPUT_GROUP + '"></div>');
             this.$inputGroup = $element.parent();
             this._wrapInput();
-            this.$input.before(this._label());
+            this._label();
             this.options.enable || this.disable();
         },
 
@@ -1707,48 +1728,39 @@
             var that = this,
                 op   = that.options,
                 $input = this.$element;
+            $input.addClass('form-control');
 
             if(op.readonly){
-                $input = this._readonlyInput($input);
-            }
-
-            else{
-                $input.on("focus",function(){
-                    that.options.onFocus && that.options.onFocus.call(that);
-                }).blur(function(){
-                    that.options.onBlur && that.options.onBlur.call(that);
-                });
+                if($input.is(INPUT_SELECTOR)){
+                    $input.prop('readonly',true);
+                }
+                else{
+                    var $static = $('<span class="form-control-static"></span>');
+                    this.$element.after($static);
+                    $input = $static;
+                }
             }
 
             if(op.button){
-                var $button = $('<button></button>');
-                $input.after($button);
-                this._button($button);
-                $input.addClass(WITH_BTN);
+                $input.wrap('<div class="input-group"></div>');
+                var $inputGroup = $input.parent();
+                var $inputGroupBtn = $('<span class="input-group-btn"></span>');
+                $inputGroup.append($inputGroupBtn);
+                this._button($inputGroupBtn);
             }
-
             this.$input = $input;
         },
 
-        /**
-         * 返回包装 readonly input
-         * @param $element
-         * @private
-         */
-        _readonlyInput:function($element){
-            var that = this,
-                $input = $('<span class="readonly" role="readonly"></span>');
-            $input.on("click",function(){
-                that.options.onFocus && that.options.onFocus.call(that);
-            }).blur(function(){
-                that.options.onBlur && that.options.onBlur.call(that);
+        _button:function($p){
+            var button = this.options.button,
+                text   = button.text || '',
+                $i     = $('<i class="' + button.iconCls + '">' + text + '</i>'),
+                $btn   = $('<button type="button" class="btn btn-fab-mini"></button>');
+            $btn.append($i);
+            this.button = $p.append($btn);
+            $btn.click(function(){
+                button.handler && button.handler.call();
             });
-            this.$element.attr("readonly",true).hide().after($input);
-            return $input;
-        },
-
-        _button:function($button){
-            this.button = $button.button(this.options.button);
         },
 
         _label:function(){
@@ -1756,12 +1768,22 @@
                 this.$element.data("label") ||
                 this.$element.attr("title") ||
                 this.$element.attr("name") ||
-                "";
-            var $label = $('<label></label>').text(label);
-            if(this.options.required){
-                $label.addClass('required');
+                "",
+                $input = this.$input;
+            label = "" + label;
+            if(label.length){
+                var $label = $('<label class="control-label col-sm-4">' + label + '</label>');
+                if(this.options.required){
+                    $label.addClass('required');
+                }
+                this.$inputGroup.prepend($label);
+                if($input.parent().is('.input-group')){
+                    $input.parent().wrap('<div class="col-sm-8"></div>');
+                }
+                else{
+                    $input.wrap('<div class="col-sm-8"></div>');
+                }
             }
-            return $label;
         },
 
         _destroy:function(){
@@ -1773,28 +1795,13 @@
             if(value == null){
                 return ;
             }
-            if(this.$input.is("input")){
+            if(this.$input.is(INPUT_SELECTOR)){
                 this.$input.val(value);
                 this.$input.change();
-            }else{
-                if(this.$element.is("select")){
-                    this.$element.val(value);
-                    if(this.$element.attr("multiple")){
-                        var text = [];
-                        this.$element.find("option:selected").each(function(){
-                            text.push($(this).text());
-                        });
-                        this.$input.text(text.join(","));
-                    }
-                    else{
-                        this.$input.text(this.$element.find("option:selected").text());
-                    }
-                }
-                else{
-                    this.$element.val(value);
-                    this.$input.text(value);
-                }
-                this.$element.change();
+            }
+            else if(this.$element.is('select')){
+                this.$element.val(value);
+                this.$input.text(this.$element.find("option:selected").text());
             }
         },
 
@@ -1807,56 +1814,34 @@
          * @private
          */
         _showValidateMsg: function(errorMsg){
-            this.$input.addClass("failure");
-            var offset = this.$input.offset();
+            this.$inputGroup.addClass("has-error");
             if(!this.$errorMsg){
-                this.$errorMsg = $('<div class="input-warm"><i class="fa fa-exclamation"></i><span>' + errorMsg + '</span></div>');
+                this.$errorMsg = $('<span class="help-block">' + errorMsg + '</span>');
                 this.$input.after(this.$errorMsg);
             }
             else{
-                this.$errorMsg.find("span").text(errorMsg);
-            }
-            if(offset.top <= (ERROR_MSG_HEIGHT)){
-                this.$errorMsg.addClass("bottom-input");
-            }
-            else{
-                this.$errorMsg.removeClass("bottom-input");
+                this.$errorMsg.text(errorMsg);
             }
             this.$errorMsg.show();
-
-            $('html,body').is(':animated') || $('html,body').animate({
-                scrollTop: this.$input.offset().top
-            },300);
-
         },
 
         _hideValidateMsg: function(){
-            this.$input.removeClass("failure");
+            this.$inputGroup.removeClass("has-error");
             this.$errorMsg && this.$errorMsg.hide();
-        },
-
-        /**
-         * 返回input的button对象
-         */
-        getButton:function(){
-            return this.button;
         },
 
         /**
          * 使输入框不能用
          */
         disable:function(){
-            var $layout = $('<div class="input-layout"></div>');
-            if(this.$inputGroup.has(".input-layout").length == 0){
-                this.$inputGroup.append($layout);
-            }
+            this.$element.prop('disabled',true);
         },
 
         /**
          * 使输入框可用
          */
         enable:function(){
-            this.$inputGroup.children(".input-layout").remove();
+            this.$element.prop('disabled',false);
         },
 
         value:function(value){
@@ -1871,21 +1856,25 @@
     cri.Input = Input;
 
     $.fn.input = function(option) {
-        var o = null;
+        var widget = null;
         this.each(function () {
             var $this   = $(this),
-                input   = $this.data('input'),
                 options = typeof option == 'object' && option,
                 role    = $this.attr("role");
-            if(role == "timeInput"){
-                return input;
+            widget = $this.data('widget');
+
+            if(widget != null){
+                if(widget instanceof Input){
+                    widget._destroy();
+                }
+                else if(widget instanceof cri.TimeInput){
+                    widget = null;
+                    return ;
+                }
             }
-            if(input != null){
-                input._destroy();
-            }
-            $this.data('input', (o = new Input(this, options)));
+            $this.data('widget', (widget = new Input(this, options)));
         });
-        return o;
+        return widget;
     };
 }(window);
 
@@ -2092,7 +2081,8 @@
         enable:true,
         required:false,
         max:null,
-        min:null
+        min:null,
+        button:{}
     };
 
     var NumberInput = cri.Input.extend(function(element,options){
@@ -2104,55 +2094,42 @@
 
     $.extend(NumberInput.prototype,{
         _eventListen:function(){
-
+            var that = this,
+                op   = that.options;
+            this.$element.on("focus", function () {
+                op.onFocus && op.onFocus.call(that);
+            }).on('blur',function () {
+                op.onBlur && op.onBlur.call(that);
+                if(op.min != null){
+                    var val = that.$element.val();
+                    if(val == "" || val < op.min){
+                        that.value(that.options.min);
+                    }
+                }
+                if(that.options.max != null){
+                    var val = that.$element.val();
+                    if(val == "" || val > op.max){
+                        that.value(that.options.max);
+                    }
+                }
+            }).on("change",function(){
+                op.onChange && op.onChange.call(that);
+            }).on("keydown",function(e){
+                var keycode = e.keyCode || e.which || e.charCode;
+                if((keycode>=48 && keycode<=57) || keycode == 8){
+                    return true;
+                }
+                else{
+                    return false;
+                }
+            });
         },
 
-        _wrapInput:function() {
-            var that   = this,
-                op     = that.options,
-                $input = that.$element;
-            if (op.readonly) {
-                $input = this._readonlyInput($input);
-            }
-            else {
-                $input.on("focus", function () {
-                    that.options.onFocus && that.options.onFocus.call(that);
-                }).blur(function () {
-                    that.options.onBlur && that.options.onBlur.call(that);
-                    if(that.options.min != null){
-                        var val = that.$element.val();
-                        if(val == "" || val < that.options.min){
-                            that.value(that.options.min);
-                        }
-                    }
-                    if(that.options.max != null){
-                        var val = that.$element.val();
-                        if(val == "" || val > that.options.max){
-                            that.value(that.options.max);
-                        }
-                    }
-                }).on("change",function(){
-                    that.options.onChange && that.options.onChange.call(that);
-                }).on("keydown",function(e){
-                    var keycode = e.keyCode || e.which || e.charCode;
-                    if((keycode>=48 && keycode<=57) || keycode == 8){
-                        return true;
-                    }else{
-                        return false;
-                    }
-                });
-            }
-            this.$input = $input;
-            $input.addClass(WITH_BTN);
-            this._appendBtn();
-        },
-
-        _appendBtn:function(){
+        _button:function($p){
             var that         = this,
-                $plusButton  = $('<i class="fa fa-sort-up plus-button"></i>'),
-                $minusButton = $('<i class="fa fa-sort-down minus-button"></i>'),
-                $Buttons     = $('<span class="plus-minus-button"></span>').append($minusButton,$plusButton);
-
+                $plusButton  = $('<a href="#" class="top"><i class="fa fa-sort-up plus-button"></i></a>'),
+                $minusButton = $('<a href="#" class="bottom"><i class="fa fa-sort-down minus-button"></i></a>');
+            $p.addClass('btn-group-vertical');
             $plusButton.click(function(){
                 var val = that.value();
                 if(cri.isNum(val)){
@@ -2171,7 +2148,7 @@
                     that.value(parseInt(val,10) - 1);
                 }
             });
-            this.$input.after($Buttons);
+            $p.append($plusButton,$minusButton);
         },
         value:function(value){
             if(arguments.length>0){
@@ -2191,18 +2168,18 @@
     cri.NumberInput = NumberInput;
 
     $.fn.numberInput = function(option) {
-        var o = null;
+        var widget;
         this.each(function () {
             var $this   = $(this),
-                input   = $this.data('numberInput'),
                 options = typeof option == 'object' && option,
                 role    = $this.attr("role");
-            if(input != null){
-                input._destroy();
+            widget = $this.data('widget');
+            if(widget != null && widget instanceof NumberInput){
+                widget._destroy();
             }
-            $this.data('numberInput', (o = new NumberInput(this, options)));
+            $this.data('widget', (widget = new NumberInput(this, options)));
         });
-        return o;
+        return widget;
     };
 }(window);
 
@@ -2228,7 +2205,6 @@
         page:1,      //当前页数
         pageSize:10, //每页条数
         total:0,     //总条数
-        rowsLen:0,   //实际数据length
         onPage:null,  //当用户点击翻页按钮时触发
         onUpdate:null //更新翻页信息结束触发
     };
@@ -2237,11 +2213,8 @@
         PREVPAGE  = "prev-page",
         NEXTPAGE  = "next-page",
         LASTPAGE  = "last-page",
-        PAGENUMBER    = "pager-number",
-        PAGENAV       = "pager-nav",
-        PAGEINFO      = "pager-info",
-        STATEDISABLED = "state-disabled",
-        STATEDSTATE   = "state-selected";
+        STATEDISABLED = "disabled",
+        ACTIVE   = "active";
 
     var Pager = cri.Widgets.extend(function(element,options){
         this.options = _defaultOptions;
@@ -2252,9 +2225,10 @@
     $.extend(Pager.prototype,{
         _eventListen:function(){
             var that = this;
-            this.$pager.on("click","a:not('."+STATEDISABLED+"')",function(e){
-                var $a = $(e.target).closest("a");
-                var page = $a.data("page");
+            this.$pager.find('li').off('click');
+            this.$pager.find('li:not(.'+STATEDISABLED+')').on("click",function(e){
+                var $li = $(e.target).closest("li");
+                var page = $li.data("page");
                 that._page(page);
             });
         },
@@ -2264,30 +2238,23 @@
         },
 
         _createPager:function($parent){
-            var $pager = this.$pager = $("<div></div>").addClass("pager");
-            $pager.append(this._createPagerBtn()).append(this._createPagerInfo());
-            $parent.append($pager);
-        },
+            var $pager   = this.$pager = $("<ul></ul>").addClass("pagination"),
+                op       = this.options,
+                pageSize = op.pageSize || 10,
+                total    = op.total || 0,
+                page     = parseInt(op.page) || 1,
+                lastPage = Math.ceil(total / pageSize),
 
-        _createPagerBtn: function(){
-            var op        = this.options,
-                pageSize  = op.pageSize || 10,
-                total     = op.total || 0,
-                page      = parseInt(op.page) || 1,
-                lastPage  = Math.ceil(total / pageSize);
+                $firstPage  = $('<li></li>').addClass(FIRSTPAGE).append('<a href="#"><span class="fa fa-angle-double-left"></span></a>'),
+                $prevPage   = $('<li></li>').addClass(PREVPAGE).append('<a href="#"><span class="fa fa-angle-left"></span></a>'),
+                $nextPage   = $('<li></li>').addClass(NEXTPAGE).append('<a href="#"><span class="fa fa-angle-right"></span></a>'),
+                $lastPage   = $('<li></li>').addClass(LASTPAGE).append('<a href="#"><span class="fa fa-angle-double-right"></span></a>');
 
-            var $pagerBtn   = $("<div></div>").addClass(PAGENAV),
-                $firstPage  = $('<a></a>').addClass(FIRSTPAGE).append('<span class="fa fa-angle-double-left"></span>'),
-                $prevPage   = $('<a></a>').addClass(PREVPAGE).append('<span class="fa fa-angle-left"></span>'),
-                $nextPage   = $('<a></a>').addClass(NEXTPAGE).append('<span class="fa fa-angle-right"></span>'),
-                $lastPage   = $('<a></a>').addClass(LASTPAGE).append('<span class="fa fa-angle-double-right"></span>'),
-                $numberPage = $("<ul></ul>").addClass(PAGENUMBER);
-
+            lastPage = lastPage>0?lastPage:page;
             this._fourBtn($firstPage,$prevPage,$nextPage,$lastPage,page,lastPage);
-            this._numberPage($numberPage,page,lastPage);
-
-            $pagerBtn.append($firstPage).append($prevPage).append($numberPage).append($nextPage).append($lastPage);
-            return $pagerBtn;
+            $pager.append($firstPage,$prevPage,$nextPage,$lastPage);
+            $prevPage.after(this._numberPage(page,lastPage));
+            $parent.append($pager);
         },
 
         _updatePagerBtn:function(){
@@ -2297,16 +2264,16 @@
                 page     = parseInt(op.page) || 1,
                 lastPage = Math.ceil(total / pageSize),
 
-                $pagerBtn   = $("." + PAGENAV,this.$pager),
-                $firstPage  = $("." + FIRSTPAGE,$pagerBtn),
-                $prevPage   = $("." + PREVPAGE,$pagerBtn),
-                $nextPage   = $("." + NEXTPAGE,$pagerBtn),
-                $lastPage   = $("." + LASTPAGE,$pagerBtn),
-                $numberPage = $("." + PAGENUMBER,$pagerBtn);
+                $firstPage  = $("." + FIRSTPAGE,this.$pager),
+                $prevPage   = $("." + PREVPAGE,this.$pager),
+                $nextPage   = $("." + NEXTPAGE,this.$pager),
+                $lastPage   = $("." + LASTPAGE,this.$pager),
+
+                $numberPage = $(".number",this.$pager);
 
             this._fourBtn($firstPage,$prevPage,$nextPage,$lastPage,page,lastPage);
-            $numberPage.empty();
-            this._numberPage($numberPage,page,lastPage);
+            $numberPage.remove();
+            $prevPage.after(this._numberPage(page,lastPage));
         },
 
         _fourBtn:function($firstPage,$prevPage,$nextPage,$lastPage,page,lastPage){
@@ -2330,45 +2297,18 @@
             }
         },
 
-        _numberPage:function($numberPage,page,lastPage){
+        _numberPage:function(page,lastPage){
             var start = page > 2 ? page-2:1,
-                end   = start + 5;
-
-            for(var i=start; i<end; i++){
-                if(i>0 && i<= lastPage){
-                    var $li = $("<li></li>"),
-                        $a  = $("<a></a>").data("page",i).text(i);
-                    i != page ?
-                        $a.addClass("pager-num"):
-                        $a.addClass(STATEDSTATE);
-                    $numberPage.append($li.append($a));
-                }
+                end   = start + 4,
+                numberPage = [];
+            start = lastPage > 4 ? (end > lastPage ? lastPage - 4:start):start;
+            for(var i=start; i<=end && i<=lastPage; i++){
+                var $li = $('<li class="number"></li>').data("page",i),
+                    $a  = $('<a href="javascript:void(0);"></a>').text(i);
+                i != page ? $li.addClass("pager-num"): $li.addClass(ACTIVE);
+                numberPage.push($li.append($a));
             }
-        },
-
-        _updatePagerInfo:function(){
-            var op       = this.options,
-                pageSize = op.pageSize || 10,
-                total    = op.total || 0,
-                page     = parseInt(op.page) || 1,
-                numStart = (page-1) * pageSize + 1,
-                numEnd   = (page-1) * pageSize + op.rowsLen,
-
-                $pager     = this.$pager,
-                $pagerInfo = $("."+PAGEINFO,$pager);
-
-            $pagerInfo.text(numStart + ' - ' + numEnd + ' of ' + total + ' items');
-        },
-
-        _createPagerInfo:function(){
-            var op  = this.options,
-                pageSize  = op.pageSize || 10,
-                total     = op.total || 0,
-                page      = parseInt(op.page) || 1,
-                numStart  = (page-1) * pageSize + 1,
-                numEnd    = (page-1) * pageSize + op.rowsLen;
-
-            return $("<div></div>").addClass(PAGEINFO).text(numStart + ' - ' + numEnd + ' of ' + total + ' items');
+            return numberPage;
         },
 
         _page:function(page){
@@ -2377,14 +2317,15 @@
             this.options.onPage.call(this,op.page,op.pageSize);
         },
 
-        update:function(page,pageSize,total,rowsLen){
+        update:function(page,pageSize,total){
             var op = this.options;
-            op.total = total;
-            op.rowsLen = rowsLen;
-            op.page = page;
-            op.pageSize = pageSize;
+            if(total !== undefined || total !== null){
+                op.total = total;
+            }
+            op.page = page || op.page;
+            op.pageSize = pageSize || op.pageSize;
             this._updatePagerBtn();
-            this._updatePagerInfo();
+            this._eventListen();
             op.onUpdate && op.onUpdate(this);
         }
     });
@@ -2440,10 +2381,10 @@
         _create:function(){
             this.$element.hide();
             this.options.multiple && this.$element.attr('multiple','multiple');
-            this.$element.wrap('<span class="' + SELECTBOX_GROUP + '"></span>');
-            this.$selectBoxGroup = this.$element.parent();
             this._createInput();
+            this.$selectBoxGroup = this.$element.parent('.form-group');
             this._createListView();
+            this.$selectBoxGroup.addClass(SELECTBOX_GROUP);
         },
 
         _createInput:function(){
@@ -2674,7 +2615,7 @@
         _init:function(){
             var that = this,
                 data = this.options.data,
-                $options = this.$options = $('<ul class="' + OPTIONS + '"></ul>'),
+                $options = this.$options = $('<ul class="list-group ' + OPTIONS + '"></ul>'),
                 selectedQuery = "."+SELECTED;
             if(data){
                 for(var i = 0,len = data.length; i<len; i++){
@@ -2704,7 +2645,7 @@
                 that.text = texts;
                 that._change();
             });
-            $('body').append($options.hide());
+            $('body').append($options);
         },
 
         /**
@@ -2713,7 +2654,7 @@
          * @private
          */
         _createOption:function(option){
-            return $('<li data-value="'+option.value+'">'+option.text+'</li>');
+            return $('<li class="list-group-item" data-value="'+option.value+'">'+option.text+'</li>');
         },
 
         /**
@@ -2722,10 +2663,10 @@
          */
         _setPosition:function(){
             var labelWidth = this.$parent.find('label').outerWidth();
-            var left = this.$parent.offset().left + labelWidth;
-            var top = this.$parent.offset().top + 28;
+            var left = this.$parent.offset().left + labelWidth + 15;
+            var top = this.$parent.offset().top + 34;
             //magic number 10 为 options padding+border宽度
-            var width = this.$parent.find('.input-group').outerWidth()-10-labelWidth;
+            var width = this.$parent.find('.input-group').outerWidth();
             this.$options.css({top:top,left:left,width:width});
         },
 
@@ -2738,7 +2679,7 @@
             $(document).mouseup(function(e) {
                 var _con = that.$options;
                 if (!_con.is(e.target) && _con.has(e.target).length === 0) {
-                    that.$options.slideUp(200);
+                    that.$options.removeClass('open');
                 }
             });
         },
@@ -2774,13 +2715,9 @@
         toggle:function(){
             var that = this;
             this._setPosition();
-            if(this.$options.is(":hidden")){
-                this.$options.slideDown(200, function(){
-                    that._clickBlank();
-                });
-            }
-            else{
-                this.$options.slideUp(200);
+            this.$options.toggleClass('open');
+            if(this.$options.is('open')){
+                that._clickBlank();
             }
         },
 
@@ -3435,7 +3372,7 @@
  * Author zhouzy
  * Date   2014/9/18
  * TimeInput 组件
- *
+ * 依赖Input组件
  */
 !function(window){
 
@@ -3462,7 +3399,7 @@
 
     var _defaultOptions = {
         value:null,
-        format:"yyyy/MM/dd hh:mm:ss",
+        format:"yyyy/MM/dd",
         HMS:false,
         enable:true
     };
@@ -3477,20 +3414,17 @@
     });
 
     TimeInput.prototype._init = function(){
-        if(!this.options.HMS && this.options.format){
-            this.options.format = this.options.format.replace(/\s*[Hh].*$/,"");
+        if(this.options.format && /hh|ss/.test(this.options.format)){
+            this.options.HMS = true;
         }
-
         this.date = this.options.value || new Date();
 
         if(!(this.date instanceof Date)){
             this.date = cri.string2Date(this.date)
         }
 
-        var $element = this.$element.attr("role","timeInput");
-        $element.wrap('<div class="'+TIME_INPUT_GROUP+'"></div>');
-        this.$timeInputGroup = $element.parent();
         this._wrapInput();
+        this.$timeInputGroup = this.$element.closest('.input-group').addClass(TIME_INPUT_GROUP);
         this._timeSelectView();
     };
 
@@ -3509,10 +3443,11 @@
             readonly:true,
             value:cri.formatDate(value,this.options.format),
             button:button,
-            enable:this.options.enable,
-            onFocus:function(){
-                that.selectView.toggle();
-            }});
+            enable:this.options.enable
+        });
+        this.$element.click(function(){
+            that.selectView.toggle();
+        });
     };
 
     /**
@@ -3632,17 +3567,16 @@
          * @private
          */
         _create:function($parent){
-            var $timeBox = this.$timeBox = $('<div class="' + TIME_BOX + '"></div>');
-            var $titleBar = $('<div class="titleBar"></div>');
+            var $timeBox = this.$timeBox = $('<div class="container-fluid ' + TIME_BOX + '"></div>');
+            var $titleBar = $('<div class="titleBar form-inline"></div>');
+            var $row = $('<div class="row"></div>');
             $titleBar.append(
                 this._yearSelect(),
-                this._monthSelect(),
-                '<span style="position:absolute;top:5px;right:23px;">月</span>');
-            $timeBox.append($titleBar,this._daySelect());
+                this._monthSelect());
+            $timeBox.append($row.append($titleBar),this._daySelect());
             if(this.options.HMS == true){
-                $timeBox.append(this._hmsSelect());
+                $timeBox.append($('<div class="row"></div>').append(this._hmsSelect()));
             }
-
             $("body").append($timeBox);
         },
 
@@ -3654,20 +3588,22 @@
         _yearSelect : function(){
             var that = this;
             var date = this.date;
-            var $yearSelect = $('<div class="yearSelecter"></div>');
-            var $minusBtn   = $('<i class="toLastYear yearButton fa fa-minus"></i>');
-            var $plusBtn    = $('<i class="toNextYear yearButton fa fa-plus"></i>');
-            var $year       = $('<span class="year">' + date.yyyy + '</span>');
+            var $yearSelect = $('<div class="year_Selecter col-sm-8"></div>');
+            var $minusBtn   = $('<span class="input-group-btn"><button class="btn btn-default" type="button">-</button></span>');
+            var $plusBtn    = $('<span class="input-group-btn"><button class="btn btn-default" type="button">+</button></span>');
+            var $year       = $('<input class="form-control" readonly/>').val(date.yyyy + '年');
             this.$year = $year;
+            var $yearInputGroup = $('<div class="input-group input-group-sm"></div>');
             $minusBtn.on("click",function(){
-                $year.html(--that.date.yyyy);
+                $year.val(--that.date.yyyy + '年');
                 that._change();
             });
             $plusBtn.on("click",function(){
-                $year.html(++that.date.yyyy);
+                $year.val(++that.date.yyyy + '年');
                 that._change();
             });
-            $yearSelect.append($minusBtn,$year,'年',$plusBtn);
+            $yearInputGroup.append($minusBtn,$year,$plusBtn);
+            $yearSelect.append($yearInputGroup);
             return $yearSelect;
         },
 
@@ -3679,19 +3615,21 @@
         _monthSelect:function(){
             var that = this,
                 date = this.date,
-                $select = $('<select class="monthSelect">');
+                $select = $('<select class="form-control month_Select">');
+            var $selectWrap = $('<div class="col-sm-4"></div>');
+            var $inputGroup = $('<div class="input-group-sm"></div>');
+
             this.$month = $select;
             $.each([1,2,3,4,5,6,7,8,9,10,11,12],function(index,value){
                 value < 10 && (value = "0" + value);
                 $select.append('<option value="' + index + '">' + value + '</option>');
             });
-            $select.val(date.MM);
-            $select.on("change",function(){
+            $select.val(date.MM).on("change",function(){
                 that.date.MM = $select.val();
                 that._refreshDaySelect();
                 that._change();
             });
-            return $select;
+            return $selectWrap.append($inputGroup.append($select,'<span class="control-label">月</span>'));
         },
 
         /**
@@ -3759,11 +3697,13 @@
          */
         _hmsSelect:function(){
             var that = this,
-                $hmsBar = $('<div class="HMSBar"></div>'),
-                $hour = $('<input class="hour"/>'),
-                $minute = $('<input class="minute"/>'),
-                $second = $('<input class="second"/>');
-            $hmsBar.append($hour,':',$minute,':',$second);
+                $hmsBar = $('<div class="HMSBar form-inline"></div>'),
+                $hour   = $('<input class="form-control hour"/>'),
+                $minute = $('<input class="form-control minute"/>'),
+                $second = $('<input class="form-control second"/>');
+            $hmsBar.append($('<div class="col-sm-4"></div>').append($hour));
+            $hmsBar.append($('<div class="col-sm-4"></div>').append($minute));
+            $hmsBar.append($('<div class="col-sm-4"></div>').append($second));
 
             this.hour = $hour.numberInput({
                 min:0,
@@ -3774,6 +3714,7 @@
                     that._change();
                 }
             });
+            $hour.before('<span class="input-group-addon">时</span>');
             this.minute = $minute.numberInput({
                 min:0,
                 max:59,
@@ -3783,6 +3724,7 @@
                     that._change();
                 }
             });
+            $minute.before('<span class="input-group-addon">分</span>');
             this.second = $second.numberInput({
                 min:0,
                 max:59,
@@ -3792,6 +3734,7 @@
                     that._change();
                 }
             });
+            $second.before('<span class="input-group-addon">秒</span>');
             return $hmsBar;
         },
 
@@ -3800,25 +3743,18 @@
         },
 
         /**
-         * 当在非本元素范围内点击，收缩下拉框
-         * @private
-         */
-        _clickBlank:function(){
-            var that = this;
-            $(document).mouseup(function(e) {
-                var _con = that.$timeBox;
-                if (!_con.is(e.target) && _con.has(e.target).length === 0) {
-                    that.$timeBox.slideUp(200);
-                }
-            });
-        },
-        /**
          * 设置position显示时在屏幕中的位置
          * @private
          */
         _setPosition:function(){
             var left = this.$parent.offset().left + this.$parent.find('label').outerWidth();
-            var top = this.$parent.offset().top + 28;
+            var top = this.$parent.offset().top + 34;
+            var scrollHeight = document.body.scrollHeight;
+            this.$timeBox.removeClass('top');
+            if(top + 250 > scrollHeight){
+                top = top - 34 - 250;
+                this.$timeBox.addClass('top');
+            }
             this.$timeBox.css({top:top,left:left});
         },
 
@@ -3837,11 +3773,25 @@
             var that = this;
             this._setPosition();
             if(this.$timeBox.is(":hidden")){
-                this.$timeBox.slideDown(200,function(){
-                    that._clickBlank();
-                });
+                var cb = function(e){
+                    var _con = that.$timeBox;
+                    if (!_con.is(e.target) && _con.has(e.target).length === 0) {
+                        that.$timeBox.slideUp(200);
+                        $(document).off('mouseup',cb);
+                    }
+                };
+                if(this.$timeBox.is('.top')){
+                    this.$timeBox.show();
+                    $(document).on('mouseup',cb);
+                }else{
+                    this.$timeBox.slideDown(200,function(){
+                        $(document).on('mouseup',cb);
+                    });
+                }
             }
             else{
+                this.$timeBox.is('.top')?
+                this.$timeBox.hide():
                 this.$timeBox.slideUp(200);
             }
         },
@@ -3873,17 +3823,17 @@
     };
 
     $.fn.timeInput = function (option) {
-        var o = null;
+        var widget = null;
         this.each(function () {
             var $this = $(this),
                 options = typeof option == 'object' && option;
-            o = $this.data('timeInput');
-            if(o != null){
-                o._destroy();
+            widget = $this.data('widget');
+            if(widget != null){
+                widget._destroy();
             }
-            $this.data('timeInput', (o = new TimeInput(this, options)));
+            $this.data('widget', (widget = new TimeInput(this, options)));
         });
-        return o;
+        return widget;
     };
 
 }(window);
@@ -3912,7 +3862,7 @@
         return $icon;
     }
     function button(button){
-        var $button = $("<li></li>");
+        var $button = $('<button class="btn btn-sm btn-default"></button>');
         button.iconCls && $button.append(icon(button.iconCls));
         button.text && $button.append(button.text);
         button.handler && $button.on("click",button.handler);
@@ -3935,7 +3885,7 @@
         _create:function($parent){
             var op = this.options;
             var buttons = op.buttons;
-            var $toolbar = this.$toolBar = $('<ul class="'+TOOLBAR + '"></ul>');
+            var $toolbar = this.$toolBar = $('<div class="btn-toolbar '+TOOLBAR + '"></div>');
             for(var i = 0,len = buttons.length; i<len; i++){
                 var btn = buttons[i];
                 $toolbar.append(button(btn));
@@ -4100,9 +4050,9 @@
             var op      = this.options,
                 height  = this.$element._getHeightPixelValue(op.height),
                 width   = this.$element._getWidthPixelValue(op.width),
-                $tree   = $("<div></div>").addClass(this._className).width(width),
+                $tree   = $("<div></div>").addClass(this._className).addClass('panel panel-default').width(width),
 
-                $treeview = this.$treeview = $("<div></div>").addClass("tree-view"),
+                $treeview = this.$treeview = $("<div></div>").addClass("tree-view panel-body"),
                 $treebody = this.$treebody = $("<ul></ul>").addClass("tree-body");
 
             $tree.attr("style",this.$element.attr("style")).show().height(height);
@@ -4206,7 +4156,7 @@
 
         _createTitle:function($parent){
             if(this.options.title){
-                this.$title = $('<div class="title"><span>' + this.options.title + '</span></div>');
+                this.$title = $('<div class="title panel-heading"><span>' + this.options.title + '</span></div>');
                 $parent.append(this.$title);
             }
         },
@@ -4654,7 +4604,7 @@
             if(that.options.validateOnBlur){
                 if(!$element.is(INPUTSELECTOR)){
                     $element.find(INPUTSELECTOR).each(function(){
-                        $(this).on("change",function(){
+                        $(this).on("blur",function(){
                             that._validateInput($(this));
                         });
                         if(!$(this).is('[role=timeInput]')){
@@ -4693,11 +4643,12 @@
         },
 
         /**
-         * 验证表单或者输入框
+         * 验证表单或者输入框,
+         * 如果传入值，则验证指定的对象
          */
-        validate:function(){
+        validate:function($e){
             var that = this,
-                $element = this.$element,
+                $element = $e || this.$element,
                 result = true;
             if(!$element.is(INPUTSELECTOR)){
                 $element.find(INPUTSELECTOR).each(function(){
@@ -4732,41 +4683,65 @@
                 this._showMessage($input,errorMsg);
                 if($input.is("[readonly=readonly]")){
                     $input.closest(".input-group").one("click",function(){
-                        that._hideMessage($input.attr('name'));
-                    })
+                        that._hideMessage($input);
+                    });
                 }
                 $input.one("focus",function(){
-                    that._hideMessage($input.attr('name'));
+                    that._hideMessage($input);
                 });
             }else{
-                this._hideMessage($input.attr('name'));
+                this._hideMessage($input);
             }
             return valid;
         },
 
         _showMessage:function($input,errorMsg){
-            errorMsg = $input.attr('error-msg')|| errorMsg || '请检查';
-            var widget = $input.data($input.data("role"));
-            if(widget){
-                widget._showValidateMsg(errorMsg)
+            errorMsg = errorMsg || $input.attr('error-msg') || '请检查';
+            var role = $input.data("role");
+            if(role){
+                var widget = $input.data('widget');
+                if(widget){
+                    widget._showValidateMsg(errorMsg)
+                }
+            }
+            else{
+                $input.closest('.form-group').addClass('has-error');
+                var _$helpBlock = $input.next();
+                if(_$helpBlock.is('.help-block')){
+                    _$helpBlock.text(errorMsg);
+                }
+                else{
+                    _$helpBlock = $('<span class="help-block">' + errorMsg + '</span>');
+                    $input.after(_$helpBlock);
+                }
+                _$helpBlock.show();
             }
         },
 
-        _hideMessage:function(name){
-            var $input = $('input[name='+name+'],select[name='+name+']');
-            var widget = $input.data("role") && $input.data($input.data("role"));
-            widget && typeof(widget._hideValidateMsg) == 'function' && widget._hideValidateMsg();
+        _hideMessage:function($input){
+            var role = $input.data("role");
+            if(role){
+                var widget = $input.data('widget');
+                widget && typeof(widget._hideValidateMsg) == 'function' && widget._hideValidateMsg();
+            }
+            else{
+                $input.closest('.form-group').removeClass('.has-error');
+                var _$helpBlock = $input.next();
+                if(_$helpBlock.is('.help-block')){
+                    _$helpBlock.hide();
+                }
+            }
         },
 
         hideMessages:function(names){
             if(names){
                 if(cri.isArray(names)){
                     for(var i = 0,len=names.length;i<len;i++){
-                        this._hideMessage(names[i]);
+                        this._hideMessage($('[name='+names[i]+']'));
                     }
                 }
                 else{
-                    this._hideMessage(names);
+                    this._hideMessage($('[name='+names+']'));
                 }
             }else{
                 $(".input-warm",this.$element).hide();
@@ -4810,7 +4785,6 @@
 
     var icons = {Minimize:"fa fa-minus",Maximize:"fa fa-expand","Close":"fa fa-close","Resume":"fa fa-compress"},
         MINI_WINDOW_WIDTH = 140+10,
-        WINDOW_PADDING = 35,
         WINDOW_BORDER  = 1,
         ZINDEX = 10000;
 
@@ -4856,7 +4830,7 @@
 
     var _defaultOptions = {
         title:"",
-        actions:["Close","Minimize","Maximize"],//Colse:关闭,Minimize:最下化,Maximize:最大化
+        actions:["Close","Maximize"],//Colse:关闭,Minimize:最下化,Maximize:最大化
         content:null,
         isIframe:false,
         visible:true,
@@ -4884,7 +4858,10 @@
         cri.Widgets.apply(this,arguments);
         this.windowStack.push(this);
         this.toFront();
-        this.$element.attr('data-role','treegrid');
+        this.$element.attr('data-role','window');
+        if(!this.options.visible){
+            this.$window.hide();
+        }
     });
 
     $.extend(Window.prototype,{
@@ -4906,10 +4883,10 @@
             var that = this;
             if(this.options.dragable){
                 this.$window.on("mousedown",".window-head",function(e){
-                    var left     = +that.$window.css("left").split("px")[0],
-                        top      = +that.$window.css("top").split("px")[0],
-                        width    = +that.$window.width(),
-                        height   = +that.$window.height(),
+                    var left     = +that._$panel.css("left").split("px")[0],
+                        top      = +that._$panel.css("top").split("px")[0],
+                        width    = +that._$panel.width(),
+                        height   = +that._$panel.height(),
                         startX   = e.pageX,
                         startY   = e.pageY;
                     $(document).on("mousemove",function(e){
@@ -4935,10 +4912,10 @@
                     that.toFront();
                 })
                 .on("mousedown",".window-resizer",function(e){
-                    var left     = +that.$window.css("left").split("px")[0],
-                        top      = +that.$window.css("top").split("px")[0],
-                        width    = +that.$window.width(),
-                        height   = +that.$window.height(),
+                    var left     = +that._$panel.css("left").split("px")[0],
+                        top      = +that._$panel.css("top").split("px")[0],
+                        width    = +that._$panel.width(),
+                        height   = +that._$panel.height(),
                         startX   = e.pageX,
                         startY   = e.pageY,
                         resizer  = /[ewsn]+$/.exec(this.className)[0];
@@ -4980,57 +4957,69 @@
             var op = this.options;
             op.width = parseWidth(op.width,$(window).width()) - WINDOW_BORDER*2;
             op.height = parseHeight(op.height,$(window).height()) - WINDOW_BORDER*2;
-
-            this._createBody();
-            this._createHead();
-
+            this._createWindow();
             op.resizable && this._createResizeHandler();
             $("body").append(this.$window);
-            this.$element.show();
             if(op.visible){
                 this.$window.show();
             }else{
                 this.$window.hide();
             }
-        },
-
-        /**
-         * 生成window 头部
-         * @private
-         */
-        _createHead : function(){
-            var $windowHead = $('<div class="' + WINDOW_HEAD + '"></div>');
-            $windowHead.append(this._createTitle()).append(this._createActions());
-            this.$window.prepend($windowHead);
-            this.$windowHead = $windowHead;
+            this.$element.show();
         },
 
         /**
          * 包装window 内容部分
          * @private
          */
-        _createBody : function(){
-            var that       = this,
-                op         = this.options,
-                viewWidth  = $(window).width(),
-                viewHeight = $(window).height(),
-                $element   = this.$element,
-                $window    = $('<div class="window"></div>'),
-                $windowBody = $('<div class="window-content"></div>');
+        _createWindow : function(){
+            var op = this.options;
+            var $window = this.$window = $('<div class="window"></div>');
+            if(op.modal){
+                $window.addClass('modal-window');
+                this._$panel = $('<div class="panel panel-default"></div>');
+                $window.append(this._$panel);
+            }
+            else{
+                this._$panel = this.$window.addClass('panel panel-default');
+            }
+
+            this._createWindowHead();
+            this._createWindowBody();
+            this.load(this.options.content);
+        },
+
+        /**
+         * 生成window 头部
+         * @private
+         */
+        _createWindowHead : function(){
+            var $windowHead = $('<div class="' + WINDOW_HEAD + ' panel-heading"></div>');
+            $windowHead.append(this._createTitle()).append(this._createActions());
+            this._$panel.prepend($windowHead);
+            this.$windowHead = $windowHead;
+        },
+
+        /**
+         * 生成window内容区域
+         * @private
+         */
+        _createWindowBody : function(){
+            var that         = this,
+                op           = this.options,
+                viewWidth    = $(window).width(),
+                viewHeight   = $(window).height(),
+                $element     = this.$element,
+                $windowBody  = $('<div class="window-content"></div>');
             var $placeHolder = this.$elementPlaceHolder = $('<div style="display:none"></div>');
             $element.after($placeHolder);
             $element.detach();
-            this.$window = $window;
             if(op.center){
                 op.position.left = (viewWidth - op.width - 2*WINDOW_BORDER) / 2;
                 op.position.top  = (viewHeight - op.height - 2*WINDOW_BORDER) / 2;
             }
             this._setPosition({top:op.position.top,left:op.position.left,width:op.width,height:op.height});
-            $windowBody.height(op.height-35);
-            $window.append($windowBody);
-            $windowBody.append($element);
-            $("body").append(this.$window);
-            this.load(this.options.content);
+            this._$panel.append($windowBody.append($element));
         },
 
         /**
@@ -5052,7 +5041,7 @@
         _createActions : function(){
             var options = this.options,
                 $buttons = $("<div></div>").addClass("actions"),
-                defaultButtons = options.modal ? ["Maximize","Close"]:["Minimize","Maximize","Close"];
+                defaultButtons = options.modal ? ["Maximize","Close"]:["Maximize","Close"];
 
             for(var i = 0, len = defaultButtons.length; i<len; i++){
                 var defBtn = defaultButtons[i];
@@ -5079,34 +5068,7 @@
             $.each(resizer.split(" "),function(index,value){
                 resizerHandler.push('<div class="window-resizer window-resizer-' + value + '" style="display: block;"></div>');
             });
-            this.$window.append(resizerHandler.join(""));
-        },
-
-        /**
-         * 模态窗口显示遮罩
-         * @param z
-         * @private
-         */
-        _showMask : function(z){
-            var $mask = Window.prototype.mask;
-            if($mask){
-                $mask.css("zIndex",z).show();
-                $('body').css('overflow','hidden');
-            }
-            else{
-                $mask = Window.prototype.mask = $("<div></div>").addClass("overlay").css("zIndex",z);
-                $("body").append($mask).css('overflow','hidden');
-            }
-        },
-
-        /**
-         * 隐藏遮罩
-         * @private
-         */
-        _hideMask : function(){
-            var $mask = Window.prototype.mask;
-            $mask && $mask.hide();
-            $('body').css('overflow','auto');
+            this._$panel.append(resizerHandler.join(""));
         },
 
         /**
@@ -5115,8 +5077,7 @@
          * @private
          */
         _setPosition : function(position){
-            var $window = this.$window;
-            $window.css(position);
+            this._$panel.css(position);
             this.options.position = position;
         },
 
@@ -5143,9 +5104,10 @@
         _setStyleByStatus : function(status){
             var op    = this.options,
                 pos   = op.position,
-                KLASS = {minimize:"window mini-window",maximize:"window maxi-window",closed:"window",normal:"window"},
+                KLASS = {minimize:"mini-window",maximize:"maxi-window",closed:"",normal:""},
                 style = {width:op.width,height:op.height,left:pos.left,top:pos.top,bottom:"auto",right:"auto"};
-            this.$window.prop("class",KLASS[status]).css(style);
+            this.$window.removeClass('mini-window').removeClass('maxi-window').addClass(KLASS[status]);
+            this._$panel.css(style);
         },
 
         /**
@@ -5207,23 +5169,24 @@
          */
         open:function(){
             this._setStyleByStatus("normal");
-            $(".window-content",this.$window).show();
+            this.toFront();
             this.windowStatus = "normal";
+            this.$window.show();
             this.options.onOpen && this.options.onOpen.call(this);
         },
 
         /**
          * 销毁当前窗口
          */
-        close : function(){
+        close:function(){
             this.options.onClose && this.options.onClose.call(this);
+            this.$window.hide();
+            /*
             this._destroy();
             if(this.windowStack.length){
                 this.windowStack[this.windowStack.length-1].toFront();
             }
-            else{
-                this._hideMask();
-            }
+            */
         },
 
         /**
@@ -5277,7 +5240,6 @@
          * 把当前窗口顶至最前
          */
         toFront:function(){
-            this._hideMask();
             var stack = this.windowStack;
             var index = stack.indexOf(this);
             stack.splice(index,1);
@@ -5289,7 +5251,6 @@
                         j<i?stack[j].$window.css('zIndex',ZINDEX+j):
                             stack[j].$window.css('zIndex',ZINDEX+j+1);
                     }
-                    this._showMask(ZINDEX+i);
                     break;
                 }
                 else{

@@ -22,7 +22,7 @@
         return $icon;
     }
     function button(button){
-        var $button = $("<li></li>");
+        var $button = $('<button class="btn btn-sm btn-default"></button>');
         button.iconCls && $button.append(icon(button.iconCls));
         button.text && $button.append(button.text);
         button.handler && $button.on("click",button.handler);
@@ -45,7 +45,7 @@
         _create:function($parent){
             var op = this.options;
             var buttons = op.buttons;
-            var $toolbar = this.$toolBar = $('<ul class="'+TOOLBAR + '"></ul>');
+            var $toolbar = this.$toolBar = $('<div class="btn-toolbar '+TOOLBAR + '"></div>');
             for(var i = 0,len = buttons.length; i<len; i++){
                 var btn = buttons[i];
                 $toolbar.append(button(btn));

@@ -24,7 +24,8 @@
         enable:true,
         required:false,
         max:null,
-        min:null
+        min:null,
+        button:{}
     };
 
     var NumberInput = cri.Input.extend(function(element,options){
@@ -36,55 +37,42 @@
 
     $.extend(NumberInput.prototype,{
         _eventListen:function(){
-
+            var that = this,
+                op   = that.options;
+            this.$element.on("focus", function () {
+                op.onFocus && op.onFocus.call(that);
+            }).on('blur',function () {
+                op.onBlur && op.onBlur.call(that);
+                if(op.min != null){
+                    var val = that.$element.val();
+                    if(val == "" || val < op.min){
+                        that.value(that.options.min);
+                    }
+                }
+                if(that.options.max != null){
+                    var val = that.$element.val();
+                    if(val == "" || val > op.max){
+                        that.value(that.options.max);
+                    }
+                }
+            }).on("change",function(){
+                op.onChange && op.onChange.call(that);
+            }).on("keydown",function(e){
+                var keycode = e.keyCode || e.which || e.charCode;
+                if((keycode>=48 && keycode<=57) || keycode == 8){
+                    return true;
+                }
+                else{
+                    return false;
+                }
+            });
         },
 
-        _wrapInput:function() {
-            var that   = this,
-                op     = that.options,
-                $input = that.$element;
-            if (op.readonly) {
-                $input = this._readonlyInput($input);
-            }
-            else {
-                $input.on("focus", function () {
-                    that.options.onFocus && that.options.onFocus.call(that);
-                }).blur(function () {
-                    that.options.onBlur && that.options.onBlur.call(that);
-                    if(that.options.min != null){
-                        var val = that.$element.val();
-                        if(val == "" || val < that.options.min){
-                            that.value(that.options.min);
-                        }
-                    }
-                    if(that.options.max != null){
-                        var val = that.$element.val();
-                        if(val == "" || val > that.options.max){
-                            that.value(that.options.max);
-                        }
-                    }
-                }).on("change",function(){
-                    that.options.onChange && that.options.onChange.call(that);
-                }).on("keydown",function(e){
-                    var keycode = e.keyCode || e.which || e.charCode;
-                    if((keycode>=48 && keycode<=57) || keycode == 8){
-                        return true;
-                    }else{
-                        return false;
-                    }
-                });
-            }
-            this.$input = $input;
-            $input.addClass(WITH_BTN);
-            this._appendBtn();
-        },
-
-        _appendBtn:function(){
+        _button:function($p){
             var that         = this,
-                $plusButton  = $('<i class="fa fa-sort-up plus-button"></i>'),
-                $minusButton = $('<i class="fa fa-sort-down minus-button"></i>'),
-                $Buttons     = $('<span class="plus-minus-button"></span>').append($minusButton,$plusButton);
-
+                $plusButton  = $('<a href="#" class="top"><i class="fa fa-sort-up plus-button"></i></a>'),
+                $minusButton = $('<a href="#" class="bottom"><i class="fa fa-sort-down minus-button"></i></a>');
+            $p.addClass('btn-group-vertical');
             $plusButton.click(function(){
                 var val = that.value();
                 if(cri.isNum(val)){
@@ -103,7 +91,7 @@
                     that.value(parseInt(val,10) - 1);
                 }
             });
-            this.$input.after($Buttons);
+            $p.append($plusButton,$minusButton);
         },
         value:function(value){
             if(arguments.length>0){
@@ -123,17 +111,17 @@
     cri.NumberInput = NumberInput;
 
     $.fn.numberInput = function(option) {
-        var o = null;
+        var widget;
         this.each(function () {
             var $this   = $(this),
-                input   = $this.data('numberInput'),
                 options = typeof option == 'object' && option,
                 role    = $this.attr("role");
-            if(input != null){
-                input._destroy();
+            widget = $this.data('widget');
+            if(widget != null && widget instanceof NumberInput){
+                widget._destroy();
             }
-            $this.data('numberInput', (o = new NumberInput(this, options)));
+            $this.data('widget', (widget = new NumberInput(this, options)));
         });
-        return o;
+        return widget;
     };
 }(window);
