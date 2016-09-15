@@ -3790,9 +3790,7 @@
                 }
             }
             else{
-                this.$timeBox.is('.top')?
-                this.$timeBox.hide():
-                this.$timeBox.slideUp(200);
+                this.$timeBox.is('.top') ? this.$timeBox.hide() : this.$timeBox.slideUp(200);
             }
         },
 
