@@ -330,8 +330,8 @@
          */
         _setPosition:function(){
             var labelWidth = this.$parent.find('label').outerWidth();
-            var left = this.$parent.offset().left + labelWidth + 15;
-            var top = this.$parent.offset().top + 34;
+            var left = this.$parent.offset().left + labelWidth;
+            var top = this.$parent.offset().top + 30;
             //magic number 10 为 options padding+border宽度
             var width = this.$parent.find('.input-group').outerWidth();
             this.$options.css({top:top,left:left,width:width});

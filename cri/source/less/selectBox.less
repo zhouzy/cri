@@ -6,22 +6,19 @@
     .form-control-static{
         display: block;
         width: 100%;
-        height: 34px;
-        padding: 6px 12px;
-        font-size: 14px;
+        height: 30px;
+        padding: 5px 12px;
         line-height: 1.42857143;
         color: #555;
         background-color: #fff;
         background-image: none;
         border: 1px solid #ccc;
-        border-radius: 4px;
         -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
         box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
         -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
         -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
         transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
+        border-radius: 4px 0 0 4px;
         cursor:pointer;
     }
 }
@@ -41,5 +38,13 @@
     li.selected{
         background:@color-selectBox-option-selected;
         color:#fff;
+    }
+}
+.list-group-item{
+    padding:5px 15px;
+    height:30px;
+    line-height:30px;
+    &:hover{
+        background:#f2f2f2;
     }
 }

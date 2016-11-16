@@ -1675,7 +1675,7 @@
         required:false
     };
 
-    var INPUT_GROUP    = "form-group form-group-sm",
+    var INPUT_GROUP    = "form-group",
         INPUT_SELECTOR = "input:not(:button,[type=submit],[type=reset],[disabled])";
 
     var Input = cri.Widgets.extend(function(element,options){
@@ -1772,17 +1772,11 @@
                 $input = this.$input;
             label = "" + label;
             if(label.length){
-                var $label = $('<label class="control-label col-sm-4">' + label + '</label>');
+                var $label = $('<label class="control-label">' + label + '</label>');
                 if(this.options.required){
                     $label.addClass('required');
                 }
                 this.$inputGroup.prepend($label);
-                if($input.parent().is('.input-group')){
-                    $input.parent().wrap('<div class="col-sm-8"></div>');
-                }
-                else{
-                    $input.wrap('<div class="col-sm-8"></div>');
-                }
             }
         },
 
@@ -2663,8 +2657,8 @@
          */
         _setPosition:function(){
             var labelWidth = this.$parent.find('label').outerWidth();
-            var left = this.$parent.offset().left + labelWidth + 15;
-            var top = this.$parent.offset().top + 34;
+            var left = this.$parent.offset().left + labelWidth;
+            var top = this.$parent.offset().top + 30;
             //magic number 10 为 options padding+border宽度
             var width = this.$parent.find('.input-group').outerWidth();
             this.$options.css({top:top,left:left,width:width});
@@ -4831,7 +4825,7 @@
         actions:["Close","Maximize"],//Colse:关闭,Minimize:最下化,Maximize:最大化
         content:null,
         isIframe:false,
-        visible:true,
+        visible:false,
         modal:false,//模态窗口
         width:600,
         height:400,

@@ -22,7 +22,7 @@
         required:false
     };
 
-    var INPUT_GROUP    = "form-group form-group-sm",
+    var INPUT_GROUP    = "form-group",
         INPUT_SELECTOR = "input:not(:button,[type=submit],[type=reset],[disabled])";
 
     var Input = cri.Widgets.extend(function(element,options){
@@ -119,17 +119,11 @@
                 $input = this.$input;
             label = "" + label;
             if(label.length){
-                var $label = $('<label class="control-label col-sm-4">' + label + '</label>');
+                var $label = $('<label class="control-label">' + label + '</label>');
                 if(this.options.required){
                     $label.addClass('required');
                 }
                 this.$inputGroup.prepend($label);
-                if($input.parent().is('.input-group')){
-                    $input.parent().wrap('<div class="col-sm-8"></div>');
-                }
-                else{
-                    $input.wrap('<div class="col-sm-8"></div>');
-                }
             }
         },
 

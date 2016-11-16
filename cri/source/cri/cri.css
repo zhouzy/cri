@@ -434,6 +434,37 @@
 .input-group-btn.btn-group-vertical .bottom i {
   top: -4px;
 }
+.form-group {
+  margin-bottom: 5px!important;
+}
+.form-group label.control-label {
+  width: 100px;
+  padding-right: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 30px;
+  vertical-align: top;
+  padding-top: 5px;
+}
+.form-group > .input-group,
+.form-group > .form-control {
+  width: calc(100% - 100px);
+  display: inline-block;
+}
+.form-group > .input-group {
+  display: table;
+  float: right;
+}
+.form-group > .input-group .input-group-btn button {
+  padding-top: 4px;
+  height: 30px;
+}
+.form-group .form-control,
+.form-group .form-control-static {
+  height: 30px;
+  padding: 5px 12px;
+  min-height: 30px;
+}
 
 .user-not-select {
   -moz-user-select: none;
@@ -637,22 +668,19 @@
 .selectBox-group .form-control-static {
   display: block;
   width: 100%;
-  height: 34px;
-  padding: 6px 12px;
-  font-size: 14px;
+  height: 30px;
+  padding: 5px 12px;
   line-height: 1.42857143;
   color: #555;
   background-color: #fff;
   background-image: none;
   border: 1px solid #ccc;
-  border-radius: 4px;
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
   -webkit-transition: border-color ease-in-out 0.15s, -webkit-box-shadow ease-in-out 0.15s;
   -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
   transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
+  border-radius: 4px 0 0 4px;
   cursor: pointer;
 }
 .options {
@@ -675,6 +703,14 @@
 .options li.selected {
   background: #4f7fe8;
   color: #fff;
+}
+.list-group-item {
+  padding: 5px 15px;
+  height: 30px;
+  line-height: 30px;
+}
+.list-group-item:hover {
+  background: #f2f2f2;
 }
 
 /**
@@ -830,6 +866,7 @@
   width: 100%;
   height: 100%;
 }
+
 
 .user-not-select {
   -moz-user-select: none;

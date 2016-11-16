@@ -35,3 +35,34 @@
         }
     }
 }
+.form-group{
+    margin-bottom:5px!important;
+    label.control-label{
+        width:100px;
+        padding-right:5px;
+        overflow:hidden;
+        text-overflow: ellipsis;
+        height:30px;
+        vertical-align: top;
+        padding-top:5px;
+    }
+    &>.input-group,&>.form-control{
+        width:~"calc(100% - 100px)";
+        display:inline-block;
+    }
+    &>.input-group{
+        display:table;
+        float:right;
+        .input-group-btn{
+            button{
+                padding-top:4px;
+                height:30px;
+            }
+        }
+    }
+    .form-control,.form-control-static{
+        height:30px;
+        padding:5px 12px;
+        min-height:30px;
+    }
+}

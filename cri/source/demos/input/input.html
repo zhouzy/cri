@@ -18,12 +18,21 @@
     </style>
 </head>
 <body style="padding:50px;">
-<form style="background-color: #f2c027" class="form-horizontal">
-    <input id="input" name="input" data-label="input"/>
-    <input id="readonlyInput" name="input" data-label="readOnlyInput"/>
-    <input id="timeInput" name="timeinput" data-label="timeInput"/>
-    <input id="timeInput2">
-</form>
+<div class="container form-horizontal panel panel-default">
+    <div class="row">
+        <div class="col-sm-4">
+            <input id="input" name="input" data-label="input"/>
+        </div>
+        <div class="col-sm-4">
+            <input id="readonlyInput" name="input" data-label="readOnlyInput"/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <input id="timeInput" name="timeinput" data-label="timeInput"/>
+        </div>
+    </div>
+</div>
 <script type="text/javascript">
     //1.测试重复初始化
     $("#input").input();
@@ -39,7 +48,6 @@
         required:true
     });
     $("#timeInput").timeInput();
-    $("#timeInput2").timeInput();
 
 </script>
 </body>
