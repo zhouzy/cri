@@ -1675,7 +1675,7 @@
         required:false
     };
 
-    var INPUT_GROUP    = "form-group",
+    var INPUT_GROUP    = "form-group form-group-sm",
         INPUT_SELECTOR = "input:not(:button,[type=submit],[type=reset],[disabled])";
 
     var Input = cri.Widgets.extend(function(element,options){
@@ -4216,7 +4216,7 @@
                 $ul.children("li").each(function(){
                     $(this).animate({
                         height:"toggle"
-                    },500);
+                    },100);
                 });
             }
         },

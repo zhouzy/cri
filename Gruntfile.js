@@ -10,7 +10,7 @@ module.exports = function (grunt) {
                     yuicompress:false
                 },
                 files:{
-                    "cri/source/cri/cri.css":["cri/source/less/reset.less","cri/source/less/*.less", "!cri/source/less/lib.less", "!cri/source/less/heme-default.less","!cri/source/less/easybootstrap.less"]
+                    "cri/source/cri/cri.css":["cri/source/less/*.less", "!cri/source/less/reset.less","!cri/source/less/lib.less", "!cri/source/less/theme-default.less","!cri/source/less/easybootstrap.less"]
                 }
             },
             production:{

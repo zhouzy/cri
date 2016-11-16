@@ -321,7 +321,7 @@
                 $ul.children("li").each(function(){
                     $(this).animate({
                         height:"toggle"
-                    },500);
+                    },100);
                 });
             }
         },

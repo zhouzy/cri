@@ -65,7 +65,7 @@
         actions:["Close","Maximize"],//Colse:关闭,Minimize:最下化,Maximize:最大化
         content:null,
         isIframe:false,
-        visible:true,
+        visible:false,
         modal:false,//模态窗口
         width:600,
         height:400,
