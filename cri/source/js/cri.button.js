@@ -55,6 +55,7 @@
 
             $e.addClass(BUTTON);
             $e.prepend($icon);
+            op.text && $e.append(op.text);
             if(!op.enable){
                 this.disable();
             }

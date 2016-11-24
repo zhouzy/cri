@@ -323,13 +323,15 @@
          * @private
          */
         _refreshBody:function(rows){
-            var $table   = $('<table class="table table-striped table-hover table-bordered"></table>'),
+            var self     = this,
+                $table   = $('<table class="table table-striped table-hover table-bordered"></table>'),
                 op       = this.options,
                 id       = 0,
                 lineNum  = 1 + op.pageSize * (op.page - 1),
                 columns  = this._columns;
             rows = rows || this._rows;
             this._selectedId = [];
+
             $table.append($("colgroup",this.$gridhead).clone());
             for(var i = 0,len = rows.length; i<len; i++){
                 var row = rows[i],
@@ -356,8 +358,17 @@
                     if(column['button']){
                         var button = column.button;
                         $content.append('<button></button>');
-                        $('button',$content).button(button);
-                    }else{
+                        $('button',$content).btn({
+                            text:button.text,
+                            iconCls:button.iconCls,
+                            handler:function(id){
+                                return function(){
+                                    button.handler && button.handler(self._getRowDataById(id));
+                                };
+                            }(id)
+                        });
+                    }
+                    else{
                         $content.prop("title",_text).append(_text);
                     }
                     $tr.append($td.append($content));

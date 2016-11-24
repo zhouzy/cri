@@ -65,6 +65,7 @@
 <h3 class="item-head">
     <span class="name">reload</span>
 </h3>
+
 <div class="item-body">
     <p>根据参数重新请求数据并生成树</p>
     <div class="sub-item">
@@ -80,6 +81,7 @@
 <h3 class="item-head">
     <span class="name">getSelected</span>
 </h3>
+
 <div class="item-body">
     <p>获取当前选择节点数据</p>
     <div class="sub-item">
@@ -92,6 +94,28 @@
 </div>
 
 <h2>事件</h2>
+<h3 class="item-head">
+    <span class="name">onLoad</span>
+</h3>
+<div class="item-body">
+    <p>树形控件完成初始化，触发该事件</p>
+    <p></p>
+    <div class="sub-item">
+        <h3 class="sub-item-title">事件数据</h3>
+        <h3 class="sub-item-head">
+            <span class="name">#</span>
+            <span class="type">#</span>
+        </h3>
+        <pre class="code"><code>
+            $("#tt").tree({
+                onLoad:function(){
+                    console.log('完成初始化');
+                }
+            });
+        </code></pre>
+    </div>
+</div>
+
 <h3 class="item-head">
     <span class="name">onSelected</span>
 </h3>

@@ -799,13 +799,15 @@
          * @private
          */
         _refreshBody:function(rows){
-            var $table   = $('<table class="table table-striped table-hover table-bordered"></table>'),
+            var self     = this,
+                $table   = $('<table class="table table-striped table-hover table-bordered"></table>'),
                 op       = this.options,
                 id       = 0,
                 lineNum  = 1 + op.pageSize * (op.page - 1),
                 columns  = this._columns;
             rows = rows || this._rows;
             this._selectedId = [];
+
             $table.append($("colgroup",this.$gridhead).clone());
             for(var i = 0,len = rows.length; i<len; i++){
                 var row = rows[i],
@@ -832,8 +834,17 @@
                     if(column['button']){
                         var button = column.button;
                         $content.append('<button></button>');
-                        $('button',$content).button(button);
-                    }else{
+                        $('button',$content).btn({
+                            text:button.text,
+                            iconCls:button.iconCls,
+                            handler:function(id){
+                                return function(){
+                                    button.handler && button.handler(self._getRowDataById(id));
+                                };
+                            }(id)
+                        });
+                    }
+                    else{
                         $content.prop("title",_text).append(_text);
                     }
                     $tr.append($td.append($content));
@@ -1265,6 +1276,7 @@
 
             $e.addClass(BUTTON);
             $e.prepend($icon);
+            op.text && $e.append(op.text);
             if(!op.enable){
                 this.disable();
             }
@@ -3921,7 +3933,8 @@
         page:true,
 
         onSelected:null,
-        onDblClick:null
+        onDblClick:null,
+        onLoad:null      //树完成初始化触发
     };
 
     /**
@@ -3985,53 +3998,32 @@
         this._className = "tree";
         cri.Widgets.apply(this,arguments);
         this.$element.attr('data-role','tree');
+
     });
 
     $.extend(Tree.prototype,{
-
-        _eventListen:function(){
-            var that = this,
-                op   = that.options;
-            this.$treebody
-                .on('click',"div.li-content",function(e){
-                    that._select(e);
-                    that._fold(e);
-                    op.onSelected && op.onSelected.call(that,that.selectedRow);
-                    return false;
-                })
-                .on('dblclick', "div.li-content", function(e){
-                    that._select(e);
-                    op.onDblClick && op.onDblClick.call(that,that.selectedRow);
-                    return false;
-                });
-        },
-
         _init:function () {
-            this._getData();
-            this._createTree();
-            if(this.options.onLoad && typeof(this.options.onLoad) === 'function'){
-                this.options.onLoad.call(this);
-            }
+            var self = this;
+            this._getData().then(function(data){
+                self.rows = data.rows;
+                self._createTree();
+                if(self.options.onLoad && typeof(self.options.onLoad) === 'function'){
+                    self.options.onLoad.call(self);
+                }
+            });
         },
 
         /**
-         * 同步数据
+         * 获取数据
          * @returns {boolean}
          * @private
          */
         _getData:function(){
-            var tree = this;
-            $.ajax({
+            return $.ajax({
                 type: "post",
                 url: this.options.url,
-                success:function(data){
-                    tree.rows = data.rows;
-                },
-                data:this.options.param,
-                dataType:"JSON",
-                async:false
-            });
-            return true;
+                data:this.options.param
+            })
         },
 
         /**
@@ -4039,7 +4031,8 @@
          * @private
          */
         _createTree:function(){
-            var op      = this.options,
+            var that    = this,
+                op      = this.options,
                 height  = this.$element._getHeightPixelValue(op.height),
                 width   = this.$element._getWidthPixelValue(op.width),
                 $tree   = $("<div></div>").addClass(this._className).addClass('panel panel-default').width(width),
@@ -4061,6 +4054,18 @@
             this._createToolbar(this.$tree);
             this._eachNode($treebody,this.rows,"show",0,0);
             this.$tree.append($treeview);
+            this.$treebody
+                .on('click',"div.li-content",function(e){
+                    that._select(e);
+                    that._fold(e);
+                    op.onSelected && op.onSelected.call(that,that.selectedRow);
+                    return false;
+                })
+                .on('dblclick', "div.li-content", function(e){
+                    that._select(e);
+                    op.onDblClick && op.onDblClick.call(that,that.selectedRow);
+                    return false;
+                });
         },
 
         /**

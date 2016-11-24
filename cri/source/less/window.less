@@ -40,6 +40,7 @@
         .actions{
             position:absolute;
             right:5px;
+            top:5px;
             display:inline-block;
             .action{
                 display:inline-block;
@@ -66,9 +67,8 @@
     }
     .window-content{
         overflow: auto;
-        padding-top:46px;
-        margin-top:-46px;
-        height:100%;
+        height:~"calc(100% - 40px)";
+        position: relative;
     }
     .window-resizer{
         position: absolute;

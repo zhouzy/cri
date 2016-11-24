@@ -18,20 +18,12 @@
         position: relative;
         margin: 0;
         border-width:0;
-        //border-collapse: separate;
-        //border-spacing: 0;
-        //empty-cells: show;
-        //border-width: 0;
-        //outline: 0;
-        //height:100%;
         display:table;
         table-layout:fixed;
-        //word-wrap:break-word;
         tr{
             td{
-                line-height: 24px;
-                height: 24px;
-                padding:3px 4px;
+                height:40px;
+                padding:2px 4px;
                 overflow: hidden;
                 white-space: nowrap;
                 vertical-align: middle;
@@ -56,8 +48,6 @@
                 .td-content{
                     position:relative;
                     display:inline-block;
-                    height:24px;
-                    line-height: 24px;
                     width:100%;
                     vertical-align: top;
                     .filter-icon{
@@ -85,9 +75,6 @@
             overflow:hidden;
         }
         td{
-            //position:relative;
-            //z-index:-1;
-            //border-right:1px solid lighten(@color-grid-border,5%);
             &.line-number{
                 div{
                     &:before{

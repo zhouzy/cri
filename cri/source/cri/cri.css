@@ -106,7 +106,7 @@
  */
 .content-loader {
   position: absolute;
-  top: 35px;
+  top: 0;
   left: 0;
   right: 0;
   bottom: 0;
@@ -158,6 +158,12 @@
   to {
     padding-left: 5px;
   }
+}
+.datagrid .grid-body .table .td-content .btn {
+  padding: 3px 5px;
+}
+.datagrid .grid-body .table .td-content .btn span {
+  margin-right: 2px;
 }
 
 .user-not-select {
@@ -223,9 +229,8 @@
   table-layout: fixed;
 }
 .grid table tr td {
-  line-height: 24px;
-  height: 24px;
-  padding: 3px 4px;
+  height: 40px;
+  padding: 2px 4px;
   overflow: hidden;
   white-space: nowrap;
   vertical-align: middle;
@@ -251,8 +256,6 @@
 .grid table tr td .td-content {
   position: relative;
   display: inline-block;
-  height: 24px;
-  line-height: 24px;
   width: 100%;
   vertical-align: top;
 }
@@ -436,6 +439,11 @@
 }
 .form-group {
   margin-bottom: 5px!important;
+  word-spacing: normal;
+  font-size: 0;
+}
+.form-group .control-label {
+  font-size: 12px;
 }
 .form-group label.control-label {
   width: 100px;
@@ -464,6 +472,17 @@
   height: 30px;
   padding: 5px 12px;
   min-height: 30px;
+  font-size: 12px;
+}
+.form-group .radio {
+  font-size: 12px;
+}
+.form-group label {
+  font-size: 12px;
+}
+.form-group input[type=checkbox],
+.form-group input[type-radio] {
+  font-size: 14px;
 }
 
 .user-not-select {
@@ -866,7 +885,6 @@
   width: 100%;
   height: 100%;
 }
-
 
 .user-not-select {
   -moz-user-select: none;
@@ -1372,6 +1390,7 @@
 .window .window-head .actions {
   position: absolute;
   right: 5px;
+  top: 5px;
   display: inline-block;
 }
 .window .window-head .actions .action {
@@ -1401,9 +1420,8 @@
 }
 .window .window-content {
   overflow: auto;
-  padding-top: 46px;
-  margin-top: -46px;
-  height: 100%;
+  height: calc(100% - 40px);
+  position: relative;
 }
 .window .window-resizer {
   position: absolute;
