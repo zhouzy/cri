@@ -831,18 +831,20 @@
                         column = columns[j],
                         text   = row[column.field]==null ? "" : row[column.field],
                         _text  = ("" + text).replace(/(<([^a\/]).*?>)|(<\/[^a].*?>)/g,"");
-                    if(column['button']){
-                        var button = column.button;
-                        $content.append('<button></button>');
-                        $('button',$content).btn({
-                            text:button.text,
-                            iconCls:button.iconCls,
-                            handler:function(id){
-                                return function(){
-                                    button.handler && button.handler(self._getRowDataById(id));
-                                };
-                            }(id)
+                    var button = column['button'];
+                    if(button){
+                        if(!cri.isArray(button)){
+                            button = [button];
+                        }
+                        var $button = button.map(function(button){
+                            var $btn = $('<button></button>');
+                            $btn.btn({
+                                text:button.text, iconCls:button.iconCls,
+                                handler:function(id){ return function(){ button.handler && button.handler(self._getRowDataById(id)); }; }(id)
+                            });
+                            return $btn;
                         });
+                        $content.append($button);
                     }
                     else{
                         $content.prop("title",_text).append(_text);
