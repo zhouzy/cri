@@ -15,7 +15,7 @@
      * 定义表格标题，工具栏，分页高度
      */
     var _titleH       = 31, //标题高度
-        _toolbarH     = 31, //工具栏高度
+        _toolbarH     = 40, //工具栏高度
         _pagerH       = 41, //分页高度
         _gridHeadH    = 31, //表格头高度
         _cellMinW     = 5;  //单元格最小宽度
@@ -311,7 +311,7 @@
          */
         _createBody:function(gridBodyHeight){
             var $gridbody    = $('<div class="grid-body loading"></div>'),
-                $loadingIcon = $('<i class="fa fa-spinner fa-spin"></i>').addClass("loadingIcon");
+                $loadingIcon = $('<i class="fa fa-spinner fa-pulse fa-spin"></i>').addClass("loadingIcon");
             gridBodyHeight && $gridbody.height(gridBodyHeight);
             $gridbody.append($loadingIcon);
             return $gridbody;
@@ -361,7 +361,7 @@
                             button = [button];
                         }
                         var $button = button.map(function(button){
-                            var $btn = $('<button></button>');
+                            var $btn = $('<button class="btn btn-sm"></button>');
                             $btn.btn({
                                 text:button.text, iconCls:button.iconCls,
                                 handler:function(id){ return function(){ button.handler && button.handler(self._getRowDataById(id)); }; }(id)
@@ -593,33 +593,35 @@
                 op.param.page = op.page;
                 op.param.rows = op.pageSize;
             }
-            $.ajax({
-                type: "post",
-                url: this.options.url,
-                success: function(data){
-                    if(op.ajaxDone){
-                        var re = op.ajaxDone.call(that,data);
-                        re && (data = re);
-                    }
-                    that._rows = data.rows || [];
-                    op.total = data.total || 0;
-                    that.pager && that.pager.update(op.page,op.pageSize,op.total,that._rows.length);
-                    $('input[type=checkbox]',that.$gridhead).prop("checked",false);
-                    that._refreshBody();
-                    if(op.filter){
-                        that._initFilter();
-                    }
-                },
-                error: function(){
-                    that._rows = [];
-                    op.total = 0;
-                    that.pager && that.pager.update(op.page,op.pageSize,op.total,that._rows.length);
-                    that._refreshBody();
-                },
-                data:op.param,
-                dataType:"JSON",
-                async:false
-            });
+            if(this.options.url){
+                $.ajax({
+                    type: "post",
+                    url: this.options.url,
+                    success: function(data){
+                        if(op.ajaxDone){
+                            var re = op.ajaxDone.call(that,data);
+                            re && (data = re);
+                        }
+                        that._rows = data.rows || [];
+                        op.total = data.total || 0;
+                        that.pager && that.pager.update(op.page,op.pageSize,op.total,that._rows.length);
+                        $('input[type=checkbox]',that.$gridhead).prop("checked",false);
+                        that._refreshBody();
+                        if(op.filter){
+                            that._initFilter();
+                        }
+                    },
+                    error: function(){
+                        that._rows = [];
+                        op.total = 0;
+                        that.pager && that.pager.update(op.page,op.pageSize,op.total,that._rows.length);
+                        that._refreshBody();
+                    },
+                    data:op.param,
+                    dataType:"JSON",
+                    async:false
+                });
+            }
             return result;
         },
 
@@ -721,9 +723,10 @@
          * @param param
          */
         loadData:function(param){
-            if(param.push){
+            if(cri.isArray(param)){
                 this._rows = param;
                 this._refreshBody();
+                this.options.filter && this._initFilter();
             }
         },
 

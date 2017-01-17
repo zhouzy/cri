@@ -30,7 +30,7 @@
             $('body').append($notification);
             that._show();
             window.setTimeout(function(){
-                that._hide($notification);
+                //that._hide($notification);
             },1000*5);
         },
 

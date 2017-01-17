@@ -18,7 +18,7 @@
         enable:true
     };
 
-    var BUTTON = "btn btn-default";
+    var BUTTON = "btn";
 
     var Button = cri.Widgets.extend(function(element,options){
         this.options     = _defaultOptions;

@@ -3,20 +3,20 @@
 
 .timeBox {
     border: 1px solid @color-timeinput-timebox-border;
-    background:@color-timeinput-timebox-title-bg;
     border-radius: 0 0 5px 5px;
-    .box-shadow(0,2px,2px,0,#CCC);
     position: absolute;
     left: 80px;
     z-index: 20004;
-    width: 280px;
+    width: 240px;
     display: none;
+    .box-shadow(0,3px,3px,1px,#CCC);
+    padding-top:5px;
     .titleBar {
         top:0;
         left:0;
         height:25px;
         width:100%;
-        font-size: 13px;
+        font-size: 12px;
         text-align: center;
         font-weight: 600;
     }
@@ -30,6 +30,7 @@
         left: 0;
         top: 5px;
     }
+
     .yearButton{
         font-size:12px;
         width:12px;
@@ -81,12 +82,11 @@
         -moz-user-select: none;
         user-select: none;
         tr{
-            height: 30px;
+            height:20px;
             &>td:hover{
                 .day-content{
                     background:@color-timeinput-timebox-day-hover;
                     background-clip: content-box;
-                    font-size:14px;
                     color:#fff;
                 }
             }
@@ -99,11 +99,12 @@
             text-align: center;
             vertical-align: middle;
             .day-content{
-                width:28px;
-                height:28px;
-                line-height:28px;
+                font-size:12px;
+                width:20px;
+                height:20px;
+                line-height:20px;
                 text-align:center;
-                .rounded-corners(14px);
+                .rounded-corners(10px);
             }
         }
     }

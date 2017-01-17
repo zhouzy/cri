@@ -22,7 +22,7 @@
         return $icon;
     }
     function button(button){
-        var $button = $('<button class="btn btn-sm btn-default"></button>');
+        var $button = $('<button class="btn btn-sm"></button>');
         button.iconCls && $button.append(icon(button.iconCls));
         button.text && $button.append(button.text);
         button.handler && $button.on("click",button.handler);
