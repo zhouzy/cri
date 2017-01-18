@@ -1767,15 +1767,22 @@
         },
 
         _button:function($p){
-            var button = this.options.button,
-                text   = button.text || '',
-                $i     = $('<i class="' + button.iconCls + '">' + text + '</i>'),
-                $btn   = $('<button type="button" class="btn btn-fab-mini"></button>');
-            $btn.append($i);
-            this.button = $p.append($btn);
-            $btn.click(function(){
-                button.handler && button.handler.call();
+            var self = this,
+                button = this.options.button;
+            if(!cri.isArray(button)){
+                button = [button];
+            }
+            var $button = button.map(function(button){
+                var $btn = $('<button class="btn btn-sm"></button>');
+                $btn.btn({
+                    text:button.text, iconCls:button.iconCls,
+                    handler:function(){
+                        button.handler && button.handler.call(this,this.value());
+                    }.bind(self)
+                });
+                return $btn;
             });
+            this.button = $p.append($button);
         },
 
         _label:function(){
