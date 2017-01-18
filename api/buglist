@@ -76,3 +76,4 @@ Button
 1.button disable掉，仍然触发handler(fixed)
 2.修改icon图标(fixed)
 3.当图标为旋转时,样式异常(fixed)
+
