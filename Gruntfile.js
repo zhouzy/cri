@@ -1,5 +1,4 @@
 module.exports = function (grunt) {
-
     // 配置
     grunt.config.init({
         pkg: grunt.file.readJSON('package.json'),
@@ -10,16 +9,23 @@ module.exports = function (grunt) {
                     yuicompress:false
                 },
                 files:{
-                    "cri/source/cri/cri.css":["cri/source/less/*.less", "!cri/source/less/reset.less","!cri/source/less/lib.less", "!cri/source/less/theme-default.less","!cri/source/less/easybootstrap.less"]
+                    "dest/cri.css":["src/less/*.less",
+                        "!src/less/reset.less",
+                        "!src/less/lib.less",
+                        "!src/less/theme-default.less",
+                        "!src/less/easybootstrap.less"]
                 }
             },
             production:{
                 options:{
-                    rootpath:"cri/source/less/",
                     yuicompress:true
                 },
                 files:{
-                    "cri/source/cri/cri.css":["cri/source/less/*.less", "!cri/source/less/lib.less", "!cri/source/less/heme-default.less","!cri/source/less/easybootstrap.less","!cri/source/less/reset.less"]
+                    "dest/cri.css":["src/less/*.less",
+                        "!src/less/reset.less",
+                        "!src/less/lib.less",
+                        "!src/less/theme-default.less",
+                        "!src/less/easybootstrap.less"]
                 }
             }
         },
@@ -28,15 +34,13 @@ module.exports = function (grunt) {
             js:{
                 files:[{
                     src: [
-                        'cri/source/js/velocity.js',
-                        'cri/source/js/velocity.ui.js',
-                        'cri/source/js/cri.framework.js',
-                        'cri/source/js/cri.widgets.js',
-                        'cri/source/js/cri.grid.js',
-                        'cri/source/js/*.js'
+                        'src/js/cri.framework.js',
+                        'src/js/cri.widgets.js',
+                        'src/js/cri.grid.js',
+                        'src/js/*.js'
                         //'cri/source/js/cri.grid.js',
                     ],
-                    dest:'cri/source/cri/cri.js'
+                    dest:'dest/cri.js'
                 }]
             }
         },
@@ -45,8 +49,8 @@ module.exports = function (grunt) {
             build: {
                 files:[
                     {
-                        src:['cri/source/cri/cri.js'],
-                        dest:'cri/source/cri/cri.min.js'
+                        src:['dest/cri.js'],
+                        dest:'dest/cri.min.js'
                     }
                 ]
             }
@@ -66,19 +70,19 @@ module.exports = function (grunt) {
         zip: {
             cri:{
                 dest:'api/download/cri.zip',
-                src:['cri/source/cri/**']
+                src:['dest/**']
             }
         },
 
         //监控文件变化并动态执行任务(https://github.com/gruntjs/grunt-contrib-watch)
         watch: {
             scripts: {
-                files: ['cri/source/js/*.js'],
+                files: ['src/js/*.js'],
                 tasks: ['concat:js']
             },
             less: {
-                files: 'cri/source/less/*.less',
-                tasks: ['less:production']
+                files: 'src/less/*.less',
+                tasks: ['less:production','less:development']
             }/*,
             redeploy:{
                 files: 'api/**',
