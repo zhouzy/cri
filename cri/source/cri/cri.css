@@ -211,6 +211,7 @@
 .grid {
   color: #666666;
   position: relative;
+  overflow: hidden;
 }
 .grid .title {
   padding-left: 4px;
@@ -270,19 +271,25 @@
   color: #000;
 }
 .grid .grid-view {
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
   overflow-x: hidden;
 }
 .grid .grid-head {
+  cursor: pointer;
+  background: #fff;
   -moz-user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
   -khtml-user-select: none;
   user-select: none;
-  border-bottom: 1px solid #c8c8c8;
-  cursor: pointer;
 }
 .grid .grid-head .grid-head-wrap {
   overflow: hidden;
+}
+.grid .grid-head td {
+  border-top: 0;
+  border-bottom: 0;
 }
 .grid .grid-head td.line-number div:before {
   content: "#";
@@ -309,6 +316,9 @@
 }
 .grid .grid-body table {
   height: auto;
+}
+.grid .grid-body tr:first-child td {
+  border-top: none;
 }
 .grid .grid-body tr.selected td {
   color: #FFF;
@@ -1129,10 +1139,13 @@
   }
 }
 .toolbar {
-  padding: 5px 15px;
+  padding: 5px;
+  margin-left: 0;
 }
 .toolbar .btn {
   min-width: 60px;
+  margin-left: 0;
+  margin-right: 5px;
 }
 .toolbar .btn i {
   margin-right: 5px;

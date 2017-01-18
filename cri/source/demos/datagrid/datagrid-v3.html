@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>grid</title>
-    <meta charset="utf-8" content="text/html"/>
+    <meta content="text/html"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link href="../../../libs/font-awesome/css/font-awesome.css" type="text/css" rel="stylesheet"/>
     <link href="../../../libs/bootstrap-3.3.5-dist/css/bootstrap.css" type="text/css" rel="stylesheet"/>
@@ -15,38 +15,20 @@
             font-family:Georgia,"Times New Roman","Microsoft YaHei","微软雅黑",STXihei,"华文细黑",serif;
             font-size:12px;
         }
-        .content{
-            width:605px;
-            margin:5px auto;
-        }
-        .grid .td-content .button{
-            height: 20px;
-            line-height: 20px;
-            width: 20px;
-            min-width: 20px;
-            padding: 0;
-            text-align: center;
-            border-radius:10px;
-        }
-
-        .grid .td-content .button i{
-            margin:0;
-            height: 20px;
-            line-height: 20px;
-        }
     </style>
 </head>
 <body>
-    <div class="content">
+    <div class="content" style="display:none;" id="gridWrapper">
         <table id="grid" style="height:50%;width:800px"></table>
     </div>
     <script type="text/javascript">
         var grid = $("#grid").datagrid({
             url:"./datagrid-data.json",
             rowNum:true,
-            title:"hello grid",
+            title:"DataGrid",
             checkBox:true,
             width:400,
+            height:400,
             toolbar:[{
                 text:"button",
                 handler:function(){
@@ -90,14 +72,22 @@
                     }
                 }
             }],
+
             pageSize:4,
+
             onClick:function(){
                 var rows = grid.getSelected();
                 console.dir(rows);
             },
+
             onDblClick:function(data){
                 console.log(data.propB);
             },
+
+            onChange : function(){
+                console.log("已经选择" + grid.getSelected().length + "行数据");
+            },
+
             filter:false
         });
         function click(){
@@ -105,6 +95,9 @@
             console.dir(selected);
         }
         console.debug($(".content").height());
+        window.setTimeout(function(){
+            $("#gridWrapper").show();
+        },2000)
     </script>
 </body>
 </html>

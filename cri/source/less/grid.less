@@ -5,6 +5,7 @@
     color:@color-grid-font;
     //border:1px solid @color-grid-border;
     position:relative;
+    overflow:hidden;
     .title{
         padding-left:4px;
         font-size: 1.2em;
@@ -65,16 +66,20 @@
         }
     }
     .grid-view{
+        border-top:1px solid #ddd;
+        border-bottom:1px solid #ddd;
         overflow-x:hidden;
     }
     .grid-head{
-        .user-not-select;
-        border-bottom:1px solid @color-grid-border;
         cursor:pointer;
+        background:#fff;
+        .user-not-select;
         .grid-head-wrap{
             overflow:hidden;
         }
         td{
+            border-top:0;
+            border-bottom:0;
             &.line-number{
                 div{
                     &:before{
@@ -99,7 +104,6 @@
                 }
             }
         }
-
     }
     .grid-body{
         position:relative;
@@ -108,6 +112,11 @@
             height:auto;
         }
         tr{
+            &:first-child{
+                td{
+                    border-top:none;
+                }
+            }
             &.selected td{
                 color:#FFF;
                 background:@color-grid-row-selected;

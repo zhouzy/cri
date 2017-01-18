@@ -257,7 +257,7 @@
     !function(jQuery){
         /**
          * 获取元素的绝对高度像素值
-         * 当父元素隐藏，或者父元素高度未设置时，返回null
+         * 当元素隐藏，或者父元素高度未设置时，返回null
          * 如果调用方法时，传入了value，则使用该value，不再去获取元素CSS高度及height属性
          * @param value 设定高度(String,Number,百分比)
          * @returns {*} 绝对高度值，类型为Number或者为Null
@@ -480,7 +480,7 @@
  * grid 组件
  * include Pager
  */
-!function(window){
+!function(){
 
     "use strict";
 
@@ -490,10 +490,10 @@
     /**
      * 定义表格标题，工具栏，分页高度
      */
-    var _titleH       = 31, //标题高度
+    var _titleH       = 41, //标题高度
         _toolbarH     = 40, //工具栏高度
-        _pagerH       = 41, //分页高度
-        _gridHeadH    = 31, //表格头高度
+        _pagerH       = 50, //分页高度
+        _gridHeadH    = 41, //表格头高度
         _cellMinW     = 5;  //单元格最小宽度
 
     function _getPlainText(text){
@@ -517,14 +517,12 @@
             });
             return columns;
         }());
-
         $.map(columns,function(column){
             if(column.title && column.width){
                 column._width = column.width;
             }
             return column;
         });
-
         return columns;
     }
 
@@ -600,7 +598,6 @@
                 })
                 .on('dblclick', "tr", function(e){
                     clearTimeout(clickTimer);
-                    that._onDblClickRow(e);
                 });
             $(document).on("mouseup",function(e){
                 that.$gridhead.css("cursor","");
@@ -662,7 +659,6 @@
             if(this.options.onLoad && typeof(this.options.onLoad) === 'function'){
                 this.options.onLoad.call(this);
             }
-            //this._colsWidth();
         },
 
         /**
@@ -673,10 +669,9 @@
             var height = this.$element._getHeightPixelValue(this.options.height);
             var width  = this.$element._getWidthPixelValue(this.options.width);
             var $grid  = $("<div></div>").addClass("grid").addClass(this._gridClassName).addClass('panel panel-default');
-            height && (height-=2);//减去border
-            width && (width-=2);
-            $grid.attr("style",this.$element.attr("style"))
-                .css({width:width,height:height,display:'block'});
+
+            $grid.attr("style",this.$element.attr("style")).css({width:width,height:height,display:'block'});
+
             this.$element.wrap($grid);
             this.$element.hide();
             this.$grid = this.$element.parent();
@@ -788,13 +783,14 @@
         _createBody:function(gridBodyHeight){
             var $gridbody    = $('<div class="grid-body loading"></div>'),
                 $loadingIcon = $('<i class="fa fa-spinner fa-pulse fa-spin"></i>').addClass("loadingIcon");
-            gridBodyHeight && $gridbody.height(gridBodyHeight);
+            if(gridBodyHeight){
+                $gridbody.height(gridBodyHeight);
+            }
             $gridbody.append($loadingIcon);
             return $gridbody;
         },
 
         /**
-         *
          * 刷新Grid Body数据行
          * @private
          */
@@ -816,9 +812,9 @@
                     var $checkBoxTd = $('<td class="line-checkbox"></td>');
                     if(row.check){
                         $tr.append($checkBoxTd.append('<input type="checkbox" checked/>'));
-                        $tr.addClass("selected");
                         this._selectedId.push(id);
-                    }else{
+                    }
+                    else{
                         $tr.append($checkBoxTd.append('<input type="checkbox"/>'));
                     }
                 }
@@ -856,15 +852,15 @@
             }
             this.$gridbody.removeClass("loading").html($table);
 
-            /**
-             * 根据gird-body纵向滚动条宽度决定headWrap rightPadding
-             * 当grid-body为空时，在IE下不能取到clientWidth
-             */
-            var clientWidth = this.$gridbody.prop("clientWidth");
+            var $temp = this.$grid.clone();
+            $temp.css({position:'fixed',left:'-10000px'});
+            $('body').append($temp);
+            var clientWidth = $temp.find('.grid-body').prop("clientWidth");
             if(clientWidth){
-                var scrollBarW = this.$gridbody.width()-clientWidth;
-                this.$gridhead.css("paddingRight",scrollBarW);
+                var scrollBarW = $temp.find('.grid-body').width()-clientWidth;
+                this.$gridhead.parent().css({"paddingRight":scrollBarW});
             }
+            $temp.remove();
         },
 
         /**
@@ -1108,32 +1104,33 @@
          * @private
          */
         _setSelected:function(e){
-            var item  = $(e.target).closest("tr"),
+            var that  = this,
+                item  = $(e.target).closest("tr"),
                 rowId = item.data('rowid');
 
-            if(!this.options.checkBox){
-                if(item.hasClass("selected")){
-                    item.removeClass("selected");
-                    this._selectedId = [];
-                }else{
-                    $("tr.selected",this.$gridbody).removeClass("selected");
-                    item.addClass("selected");
-                    this._selectedId = [rowId];
+            if(this.options.checkBox){
+                var $checkbox = item.find('input:checkbox');
+                var isSelected = $checkbox.prop("checked");
+                var selected = [];
+                if(!$(e.target).is("input:checkbox")){
+                    $checkbox.prop("checked",!isSelected);
                 }
+                this.$gridbody.find('tr').each(function(){
+                    if($(this).find('input:checkbox').prop('checked')){
+                        selected.push(rowId);
+                    }
+                    that._selectedId = selected;
+                });
             }
             else{
                 if(item.hasClass("selected")){
-                    var index = $.inArray(rowId,this._selectedId);
-                    index >= 0 && this._selectedId.splice(index,1);
                     item.removeClass("selected");
-                    $("input[type=checkbox]",item).prop("checked",false);
-                }else{
-                    this._selectedId = this._selectedId || [];
+                    this._selectedId = [];
+                }
+                else{
+                    $("tr.selected",this.$gridbody).removeClass("selected");
                     item.addClass("selected");
-                    this._selectedId.push(rowId);
-                    if(this.options.checkBox){
-                        $("input[type=checkbox]",item).prop("checked",true);
-                    }
+                    this._selectedId = [rowId];
                 }
             }
             if(this._selectedId && this._selectedId.length){
@@ -1154,13 +1151,13 @@
         },
 
         /**
-         * 根据 rowid 获取某一行的数据
-         * @param rowid
+         * 根据 id 获取某一行的数据
+         * @param _uid
          * @returns {*}
          * @private
          */
-        _getRowDataById:function(rowid){
-            return this._rows[parseInt(rowid)];
+        _getRowDataById:function(_uid){
+            return this._rows[parseInt(_uid)];
         },
 
         /**
@@ -1222,7 +1219,7 @@
     });
 
     cri.Grid = Grid;
-}(window);
+}();
 
 /**
  * Author zhouzy

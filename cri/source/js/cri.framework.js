@@ -257,7 +257,7 @@
     !function(jQuery){
         /**
          * 获取元素的绝对高度像素值
-         * 当父元素隐藏，或者父元素高度未设置时，返回null
+         * 当元素隐藏，或者父元素高度未设置时，返回null
          * 如果调用方法时，传入了value，则使用该value，不再去获取元素CSS高度及height属性
          * @param value 设定高度(String,Number,百分比)
          * @returns {*} 绝对高度值，类型为Number或者为Null
