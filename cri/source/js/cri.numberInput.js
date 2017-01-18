@@ -11,10 +11,6 @@
     var cri = window.cri,
         $   = window.jQuery;
 
-    var INPUT_GROUP = "input-group",
-        INPUT_BTN   = "input-btn",
-        WITH_BTN    = "with-btn";
-
     var _defaultOptions = {
         label:null,
         value:0,
@@ -59,12 +55,7 @@
                 op.onChange && op.onChange.call(that);
             }).on("keydown",function(e){
                 var keycode = e.keyCode || e.which || e.charCode;
-                if((keycode>=48 && keycode<=57) || keycode == 8){
-                    return true;
-                }
-                else{
-                    return false;
-                }
+                return ((keycode>=48 && keycode<=57) || keycode == 8);
             });
         },
 

@@ -365,6 +365,7 @@
                 }
             });
             $second.before('<span class="input-group-addon">秒</span>');
+            $hmsBar.find(".form-group").addClass("form-group-sm");
             return $hmsBar;
         },
 
