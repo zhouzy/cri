@@ -415,7 +415,7 @@
 }
 .input-group-btn.btn-group-vertical {
   padding: 0;
-  height: 34px;
+  height: 30px;
   margin-left: -1px;
   white-space: normal;
 }
@@ -472,7 +472,11 @@
   display: table;
   float: right;
 }
+.form-group > .input-group .input-group-btn {
+  width: 30px;
+}
 .form-group > .input-group .input-group-btn button {
+  width: 30px;
   padding-top: 4px;
   height: 30px;
 }
@@ -959,6 +963,7 @@
   box-shadow: 0 2px 4px 1px rgba(230, 220, 230, 0.8);
   -moz-box-shadow: 0 2px 4px 1px rgba(230, 220, 230, 0.8);
   -webkit-box-shadow: 0 2px 4px 1px rgba(230, 220, 230, 0.8);
+  background: #fff;
   border-radius: 0 0 5px 5px;
   position: absolute;
   left: 80px;
