@@ -1,82 +1,57 @@
 @import "lib.less";
 @import "theme-default.less";
-
-.timeBox {
+.time-input-group.input-group{
+    .form-control{
+        padding-right:0;
+        background:#fff;
+    }
+    .input-group-btn{
+        background:#fff;
+        .btn{
+            &:focus{
+                outline: none;
+                box-shadow: none;
+            }
+        }
+    }
+}
+.time-box {
     border: 1px solid @color-timeinput-timebox-border;
+    .box-shadow(0,2px,4px,1px,rgba(230,220,230,0.8));
     border-radius: 0 0 5px 5px;
     position: absolute;
     left: 80px;
     z-index: 20004;
-    width: 240px;
+    width: 220px;
     display: none;
-    .box-shadow(0,3px,3px,1px,#CCC);
     padding-top:5px;
-    .titleBar {
-        top:0;
-        left:0;
-        height:25px;
-        width:100%;
+    .form-inline{
+        padding-left:5px;
+        padding-right:5px;
+    }
+    .year-box{
+        width:60%;
         font-size: 12px;
-        text-align: center;
-        font-weight: 600;
     }
-
-    .yearSelecter {
-        height: 16px;
-        width: 120px;
-        line-height: 14px;
-        font-size: 12px;
-        position: relative;
-        left: 0;
-        top: 5px;
-    }
-
-    .yearButton{
-        font-size:12px;
-        width:12px;
-        height:12px;
-        padding:2px;
-        margin:0 5px;
-        .rounded-corners(8px);
-        color:@color-timeinput-timebox-icon;
-        cursor:pointer;
-        &:hover{
-            color:#FFF;
-            background:@color-timeinput-timebox-icon-hover;
-        }
-    }
-    input{
+    input,select{
         text-align:center;
+        &:focus{
+            outline: none;
+            box-shadow: none;
+        }
     }
     .input-group-btn .btn{
         margin-bottom:0;
     }
-    .monthSelect {
-        position: absolute;
-        top: 3px;
-        right: 40px;
-        width: 50px;
-        height: 20px;
-        border: 1px solid @color-timeinput-timebox-border;
-        .rounded-corners(2px);
-        line-height: 20px;
-        cursor: pointer;
+    .month-box{
+        margin-left:4%;
+        width:35%;
+        .form-control{
+            padding:0;
+        }
     }
 
-    .dateMouseover {
-        background: -webkit-linear-gradient(top, #eee, #fff 70%) !important;
-        background: -moz-linear-gradient(top, #eee, #fff 70%) !important;
-        background: -o-linear-gradient(top, #eee, #fff 70%) !important;
-        filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#eeeeee', EndColorStr='#ffffff');
-        border-top: 1px solid rgba(255, 255, 255, 0.8);
-        padding-top: 0 !important;
-        box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.3);
-        color: red !important;
-        font-weight: 400;
-        text-shadow: 0 1px 0 rgba(255, 255, 255, 0) !important;
-    }
-
-    & > table {
+    table {
         width: 100%;
         font-size: 12px;
         -moz-user-select: none;
@@ -107,45 +82,51 @@
                 .rounded-corners(10px);
             }
         }
-    }
-
-    & > table td.choosed {
-        .day-content{
-            color:#fff;
-            background-color:@color-timeinput-timebox-day-selected;
-            background-clip: content-box;
+        table td.choosed {
+            .day-content{
+                color:#fff;
+                background-color:@color-timeinput-timebox-day-selected;
+                background-clip: content-box;
+            }
         }
-
     }
-    .HMSBar {
-        height: 35px;
-        width: 100%;
-        text-align: right;
-        font-size: 12px;
-        .col-sm-4{
-            padding-left:5px;
-            padding-right:5px;
-            &:first-child{
-                padding-left:15px;
+
+    .hms-bar {
+        .form-group{
+            display:inline-block;
+            width:33%;
+            font-size:12px;
+            &>.input-group{
+                width:100%;
+                padding-right:5px;
+                padding-left:0;
+                .input-group-addon{
+                    padding-left:2px;
+                    padding-right:2px;
+                    height:30px;
+                    font-size:12px;
+                    width:20px;
+                }
+                .form-control{
+                    height:30px;
+                    padding:0;
+
+                }
+                .input-group-btn.btn-group-vertical{
+                    height:30px;
+                    .top,.bottom{
+                        height:15px;
+                        width:20px;
+                        padding:0;
+                    }
+                }
             }
             &:last-child{
-                padding-right:15px;
-            }
-            input{
-                padding-left:0;
-                padding-right:0;
-            }
-        }
-        .input-group-addon{
-            padding-left:2px;
-            padding-right:2px;
-        }
-        .input-group-btn.btn-group-vertical{
-            .top,.bottom{
-                width:20px;
-                padding:0;
+                width:34%;
+                &.input-group{
+                    padding-right:0;
+                }
             }
         }
-
     }
 }

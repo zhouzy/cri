@@ -422,9 +422,8 @@
 .input-group-btn.btn-group-vertical .top,
 .input-group-btn.btn-group-vertical .bottom {
   display: inline-block;
-  height: 17px;
-  width: 38px;
-  padding: 2px 13px;
+  height: 15px;
+  width: 30px;
   font-size: 12px;
   border: 1px solid #ccc;
   border-left-width: 0;
@@ -902,7 +901,6 @@
   height: 100%;
 }
 
-
 .user-not-select {
   -moz-user-select: none;
   -webkit-user-select: none;
@@ -945,111 +943,80 @@
     padding-left: 5px;
   }
 }
-.timeBox {
+.time-input-group.input-group .form-control {
+  padding-right: 0;
+  background: #fff;
+}
+.time-input-group.input-group .input-group-btn {
+  background: #fff;
+}
+.time-input-group.input-group .input-group-btn .btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+.time-box {
   border: 1px solid #c8c8c8;
+  box-shadow: 0 2px 4px 1px rgba(230, 220, 230, 0.8);
+  -moz-box-shadow: 0 2px 4px 1px rgba(230, 220, 230, 0.8);
+  -webkit-box-shadow: 0 2px 4px 1px rgba(230, 220, 230, 0.8);
   border-radius: 0 0 5px 5px;
   position: absolute;
   left: 80px;
   z-index: 20004;
-  width: 240px;
+  width: 220px;
   display: none;
-  box-shadow: 0 3px 3px 1px #cccccc;
-  -moz-box-shadow: 0 3px 3px 1px #cccccc;
-  -webkit-box-shadow: 0 3px 3px 1px #cccccc;
   padding-top: 5px;
 }
-.timeBox .titleBar {
-  top: 0;
-  left: 0;
-  height: 25px;
-  width: 100%;
+.time-box .form-inline {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+.time-box .year-box {
+  width: 60%;
   font-size: 12px;
-  text-align: center;
-  font-weight: 600;
 }
-.timeBox .yearSelecter {
-  height: 16px;
-  width: 120px;
-  line-height: 14px;
-  font-size: 12px;
-  position: relative;
-  left: 0;
-  top: 5px;
-}
-.timeBox .yearButton {
-  font-size: 12px;
-  width: 12px;
-  height: 12px;
-  padding: 2px;
-  margin: 0 5px;
-  -webkit-border-radius: 8px;
-  -moz-border-radius: 8px;
-  -ms-border-radius: 8px;
-  -o-border-radius: 8px;
-  border-radius: 8px;
-  color: #555555;
-  cursor: pointer;
-}
-.timeBox .yearButton:hover {
-  color: #FFF;
-  background: #4f7fe8;
-}
-.timeBox input {
+.time-box input,
+.time-box select {
   text-align: center;
 }
-.timeBox .input-group-btn .btn {
+.time-box input:focus,
+.time-box select:focus {
+  outline: none;
+  box-shadow: none;
+}
+.time-box .input-group-btn .btn {
   margin-bottom: 0;
 }
-.timeBox .monthSelect {
-  position: absolute;
-  top: 3px;
-  right: 40px;
-  width: 50px;
-  height: 20px;
-  border: 1px solid #c8c8c8;
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  -ms-border-radius: 2px;
-  -o-border-radius: 2px;
-  border-radius: 2px;
-  line-height: 20px;
-  cursor: pointer;
+.time-box .month-box {
+  margin-left: 4%;
+  width: 35%;
 }
-.timeBox .dateMouseover {
-  background: -webkit-linear-gradient(top, #eeeeee, #ffffff 70%) !important;
-  background: -moz-linear-gradient(top, #eeeeee, #ffffff 70%) !important;
-  background: -o-linear-gradient(top, #eeeeee, #ffffff 70%) !important;
-  filter: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr='#eeeeee', EndColorStr='#ffffff');
-  border-top: 1px solid rgba(255, 255, 255, 0.8);
-  padding-top: 0 !important;
-  box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.3);
-  color: red !important;
-  font-weight: 400;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0) !important;
+.time-box .month-box .form-control {
+  padding: 0;
 }
-.timeBox > table {
+.time-box table {
   width: 100%;
   font-size: 12px;
   -moz-user-select: none;
   user-select: none;
 }
-.timeBox > table tr {
+.time-box table tr {
   height: 20px;
 }
-.timeBox > table tr > td:hover .day-content {
+.time-box table tr > td:hover .day-content {
   background: #a3a3a3;
   background-clip: content-box;
   color: #fff;
 }
-.timeBox > table th {
+.time-box table th {
   cursor: default;
 }
-.timeBox > table td {
+.time-box table td {
   cursor: pointer;
   text-align: center;
   vertical-align: middle;
 }
-.timeBox > table td .day-content {
+.time-box table td .day-content {
   font-size: 12px;
   width: 20px;
   height: 20px;
@@ -1061,39 +1028,46 @@
   -o-border-radius: 10px;
   border-radius: 10px;
 }
-.timeBox > table td.choosed .day-content {
+.time-box table table td.choosed .day-content {
   color: #fff;
   background-color: #4f7fe8;
   background-clip: content-box;
 }
-.timeBox .HMSBar {
-  height: 35px;
-  width: 100%;
-  text-align: right;
+.time-box .hms-bar .form-group {
+  display: inline-block;
+  width: 33%;
   font-size: 12px;
 }
-.timeBox .HMSBar .col-sm-4 {
-  padding-left: 5px;
+.time-box .hms-bar .form-group > .input-group {
+  width: 100%;
   padding-right: 5px;
-}
-.timeBox .HMSBar .col-sm-4:first-child {
-  padding-left: 15px;
-}
-.timeBox .HMSBar .col-sm-4:last-child {
-  padding-right: 15px;
-}
-.timeBox .HMSBar .col-sm-4 input {
   padding-left: 0;
-  padding-right: 0;
 }
-.timeBox .HMSBar .input-group-addon {
+.time-box .hms-bar .form-group > .input-group .input-group-addon {
   padding-left: 2px;
   padding-right: 2px;
+  height: 30px;
+  font-size: 12px;
+  width: 20px;
 }
-.timeBox .HMSBar .input-group-btn.btn-group-vertical .top,
-.timeBox .HMSBar .input-group-btn.btn-group-vertical .bottom {
+.time-box .hms-bar .form-group > .input-group .form-control {
+  height: 30px;
+  padding: 0;
+}
+.time-box .hms-bar .form-group > .input-group .input-group-btn.btn-group-vertical {
+  height: 30px;
+}
+.time-box .hms-bar .form-group > .input-group .input-group-btn.btn-group-vertical .top,
+.time-box .hms-bar .form-group > .input-group .input-group-btn.btn-group-vertical .bottom {
+  height: 15px;
   width: 20px;
   padding: 0;
+}
+.time-box .hms-bar .form-group:last-child {
+  width: 34%;
+}
+.time-box .hms-bar .form-group:last-child.input-group {
+  padding-right: 0;
 }
 
 .user-not-select {

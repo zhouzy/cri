@@ -11,8 +11,8 @@
     var cri = window.cri,
         $   = window.jQuery;
 
-    var TIME_INPUT_GROUP = "timeInputGroup",
-        TIME_BOX         = "timeBox",
+    var TIME_INPUT_GROUP = "time-input-group",
+        TIME_BOX         = "time-box",
         TIME_INPUT_ICON  = "fa fa-table";
 
     /**
@@ -198,7 +198,7 @@
          */
         _create:function($parent){
             var $timeBox = this.$timeBox = $('<div class="container-fluid ' + TIME_BOX + '"></div>');
-            var $titleBar = $('<div class="titleBar form-inline"></div>');
+            var $titleBar = $('<div class="col-sm-12 col-lg-12 form-inline"></div>');
             var $row = $('<div class="row"></div>');
             $titleBar.append(
                 this._yearSelect(),
@@ -218,12 +218,11 @@
         _yearSelect : function(){
             var that = this;
             var date = this.date;
-            var $yearSelect = $('<div class="year_Selecter col-sm-8"></div>');
-            var $minusBtn   = $('<span class="input-group-btn"><button class="btn btn-default" type="button">-</button></span>');
-            var $plusBtn    = $('<span class="input-group-btn"><button class="btn btn-default" type="button">+</button></span>');
-            var $year       = $('<input class="form-control" readonly/>').val(date.yyyy + '年');
+            var $yearInputGroup = $('<div class="year-box input-group input-group-sm"></div>');
+            var $minusBtn       = $('<span class="input-group-btn"><button class="btn btn-default" type="button">-</button></span>');
+            var $plusBtn        = $('<span class="input-group-btn"><button class="btn btn-default" type="button">+</button></span>');
+            var $year           = $('<input class="form-control" readonly/>').val(date.yyyy + '年');
             this.$year = $year;
-            var $yearInputGroup = $('<div class="input-group input-group-sm"></div>');
             $minusBtn.on("click",function(){
                 $year.val(--that.date.yyyy + '年');
                 that._change();
@@ -233,8 +232,7 @@
                 that._change();
             });
             $yearInputGroup.append($minusBtn,$year,$plusBtn);
-            $yearSelect.append($yearInputGroup);
-            return $yearSelect;
+            return $yearInputGroup;
         },
 
         /**
@@ -245,9 +243,8 @@
         _monthSelect:function(){
             var that = this,
                 date = this.date,
-                $select = $('<select class="form-control month_Select">');
-            var $selectWrap = $('<div class="col-sm-4"></div>');
-            var $inputGroup = $('<div class="input-group-sm"></div>');
+                $inputGroup = $('<div class="month-box input-group input-group-sm"></div>'),
+                $select = $('<select class="form-control">');
 
             this.$month = $select;
             $.each([1,2,3,4,5,6,7,8,9,10,11,12],function(index,value){
@@ -259,7 +256,7 @@
                 that._refreshDaySelect();
                 that._change();
             });
-            return $selectWrap.append($inputGroup.append($select,'<span class="control-label">月</span>'));
+            return $inputGroup.append($select,'<span class="input-group-addon">月</span>');
         },
 
         /**
@@ -327,13 +324,13 @@
          */
         _hmsSelect:function(){
             var that = this,
-                $hmsBar = $('<div class="HMSBar form-inline"></div>'),
+                $hmsBar = $('<div class="hms-bar form-inline col-lg-12 col-sm-12"></div>'),
                 $hour   = $('<input class="form-control hour"/>'),
                 $minute = $('<input class="form-control minute"/>'),
                 $second = $('<input class="form-control second"/>');
-            $hmsBar.append($('<div class="col-sm-4"></div>').append($hour));
-            $hmsBar.append($('<div class="col-sm-4"></div>').append($minute));
-            $hmsBar.append($('<div class="col-sm-4"></div>').append($second));
+            $hmsBar.append($hour);
+            $hmsBar.append($minute);
+            $hmsBar.append($second);
 
             this.hour = $hour.numberInput({
                 min:0,
@@ -379,11 +376,11 @@
          */
         _setPosition:function(){
             var left = this.$parent.offset().left + this.$parent.find('label').outerWidth();
-            var top = this.$parent.offset().top + 34;
+            var top = this.$parent.offset().top + 30;
             var scrollHeight = document.body.scrollHeight;
             this.$timeBox.removeClass('top');
             if(top + 250 > scrollHeight){
-                top = top - 34 - 250;
+                top = top - 30 - 230;
                 this.$timeBox.addClass('top');
             }
             this.$timeBox.css({top:top,left:left});
