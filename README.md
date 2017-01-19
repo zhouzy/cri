@@ -1,6 +1,6 @@
 cri
 ==============
-cri 类似于easyUI的一种前端框架，封装了各种jquery插件，例如：datagrid、tree、treegrid、window、tabpage、input。
+[cri](http://zhouzy.github.io/cri/) 类似于easyUI的一种前端框架，封装了各种jquery插件，例如：datagrid、tree、treegrid、window、tabpage、input。
 
 ###1.版本：
 
