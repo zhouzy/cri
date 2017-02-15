@@ -15,7 +15,7 @@
 
     var WINDOW_HEAD = "window-head";
 
-    var icons = {Minimize:"fa fa-minus",Maximize:"fa fa-expand","Close":"fa fa-close","Resume":"fa fa-compress"},
+    var icons = {Minimize:"fa fa-window-minimize",Maximize:"fa fa-window-maximize","Close":"fa fa-window-close-o","Resume":"fa fa-window-restore"},
         MINI_WINDOW_WIDTH = 140+10,
         WINDOW_BORDER  = 1,
         ZINDEX = 10000;

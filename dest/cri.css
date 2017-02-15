@@ -1395,27 +1395,25 @@
 .window .window-head .actions .action {
   display: inline-block;
   cursor: pointer;
-  -webkit-border-radius: 15px;
-  -moz-border-radius: 15px;
-  -ms-border-radius: 15px;
-  -o-border-radius: 15px;
-  border-radius: 15px;
-  line-height: 30px;
-  height: 30px;
-  width: 30px;
-  margin-right: 2px;
+  line-height: 35px;
+  height: 35px;
+  width: 25px;
   text-align: center;
-  font-size: 10px;
-  font-weight: 400;
-}
-.window .window-head .actions .action:hover {
-  background: #4f7fe8;
+  font-size: 14px;
 }
 .window .window-head .actions .action:hover i {
-  color: #fff;
+  color: #4f7fe8;
 }
 .window .window-head .actions .action i {
   color: #555555;
+}
+.window .window-head .actions .action.close {
+  float: none;
+  color: #727272;
+  opacity: 0.5;
+}
+.window .window-head .actions .action.close:hover {
+  opacity: 1;
 }
 .window .window-content {
   overflow: auto;

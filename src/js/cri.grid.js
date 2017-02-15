@@ -640,8 +640,9 @@
                     $checkbox.prop("checked",!isSelected);
                 }
                 this.$gridbody.find('tr').each(function(){
+                    var $tr = $(this);
                     if($(this).find('input:checkbox').prop('checked')){
-                        selected.push(rowId);
+                        selected.push($tr.data('rowid'));
                     }
                     that._selectedId = selected;
                 });
