@@ -4784,48 +4784,8 @@
 
     var icons = {Minimize:"fa fa-window-minimize",Maximize:"fa fa-window-maximize","Close":"fa fa-window-close-o","Resume":"fa fa-window-restore"},
         MINI_WINDOW_WIDTH = 140+10,
-        WINDOW_BORDER  = 1,
+        WINDOW_BORDER = 1,
         ZINDEX = 10000;
-
-    /**
-     * 格式化宽度，接受百分比、像素值、整数参数
-     * @param width
-     * @param parentWidth
-     * @returns {格式化后的宽度，如果为百分比，则返回百分比父节点宽度的整数}
-     */
-    function parseWidth(width,parentWidth){
-        width = "" + width;
-        //百分比
-        if(/^-?\d+%$/g.test(width)){
-            return Math.floor(parentWidth * width.split("%")[0] / 100);
-        }
-        //像素值
-        if(/^\d+px$/g.test(width)){
-            return parseInt(width.split("px")[0]);
-        }
-        //整数
-        return parseInt(width) || 0;
-    }
-
-    /**
-     * 格式化高度，接受百分比、像素值、整数参数
-     * @param width
-     * @param parentWidth
-     * @returns {格式化后的高度，如果为百分比，则返回百分比父节点高度的整数}
-     */
-    function parseHeight(height,parentHeight){
-        height = "" + height;
-        //百分比
-        if(/^-?\d+%$/g.test(height)){
-            return Math.floor(parentHeight * height.split("%")[0] / 100);
-        }
-        //像素值
-        if(/^\d+px$/g.test(height)){
-            return parseInt(height.split("px")[0]);
-        }
-        //整数
-        return parseInt(height) || 0;
-    }
 
     var _defaultOptions = {
         title:"",
@@ -4854,7 +4814,13 @@
         this.windowStatus = "normal";
         this.contentLoader = null;
         this.$elementPlaceHolder = null;//原始元素占位符
+
+        if(this.options.center){
+            this.options.position = {left:'50%',top:'50%'};
+        }
+
         cri.Widgets.apply(this,arguments);
+
         this.windowStack.push(this);
         this.toFront();
         this.$element.attr('data-role','window');
@@ -4954,16 +4920,10 @@
          */
         _init : function(){
             var op = this.options;
-            op.width = parseWidth(op.width,$(window).width()) - WINDOW_BORDER*2;
-            op.height = parseHeight(op.height,$(window).height()) - WINDOW_BORDER*2;
             this._createWindow();
             op.resizable && this._createResizeHandler();
-            $("body").append(this.$window);
-            if(op.visible){
-                this.$window.show();
-            }else{
-                this.$window.hide();
-            }
+            this.$elementPlaceHolder.after(this.$window);
+            op.visible ? this.$window.show() : this.$window.hide();
             this.$element.show();
         },
 
@@ -4982,7 +4942,9 @@
             else{
                 this._$panel = this.$window.addClass('panel panel-default');
             }
-
+            if(op.center){
+                $window.addClass('center');
+            }
             this._createWindowHead();
             this._createWindowBody();
             this.load(this.options.content);
@@ -5006,17 +4968,11 @@
         _createWindowBody : function(){
             var that         = this,
                 op           = this.options,
-                viewWidth    = $(window).width(),
-                viewHeight   = $(window).height(),
                 $element     = this.$element,
                 $windowBody  = $('<div class="window-content"></div>');
             var $placeHolder = this.$elementPlaceHolder = $('<div style="display:none"></div>');
             $element.after($placeHolder);
             $element.detach();
-            if(op.center){
-                op.position.left = (viewWidth - op.width - 2*WINDOW_BORDER) / 2;
-                op.position.top  = (viewHeight - op.height - 2*WINDOW_BORDER) / 2;
-            }
             this._setPosition({top:op.position.top,left:op.position.left,width:op.width,height:op.height});
             this._$panel.append($windowBody.append($element));
         },
@@ -5155,9 +5111,7 @@
                 $wrapper = $element.parents(".window");
             var index = this.windowStack.indexOf(this);
             index>=0 && this.windowStack.splice(index,1);
-            this.$elementPlaceHolder.after($element);
-            this.$elementPlaceHolder.remove();
-            this.$elementPlaceHolder = null;
+            $wrapper.after($element);
             $wrapper.remove();
             $element.hide();
             $element.data("window",null);
@@ -5180,12 +5134,6 @@
         close:function(){
             this.options.onClose && this.options.onClose.call(this);
             this.$window.hide();
-            /*
-            this._destroy();
-            if(this.windowStack.length){
-                this.windowStack[this.windowStack.length-1].toFront();
-            }
-            */
         },
 
         /**

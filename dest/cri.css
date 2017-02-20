@@ -1358,6 +1358,9 @@
   -webkit-box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
+.window.center {
+  transform: translate(-50%, -50%);
+}
 .window.modal-window {
   background: rgba(220, 220, 220, 0.8);
   z-index: 10000;
@@ -1370,6 +1373,14 @@
   position: fixed;
   z-index: 100001;
 }
+.window.modal-window.center {
+  transform: translate(0, 0);
+}
+.window.modal-window.center .panel {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
 .window .window-head {
   position: relative;
   -moz-user-select: none;
@@ -1378,6 +1389,7 @@
   -khtml-user-select: none;
   user-select: none;
   padding-right: 200px;
+  height: 45px;
 }
 .window .window-head .title {
   display: inline-block;
@@ -1420,7 +1432,7 @@
 }
 .window .window-content {
   overflow: auto;
-  height: calc(100% - 40px);
+  height: calc(100% - 45px);
   position: relative;
 }
 .window .window-resizer {
