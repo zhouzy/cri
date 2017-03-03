@@ -47,13 +47,7 @@
         this.windowStatus = "normal";
         this.contentLoader = null;
         this.$elementPlaceHolder = null;//原始元素占位符
-
-        if(this.options.center){
-            this.options.position = {left:'50%',top:'50%'};
-        }
-
         cri.Widgets.apply(this,arguments);
-
         this.windowStack.push(this);
         this.toFront();
         this.$element.attr('data-role','window');
@@ -81,25 +75,22 @@
             var that = this;
             if(this.options.dragable){
                 this.$window.on("mousedown",".window-head",function(e){
-                    var left     = +that._$panel.css("left").split("px")[0],
-                        top      = +that._$panel.css("top").split("px")[0],
-                        width    = +that._$panel.width(),
-                        height   = +that._$panel.height(),
+                    var left     = +that._$panel.position().left,
+                        top      = +that._$panel.position().top,
                         startX   = e.pageX,
                         startY   = e.pageY;
                     $(document).on("mousemove",function(e){
                         var pageX  = e.pageX,
-                            pageY  = e.pageY,
-                            shiftX = pageX - startX,
-                            shiftY = pageY - startY;
-                        left += shiftX;
-                        top  += shiftY;
+                            pageY  = e.pageY;
+                        left += (pageX - startX);
+                        top  += (pageY - startY);
                         startX = pageX;
                         startY = pageY;
-                        that._setPosition({top:top,left:left,width:width,height:height});
+                        that._setPosition({top:top,left:left});
                     });
                 })
             }
+
             this.$window
                 .on("click",".action",function(){
                     var action = that._actionForButton($(this));
@@ -176,7 +167,9 @@
                 this._$panel = this.$window.addClass('panel panel-default');
             }
             if(op.center){
-                $window.addClass('center');
+                var width = window.innerWidth;
+                var height = window.innerHeight;
+                this._setPosition({top:(height - op.height) / 2,left:(width - op.width)/2,width:op.width,height:op.height});
             }
             this._createWindowHead();
             this._createWindowBody();
@@ -377,6 +370,7 @@
             this._setStyleByStatus("maximize");
             this._setButtons("maximize");
             this.windowStatus = "maximize";
+            this.$window.removeClass('center');
             this.options.onMaxmize && this.options.onMaxmize.call(this);
         },
 
@@ -410,6 +404,9 @@
                         wnd._moveLeft(i++);
                     }
                 });
+            }
+            if(this.options.center){
+                this.$window.addClass('center');
             }
             this.windowStatus = "normal";
             this.options.onResume && this.options.onResume.call(this);

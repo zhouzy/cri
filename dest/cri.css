@@ -1358,9 +1358,6 @@
   -webkit-box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
-.window.center {
-  transform: translate(-50%, -50%);
-}
 .window.modal-window {
   background: rgba(220, 220, 220, 0.8);
   z-index: 10000;
