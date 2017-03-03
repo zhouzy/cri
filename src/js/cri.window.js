@@ -79,6 +79,7 @@
                         top      = +that._$panel.position().top,
                         startX   = e.pageX,
                         startY   = e.pageY;
+                    that.$window.addClass('will-change');
                     $(document).on("mousemove",function(e){
                         var pageX  = e.pageX,
                             pageY  = e.pageY;
@@ -135,6 +136,7 @@
                 });
             $(document).on("mouseup",function(){
                 $(document).off("mousemove");
+                that.$window.removeClass('will-change');
             });
         },
 
