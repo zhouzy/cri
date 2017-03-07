@@ -668,7 +668,8 @@
         _createGrid:function(){
             var height = this.$element._getHeightPixelValue(this.options.height);
             var width  = this.$element._getWidthPixelValue(this.options.width);
-            var $grid  = $("<div></div>").addClass("grid").addClass(this._gridClassName).addClass('panel panel-default');
+            //var $grid  = $("<div></div>").addClass("grid").addClass(this._gridClassName).addClass('panel panel-default');
+            var $grid  = $("<div></div>").addClass("grid").addClass(this._gridClassName);
 
             $grid.attr("style",this.$element.attr("style")).css({width:width,height:height,display:'block'});
 
@@ -720,7 +721,9 @@
          */
         _createHead:function($parent){
             var $headWrap = $("<div></div>").addClass("grid-head-wrap"),
-                $table    = $('<table class="table table-bordered"></table>'),
+                //tableStyle = 'table table-bordered',
+                tableStyle = 'table',
+                $table    = $('<table class="'+tableStyle+'"></table>'),
                 $tr       = $("<tr></tr>"),
                 op        = this.options,
                 columns   = this._columns;
@@ -796,7 +799,9 @@
          */
         _refreshBody:function(rows){
             var self     = this,
-                $table   = $('<table class="table table-striped table-hover table-bordered"></table>'),
+                //tableStyle = 'table table-striped table-hover table-bordered',
+                tableStyle = 'table table-striped table-hover',
+                $table   = $('<table class="'+tableStyle+'"></table>'),
                 op       = this.options,
                 id       = 0,
                 lineNum  = 1 + op.pageSize * (op.page - 1),
@@ -1691,7 +1696,7 @@
         required:false
     };
 
-    var INPUT_GROUP    = "form-group",
+    var FORM_GROUP    = "form-group",
         INPUT_SELECTOR = "input:not(:button,[type=submit],[type=reset],[disabled])";
 
     var Input = cri.Widgets.extend(function(element,options){
@@ -1733,8 +1738,9 @@
 
         _createInputGroup:function(){
             var $element = this.$element;
-            $element.wrap('<div class="'+ INPUT_GROUP + '"></div>');
+            $element.wrap('<div class="'+ FORM_GROUP + '"></div>');
             this.$inputGroup = $element.parent();
+            this.$element.wrap('<div class="col-sm-8"></div>');//此处用于 4 8布局的输入框
             this._wrapInput();
             this._label();
             this.options.enable || this.disable();
@@ -1795,7 +1801,8 @@
                 $input = this.$input;
             label = "" + label;
             if(label.length){
-                var $label = $('<label class="control-label">' + label + '</label>');
+                //var $label = $('<label class="control-label">' + label + '</label>');
+                var $label = $('<label class="control-label col-sm-4 col-md-4">' + label + '</label>');//用于 4 8 布局的input
                 if(this.options.required){
                     $label.addClass('required');
                 }
@@ -3444,9 +3451,12 @@
     TimeInput.prototype._wrapInput = function(){
         var that = this,
             value = this.date,
-            button = {iconCls:TIME_INPUT_ICON,handler:function(){
-                that.selectView.toggle();
-            }};
+            button = {
+                iconCls:TIME_INPUT_ICON,
+                handler:function(){
+                    that.selectView.toggle();
+                }
+            };
 
         this.input = new cri.Input(this.$element,{
             readonly:true,

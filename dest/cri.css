@@ -413,133 +413,6 @@
     padding-left: 5px;
   }
 }
-.input-group-btn.btn-group-vertical {
-  padding: 0;
-  height: 30px;
-  margin-left: -1px;
-  white-space: normal;
-}
-.input-group-btn.btn-group-vertical .top,
-.input-group-btn.btn-group-vertical .bottom {
-  display: inline-block;
-  height: 15px;
-  width: 30px;
-  font-size: 12px;
-  border: 1px solid #ccc;
-  border-left-width: 0;
-  text-align: center;
-  color: #444;
-}
-.input-group-btn.btn-group-vertical .top i,
-.input-group-btn.btn-group-vertical .bottom i {
-  position: relative;
-}
-.input-group-btn.btn-group-vertical .top {
-  border-top-right-radius: 4px;
-}
-.input-group-btn.btn-group-vertical .top i {
-  bottom: -1px;
-}
-.input-group-btn.btn-group-vertical .bottom {
-  border-bottom-right-radius: 4px;
-}
-.input-group-btn.btn-group-vertical .bottom i {
-  top: -4px;
-}
-.form-group {
-  margin-bottom: 5px!important;
-  word-spacing: normal;
-  font-size: 0;
-}
-.form-group .control-label {
-  font-size: 12px;
-}
-.form-group label.control-label {
-  width: 100px;
-  padding-right: 5px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  height: 30px;
-  vertical-align: top;
-  padding-top: 5px;
-}
-.form-group > .input-group,
-.form-group > .form-control {
-  width: calc(100% - 100px);
-  display: inline-block;
-}
-.form-group > .input-group {
-  display: table;
-  float: right;
-}
-.form-group > .input-group .input-group-btn {
-  width: 30px;
-}
-.form-group > .input-group .input-group-btn button {
-  width: 30px;
-  padding-top: 4px;
-  height: 30px;
-}
-.form-group .form-control,
-.form-group .form-control-static {
-  height: 30px;
-  padding: 5px 12px;
-  min-height: 30px;
-  font-size: 12px;
-}
-.form-group .radio {
-  font-size: 12px;
-}
-.form-group label {
-  font-size: 12px;
-}
-.form-group input[type=checkbox],
-.form-group input[type-radio] {
-  font-size: 14px;
-}
-
-.user-not-select {
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-  -khtml-user-select: none;
-  user-select: none;
-}
-@keyframes left2right {
-  from {
-    padding-left: 4px;
-  }
-  to {
-    padding-left: 5px;
-  }
-}
-@-moz-keyframes left2right {
-  /* Firefox */
-  from {
-    padding-left: 4px;
-  }
-  to {
-    padding-left: 5px;
-  }
-}
-@-webkit-keyframes left2right {
-  /* Safari 和 Chrome */
-  from {
-    padding-left: 4px;
-  }
-  to {
-    padding-left: 5px;
-  }
-}
-@-o-keyframes left2right {
-  /* Opera */
-  from {
-    padding-left: 4px;
-  }
-  to {
-    padding-left: 5px;
-  }
-}
 .notification {
   position: fixed;
   z-index: 30000;
@@ -949,7 +822,6 @@
 }
 .time-input-group.input-group .form-control {
   padding-right: 0;
-  background: #fff;
 }
 .time-input-group.input-group .input-group-btn {
   background: #fff;
@@ -968,9 +840,10 @@
   position: absolute;
   left: 80px;
   z-index: 20004;
-  width: 220px;
+  width: 260px;
   display: none;
   padding-top: 5px;
+  font-size: 12px;
 }
 .time-box .form-inline {
   padding-left: 5px;

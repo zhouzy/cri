@@ -22,7 +22,7 @@
         required:false
     };
 
-    var INPUT_GROUP    = "form-group",
+    var FORM_GROUP    = "form-group",
         INPUT_SELECTOR = "input:not(:button,[type=submit],[type=reset],[disabled])";
 
     var Input = cri.Widgets.extend(function(element,options){
@@ -64,8 +64,9 @@
 
         _createInputGroup:function(){
             var $element = this.$element;
-            $element.wrap('<div class="'+ INPUT_GROUP + '"></div>');
+            $element.wrap('<div class="'+ FORM_GROUP + '"></div>');
             this.$inputGroup = $element.parent();
+            this.$element.wrap('<div class="col-sm-8"></div>');//此处用于 4 8布局的输入框
             this._wrapInput();
             this._label();
             this.options.enable || this.disable();
@@ -126,7 +127,8 @@
                 $input = this.$input;
             label = "" + label;
             if(label.length){
-                var $label = $('<label class="control-label">' + label + '</label>');
+                //var $label = $('<label class="control-label">' + label + '</label>');
+                var $label = $('<label class="control-label col-sm-4 col-md-4">' + label + '</label>');//用于 4 8 布局的input
                 if(this.options.required){
                     $label.addClass('required');
                 }

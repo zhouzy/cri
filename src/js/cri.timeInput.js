@@ -65,9 +65,12 @@
     TimeInput.prototype._wrapInput = function(){
         var that = this,
             value = this.date,
-            button = {iconCls:TIME_INPUT_ICON,handler:function(){
-                that.selectView.toggle();
-            }};
+            button = {
+                iconCls:TIME_INPUT_ICON,
+                handler:function(){
+                    that.selectView.toggle();
+                }
+            };
 
         this.input = new cri.Input(this.$element,{
             readonly:true,
