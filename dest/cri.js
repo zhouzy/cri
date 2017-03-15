@@ -1715,7 +1715,9 @@
                     that.options.onFocus && that.options.onFocus.call(that);
                 }).blur(function(){
                     that.options.onBlur && that.options.onBlur.call(that);
-                });
+                }).on('change', function() {
+					that.options.onChange && that.options.onChange.call(that);
+				});
             }
             else if(this.$element.is('select')){
                 this.$input.click(function(){
@@ -1780,7 +1782,7 @@
                 button = [button];
             }
             var $button = button.map(function(button){
-                var $btn = $('<button class="btn btn-sm"></button>');
+                var $btn = $('<button class="btn"></button>');
                 $btn.btn({
                     text:button.text, iconCls:button.iconCls,
                     handler:function(){
