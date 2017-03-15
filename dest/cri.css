@@ -911,38 +911,43 @@
   background-color: #4f7fe8;
   background-clip: content-box;
 }
+.time-box .hms-bar .col-sm-4 {
+  padding: 0;
+}
 .time-box .hms-bar .form-group {
   display: inline-block;
-  width: 33%;
   font-size: 12px;
 }
-.time-box .hms-bar .form-group > .input-group {
+.time-box .hms-bar .form-group .col-sm-8 {
+  width: 100%;
+}
+.time-box .hms-bar .form-group .input-group {
   width: 100%;
   padding-right: 5px;
   padding-left: 0;
 }
-.time-box .hms-bar .form-group > .input-group .input-group-addon {
+.time-box .hms-bar .form-group .input-group .input-group-addon {
   padding-left: 2px;
   padding-right: 2px;
   height: 30px;
   font-size: 12px;
   width: 20px;
 }
-.time-box .hms-bar .form-group > .input-group .form-control {
+.time-box .hms-bar .form-group .input-group .form-control {
   height: 30px;
   padding: 0;
 }
-.time-box .hms-bar .form-group > .input-group .input-group-btn.btn-group-vertical {
+.time-box .hms-bar .form-group .input-group .input-group-btn.btn-group-vertical {
   height: 30px;
 }
-.time-box .hms-bar .form-group > .input-group .input-group-btn.btn-group-vertical .top,
-.time-box .hms-bar .form-group > .input-group .input-group-btn.btn-group-vertical .bottom {
+.time-box .hms-bar .form-group .input-group .input-group-btn.btn-group-vertical .top,
+.time-box .hms-bar .form-group .input-group .input-group-btn.btn-group-vertical .bottom {
   height: 15px;
   width: 20px;
   padding: 0;
 }
-.time-box .hms-bar .form-group:last-child {
-  width: 34%;
+.time-box .hms-bar .form-group .input-group .input-group-btn {
+  padding: 0 2px;
 }
 .time-box .hms-bar .form-group:last-child.input-group {
   padding-right: 0;

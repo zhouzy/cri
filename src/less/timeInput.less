@@ -93,11 +93,16 @@
     }
 
     .hms-bar {
+		.col-sm-4{
+			padding:0;
+		}
         .form-group{
             display:inline-block;
-            width:33%;
             font-size:12px;
-            &>.input-group{
+			.col-sm-8{
+				width:100%;
+			}
+            .input-group{
                 width:100%;
                 padding-right:5px;
                 padding-left:0;
@@ -121,9 +126,12 @@
                         padding:0;
                     }
                 }
+				.input-group-btn{
+					padding:0 2px;
+					//font-size:12px;
+				}
             }
             &:last-child{
-                width:34%;
                 &.input-group{
                     padding-right:0;
                 }

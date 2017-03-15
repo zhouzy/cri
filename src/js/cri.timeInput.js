@@ -208,7 +208,8 @@
                 this._monthSelect());
             $timeBox.append($row.append($titleBar),this._daySelect());
             if(this.options.HMS == true){
-                $timeBox.append($('<div class="row"></div>').append(this._hmsSelect()));
+                $timeBox.append($('<div class="row hms-bar form-horizontal"></div>').append(this._hmsSelect()));
+				$timeBox.find(".hms-bar .form-group").addClass("form-group-sm");
             }
             $("body").append($timeBox);
         },
@@ -327,13 +328,12 @@
          */
         _hmsSelect:function(){
             var that = this,
-                $hmsBar = $('<div class="hms-bar form-inline col-lg-12 col-sm-12"></div>'),
                 $hour   = $('<input class="form-control hour"/>'),
                 $minute = $('<input class="form-control minute"/>'),
-                $second = $('<input class="form-control second"/>');
-            $hmsBar.append($hour);
-            $hmsBar.append($minute);
-            $hmsBar.append($second);
+                $second = $('<input class="form-control second"/>'),
+            	$hourForm = $("<div class='col-sm-4'></div>").append($hour),
+				$minuteForm = $("<div class='col-sm-4'></div>").append($minute),
+				$secondForm = $("<div class='col-sm-4'></div>").append($second);
 
             this.hour = $hour.numberInput({
                 min:0,
@@ -365,8 +365,7 @@
                 }
             });
             $second.before('<span class="input-group-addon">秒</span>');
-            $hmsBar.find(".form-group").addClass("form-group-sm");
-            return $hmsBar;
+            return [$hourForm,$minuteForm,$secondForm];
         },
 
         _change:function(){
