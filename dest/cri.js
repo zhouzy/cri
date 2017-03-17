@@ -1687,17 +1687,17 @@
         $   = window.jQuery;
 
     var _defaultOptions = {
-        label:null,
-        value:null,
-        button:null,//button={iconCls:"",handler:""}
-        readonly:false,
-        onFocus:null,
-        onBlur:null,
-        enable:true,
-        required:false
+        label    : null,
+        value    : null,
+        button   : null, //button={iconCls:"",handler:""}
+        readonly : false,
+        onFocus  : null,
+        onBlur   : null,
+        enable   : true,
+        required : false
     };
 
-    var FORM_GROUP    = "form-group",
+    var FORM_GROUP     = "cri-form-group form-group",
         INPUT_SELECTOR = "input:not(:button,[type=submit],[type=reset],[disabled])";
 
     var Input = cri.Widgets.extend(function(element,options){
@@ -1767,7 +1767,7 @@
             }
 
             if(op.button){
-                $input.wrap('<div class="input-group"></div>');
+                $input.wrap('<div class="input-group cri-input-group"></div>');
                 var $inputGroup = $input.parent();
                 var $inputGroupBtn = $('<span class="input-group-btn"></span>');
                 $inputGroup.append($inputGroupBtn);
@@ -2087,7 +2087,6 @@
  * Author zhouzy
  * Date   2014/9/18
  * Input 组件
- *
  */
 !function(window){
 
@@ -2097,22 +2096,23 @@
         $   = window.jQuery;
 
     var _defaultOptions = {
-        label:null,
-        value:0,
-        readonly:false,
-        onFocus:null,
-        onBlur:null,
-        enable:true,
-        required:false,
-        max:null,
-        min:null,
-        button:{}
+        label    : null,
+        value    : 0,
+        readonly : false,
+        onFocus  : null,
+        onBlur   : null,
+        enable   : true,
+        required : false,
+        max      : null,
+        min      : null,
+        button   : {}
     };
 
     var NumberInput = cri.Input.extend(function(element,options){
         this.options = _defaultOptions;
         this.$inputGroup = null;
         cri.Widgets.apply(this,arguments);
+        this.$element.addClass("cri-number-input__input");
         this.$element.attr('data-role','numberInput');
     });
 
@@ -2146,9 +2146,9 @@
 
         _button:function($p){
             var that         = this,
-                $plusButton  = $('<a href="#" class="top"><i class="fa fa-sort-up plus-button"></i></a>'),
-                $minusButton = $('<a href="#" class="bottom"><i class="fa fa-sort-down minus-button"></i></a>');
-            $p.addClass('btn-group-vertical');
+                $plusButton  = $('<span class="cri-number-input__btn__top"><i class="fa fa-sort-up plus-button"></i></span>'),
+                $minusButton = $('<span class="cri-number-input__btn__bottom"><i class="fa fa-sort-down minus-button"></i></span>');
+            $p.addClass("cri-number-input__btn-group");
             $plusButton.click(function(){
                 var val = that.value();
                 if(cri.isNum(val)){

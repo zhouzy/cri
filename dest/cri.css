@@ -408,6 +408,132 @@
     padding-left: 5px;
   }
 }
+.cri-form-group {
+  margin-bottom: 5px!important;
+  word-spacing: normal;
+  font-size: 0;
+}
+.cri-form-group .control-label {
+  font-size: 12px;
+}
+.cri-form-group label.control-label {
+  width: 100px;
+  padding-right: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 30px;
+  vertical-align: top;
+  padding-top: 5px;
+}
+.cri-form-group > .input-group,
+.cri-form-group > .form-control {
+  width: calc(100% - 100px);
+  display: inline-block;
+}
+.cri-form-group > .input-group {
+  display: table;
+  float: right;
+}
+.cri-form-group > .input-group .input-group-btn {
+  width: 30px;
+}
+.cri-form-group > .input-group .input-group-btn button {
+  width: 30px;
+  padding-top: 4px;
+  height: 30px;
+}
+.cri-form-group .radio {
+  font-size: 12px;
+}
+.cri-form-group label {
+  font-size: 12px;
+}
+.cri-form-group input[type=checkbox],
+.cri-form-group input[type-radio] {
+  font-size: 14px;
+}
+.cri-input-group {
+  position: relative;
+}
+.cri-number-input__btn-group.input-group-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 24px;
+  white-space: normal;
+  font-size: 12px;
+  z-index: 10;
+  padding: 0;
+}
+.cri-number-input__btn-group.input-group-btn .cri-number-input__btn__top,
+.cri-number-input__btn-group.input-group-btn .cri-number-input__btn__bottom {
+  display: inline-block;
+  height: 50%;
+  width: 100%;
+  font-size: 12px;
+  text-align: center;
+  color: #444;
+  cursor: pointer;
+}
+.cri-number-input__btn-group.input-group-btn .cri-number-input__btn__top i,
+.cri-number-input__btn-group.input-group-btn .cri-number-input__btn__bottom i {
+  position: relative;
+}
+.cri-number-input__btn-group.input-group-btn .cri-number-input__btn__top i {
+  top: 4px;
+}
+.cri-number-input__btn-group.input-group-btn .cri-number-input__btn__bottom i {
+  top: -4px;
+}
+.cri-number-input__input {
+  padding-right: 24px;
+  border-bottom-right-radius: 4px;
+  border-top-right-radius: 4px;
+}
+
+.user-not-select {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -khtml-user-select: none;
+  user-select: none;
+}
+@keyframes left2right {
+  from {
+    padding-left: 4px;
+  }
+  to {
+    padding-left: 5px;
+  }
+}
+@-moz-keyframes left2right {
+  /* Firefox */
+  from {
+    padding-left: 4px;
+  }
+  to {
+    padding-left: 5px;
+  }
+}
+@-webkit-keyframes left2right {
+  /* Safari 和 Chrome */
+  from {
+    padding-left: 4px;
+  }
+  to {
+    padding-left: 5px;
+  }
+}
+@-o-keyframes left2right {
+  /* Opera */
+  from {
+    padding-left: 4px;
+  }
+  to {
+    padding-left: 5px;
+  }
+}
 .notification {
   position: fixed;
   z-index: 30000;

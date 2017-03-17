@@ -12,7 +12,7 @@ module.exports = function (grunt) {
                     "dest/cri.css":["src/less/*.less",
                         "!src/less/reset.less",
                         "!src/less/lib.less",
-                        "!src/less/input.less",
+                        //"!src/less/input.less",
                         "!src/less/theme-default.less",
                         "!src/less/easybootstrap.less"]
                 }
@@ -25,7 +25,7 @@ module.exports = function (grunt) {
                     "dest/cri.css":["src/less/*.less",
                         "!src/less/reset.less",
                         "!src/less/lib.less",
-                        "!src/less/input.less",
+                        //"!src/less/input.less",
                         "!src/less/theme-default.less",
                         "!src/less/easybootstrap.less"]
                 }

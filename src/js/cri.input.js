@@ -12,17 +12,17 @@
         $   = window.jQuery;
 
     var _defaultOptions = {
-        label:null,
-        value:null,
-        button:null,//button={iconCls:"",handler:""}
-        readonly:false,
-        onFocus:null,
-        onBlur:null,
-        enable:true,
-        required:false
+        label    : null,
+        value    : null,
+        button   : null, //button={iconCls:"",handler:""}
+        readonly : false,
+        onFocus  : null,
+        onBlur   : null,
+        enable   : true,
+        required : false
     };
 
-    var FORM_GROUP    = "form-group",
+    var FORM_GROUP     = "cri-form-group form-group",
         INPUT_SELECTOR = "input:not(:button,[type=submit],[type=reset],[disabled])";
 
     var Input = cri.Widgets.extend(function(element,options){
@@ -92,7 +92,7 @@
             }
 
             if(op.button){
-                $input.wrap('<div class="input-group"></div>');
+                $input.wrap('<div class="input-group cri-input-group"></div>');
                 var $inputGroup = $input.parent();
                 var $inputGroupBtn = $('<span class="input-group-btn"></span>');
                 $inputGroup.append($inputGroupBtn);
