@@ -236,11 +236,6 @@
   white-space: nowrap;
   vertical-align: middle;
   text-overflow: ellipsis;
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-  -khtml-user-select: none;
-  user-select: none;
 }
 .grid table tr td:first-child {
   border-left-width: 0;

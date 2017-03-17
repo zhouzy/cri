@@ -656,9 +656,7 @@
             this._createGrid();
             this._createPage();
             this._getData();
-            if(this.options.onLoad && typeof(this.options.onLoad) === 'function'){
-                this.options.onLoad.call(this);
-            }
+
         },
 
         /**
@@ -827,12 +825,12 @@
                     $tr.append($("<td></td>").addClass("line-number").append(lineNum));
                 }
                 for(var j = 0,length = columns.length; j<length;j++){
-                    var $td = $('<td></td>'),
+                    var $td      = $('<td></td>'),
                         $content = $('<div></div>').addClass('td-content'),
-                        column = columns[j],
-                        text   = row[column.field]==null ? "" : row[column.field],
-                        _text  = ("" + text).replace(/(<([^a\/]).*?>)|(<\/[^a].*?>)/g,"");
-                    var button = column['button'];
+                        column   = columns[j],
+                        text     = row[column.field]==null ? "" : row[column.field],
+                        _text    = ("" + text).replace(/(<([^a\/]).*?>)|(<\/[^a].*?>)/g,""),
+                    	button   = column['button'];
                     if(button){
                         if(!cri.isArray(button)){
                             button = [button];
@@ -1087,6 +1085,9 @@
                         if(op.filter){
                             that._initFilter();
                         }
+                        if(op.onLoad && typeof(op.onLoad) === 'function'){
+                			op.onLoad.call(this);
+            			}
                     },
                     error: function(){
                         that._rows = [];

@@ -180,9 +180,7 @@
             this._createGrid();
             this._createPage();
             this._getData();
-            if(this.options.onLoad && typeof(this.options.onLoad) === 'function'){
-                this.options.onLoad.call(this);
-            }
+
         },
 
         /**
@@ -611,6 +609,9 @@
                         if(op.filter){
                             that._initFilter();
                         }
+                        if(op.onLoad && typeof(op.onLoad) === 'function'){
+                			op.onLoad.call(this);
+            			}
                     },
                     error: function(){
                         that._rows = [];
