@@ -60,10 +60,10 @@
                 page     = parseInt(op.page) || 1,
                 lastPage = Math.ceil(total / pageSize),
 
-                $firstPage  = $('<li></li>').addClass(FIRSTPAGE).append('<a href="#"><span class="fa fa-angle-double-left"></span></a>'),
-                $prevPage   = $('<li></li>').addClass(PREVPAGE).append('<a href="#"><span class="fa fa-angle-left"></span></a>'),
-                $nextPage   = $('<li></li>').addClass(NEXTPAGE).append('<a href="#"><span class="fa fa-angle-right"></span></a>'),
-                $lastPage   = $('<li></li>').addClass(LASTPAGE).append('<a href="#"><span class="fa fa-angle-double-right"></span></a>');
+                $firstPage  = $('<li></li>').addClass(FIRSTPAGE).append('<a href="javascript:void(0)"><span class="fa fa-angle-double-left"></span></a>'),
+                $prevPage   = $('<li></li>').addClass(PREVPAGE).append('<a href="javascript:void(0)"><span class="fa fa-angle-left"></span></a>'),
+                $nextPage   = $('<li></li>').addClass(NEXTPAGE).append('<a href="javascript:void(0)"><span class="fa fa-angle-right"></span></a>'),
+                $lastPage   = $('<li></li>').addClass(LASTPAGE).append('<a href="javascript:void(0)"><span class="fa fa-angle-double-right"></span></a>');
 
             lastPage = lastPage>0?lastPage:page;
             this._fourBtn($firstPage,$prevPage,$nextPage,$lastPage,page,lastPage);

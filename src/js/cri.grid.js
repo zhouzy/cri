@@ -621,7 +621,7 @@
                     },
                     data:op.param,
                     dataType:"JSON",
-                    async:false
+                    async:true
                 });
             }
             return result;
