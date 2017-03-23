@@ -1097,7 +1097,7 @@
                     },
                     data:op.param,
                     dataType:"JSON",
-                    async:false
+                    async:true
                 });
             }
             return result;
@@ -2264,10 +2264,10 @@
                 page     = parseInt(op.page) || 1,
                 lastPage = Math.ceil(total / pageSize),
 
-                $firstPage  = $('<li></li>').addClass(FIRSTPAGE).append('<a href="#"><span class="fa fa-angle-double-left"></span></a>'),
-                $prevPage   = $('<li></li>').addClass(PREVPAGE).append('<a href="#"><span class="fa fa-angle-left"></span></a>'),
-                $nextPage   = $('<li></li>').addClass(NEXTPAGE).append('<a href="#"><span class="fa fa-angle-right"></span></a>'),
-                $lastPage   = $('<li></li>').addClass(LASTPAGE).append('<a href="#"><span class="fa fa-angle-double-right"></span></a>');
+                $firstPage  = $('<li></li>').addClass(FIRSTPAGE).append('<a href="javascript:void(0)"><span class="fa fa-angle-double-left"></span></a>'),
+                $prevPage   = $('<li></li>').addClass(PREVPAGE).append('<a href="javascript:void(0)"><span class="fa fa-angle-left"></span></a>'),
+                $nextPage   = $('<li></li>').addClass(NEXTPAGE).append('<a href="javascript:void(0)"><span class="fa fa-angle-right"></span></a>'),
+                $lastPage   = $('<li></li>').addClass(LASTPAGE).append('<a href="javascript:void(0)"><span class="fa fa-angle-double-right"></span></a>');
 
             lastPage = lastPage>0?lastPage:page;
             this._fourBtn($firstPage,$prevPage,$nextPage,$lastPage,page,lastPage);
@@ -3611,10 +3611,10 @@
         _yearSelect : function(){
             var that = this;
             var date = this.date;
-            var $yearInputGroup = $('<div class="year-box input-group input-group-sm"></div>');
-            var $minusBtn       = $('<span class="input-group-btn"><button class="btn btn-default" type="button">-</button></span>');
-            var $plusBtn        = $('<span class="input-group-btn"><button class="btn btn-default" type="button">+</button></span>');
-            var $year           = $('<input class="form-control" readonly/>').val(date.yyyy + '年');
+            var $yearInputGroup = $('<div class="year-box cri-input-group cri-time-box-input-group"></div>');
+            var $minusBtn       = $('<span class="cri-time-box-input-group__btn">-</span>');
+            var $plusBtn        = $('<span class="cri-time-box-input-group__btn">+</span>');
+            var $year           = $('<input class="cri-time-box-input-group__input" readonly/>').val(date.yyyy + '年');
             this.$year = $year;
             $minusBtn.on("click",function(){
                 $year.val(--that.date.yyyy + '年');
@@ -3636,8 +3636,8 @@
         _monthSelect:function(){
             var that = this,
                 date = this.date,
-                $inputGroup = $('<div class="month-box input-group input-group-sm"></div>'),
-                $select = $('<select class="form-control">');
+                $inputGroup = $('<div class="month-box cri-input-group"></div>'),
+                $select = $('<select class="cri-select">');
 
             this.$month = $select;
             $.each([1,2,3,4,5,6,7,8,9,10,11,12],function(index,value){
@@ -3649,7 +3649,7 @@
                 that._refreshDaySelect();
                 that._change();
             });
-            return $inputGroup.append($select,'<span class="input-group-addon">月</span>');
+            return $inputGroup.append($select,'<span class="cri-input-group__addon">月</span>');
         },
 
         /**
@@ -3717,9 +3717,9 @@
          */
         _hmsSelect:function(){
             var that = this,
-                $hour   = $('<input class="form-control hour"/>'),
-                $minute = $('<input class="form-control minute"/>'),
-                $second = $('<input class="form-control second"/>'),
+                $hour   = $('<input class="hour"/>'),
+                $minute = $('<input class="minute"/>'),
+                $second = $('<input class="second"/>'),
             	$hourForm = $("<div class='col-sm-4'></div>").append($hour),
 				$minuteForm = $("<div class='col-sm-4'></div>").append($minute),
 				$secondForm = $("<div class='col-sm-4'></div>").append($second);

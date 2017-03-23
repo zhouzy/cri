@@ -455,6 +455,15 @@
 .cri-input-group {
   position: relative;
 }
+.cri-input-group .cri-input-group__input {
+  padding: 5px;
+  height: 30px;
+  border-radius: 3px;
+}
+.cri-input-group .cri-input-group__btn {
+  height: 30px;
+  padding: 5px;
+}
 .cri-number-input__btn-group.input-group-btn {
   position: absolute;
   top: 0;
@@ -971,7 +980,7 @@
   padding-right: 5px;
 }
 .time-box .year-box {
-  width: 60%;
+  width: 40%;
   font-size: 12px;
 }
 .time-box input,
@@ -987,11 +996,16 @@
   margin-bottom: 0;
 }
 .time-box .month-box {
-  margin-left: 4%;
-  width: 35%;
+  display: inline-block;
+  width: 58%;
+  vertical-align: top;
+  text-align: right;
 }
-.time-box .month-box .form-control {
+.time-box .month-box .cri-select {
+  height: 30px;
   padding: 0;
+  border-radius: 0px;
+  min-width: 50px;
 }
 .time-box table {
   width: 100%;
@@ -1035,12 +1049,16 @@
 .time-box .hms-bar .col-sm-4 {
   padding: 0;
 }
+.time-box .hms-bar .form-group.form-group-sm {
+  margin-top: 0;
+}
 .time-box .hms-bar .form-group {
   display: inline-block;
   font-size: 12px;
 }
 .time-box .hms-bar .form-group .col-sm-8 {
   width: 100%;
+  padding: 0;
 }
 .time-box .hms-bar .form-group .input-group {
   width: 100%;
@@ -1058,6 +1076,9 @@
   height: 30px;
   padding: 0;
 }
+.time-box .hms-bar .form-group .input-group .form-control.cri-number-input__input {
+  border: 1px solid #F2F2F2;
+}
 .time-box .hms-bar .form-group .input-group .input-group-btn.btn-group-vertical {
   height: 30px;
 }
@@ -1072,6 +1093,38 @@
 }
 .time-box .hms-bar .form-group:last-child.input-group {
   padding-right: 0;
+}
+.cri-time-box-input-group {
+  display: inline-block;
+  position: relative;
+  width: 100px;
+}
+.cri-time-box-input-group .cri-time-box-input-group__input {
+  padding: 5px 30px;
+  height: 30px;
+  outline: none;
+  -webkit-appearance: none;
+  box-shadow: none;
+  border: 1px solid #8b8b8b;
+  width: 100%;
+}
+.cri-time-box-input-group .cri-time-box-input-group__btn {
+  height: 30px;
+  width: 24px;
+  padding: 5px;
+  position: absolute;
+  background: #8b8b8b;
+  color: #fff;
+  text-align: center;
+  cursor: pointer;
+}
+.cri-time-box-input-group .cri-time-box-input-group__btn:first-child {
+  top: 0;
+  left: 0;
+}
+.cri-time-box-input-group .cri-time-box-input-group__btn:last-child {
+  top: 0;
+  right: 0;
 }
 
 .user-not-select {
