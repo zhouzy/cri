@@ -745,8 +745,21 @@
                 selected.push(this._getRowDataById(selectedId[i]));
             }
             return selected;
-        }
+        },
 
+        /**
+         * 清空用户选择
+         */
+        clearSelected : function(){
+            if(this.options.checkBox){
+                this.$gridbody.find('input:checkbox').prop("checked",false);
+                this.$gridhead.find('input:checkbox').prop("checked",false);
+            }
+            else{
+                this.$gridbody.find('tr.selected').removeClass("selected");
+            }
+            this._selectedId = [];
+        }
     });
 
     cri.Grid = Grid;
