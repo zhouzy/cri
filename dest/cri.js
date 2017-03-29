@@ -2105,6 +2105,7 @@
         required:false,
         max:null,
         min:null,
+        step:null,
         button:{}
     };
 
@@ -2118,17 +2119,23 @@
     $.extend(NumberInput.prototype,{
         _eventListen:function(){
             var that = this,
-                op   = that.options;
+                op   = that.options,
+                el = that.$element;
             this.$element.on("focus", function () {
                 op.onFocus && op.onFocus.call(that);
                 $(document).on("mousewheel DOMMouseScroll", function (e) {
                     var delta = (e.originalEvent.wheelDelta && (e.originalEvent.wheelDelta > 0 ? 1 : -1)) ||  // chrome & ie
                         (e.originalEvent.detail && (e.originalEvent.detail > 0 ? -1 : 1));              // firefox
-
                     if(delta > 0){
-                        that.$element.val(parseInt(that.$element.val()) + 1);
+                        el.val(parseInt(el.val()) + op.step);
+                        if(op.max !=null && parseInt(el.val()) > op.max){
+                            el.val(op.max);
+                        }
                     }else{
-                        that.$element.val(parseInt(that.$element.val()) + 1);
+                        el.val(parseInt(el.val()) - op.step);
+                        if(op.min != null && parseInt(el.val()) < op.min){
+                            el.val(op.min);
+                        }
                     }
                 })
             }).on('blur',function () {
