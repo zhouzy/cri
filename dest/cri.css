@@ -1050,6 +1050,8 @@
   padding: 0;
 }
 .time-box .hms-bar .form-group.form-group-sm {
+  margin-left: 0;
+  margin-right: 0;
   margin-top: 0;
 }
 .time-box .hms-bar .form-group {
@@ -1077,7 +1079,8 @@
   padding: 0;
 }
 .time-box .hms-bar .form-group .input-group .form-control.cri-number-input__input {
-  border: 1px solid #F2F2F2;
+  border-bottom-right-radius: 3px;
+  border-top-right-radius: 3px;
 }
 .time-box .hms-bar .form-group .input-group .input-group-btn.btn-group-vertical {
   height: 30px;
