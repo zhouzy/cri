@@ -1715,7 +1715,9 @@
                     that.options.onFocus && that.options.onFocus.call(that);
                 }).blur(function(){
                     that.options.onBlur && that.options.onBlur.call(that);
-                });
+                }).on('change', function() {
+					that.options.onChange && that.options.onChange.call(that);
+				});
             }
             else if(this.$element.is('select')){
                 this.$input.click(function(){
@@ -2119,7 +2121,18 @@
                 op   = that.options;
             this.$element.on("focus", function () {
                 op.onFocus && op.onFocus.call(that);
+                $(document).on("mousewheel DOMMouseScroll", function (e) {
+                    var delta = (e.originalEvent.wheelDelta && (e.originalEvent.wheelDelta > 0 ? 1 : -1)) ||  // chrome & ie
+                        (e.originalEvent.detail && (e.originalEvent.detail > 0 ? -1 : 1));              // firefox
+
+                    if(delta > 0){
+                        that.$element.val(parseInt(that.$element.val()) + 1);
+                    }else{
+                        that.$element.val(parseInt(that.$element.val()) + 1);
+                    }
+                })
             }).on('blur',function () {
+                $(document).off("mousewheel DOMMouseScroll");
                 op.onBlur && op.onBlur.call(that);
                 if(op.min != null){
                     var val = that.$element.val();
@@ -2143,8 +2156,8 @@
 
         _button:function($p){
             var that         = this,
-                $plusButton  = $('<a href="#" class="top"><i class="fa fa-sort-up plus-button"></i></a>'),
-                $minusButton = $('<a href="#" class="bottom"><i class="fa fa-sort-down minus-button"></i></a>');
+                $plusButton  = $('<a href="javascript:void(0)" class="top"><i class="fa fa-sort-up plus-button"></i></a>'),
+                $minusButton = $('<a href="javascript:void(0)" class="bottom"><i class="fa fa-sort-down minus-button"></i></a>');
             $p.addClass('btn-group-vertical');
             $plusButton.click(function(){
                 var val = that.value();

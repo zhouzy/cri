@@ -37,7 +37,18 @@
                 op   = that.options;
             this.$element.on("focus", function () {
                 op.onFocus && op.onFocus.call(that);
+                $(document).on("mousewheel DOMMouseScroll", function (e) {
+                    var delta = (e.originalEvent.wheelDelta && (e.originalEvent.wheelDelta > 0 ? 1 : -1)) ||  // chrome & ie
+                        (e.originalEvent.detail && (e.originalEvent.detail > 0 ? -1 : 1));              // firefox
+
+                    if(delta > 0){
+                        that.$element.val(parseInt(that.$element.val()) + 1);
+                    }else{
+                        that.$element.val(parseInt(that.$element.val()) + 1);
+                    }
+                })
             }).on('blur',function () {
+                $(document).off("mousewheel DOMMouseScroll");
                 op.onBlur && op.onBlur.call(that);
                 if(op.min != null){
                     var val = that.$element.val();
