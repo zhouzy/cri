@@ -1759,7 +1759,7 @@
                     $input.prop('readonly',true);
                 }
                 else{
-                    var $static = $('<span class="form-control-static"></span>');
+                    var $static = $('<input class="form-control" readonly/>');
                     this.$element.after($static);
                     $input = $static;
                 }
@@ -1821,13 +1821,13 @@
             if(value == null){
                 return ;
             }
-            if(this.$input.is(INPUT_SELECTOR)){
+            if(this.$element.is('select')){
+                this.$element.val(value);
+                this.$input.val(this.$element.find("option:selected").text());
+            }
+            else if(this.$input.is(INPUT_SELECTOR)){
                 this.$input.val(value);
                 this.$input.change();
-            }
-            else if(this.$element.is('select')){
-                this.$element.val(value);
-                this.$input.text(this.$element.find("option:selected").text());
             }
         },
 
@@ -2386,12 +2386,12 @@
         SELECTED = "selected";
 
     var _defaultOptions = {
-        label:'',
-        data:null,  //Array [{value:"",text:""},{value:"",text:""}]
-        change:null, //Function: call back after select option
-        value:null,
-        enable:true,
-        multiple:false
+        label    : '',
+        data     : null,  //Array [{value:"",text:""},{value:"",text:""}]
+        change   : null, //Function: call back after select option
+        value    : null,
+        enable   : true,
+        multiple : false
     };
 
     var SelectBox = cri.Widgets.extend(function(element,options){
@@ -2418,16 +2418,19 @@
             this.$element.hide();
             this.options.multiple && this.$element.attr('multiple','multiple');
             this._createInput();
-            this.$selectBoxGroup = this.$element.parent('.form-group');
+            this.$selectBoxGroup = this.$element.closest('.form-group');
             this._createListView();
             this.$selectBoxGroup.addClass(SELECTBOX_GROUP);
         },
 
         _createInput:function(){
             var that = this,
-                button = {iconCls:SELECTBOX_BTN,handler:function(){
-                    that.listView.toggle();
-                }};
+                button = {
+                    iconCls:SELECTBOX_BTN,
+                    handler:function(){
+                        that.listView.toggle();
+                    }
+                };
             this.input = new cri.Input(this.$element,{
                 label:that.label,
                 readonly:true,
@@ -2699,11 +2702,20 @@
          */
         _setPosition:function(){
             var labelWidth = this.$parent.find('label').outerWidth();
-            var left = this.$parent.offset().left + labelWidth;
-            var top = this.$parent.offset().top + 30;
-            //magic number 10 为 options padding+border宽度
             var width = this.$parent.find('.input-group').outerWidth();
-            this.$options.css({top:top,left:left,width:width});
+            var parentOffset = this.$parent.offset();
+            var left = parentOffset.left + labelWidth + 15;
+            var top = parentOffset.top;
+            var bottom = $(window).height() - top;
+            var scrollHeight = document.body.scrollHeight;
+            this.$options.removeClass('show-on-above');
+            if(top + 200 > scrollHeight){
+                this.$options.addClass('show-on-above');
+                this.$options.css({bottom:bottom,left:left,top:'auto',width:width});
+            }
+            else{
+                this.$options.css({top:top + 34,left:left,bottom:'auto',width:width});
+            }
         },
 
         /**

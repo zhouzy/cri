@@ -85,7 +85,7 @@
                     $input.prop('readonly',true);
                 }
                 else{
-                    var $static = $('<span class="form-control-static"></span>');
+                    var $static = $('<input class="form-control" readonly/>');
                     this.$element.after($static);
                     $input = $static;
                 }
@@ -147,13 +147,13 @@
             if(value == null){
                 return ;
             }
-            if(this.$input.is(INPUT_SELECTOR)){
+            if(this.$element.is('select')){
+                this.$element.val(value);
+                this.$input.val(this.$element.find("option:selected").text());
+            }
+            else if(this.$input.is(INPUT_SELECTOR)){
                 this.$input.val(value);
                 this.$input.change();
-            }
-            else if(this.$element.is('select')){
-                this.$element.val(value);
-                this.$input.text(this.$element.find("option:selected").text());
             }
         },
 
