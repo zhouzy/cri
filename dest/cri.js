@@ -3778,13 +3778,16 @@
         _setPosition:function(){
             var left = this.$parent.offset().left + this.$parent.find('label').outerWidth();
             var top = this.$parent.offset().top + 34;
+            var bottom = $(window).height() - this.$parent[0].getBoundingClientRect().bottom + 34;
             var scrollHeight = document.body.scrollHeight;
             this.$timeBox.removeClass('show-on-above');
             if(top + 200 > scrollHeight){
-                top = top - 34 - 197;
                 this.$timeBox.addClass('show-on-above');
+				this.$timeBox.css({bottom:bottom,left:left,top:'auto'});
             }
-            this.$timeBox.css({top:top,left:left});
+            else{
+				this.$timeBox.css({top:top,left:left,bottom:'auto'});
+			}
         },
 
         /**
