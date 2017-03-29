@@ -248,7 +248,7 @@
             var that = this,
                 date = this.date,
                 $inputGroup = $('<div class="month-box input-group input-group-sm"></div>'),
-                $select = $('<select class="form-control">');
+                $select = $('<select class="form-control"></select>');
 
             this.$month = $select;
             $.each([1,2,3,4,5,6,7,8,9,10,11,12],function(index,value){
@@ -378,12 +378,12 @@
          */
         _setPosition:function(){
             var left = this.$parent.offset().left + this.$parent.find('label').outerWidth();
-            var top = this.$parent.offset().top + 30;
+            var top = this.$parent.offset().top + 34;
             var scrollHeight = document.body.scrollHeight;
-            this.$timeBox.removeClass('top');
-            if(top + 250 > scrollHeight){
-                top = top - 30 - 230;
-                this.$timeBox.addClass('top');
+            this.$timeBox.removeClass('show-on-above');
+            if(top + 200 > scrollHeight){
+                top = top - 34 - 197;
+                this.$timeBox.addClass('show-on-above');
             }
             this.$timeBox.css({top:top,left:left});
         },

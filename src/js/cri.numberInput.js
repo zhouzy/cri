@@ -74,7 +74,7 @@
             var that         = this,
                 $plusButton  = $('<a href="javascript:void(0)" class="top"><i class="fa fa-sort-up plus-button"></i></a>'),
                 $minusButton = $('<a href="javascript:void(0)" class="bottom"><i class="fa fa-sort-down minus-button"></i></a>');
-            $p.addClass('btn-group-vertical');
+            $p.addClass("input-group-addon").addClass('btn-group-vertical');
             $plusButton.click(function(){
                 var val = that.value();
                 if(cri.isNum(val)){
@@ -118,11 +118,11 @@
             var $this   = $(this),
                 options = typeof option == 'object' && option,
                 role    = $this.attr("role");
-            widget = $this.data('widget');
+            widget = $this.data('numberInput');
             if(widget != null && widget instanceof NumberInput){
                 widget._destroy();
             }
-            $this.data('widget', (widget = new NumberInput(this, options)));
+            $this.data('numberInput', (widget = new NumberInput(this, options)));
         });
         return widget;
     };
