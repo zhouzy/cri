@@ -27,7 +27,11 @@
 </form>
 <script type="text/javascript">
     //1.测试重复初始化
-    $("#numberinput").numberInput({});
+    $("#numberinput").numberInput({
+        step: 5,
+        max: 60,
+        min: 0
+    });
     //$("#numberinput").input({});
     $("#input").input({required:true});
     $("#readonlyInput").input({readonly:true});
