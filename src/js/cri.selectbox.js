@@ -383,7 +383,12 @@
             if(data){
                 $options.children().removeClass(SELECTED);
                 for (var i in value){
-                    $options.find('li[data-value='+value[i]+']').addClass(SELECTED);
+                	if(value[i] !== ""){
+						$options.find('li[data-value='+value[i]+']').addClass(SELECTED);
+					}
+					else{
+						$options.find('li:eq(0)').addClass(SELECTED);
+					}
                 }
             }
         },
@@ -395,7 +400,7 @@
             var that = this;
             this._setPosition();
             this.$options.toggleClass('open');
-            if(this.$options.is('open')){
+            if(this.$options.is('.open')){
                 that._clickBlank();
             }
         },

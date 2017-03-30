@@ -2752,7 +2752,12 @@
             if(data){
                 $options.children().removeClass(SELECTED);
                 for (var i in value){
-                    $options.find('li[data-value='+value[i]+']').addClass(SELECTED);
+                	if(value[i] !== ""){
+						$options.find('li[data-value='+value[i]+']').addClass(SELECTED);
+					}
+					else{
+						$options.find('li:eq(0)').addClass(SELECTED);
+					}
                 }
             }
         },
