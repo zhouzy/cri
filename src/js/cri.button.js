@@ -31,8 +31,9 @@
     $.extend(Button.prototype,{
         _eventListen:function(){
             var that = this;
-            this.$button.on("click",function(){
+            this.$button.on("click",function(evt){
                 that.options.enable && that.options.handler && that.options.handler.call();
+				evt.preventDefault();
             });
         },
 
