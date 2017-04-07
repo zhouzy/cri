@@ -1004,7 +1004,7 @@
 .time-box .month-box .cri-select {
   height: 30px;
   padding: 0;
-  border-radius: 0px;
+  border-radius: 0;
   min-width: 50px;
 }
 .time-box table {
@@ -1016,20 +1016,12 @@
 .time-box table tr {
   height: 20px;
 }
-.time-box table tr > td:hover .day-content {
-  background: #a3a3a3;
-  background-clip: content-box;
-  color: #fff;
-}
-.time-box table th {
-  cursor: default;
-}
-.time-box table td {
+.time-box table tr td {
   cursor: pointer;
   text-align: center;
   vertical-align: middle;
 }
-.time-box table td .day-content {
+.time-box table tr td .day-content {
   font-size: 12px;
   width: 20px;
   height: 20px;
@@ -1041,10 +1033,18 @@
   -o-border-radius: 10px;
   border-radius: 10px;
 }
-.time-box table table td.choosed .day-content {
+.time-box table tr td:hover .day-content {
+  background: #a3a3a3;
+  background-clip: content-box;
+  color: #fff;
+}
+.time-box table tr td.active .day-content {
   color: #fff;
   background-color: #4f7fe8;
   background-clip: content-box;
+}
+.time-box table th {
+  cursor: default;
 }
 .time-box .hms-bar .col-sm-4 {
   padding: 0;

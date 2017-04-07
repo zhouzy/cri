@@ -52,7 +52,7 @@
         .cri-select{
 			height:30px;
             padding:0;
-			border-radius:0px;
+			border-radius:0;
 			min-width:50px;
         }
     }
@@ -64,36 +64,36 @@
         user-select: none;
         tr{
             height:20px;
-            &>td:hover{
-                .day-content{
-                    background:@color-timeinput-timebox-day-hover;
-                    background-clip: content-box;
-                    color:#fff;
-                }
-            }
-        }
+			td{
+				cursor: pointer;
+				text-align: center;
+				vertical-align: middle;
+				.day-content{
+					font-size:12px;
+					width:20px;
+					height:20px;
+					line-height:20px;
+					text-align:center;
+					.rounded-corners(10px);
+				}
+				&:hover{
+					.day-content{
+						background:@color-timeinput-timebox-day-hover;
+						background-clip: content-box;
+						color:#fff;
+					}
+				}
+				&.active{
+					.day-content{
+						color:#fff;
+						background-color:@color-timeinput-timebox-day-selected;
+						background-clip: content-box;
+					}
+				}
+			}
+		}
         th{
             cursor: default;
-        }
-        td{
-            cursor: pointer;
-            text-align: center;
-            vertical-align: middle;
-            .day-content{
-                font-size:12px;
-                width:20px;
-                height:20px;
-                line-height:20px;
-                text-align:center;
-                .rounded-corners(10px);
-            }
-        }
-        table td.choosed {
-            .day-content{
-                color:#fff;
-                background-color:@color-timeinput-timebox-day-selected;
-                background-clip: content-box;
-            }
         }
     }
 
