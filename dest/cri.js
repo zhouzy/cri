@@ -1260,8 +1260,9 @@
     $.extend(Button.prototype,{
         _eventListen:function(){
             var that = this;
-            this.$button.on("click",function(){
+            this.$button.on("click",function(evt){
                 that.options.enable && that.options.handler && that.options.handler.call();
+				evt.preventDefault();
             });
         },
 
@@ -2769,7 +2770,7 @@
             var that = this;
             this._setPosition();
             this.$options.toggleClass('open');
-            if(this.$options.is('open')){
+            if(this.$options.is('.open')){
                 that._clickBlank();
             }
         },
@@ -3520,7 +3521,14 @@
                 that.date = this.getDate();
                 that.input.value(cri.formatDate(that.date,that.options.format));
                 that.options.change && that.options.change.call(that);
-            }
+            },
+			onClearTime:function(){
+				var value = that.input.value();
+				that.input.value("");
+				if(value){
+					that.options.change && that.options.change.call(that);
+				}
+			}
         });
     };
 
@@ -3634,6 +3642,7 @@
                 $timeBox.append($('<div class="row hms-bar form-horizontal"></div>').append(this._hmsSelect()));
 				$timeBox.find(".hms-bar .form-group").addClass("form-group-sm");
             }
+			$timeBox.append(this._buttons());
             $("body").append($timeBox);
         },
 
@@ -3652,11 +3661,11 @@
             this.$year = $year;
             $minusBtn.on("click",function(){
                 $year.val(--that.date.yyyy + '年');
-                that._change();
+                //that._change();
             });
             $plusBtn.on("click",function(){
                 $year.val(++that.date.yyyy + '年');
-                that._change();
+                //that._change();
             });
             $yearInputGroup.append($minusBtn,$year,$plusBtn);
             return $yearInputGroup;
@@ -3681,7 +3690,7 @@
             $select.val(date.MM).on("change",function(){
                 that.date.MM = $select.val();
                 that._refreshDaySelect();
-                that._change();
+                //that._change();
             });
             return $inputGroup.append($select,'<span class="input-group-addon">月</span>');
         },
@@ -3710,10 +3719,10 @@
                     var $td = $("<td></td>").on("click",function(){
                         var day = $(this).find(".day-content").text();
                         if(day && day!=that.date.dd){
-                            $('td.choosed',$daySelect).removeClass("choosed");
+                            $('td.active',$daySelect).removeClass("active");
                             that.date.dd = +day;
-                            $(this).addClass("choosed");
-                            that._change();
+                            $(this).addClass("active");
+                            //that._change();
                         }
                     });
                     $tr.append($td);
@@ -3732,7 +3741,7 @@
             var date   = this.date,
                 maxDay = getMonthArr(date.yyyy)[date.MM],
                 shift  = new Date(date.yyyy,date.MM,1).getDay();
-            $('td.choosed',this.$daySelect).removeClass("choosed");
+            $('td.active',this.$daySelect).removeClass("active");
             $('tr.days td',this.$daySelect).html("");
             for(var i=shift;i<maxDay+shift;i++){
                 var rows = i%7,
@@ -3740,7 +3749,7 @@
                     $td = $('tr.days:eq("'+cols+'") td:eq("' + rows + '")',this.$daySelect),
                     day = i- shift + 1;
                 $td.append('<div class="day-content">' + day + '</div>');
-                day == this.date.dd && $td.addClass("choosed");
+                day == this.date.dd && $td.addClass("active");
             }
         },
 
@@ -3764,7 +3773,7 @@
                 value:this.date.HH,
                 onChange:function(){
                     that.date.HH = this.value();
-                    that._change();
+                    //that._change();
                 }
             });
             $hour.before('<span class="input-group-addon">时</span>');
@@ -3774,7 +3783,7 @@
                 value:this.date.mm,
                 onChange:function(){
                     that.date.mm = this.value();
-                    that._change();
+                    //that._change();
                 }
             });
             $minute.before('<span class="input-group-addon">分</span>');
@@ -3821,6 +3830,28 @@
         _destroy : function(){
             this.$timeBox.remove();
         },
+
+		/**
+		 * 生成时间选择面板底部的确认取消按钮
+		 * @returns {*|jQuery|HTMLElement}
+		 * @private
+		 */
+		_buttons : function(){
+			var that = this;
+			var $buttons = $('<div class="rows text-right"></div>');
+			var $clearBtn = $('<a href="javascript:void(0)" class="btn btn-xs">清除</a>');
+			var $okBtn = $('<a href="javascript:void(0)" class="btn btn-xs">确定</a>');
+			$clearBtn.click(function(){
+				that.options.onClearTime && that.options.onClearTime();
+				//that.toggle();
+			});
+			$okBtn.click(function(){
+				that._change();
+				that.toggle();
+			});
+			$buttons.append($('<div class="btn-group"></div>').append($clearBtn,$okBtn));
+			return $buttons;
+		},
 
         /**
          * 展开收缩时间选择面板

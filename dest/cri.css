@@ -1039,7 +1039,7 @@
   -o-border-radius: 10px;
   border-radius: 10px;
 }
-.time-box table table td.choosed .day-content {
+.time-box table td.active .day-content {
   color: #fff;
   background-color: #4f7fe8;
   background-clip: content-box;
