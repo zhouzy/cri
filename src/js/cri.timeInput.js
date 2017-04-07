@@ -411,7 +411,7 @@
 		 */
 		_buttons : function() {
 			var that = this;
-			var $buttons = $('<div class="rows text-right"></div>');
+			var $buttons = $('<div class="row text-right"></div>');
 			var $clearBtn = $('<a href="javascript:void(0)" class="btn btn-xs">清除</a>');
 			var $okBtn = $('<a href="javascript:void(0)" class="btn btn-xs">确定</a>');
 			$clearBtn.click(function () {

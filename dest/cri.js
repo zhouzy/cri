@@ -830,6 +830,7 @@
                         column   = columns[j],
                         text     = row[column.field]==null ? "" : row[column.field],
                         _text    = ("" + text).replace(/(<([^a\/]).*?>)|(<\/[^a].*?>)/g,""),
+						_title   = ("" + text).replace(/(<.*?>)|(<\/.*?>)/g,""),
                     	button   = column['button'];
                     if(button){
                         if(!cri.isArray(button)){
@@ -846,7 +847,7 @@
                         $content.append($button);
                     }
                     else{
-                        $content.prop("title",_text).append(_text);
+                        $content.prop("title",_title).append(_text);
                     }
                     $tr.append($td.append($content));
                 }
@@ -3814,7 +3815,7 @@
 		 */
 		_buttons : function() {
 			var that = this;
-			var $buttons = $('<div class="rows text-right"></div>');
+			var $buttons = $('<div class="row text-right"></div>');
 			var $clearBtn = $('<a href="javascript:void(0)" class="btn btn-xs">清除</a>');
 			var $okBtn = $('<a href="javascript:void(0)" class="btn btn-xs">确定</a>');
 			$clearBtn.click(function () {

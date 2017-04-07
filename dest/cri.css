@@ -980,7 +980,7 @@
   padding-right: 5px;
 }
 .time-box .year-box {
-  width: 40%;
+  width: 45%;
   font-size: 12px;
 }
 .time-box input,
@@ -997,7 +997,7 @@
 }
 .time-box .month-box {
   display: inline-block;
-  width: 58%;
+  width: 53%;
   vertical-align: top;
   text-align: right;
 }
@@ -1096,6 +1096,9 @@
 }
 .time-box .hms-bar .form-group:last-child.input-group {
   padding-right: 0;
+}
+.time-box .text-right .btn-group {
+  margin: 0;
 }
 .cri-time-box-input-group {
   display: inline-block;

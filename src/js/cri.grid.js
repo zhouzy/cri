@@ -354,6 +354,7 @@
                         column   = columns[j],
                         text     = row[column.field]==null ? "" : row[column.field],
                         _text    = ("" + text).replace(/(<([^a\/]).*?>)|(<\/[^a].*?>)/g,""),
+						_title   = ("" + text).replace(/(<.*?>)|(<\/.*?>)/g,""),
                     	button   = column['button'];
                     if(button){
                         if(!cri.isArray(button)){
@@ -370,7 +371,7 @@
                         $content.append($button);
                     }
                     else{
-                        $content.prop("title",_text).append(_text);
+                        $content.prop("title",_title).append(_text);
                     }
                     $tr.append($td.append($content));
                 }
