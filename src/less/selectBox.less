@@ -25,25 +25,33 @@
 .options{
     position:absolute;
     z-index:@zIndex-selectBox-option;
-    font-size:12px;
+    font-size:14px;
     max-height:0;
     transition: max-height ease 0.2s;
-    .user-not-select;
     overflow:auto;
     margin:0;
+    border-radius: 0 0 5px 5px;
+    .list-group-item:first-child{
+        border-radius:0;
+    }
+    &.show-on-above{
+        border-radius: 5px 5px 0 0;
+        .list-group-item:first-child{
+            border-radius:4px 4px 0 0;
+        }
+        .list-group-item:last-child{
+            border-radius:0;
+        }
+    }
     &.open{
         max-height:300px;
     }
-
     li.selected{
         background:@color-selectBox-option-selected;
         color:#fff;
     }
 }
 .list-group-item{
-    padding:5px 15px;
-    height:30px;
-    line-height:30px;
     &:hover{
         background:#f2f2f2;
     }

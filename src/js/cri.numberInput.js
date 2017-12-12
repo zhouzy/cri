@@ -21,6 +21,7 @@
         required:false,
         max:null,
         min:null,
+        step:null,
         button:{}
     };
 
@@ -34,10 +35,27 @@
     $.extend(NumberInput.prototype,{
         _eventListen:function(){
             var that = this,
-                op   = that.options;
+                op   = that.options,
+                el = that.$element;
             this.$element.on("focus", function () {
                 op.onFocus && op.onFocus.call(that);
+                $(document).on("mousewheel DOMMouseScroll", function (e) {
+                    var delta = (e.originalEvent.wheelDelta && (e.originalEvent.wheelDelta > 0 ? 1 : -1)) ||  // chrome & ie
+                        (e.originalEvent.detail && (e.originalEvent.detail > 0 ? -1 : 1));              // firefox
+                    if(delta > 0){
+                        el.val(parseInt(el.val()) + op.step);
+                        if(op.max !=null && parseInt(el.val()) > op.max){
+                            el.val(op.max);
+                        }
+                    }else{
+                        el.val(parseInt(el.val()) - op.step);
+                        if(op.min != null && parseInt(el.val()) < op.min){
+                            el.val(op.min);
+                        }
+                    }
+                })
             }).on('blur',function () {
+                $(document).off("mousewheel DOMMouseScroll");
                 op.onBlur && op.onBlur.call(that);
                 if(op.min != null){
                     var val = that.$element.val();
@@ -61,9 +79,9 @@
 
         _button:function($p){
             var that         = this,
-                $plusButton  = $('<a href="#" class="top"><i class="fa fa-sort-up plus-button"></i></a>'),
-                $minusButton = $('<a href="#" class="bottom"><i class="fa fa-sort-down minus-button"></i></a>');
-            $p.addClass('btn-group-vertical');
+                $plusButton  = $('<a href="javascript:void(0)" class="top"><i class="fa fa-sort-up plus-button"></i></a>'),
+                $minusButton = $('<a href="javascript:void(0)" class="bottom"><i class="fa fa-sort-down minus-button"></i></a>');
+            $p.addClass("input-group-addon").addClass('btn-group-vertical');
             $plusButton.click(function(){
                 var val = that.value();
                 if(cri.isNum(val)){
@@ -107,11 +125,11 @@
             var $this   = $(this),
                 options = typeof option == 'object' && option,
                 role    = $this.attr("role");
-            widget = $this.data('widget');
+            widget = $this.data('numberInput');
             if(widget != null && widget instanceof NumberInput){
                 widget._destroy();
             }
-            $this.data('widget', (widget = new NumberInput(this, options)));
+            $this.data('numberInput', (widget = new NumberInput(this, options)));
         });
         return widget;
     };

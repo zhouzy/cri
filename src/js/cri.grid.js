@@ -192,7 +192,8 @@
         _createGrid:function(){
             var height = this.$element._getHeightPixelValue(this.options.height);
             var width  = this.$element._getWidthPixelValue(this.options.width);
-            var $grid  = $("<div></div>").addClass("grid").addClass(this._gridClassName).addClass('panel panel-default');
+            //var $grid  = $("<div></div>").addClass("grid").addClass(this._gridClassName).addClass('panel panel-default');
+            var $grid  = $("<div></div>").addClass("grid").addClass(this._gridClassName);
 
             $grid.attr("style",this.$element.attr("style")).css({width:width,height:height,display:'block'});
 
@@ -244,7 +245,9 @@
          */
         _createHead:function($parent){
             var $headWrap = $("<div></div>").addClass("grid-head-wrap"),
-                $table    = $('<table class="table table-bordered"></table>'),
+                //tableStyle = 'table table-bordered',
+                tableStyle = 'table',
+                $table    = $('<table class="'+tableStyle+'"></table>'),
                 $tr       = $("<tr></tr>"),
                 op        = this.options,
                 columns   = this._columns;
@@ -320,7 +323,9 @@
          */
         _refreshBody:function(rows){
             var self     = this,
-                $table   = $('<table class="table table-striped table-hover table-bordered"></table>'),
+                //tableStyle = 'table table-striped table-hover table-bordered',
+                tableStyle = 'table table-striped table-hover',
+                $table   = $('<table class="'+tableStyle+'"></table>'),
                 op       = this.options,
                 id       = 0,
                 lineNum  = 1 + op.pageSize * (op.page - 1),

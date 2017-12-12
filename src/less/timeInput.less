@@ -3,7 +3,6 @@
 .time-input-group.input-group{
     .form-control{
         padding-right:0;
-        background:#fff;
     }
     .input-group-btn{
         background:#fff;
@@ -23,15 +22,21 @@
     position: absolute;
     left: 80px;
     z-index: 20004;
-    width: 220px;
+    width: 260px;
     display: none;
     padding-top:5px;
+    font-size:12px;
+
+	&.show-on-above{
+		border-radius : 5px 5px 0 0;
+	}
+
     .form-inline{
         padding-left:5px;
         padding-right:5px;
     }
     .year-box{
-        width:60%;
+        width:50%;
         font-size: 12px;
     }
     input,select{
@@ -45,11 +50,19 @@
         margin-bottom:0;
     }
     .month-box{
-        margin-left:4%;
-        width:35%;
+		position: absolute;
+		right:0;
+        width:30%;
+		text-align:right;
         .form-control{
-            padding:0;
         }
+		.input-group-addon{
+			background:none;
+			border:none;
+			padding-left:0;
+			text-align:left;
+			margin-left:-10px;
+		}
     }
 
     table {
@@ -83,7 +96,7 @@
                 .rounded-corners(10px);
             }
         }
-        table td.choosed {
+        td.active{
             .day-content{
                 color:#fff;
                 background-color:@color-timeinput-timebox-day-selected;
@@ -93,16 +106,21 @@
     }
 
     .hms-bar {
+		.col-sm-4{
+			padding:0;
+		}
         .form-group{
             display:inline-block;
-            width:33%;
             font-size:12px;
-            &>.input-group{
+			.col-sm-8{
+				width:100%;
+			}
+            .input-group{
                 width:100%;
                 padding-right:5px;
-                padding-left:0;
+                padding-left:5px;
                 .input-group-addon{
-                    padding-left:2px;
+                    padding-left:0;
                     padding-right:2px;
                     height:30px;
                     font-size:12px;
@@ -111,19 +129,22 @@
                 .form-control{
                     height:30px;
                     padding:0;
-
                 }
                 .input-group-btn.btn-group-vertical{
                     height:30px;
+					border:none;
+					background:none;
                     .top,.bottom{
+						display:inline-block;
                         height:15px;
                         width:20px;
                         padding:0;
                     }
                 }
+				.input-group-btn{
+				}
             }
             &:last-child{
-                width:34%;
                 &.input-group{
                     padding-right:0;
                 }

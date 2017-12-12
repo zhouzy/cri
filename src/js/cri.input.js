@@ -22,7 +22,7 @@
         required:false
     };
 
-    var INPUT_GROUP    = "form-group",
+    var FORM_GROUP    = "form-group",
         INPUT_SELECTOR = "input:not(:button,[type=submit],[type=reset],[disabled])";
 
     var Input = cri.Widgets.extend(function(element,options){
@@ -41,7 +41,9 @@
                     that.options.onFocus && that.options.onFocus.call(that);
                 }).blur(function(){
                     that.options.onBlur && that.options.onBlur.call(that);
-                });
+                }).on('change', function() {
+					that.options.onChange && that.options.onChange.call(that);
+				});
             }
             else if(this.$element.is('select')){
                 this.$input.click(function(){
@@ -64,8 +66,9 @@
 
         _createInputGroup:function(){
             var $element = this.$element;
-            $element.wrap('<div class="'+ INPUT_GROUP + '"></div>');
+            $element.wrap('<div class="'+ FORM_GROUP + '"></div>');
             this.$inputGroup = $element.parent();
+            this.$element.wrap('<div class="col-sm-8"></div>');//此处用于 4 8布局的输入框
             this._wrapInput();
             this._label();
             this.options.enable || this.disable();
@@ -82,7 +85,7 @@
                     $input.prop('readonly',true);
                 }
                 else{
-                    var $static = $('<span class="form-control-static"></span>');
+                    var $static = $('<input class="form-control" readonly/>');
                     this.$element.after($static);
                     $input = $static;
                 }
@@ -105,7 +108,7 @@
                 button = [button];
             }
             var $button = button.map(function(button){
-                var $btn = $('<button class="btn btn-sm"></button>');
+                var $btn = $('<button class="btn"></button>');
                 $btn.btn({
                     text:button.text, iconCls:button.iconCls,
                     handler:function(){
@@ -126,7 +129,8 @@
                 $input = this.$input;
             label = "" + label;
             if(label.length){
-                var $label = $('<label class="control-label">' + label + '</label>');
+                //var $label = $('<label class="control-label">' + label + '</label>');
+                var $label = $('<label class="control-label col-sm-4 col-md-4">' + label + '</label>');//用于 4 8 布局的input
                 if(this.options.required){
                     $label.addClass('required');
                 }
@@ -143,13 +147,13 @@
             if(value == null){
                 return ;
             }
-            if(this.$input.is(INPUT_SELECTOR)){
+            if(this.$element.is('select')){
+                this.$element.val(value);
+                this.$input.val(this.$element.find("option:selected").text());
+            }
+            else if(this.$input.is(INPUT_SELECTOR)){
                 this.$input.val(value);
                 this.$input.change();
-            }
-            else if(this.$element.is('select')){
-                this.$element.val(value);
-                this.$input.text(this.$element.find("option:selected").text());
             }
         },
 
