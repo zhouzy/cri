@@ -471,7 +471,7 @@
                 wnd     = $this.data('window'),
                 options = typeof option == 'object' && option;
             if(wnd != null) {
-                wnd.close();
+                wnd._destroy();
             }
             $this.data('window', (o = new Window(this, options)));
         });

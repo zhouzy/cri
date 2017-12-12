@@ -44,31 +44,34 @@
 </div>
 </div>
 <script>
-    var win1 = $("#window1").window({
-        title:"window1",
-        actions:["Maximize","Close","Minimize"],
-        visible:true
-    });
-    var win2 = $("#window2").window({
-        title:"window2",
-        modal:true,
-        visible:true
-    });
-
-    var win3 = $("#window3").window({
-        title:"window3",
-        modal:true
-    });
-    var win4 = $("#window4").window({
-        title:"window4"
-    });
-    var win5 = $("#window5").window({
+//    var win1 = $("#window1").window({
+//        title:"window1",
+//        actions:["Maximize","Close","Minimize"],
+//        visible:true
+//    });
+//    var win2 = $("#window2").window({
+//        title:"window2",
+//        modal:true,
+//        visible:true
+//    });
+//
+//    var win3 = $("#window3").window({
+//        title:"window3",
+//        modal:true
+//    });
+//    var win4 = $("#window4").window({
+//        title:"window4"
+//    });
+//    var win5 = $("#window5").window({
+//        title:"window5",
+//        modal:true
+//    });
+    var win = $("#inputWin").window({
         title:"window5",
-        modal:true
-    });
-    $("#inputWin").window({
-        title:"window5",
         modal:true,
+        content : './windowContent.html',
+        isIframe:true,
+        visible:true,
         onReady:function(){
             $("[name=input]").input();
             $("[name=timeInput]").timeInput();
@@ -76,9 +79,12 @@
             $("#button").button();
         }
     });
-    $("#inputWin").window({
+    win = $("#inputWin").window({
         title:"window5",
         modal:true,
+        content : './windowContent.html',
+        isIframe:true,
+        visible:true,
         onReady:function(){
             $("[name=input]").input();
             $("[name=timeInput]").timeInput();
@@ -86,6 +92,7 @@
             $("#button").button();
         }
     });
+    win.open();
 </script>
 </body>
 </html>
